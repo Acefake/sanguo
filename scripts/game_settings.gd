@@ -14,7 +14,7 @@ func _ready() -> void:
 	store = get_node("/root/GameState")
 	window = Window.new()
 	window.title = "游戏主设置 · 武将智能体"
-	window.size = Vector2i(640, 600)
+	window.size = Vector2i(640, 720)
 	window.transient = true
 	window.exclusive = true
 	window.visible = false
@@ -24,9 +24,12 @@ func _ready() -> void:
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	panel.add_theme_stylebox_override("panel", CitySkin.paper(1.0, 20))
 	window.add_child(panel)
+	var scroll := ScrollContainer.new()
+	panel.add_child(scroll)
 	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 10)
-	panel.add_child(rows)
+	scroll.add_child(rows)
 	_label(rows, "武将智能体")
 	_label(rows, "每位武将独立判断，共用下方模型服务；未启用或请求失败时由本地策略接管。")
 	enabled = CheckButton.new()
@@ -53,6 +56,22 @@ func _ready() -> void:
 	CitySkin.style_button(close)
 	close.pressed.connect(window.hide)
 	rows.add_child(close)
+	var battle := Button.new()
+	battle.text = "小沛中型对战 · 全武将出阵／重置"
+	CitySkin.style_button(battle)
+	battle.pressed.connect(func():
+		if store.busy: notice.text = "请先完成本轮推进。"
+		else: store.start_battle_test()
+	)
+	rows.add_child(battle)
+	var back := Button.new()
+	back.text = "结束测试，返回原战役"
+	CitySkin.style_button(back)
+	back.pressed.connect(func():
+		if store.busy: notice.text = "请先完成本轮推进。"
+		elif store.battle_test: store.leave_battle_test()
+	)
+	rows.add_child(back)
 
 func open() -> void:
 	enabled.button_pressed = store.agent.enabled

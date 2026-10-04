@@ -58,6 +58,18 @@ func _ready() -> void:
 		if not store.busy: refresh()
 	)
 	refresh()
+	if store.battle_test: call_deferred("_focus_battle")
+
+func _focus_battle() -> void:
+	var center := Vector3.ZERO
+	for position in destinations.values(): center += position
+	center /= maxf(destinations.size(), 1)
+	map.camera_target = center
+	map.target_goal = center
+	map.distance = 270
+	map.distance_goal = 270
+	map.pitch = deg_to_rad(58)
+	map._update_camera()
 
 func _load_mesh() -> void:
 	var document := GLTFDocument.new()
@@ -104,6 +116,14 @@ func refresh() -> void:
 			if not observed_enemies.has(id) or int(observed["observed_at"]) > int(observed_enemies[id]["observed_at"]): observed_enemies[id] = observed
 	for observed in observed_enemies.values():
 		entries.append({"id": observed["id"], "name": "敌军", "faction": "observed_enemy", "location": observed["location"], "strength_estimate": observed["strength_estimate"], "morale": 0, "returning": observed["routing"]})
+	if store.battle_test:
+		entries = []
+		for original in store.war.active_armies():
+			var entry: Dictionary = original.duplicate(false)
+			if original["faction"] != store.war.state["player_faction"]:
+				entry["faction"] = "observed_enemy"
+				entry["strength_estimate"] = store.war.Combat.strength(original)
+			entries.append(entry)
 	for army in entries:
 		var id: String = army["id"]
 		var enemy: bool = army["faction"] == "observed_enemy"
@@ -112,7 +132,8 @@ func refresh() -> void:
 			army_choice.add_item(str(army["name"]) + "队" + (" · 撤退" if army["returning"] else ""))
 			army_choice.set_item_metadata(army_choice.item_count - 1, id)
 		var target: Vector3 = world_position(army["location"])
-		if enemy: target += Vector3(8, 0, -6)
+		if store.battle_test: target += store.battle_offsets.get(id, Vector3.ZERO)
+		elif enemy: target += Vector3(8, 0, -6)
 		destinations[id] = target
 		if not formations.has(id):
 			var group := Node3D.new()
@@ -302,6 +323,12 @@ func show_enemy(id: String) -> void:
 	ui.heading.text = "敌军侦察情报"
 	ui.drawer.show()
 	ui._clear()
+	if store.battle_test:
+		var army: Dictionary = store.war.state["armies"].get(id, {})
+		ui.heading.text = str(army.get("name", "敌军")) + "队 · 测试观察"
+		ui.body.add_child(ui._label("主将判断：" + str(army.get("last_reason", "")), 18))
+		for record in army.get("decision_history", []).slice(-5):
+			ui.body.add_child(ui._label("第%d日 · %s · %s" % [record["tick"], record["source"], record["candidate_id"]], 15))
 	ui.body.add_child(ui._label("估计兵力：约 %d\n误差：约 %d 人\n观察位置：%s\n情报距今：%d 日\n状态：%s" % [int(observed["strength_estimate"]), int(observed["uncertainty"]), store.war.graph.name_of(str(observed["location"]["node"])), int(store.war.state["tick"]) - int(observed["observed_at"]), "撤退中" if observed["routing"] else "未见撤退"], 19))
 
 func deploy_city(city: String) -> void:

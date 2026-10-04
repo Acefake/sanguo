@@ -42,6 +42,41 @@ var time_phase := "strategy"
 var turn_days_done := 0
 var turn_days_total := 0
 var settings_menu: CanvasLayer
+var battle_test := false
+var battle_offsets: Dictionary = {}
+var battle_snapshot: Dictionary = {}
+
+func start_battle_test() -> void:
+	if busy: return
+	prepare_battle_test()
+	if is_instance_valid(settings_menu): settings_menu.window.hide()
+	get_tree().change_scene_to_file("res://scenes/rtk14_world_3d.tscn")
+
+func prepare_battle_test() -> void:
+	if not battle_test:
+		_save()
+		battle_snapshot = {"scenario": scenario.duplicate(true), "war": war.export_state(), "year": year, "month": month, "day": day, "action_points": action_points, "chronicles": chronicles.duplicate(true), "persist": persist_enabled}
+	battle_test = true
+	persist_enabled = false
+	battle_offsets.clear()
+	preload("res://scripts/war/xiaopei_battle.gd").setup(self)
+
+func leave_battle_test() -> void:
+	if busy or not battle_test: return
+	_load_demo()
+	scenario = battle_snapshot["scenario"]
+	war.setup(self, battle_snapshot["war"])
+	year = battle_snapshot["year"]
+	month = battle_snapshot["month"]
+	day = battle_snapshot["day"]
+	action_points = battle_snapshot["action_points"]
+	chronicles = battle_snapshot["chronicles"]
+	persist_enabled = battle_snapshot["persist"]
+	battle_test = false
+	battle_offsets.clear()
+	battle_snapshot.clear()
+	settings_menu.window.hide()
+	get_tree().change_scene_to_file("res://scenes/rtk14_world_3d.tscn")
 
 func open_settings() -> void:
 	if not is_instance_valid(settings_menu):
@@ -77,6 +112,7 @@ func _ready() -> void:
 	agent = AgentAdapter.new()
 	add_child(agent)
 	agent.load_settings()
+	if "--xiaopei-battle" in OS.get_cmdline_user_args(): prepare_battle_test()
 
 
 func _load_demo() -> void:

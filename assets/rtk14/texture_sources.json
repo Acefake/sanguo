@@ -1,0 +1,827 @@
+{
+  "023bc254": {
+    "g1t": "7c0c0379",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/023bc254.png"
+  },
+  "02c31398": {
+    "g1t": "be7dd0b5",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/02c31398.png"
+  },
+  "043016f4": {
+    "g1t": "e8f3b2d9",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/043016f4.png"
+  },
+  "0885a18c": {
+    "g1t": "1ca9bf41",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/0885a18c.png"
+  },
+  "08eb871f": {
+    "g1t": "114b348e",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/08eb871f.png"
+  },
+  "0c68742d": {
+    "g1t": "4f5bb640",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/0c68742d.png"
+  },
+  "0c9813e4": {
+    "g1t": "6a3a7be9",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/0c9813e4.png"
+  },
+  "0d4a4b47": {
+    "g1t": "4a1bd166",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/0d4a4b47.png"
+  },
+  "0fe26c97": {
+    "g1t": "437f1216",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/0fe26c97.png"
+  },
+  "107048e2": {
+    "g1t": "26245bab",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/107048e2.png"
+  },
+  "15d1803b": {
+    "g1t": "23ae78f2",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/15d1803b.png"
+  },
+  "1707c20e": {
+    "g1t": "e88679ff",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/1707c20e.png"
+  },
+  "195da555": {
+    "g1t": "f1bb0618",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/195da555.png"
+  },
+  "1a6c9777": {
+    "g1t": "f7a61336",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/1a6c9777.png"
+  },
+  "1c6e24c8": {
+    "g1t": "e4d36d85",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/1c6e24c8.png"
+  },
+  "1f3e9f7b": {
+    "g1t": "f91121b2",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/1f3e9f7b.png"
+  },
+  "201fc3c4": {
+    "g1t": "ab701809",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/201fc3c4.png"
+  },
+  "21d8c456": {
+    "g1t": "3c024cb7",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/21d8c456.png"
+  },
+  "27cfcb55": {
+    "g1t": "dd5ea018",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/27cfcb55.png"
+  },
+  "2931d459": {
+    "g1t": "c03f4d94",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/2931d459.png"
+  },
+  "2a56b054": {
+    "g1t": "436bd579",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/2a56b054.png"
+  },
+  "2e0872d7": {
+    "g1t": "803c33d6",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/2e0872d7.png"
+  },
+  "2fa29f73": {
+    "g1t": "898cf4ba",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/2fa29f73.png"
+  },
+  "2fecfeda": {
+    "g1t": "8a8738b3",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/2fecfeda.png"
+  },
+  "323fdc60": {
+    "g1t": "858a6ced",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/323fdc60.png"
+  },
+  "35bcc96e": {
+    "g1t": "c39aee9f",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/35bcc96e.png"
+  },
+  "36461a90": {
+    "g1t": "2661fcbd",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/36461a90.png"
+  },
+  "38b904bf": {
+    "g1t": "89e05aee",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/38b904bf.png"
+  },
+  "39f9f202": {
+    "g1t": "3d72068b",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/39f9f202.png"
+  },
+  "3c1d6eef": {
+    "g1t": "8d113ebe",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/3c1d6eef.png"
+  },
+  "3cf6d1e1": {
+    "g1t": "f02c6d0c",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/3cf6d1e1.png"
+  },
+  "3cf781c0": {
+    "g1t": "1b55038d",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/3cf781c0.png"
+  },
+  "3e1b82cb": {
+    "g1t": "40f2e062",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/3e1b82cb.png"
+  },
+  "3f25504b": {
+    "g1t": "d50d02e2",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/3f25504b.png"
+  },
+  "4185e7f9": {
+    "g1t": "bd599df4",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/4185e7f9.png"
+  },
+  "42022dc9": {
+    "g1t": "46260a24",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/42022dc9.png"
+  },
+  "42b1fa96": {
+    "g1t": "65fa3e77",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/42b1fa96.png"
+  },
+  "430c0297": {
+    "g1t": "52413c16",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/430c0297.png"
+  },
+  "43142655": {
+    "g1t": "9e9a2518",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/43142655.png"
+  },
+  "434d52f8": {
+    "g1t": "27180d55",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/434d52f8.png"
+  },
+  "45ceaf5f": {
+    "g1t": "ff2a744e",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/45ceaf5f.png"
+  },
+  "46457e63": {
+    "g1t": "efd01bca",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/46457e63.png"
+  },
+  "481d4c3a": {
+    "g1t": "f98a2753",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/481d4c3a.png"
+  },
+  "4b86cb02": {
+    "g1t": "f829cd8b",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/4b86cb02.png"
+  },
+  "4c17ccbd": {
+    "g1t": "673e87b0",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/4c17ccbd.png"
+  },
+  "50bb7d92": {
+    "g1t": "a0a184fb",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/50bb7d92.png"
+  },
+  "5177b6a2": {
+    "g1t": "79e645eb",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5177b6a2.png"
+  },
+  "5605d7c6": {
+    "g1t": "58228f47",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5605d7c6.png"
+  },
+  "5638c6a7": {
+    "g1t": "0e235206",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5638c6a7.png"
+  },
+  "57c8f5a3": {
+    "g1t": "1acb6c8a",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/57c8f5a3.png"
+  },
+  "5abf97c7": {
+    "g1t": "3a74d4e6",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5abf97c7.png"
+  },
+  "5d68d197": {
+    "g1t": "8df0cd16",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5d68d197.png"
+  },
+  "5efbaf67": {
+    "g1t": "14bda146",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5efbaf67.png"
+  },
+  "5fa8dd9d": {
+    "g1t": "912c62d0",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5fa8dd9d.png"
+  },
+  "5fc6cfc8": {
+    "g1t": "303ca285",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5fc6cfc8.png"
+  },
+  "60bae165": {
+    "g1t": "6a0fa408",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/60bae165.png"
+  },
+  "622552f7": {
+    "g1t": "350c07b6",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/622552f7.png"
+  },
+  "65fc2e04": {
+    "g1t": "726955c9",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/65fc2e04.png"
+  },
+  "679636ca": {
+    "g1t": "a778a6c3",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/679636ca.png"
+  },
+  "67e036dc": {
+    "g1t": "0f170bf1",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/67e036dc.png"
+  },
+  "68325814": {
+    "g1t": "8c1fc5b9",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/68325814.png"
+  },
+  "68a5f953": {
+    "g1t": "04e326da",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/68a5f953.png"
+  },
+  "6ada3d3a": {
+    "g1t": "3198d653",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/6ada3d3a.png"
+  },
+  "6b30e094": {
+    "g1t": "1ae10d39",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/6b30e094.png"
+  },
+  "6c064fd7": {
+    "g1t": "da3976d6",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/6c064fd7.png"
+  },
+  "6db1553b": {
+    "g1t": "5adcc3f2",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/6db1553b.png"
+  },
+  "71e749fd": {
+    "g1t": "e18f9270",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/71e749fd.png"
+  },
+  "7742ffd5": {
+    "g1t": "1ff2bb98",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/7742ffd5.png"
+  },
+  "78d5dda5": {
+    "g1t": "a6bf8fc8",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/78d5dda5.png"
+  },
+  "79172e06": {
+    "g1t": "7b966107",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/79172e06.png"
+  },
+  "7b988a6d": {
+    "g1t": "53a8c800",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/7b988a6d.png"
+  },
+  "7bcccfa8": {
+    "g1t": "6f75eea5",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/7bcccfa8.png"
+  },
+  "80719106": {
+    "g1t": "eca8de07",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/80719106.png"
+  },
+  "807b1441": {
+    "g1t": "b01d86ac",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/807b1441.png"
+  },
+  "807dda9e": {
+    "g1t": "d49a8b6f",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/807dda9e.png"
+  },
+  "811d4ae4": {
+    "g1t": "8f0aa4e9",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/811d4ae4.png"
+  },
+  "81e7ee19": {
+    "g1t": "22da0bd4",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/81e7ee19.png"
+  },
+  "82a44733": {
+    "g1t": "b2dae4fa",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/82a44733.png"
+  },
+  "82a7bb16": {
+    "g1t": "065f4df7",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/82a7bb16.png"
+  },
+  "832137f3": {
+    "g1t": "d8282c3a",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/832137f3.png"
+  },
+  "8413ed08": {
+    "g1t": "aeb40d45",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/8413ed08.png"
+  },
+  "846cd8f0": {
+    "g1t": "ddaa1a5d",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/846cd8f0.png"
+  },
+  "8512f66a": {
+    "g1t": "9431cb23",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/8512f66a.png"
+  },
+  "87103aeb": {
+    "g1t": "ff09dc42",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/87103aeb.png"
+  },
+  "879739a9": {
+    "g1t": "9073ca44",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/879739a9.png"
+  },
+  "8cee875c": {
+    "g1t": "b48d8b71",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/8cee875c.png"
+  },
+  "8f43e0b2": {
+    "g1t": "83c6b5db",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/8f43e0b2.png"
+  },
+  "8ffdc519": {
+    "g1t": "fb9d94d4",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/8ffdc519.png"
+  },
+  "906b746a": {
+    "g1t": "f29e0d23",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/906b746a.png"
+  },
+  "90a09125": {
+    "g1t": "d9268c48",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/90a09125.png"
+  },
+  "9332aca5": {
+    "g1t": "e26f20c8",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/9332aca5.png"
+  },
+  "93455e3c": {
+    "g1t": "bc2f6091",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/93455e3c.png"
+  },
+  "942e927b": {
+    "g1t": "a5d80eb2",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/942e927b.png"
+  },
+  "9572b8ab": {
+    "g1t": "e5aab682",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/9572b8ab.png"
+  },
+  "96cc19eb": {
+    "g1t": "bc145d42",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/96cc19eb.png"
+  },
+  "97ef2e05": {
+    "g1t": "898a5b68",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/97ef2e05.png"
+  },
+  "99d2c565": {
+    "g1t": "a75a4008",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/99d2c565.png"
+  },
+  "9c44bd3a": {
+    "g1t": "f73e5653",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/9c44bd3a.png"
+  },
+  "9d1d1e18": {
+    "g1t": "809ed635",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/9d1d1e18.png"
+  },
+  "a160d8a9": {
+    "g1t": "d0c88b44",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/a160d8a9.png"
+  },
+  "a44f9430": {
+    "g1t": "a224a71d",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/a44f9430.png"
+  },
+  "a77bf71a": {
+    "g1t": "842ca873",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/a77bf71a.png"
+  },
+  "aa71a025": {
+    "g1t": "0349dd48",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/aa71a025.png"
+  },
+  "ad0cdae3": {
+    "g1t": "74710f4a",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/ad0cdae3.png"
+  },
+  "ad684249": {
+    "g1t": "22f345a4",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/ad684249.png"
+  },
+  "af1375d7": {
+    "g1t": "792210d6",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/af1375d7.png"
+  },
+  "b0f891e1": {
+    "g1t": "0602ad0c",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/b0f891e1.png"
+  },
+  "b1ea9eca": {
+    "g1t": "97ed3ec3",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/b1ea9eca.png"
+  },
+  "b61eeb78": {
+    "g1t": "894044d5",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/b61eeb78.png"
+  },
+  "b642dc9d": {
+    "g1t": "28ccc3d0",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/b642dc9d.png"
+  },
+  "b6603bd9": {
+    "g1t": "5e171614",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/b6603bd9.png"
+  },
+  "b90acce2": {
+    "g1t": "b2b057ab",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/b90acce2.png"
+  },
+  "b9bfc9ab": {
+    "g1t": "66dd4582",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/b9bfc9ab.png"
+  },
+  "bcda15f9": {
+    "g1t": "53882ff4",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/bcda15f9.png"
+  },
+  "c0206f2c": {
+    "g1t": "305395a1",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/c0206f2c.png"
+  },
+  "c380cc11": {
+    "g1t": "6381c0dc",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/c380cc11.png"
+  },
+  "c5ec268e": {
+    "g1t": "6857657f",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/c5ec268e.png"
+  },
+  "cbe7847a": {
+    "g1t": "b43c5713",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/cbe7847a.png"
+  },
+  "cc95f4f9": {
+    "g1t": "1092b0f4",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/cc95f4f9.png"
+  },
+  "cd10001b": {
+    "g1t": "e57f4512",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/cd10001b.png"
+  },
+  "cfccdf8e": {
+    "g1t": "82874c7f",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/cfccdf8e.png"
+  },
+  "d1564f6c": {
+    "g1t": "fb2b1d61",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/d1564f6c.png"
+  },
+  "d20e9848": {
+    "g1t": "4bbcaa05",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/d20e9848.png"
+  },
+  "d2bbc67e": {
+    "g1t": "c82b6b8f",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/d2bbc67e.png"
+  },
+  "d3802fe4": {
+    "g1t": "2cefdfe9",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/d3802fe4.png"
+  },
+  "d68c9ae2": {
+    "g1t": "675549ab",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/d68c9ae2.png"
+  },
+  "d8c17c83": {
+    "g1t": "354991aa",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/d8c17c83.png"
+  },
+  "dca7b953": {
+    "g1t": "1ab966da",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/dca7b953.png"
+  },
+  "ddf62f13": {
+    "g1t": "ddc1491a",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/ddf62f13.png"
+  },
+  "df9731de": {
+    "g1t": "9d0bfc2f",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/df9731de.png"
+  },
+  "e007a52d": {
+    "g1t": "cf302540",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/e007a52d.png"
+  },
+  "e3141eec": {
+    "g1t": "db1c7de1",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/e3141eec.png"
+  },
+  "e31505d1": {
+    "g1t": "20b25f1c",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/e31505d1.png"
+  },
+  "e44b58b0": {
+    "g1t": "345a329d",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/e44b58b0.png"
+  },
+  "e7e08ff1": {
+    "g1t": "634fc8fc",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/e7e08ff1.png"
+  },
+  "e974c46d": {
+    "g1t": "a492ce00",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/e974c46d.png"
+  },
+  "ea55e8b6": {
+    "g1t": "56f1c457",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/ea55e8b6.png"
+  },
+  "ebe8c686": {
+    "g1t": "ddbe9887",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/ebe8c686.png"
+  },
+  "ec2a16e7": {
+    "g1t": "b29569c6",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/ec2a16e7.png"
+  },
+  "edf592e6": {
+    "g1t": "a72f6827",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/edf592e6.png"
+  },
+  "ef41eca5": {
+    "g1t": "5c27e0c8",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/ef41eca5.png"
+  },
+  "f336df85": {
+    "g1t": "af8919e8",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/f336df85.png"
+  },
+  "f56d0995": {
+    "g1t": "c93f89d8",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/f56d0995.png"
+  },
+  "f5ea4a3a": {
+    "g1t": "84d1e953",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/f5ea4a3a.png"
+  },
+  "f6143cf8": {
+    "g1t": "9b356355",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/f6143cf8.png"
+  },
+  "f83e97c9": {
+    "g1t": "2bbde024",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/f83e97c9.png"
+  },
+  "fa2323cc": {
+    "g1t": "3608e501",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/fa2323cc.png"
+  },
+  "fb0ae75f": {
+    "g1t": "1ca93c4e",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/fb0ae75f.png"
+  },
+  "fb649564": {
+    "g1t": "07c66a69",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/fb649564.png"
+  },
+  "fbb6019c": {
+    "g1t": "bcd5b931",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/fbb6019c.png"
+  },
+  "fc20a3e3": {
+    "g1t": "c8a7e64a",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/fc20a3e3.png"
+  },
+  "fc413a3e": {
+    "g1t": "30510fcf",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/fc413a3e.png"
+  },
+  "971246b0": {
+    "g1t": "788e049d",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/971246b0.png"
+  },
+  "791a448a": {
+    "g1t": "67c1f103",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/791a448a.png"
+  },
+  "4795545b": {
+    "g1t": "35f3d8d2",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/4795545b.png"
+  },
+  "cbc2ef0c": {
+    "g1t": "504061c1",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/cbc2ef0c.png"
+  },
+  "9a3dfedd": {
+    "g1t": "1e724990",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/9a3dfedd.png"
+  },
+  "a26e99cb": {
+    "g1t": "dc012962",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/a26e99cb.png"
+  },
+  "70e9a99c": {
+    "g1t": "aa331131",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/70e9a99c.png"
+  },
+  "c0abe095": {
+    "g1t": "eb7a12d8",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/c0abe095.png"
+  },
+  "2ccc9547": {
+    "g1t": "6f79c766",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/2ccc9547.png"
+  },
+  "5b5fcfb3": {
+    "g1t": "b2ff2c7a",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/5b5fcfb3.png"
+  },
+  "112a08e5": {
+    "g1t": "30deac88",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/112a08e5.png"
+  },
+  "7b94dda7": {
+    "g1t": "bac89b06",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/7b94dda7.png"
+  },
+  "6d9893b5": {
+    "g1t": "947cf3b8",
+    "slot": 0,
+    "path": "res://assets/rtk14/textures/6d9893b5.png"
+  }
+}

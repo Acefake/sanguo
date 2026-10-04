@@ -1,0 +1,72 @@
+shader_type spatial;
+render_mode cull_back;
+uniform sampler2D world_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_disable;
+uniform sampler2D world_normal_texture : hint_normal, filter_linear_mipmap_anisotropic, repeat_disable;
+uniform sampler2D cliff_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D cliff_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D terrain_control : filter_nearest, repeat_disable;
+uniform sampler2D rock_grading_mask : filter_linear, repeat_disable;
+uniform sampler2DArray terrain_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2DArray terrain_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform vec4 map_bounds = vec4(0.0, 0.0, 2048.0, 2048.0);
+varying vec3 world_position;
+varying vec3 world_normal;
+varying float view_distance;
+const int LAYER_LOOKUP[17] = int[17](12,16,15,10,9,11,8,17,13,14,18,0,4,3,2,-1,6);
+
+void vertex() {
+    world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+    world_normal = MODEL_NORMAL_MATRIX * NORMAL;
+    view_distance = length((VIEW_MATRIX * vec4(world_position, 1.0)).xyz);
+}
+
+void fragment() {
+    vec3 n = normalize(world_normal);
+    vec2 map_uv = (world_position.xz - map_bounds.xy) / map_bounds.zw;
+    // Preserve native exposed ground, forest floor and field placement.
+    vec3 base = texture(world_albedo, map_uv).rgb;
+    vec3 detail = texture(world_normal_texture, map_uv).rgb * 2.0 - 1.0;
+    int terrain_class = int(round(texture(terrain_control, map_uv).r * 255.0));
+    float fine_amount = 1.0 - smoothstep(140.0, 480.0, view_distance);
+    if (fine_amount > 0.001) {
+        if (terrain_class < 17 && LAYER_LOOKUP[terrain_class] >= 0) {
+            float layer = float(LAYER_LOOKUP[terrain_class]);
+            vec3 tile_uv = vec3(world_position.xz / 60.0, layer);
+            vec3 fine_color = texture(terrain_albedo, tile_uv).rgb;
+            vec3 baked_detail = textureLod(terrain_albedo, tile_uv, 3.0).rgb;
+            // Add the frequencies missing from the 4096px bake without moving
+            // roads, fields, forest-floor patches or their soft native edges.
+            base *= mix(vec3(1.0), clamp(fine_color / max(baked_detail, vec3(0.01)),
+                vec3(0.5), vec3(1.8)), fine_amount * 0.8);
+            detail = mix(detail, texture(terrain_normal, tile_uv).rgb * 2.0 - 1.0,
+                fine_amount * 0.65);
+        }
+    }
+    vec3 tangent = normalize(vec3(n.y, -n.x, 0.0));
+    vec3 bitangent = normalize(vec3(0.0, -n.z, n.y));
+    vec3 surface_normal = normalize(n * max(detail.z, 0.3) +
+        (tangent * detail.x + bitangent * detail.y) * 0.55);
+    float cliff = smoothstep(0.20, 0.65, 1.0 - n.y);
+    // Project the native vertical cliff texture onto steep terrain sides.
+    float side_x = abs(n.x) / max(abs(n.x) + abs(n.z), 0.001);
+    vec2 uv_x = world_position.zy / 24.0;
+    vec2 uv_z = world_position.xy / 24.0;
+    vec3 stone = mix(texture(cliff_albedo, uv_z).rgb,
+                     texture(cliff_albedo, uv_x).rgb, side_x);
+    // Share the source mountain meshes' rock grading for continuous cliff faces.
+    stone = mix(vec3(dot(stone, vec3(0.299,0.587,0.114))), stone, 0.4) * 1.18
+        + vec3(0.004,0.005,0.006);
+    vec3 graded_base = mix(vec3(dot(base, vec3(0.299,0.587,0.114))), base, 0.4) * 1.18
+        + vec3(0.004,0.005,0.006);
+    // Color grading needs a soft boundary; never expose the discrete index
+    // map as a hard grey/green edge along a cliff shoulder.
+    base = mix(base, graded_base, texture(rock_grading_mask, map_uv).r);
+    vec3 nx = texture(cliff_normal, uv_x).rgb * 2.0 - 1.0;
+    vec3 nz = texture(cliff_normal, uv_z).rgb * 2.0 - 1.0;
+    vec3 cliff_detail = mix(vec3(nz.x, nz.y, 0.0), vec3(0.0, nx.y, nx.x), side_x);
+    surface_normal = normalize(mix(surface_normal, n + cliff_detail * 0.45, cliff));
+    NORMAL = normalize((VIEW_MATRIX * vec4(surface_normal, 0.0)).xyz);
+    ALBEDO = mix(base, stone, cliff);
+    ROUGHNESS = 0.95;
+    SPECULAR = 0.12;
+}

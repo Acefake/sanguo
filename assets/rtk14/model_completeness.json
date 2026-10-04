@@ -1,0 +1,408 @@
+[
+  {
+    "model": "0113b89c",
+    "submeshes": 1,
+    "triangles": 10,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "03283f62",
+    "submeshes": 4,
+    "triangles": 1181,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "0826cf83",
+    "submeshes": 13,
+    "triangles": 12273,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "0af68ace",
+    "submeshes": 1,
+    "triangles": 32,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "14d3de0c",
+    "submeshes": 1,
+    "triangles": 510,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "1806dd8b",
+    "submeshes": 4,
+    "triangles": 1286,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "24d0b90c",
+    "submeshes": 2,
+    "triangles": 26,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "3bf95ce9",
+    "submeshes": 19,
+    "triangles": 6423,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "3eaae74a",
+    "submeshes": 3,
+    "triangles": 106,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "48eaf4e3",
+    "submeshes": 18,
+    "triangles": 8876,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "4b17a777",
+    "submeshes": 1,
+    "triangles": 593,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "571f6002",
+    "submeshes": 3,
+    "triangles": 4895,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "58851588",
+    "submeshes": 3,
+    "triangles": 58,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "5b5c506d",
+    "submeshes": 1,
+    "triangles": 638,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "790cf38a",
+    "submeshes": 14,
+    "triangles": 5752,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "84e24956",
+    "submeshes": 1,
+    "triangles": 712,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "85fe8b84",
+    "submeshes": 14,
+    "triangles": 7550,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "90ca3c38",
+    "submeshes": 7,
+    "triangles": 643,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "97e3a1ed",
+    "submeshes": 1,
+    "triangles": 16,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "b1bdd02b",
+    "submeshes": 1,
+    "triangles": 64,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "beaceb35",
+    "submeshes": 1,
+    "triangles": 729,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "c642bf49",
+    "submeshes": 4,
+    "triangles": 1181,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "cb1338e2",
+    "submeshes": 17,
+    "triangles": 16971,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "cb97fe69",
+    "submeshes": 3,
+    "triangles": 116,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "ce4b6bab",
+    "submeshes": 1,
+    "triangles": 742,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "d9ddec3d",
+    "submeshes": 4,
+    "triangles": 1346,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "e5722ca7",
+    "submeshes": 3,
+    "triangles": 164,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "e8a8567b",
+    "submeshes": 4,
+    "triangles": 992,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "8dffa241",
+    "submeshes": 14,
+    "triangles": 14205,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "0bd75e42",
+    "submeshes": 18,
+    "triangles": 9819,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "fee5c648",
+    "submeshes": 19,
+    "triangles": 8326,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "bec43d7a",
+    "submeshes": 2,
+    "triangles": 438,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "f00d8b9a",
+    "submeshes": 4,
+    "triangles": 830,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "b75f085b",
+    "submeshes": 4,
+    "triangles": 971,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "a8949e1d",
+    "submeshes": 4,
+    "triangles": 1299,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "d3d20e5c",
+    "submeshes": 2,
+    "triangles": 282,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "99ca33df",
+    "submeshes": 4,
+    "triangles": 1286,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "9ca0771c",
+    "submeshes": 4,
+    "triangles": 778,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "7f0ba2a0",
+    "submeshes": 4,
+    "triangles": 1286,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "f772c0b9",
+    "submeshes": 4,
+    "triangles": 666,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "50ec0ba0",
+    "submeshes": 12,
+    "triangles": 3201,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "13d874ff",
+    "submeshes": 12,
+    "triangles": 3585,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "32779e6d",
+    "submeshes": 2,
+    "triangles": 353,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "5d20da2c",
+    "submeshes": 1,
+    "triangles": 144,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "4108f1af",
+    "submeshes": 2,
+    "triangles": 148,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "e0e163df",
+    "submeshes": 4,
+    "triangles": 1181,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "c0008e34",
+    "submeshes": 4,
+    "triangles": 1286,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "6c07a9c7",
+    "submeshes": 4,
+    "triangles": 1299,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "5d3d3f89",
+    "submeshes": 4,
+    "triangles": 1286,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "573507b5",
+    "submeshes": 1,
+    "triangles": 5300,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "d6302d91",
+    "submeshes": 4,
+    "triangles": 992,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "c765c353",
+    "submeshes": 4,
+    "triangles": 1346,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "1d6a65d6",
+    "submeshes": 1,
+    "triangles": 3180,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "e39fc3f7",
+    "submeshes": 1,
+    "triangles": 4240,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "5816f8ce",
+    "submeshes": 7,
+    "triangles": 3662,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "d62ac9f7",
+    "submeshes": 1,
+    "triangles": 6,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "60a6b539",
+    "submeshes": 1,
+    "triangles": 30,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  },
+  {
+    "model": "c159e572",
+    "submeshes": 3,
+    "triangles": 282,
+    "complete": true,
+    "source_draw_ranges_verified": true
+  }
+]

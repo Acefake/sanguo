@@ -1,0 +1,47 @@
+{
+  "world_source": "field-textures/239167e0.g1t",
+  "world_sha256": "9205d5f0914a6d4227ca7048786bbbedc93aeef860c4a766e7636f6714418948",
+  "world_resolution": [
+    4096,
+    4096
+  ],
+  "height_variant_verified": true,
+  "world_roles": {
+    "2": "albedo/occlusion",
+    "3": "normal/height",
+    "4": "reflectance/linear roughness"
+  },
+  "array_source": "field-textures/57ee6cea.g1t",
+  "array_sha256": "a453afafd96870f5305b7eb3d52a56a84daaea1a811b7613e0ff1489b86beabf",
+  "array_resolution": [
+    1024,
+    1024
+  ],
+  "array_slices": 19,
+  "array_layout": "mip-major: 19 contiguous slices at each mip size",
+  "godot_layer_bytes": 1398128,
+  "control_b_to_layer": [
+    12,
+    16,
+    15,
+    10,
+    9,
+    11,
+    8,
+    17,
+    13,
+    14,
+    18,
+    0,
+    4,
+    3,
+    2,
+    5,
+    6,
+    7
+  ],
+  "mapping_status": "All 18 material hashes matched to the native 19-slice array",
+  "runtime": "Three native arrays and three world maps; PB2LS-derived material blending",
+  "unresolved": "Complete original BRDF, displacement and runtime cliff flags",
+  "control_storage": "BGRA8: B=primary index, G=secondary index, R=blend, A=255"
+}

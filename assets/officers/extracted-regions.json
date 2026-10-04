@@ -1,0 +1,290 @@
+{
+  "radar-base": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      2836,
+      2500,
+      3068,
+      2723
+    ]
+  },
+  "radar-grid": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      3070,
+      2499,
+      3302,
+      2723
+    ]
+  },
+  "title-ornament": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      3935,
+      1545,
+      4087,
+      1828
+    ]
+  },
+  "scroll-up": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      3936,
+      2110,
+      4008,
+      2185
+    ]
+  },
+  "scroll-down": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      4020,
+      1890,
+      4090,
+      1965
+    ]
+  },
+  "scroll-thumb": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      4026,
+      0,
+      4084,
+      119
+    ]
+  },
+  "stat-track": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      3550,
+      2507,
+      3891,
+      2565
+    ]
+  },
+  "title-paper": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x0bf91892_1be678dd_10_005.png",
+    "rect": [
+      0,
+      247,
+      399,
+      315
+    ]
+  },
+  "name-paper": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x0bf91892_1be678dd_10_005.png",
+    "rect": [
+      404,
+      300,
+      993,
+      379
+    ]
+  },
+  "panel-paper": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\0x01e1e380_1be678dd_10_006.png",
+    "rect": [
+      0,
+      0,
+      128,
+      128
+    ]
+  },
+  "tab-normal": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_026.png",
+    "rect": [
+      1331,
+      563,
+      1521,
+      658
+    ]
+  },
+  "tab-active": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_026.png",
+    "rect": [
+      1,
+      661,
+      191,
+      756
+    ]
+  },
+  "row-highlight": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_027.png",
+    "rect": [
+      528,
+      278,
+      883,
+      317
+    ]
+  },
+  "title-ribbon": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\0x22b448e8_cf8bd79c_d2180_001.png",
+    "rect": [
+      410,
+      0,
+      816,
+      73
+    ]
+  },
+  "window-wing": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\0x01e1e380_1be678dd_10_005.png",
+    "rect": [
+      0,
+      0,
+      140,
+      140
+    ]
+  },
+  "scene-background": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\城内场景背景候选\\原图\\0x98561b5c_3a16de41_000.png",
+    "rect": [
+      0,
+      0,
+      1920,
+      1080
+    ]
+  },
+  "table-header": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\0x01e1e380_1be678dd_10_011.png",
+    "rect": [
+      2,
+      2,
+      62,
+      47
+    ]
+  },
+  "row-hover": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\0x01e1e380_1be678dd_10_075.png",
+    "rect": [
+      0,
+      0,
+      12,
+      12
+    ]
+  },
+  "table-header-hover": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\0x01e1e380_1be678dd_10_011.png",
+    "rect": [
+      90,
+      5,
+      110,
+      43
+    ]
+  },
+  "trait-gold": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      775,
+      198,
+      925,
+      237
+    ]
+  },
+  "trait-red": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      323,
+      267,
+      400,
+      304
+    ]
+  },
+  "trait-blue": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      628,
+      286,
+      690,
+      318
+    ]
+  },
+  "trait-hover": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      432,
+      221,
+      524,
+      263
+    ]
+  },
+  "meter-fill": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      432,
+      172,
+      475,
+      221
+    ]
+  },
+  "meter-track": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_032.png",
+    "rect": [
+      1863,
+      563,
+      1935,
+      574
+    ]
+  },
+  "trait-common": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      773,
+      243,
+      854,
+      278
+    ]
+  },
+  "section-title": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x0bf91892_1be678dd_10_005.png",
+    "rect": [
+      450,
+      470,
+      794,
+      532
+    ]
+  },
+  "personality-legend": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      773,
+      198,
+      925,
+      239
+    ]
+  },
+  "personality-gold": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      751,
+      286,
+      811,
+      315
+    ]
+  },
+  "personality-silver": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      629,
+      288,
+      690,
+      316
+    ]
+  },
+  "personality-bronze": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      928,
+      272,
+      992,
+      304
+    ]
+  },
+  "personality-negative": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x771465d1_e295681c_8f40_031.png",
+    "rect": [
+      501,
+      288,
+      563,
+      317
+    ]
+  }
+}

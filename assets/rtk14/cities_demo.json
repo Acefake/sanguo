@@ -1,0 +1,130 @@
+[
+  {
+    "id": "changan",
+    "name": "长安",
+    "x": 880,
+    "z": 980,
+    "model": "0826cf83",
+    "placement": "demo"
+  },
+  {
+    "id": "luoyang",
+    "name": "洛阳",
+    "x": 1120,
+    "z": 920,
+    "model": "cb1338e2",
+    "placement": "demo"
+  },
+  {
+    "id": "xuchang",
+    "name": "许昌",
+    "x": 1240,
+    "z": 980,
+    "model": "85fe8b84",
+    "placement": "demo"
+  },
+  {
+    "id": "ye",
+    "name": "邺",
+    "x": 1300,
+    "z": 720,
+    "model": "48eaf4e3",
+    "placement": "demo"
+  },
+  {
+    "id": "beiping",
+    "name": "北平",
+    "x": 1570,
+    "z": 380,
+    "model": "790cf38a",
+    "placement": "demo"
+  },
+  {
+    "id": "xiangping",
+    "name": "襄平",
+    "x": 1860,
+    "z": 350,
+    "model": "3bf95ce9",
+    "placement": "demo"
+  },
+  {
+    "id": "beihai",
+    "name": "北海",
+    "x": 1770,
+    "z": 820,
+    "model": "85fe8b84",
+    "placement": "demo"
+  },
+  {
+    "id": "xiapi",
+    "name": "下邳",
+    "x": 1630,
+    "z": 1040,
+    "model": "48eaf4e3",
+    "placement": "demo"
+  },
+  {
+    "id": "jianye",
+    "name": "建业",
+    "x": 1710,
+    "z": 1220,
+    "model": "cb1338e2",
+    "placement": "demo"
+  },
+  {
+    "id": "xiangyang",
+    "name": "襄阳",
+    "x": 1140,
+    "z": 1180,
+    "model": "0826cf83",
+    "placement": "demo"
+  },
+  {
+    "id": "jiangling",
+    "name": "江陵",
+    "x": 1170,
+    "z": 1360,
+    "model": "85fe8b84",
+    "placement": "demo"
+  },
+  {
+    "id": "changsha",
+    "name": "长沙",
+    "x": 1320,
+    "z": 1510,
+    "model": "48eaf4e3",
+    "placement": "demo"
+  },
+  {
+    "id": "hanzhong",
+    "name": "汉中",
+    "x": 750,
+    "z": 1110,
+    "model": "790cf38a",
+    "placement": "demo"
+  },
+  {
+    "id": "chengdu",
+    "name": "成都",
+    "x": 580,
+    "z": 1450,
+    "model": "cb1338e2",
+    "placement": "demo"
+  },
+  {
+    "id": "yongan",
+    "name": "永安",
+    "x": 850,
+    "z": 1330,
+    "model": "3bf95ce9",
+    "placement": "demo"
+  },
+  {
+    "id": "nanhai",
+    "name": "南海",
+    "x": 1630,
+    "z": 1800,
+    "model": "85fe8b84",
+    "placement": "demo"
+  }
+]

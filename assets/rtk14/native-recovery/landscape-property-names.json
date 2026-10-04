@@ -1,0 +1,344 @@
+[
+  {
+    "id": "b1f11a12",
+    "type": "c388ea58",
+    "props": {
+      "PaletteNum": [
+        18
+      ],
+      "MaterialNameHashArray": {
+        "count": 18,
+        "type": 5,
+        "offset": 140
+      },
+      "BlendSharpnessArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 212
+      },
+      "TexScaleUArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 284
+      },
+      "TexScaleVArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 356
+      },
+      "TessScaleArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 428
+      },
+      "TessBiasArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 500
+      }
+    }
+  },
+  {
+    "id": "bef4550e",
+    "type": "8e1ecb72",
+    "props": {
+      "GroupMask": [
+        4294967287
+      ],
+      "CompositionObjectNameHash": [
+        1598299316
+      ],
+      "HeightRenderTargetObjectNameHash": [
+        0
+      ],
+      "ControlRenderTargetObjectNameHash": [
+        0
+      ],
+      "AlbedoOcclusionRenderTargetObjectNameHash": [
+        0
+      ],
+      "NormalHeightRenderTargetObjectNameHash": [
+        0
+      ],
+      "ReflectanceLinearRoughnessRenderTargetObjectNameHash": [
+        0
+      ],
+      "PB2DSGbG1SFileResourceHash": [
+        3696426268
+      ],
+      "HeightMapEditorG1SFileResourceHash": [
+        1818052676
+      ],
+      "ControlMapEditorG1SFileResourceHash": [
+        1126194802
+      ],
+      "CommandBufferSize": [
+        4096
+      ],
+      "LandscapeObjectNameHash": [
+        3203683598
+      ],
+      "ProceduralPlacementObjectResourceHash": [
+        3843603451
+      ],
+      "HeightMapCopyG1SFileResourceHash": [
+        3949332988
+      ],
+      "ControlMapCopyG1SFileResourceHash": [
+        2771375034
+      ],
+      "ShadowMapG1SFileResourceHash": [
+        2221360481
+      ],
+      "ShadowMapLSPG1SFileResourceHash": [
+        2346645045
+      ],
+      "ShadowMapGeneralG1SFileResourceHash": [
+        2346645045
+      ],
+      "ReflectiveShadowMapG1SFileResourceHash": [
+        0
+      ]
+    }
+  },
+  {
+    "id": "09d739c4",
+    "type": "774ddc07",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "DetailTexturesRenderStateObjectHash": [
+        3179075068
+      ],
+      "ElementObjectArray": [
+        2148126898
+      ],
+      "ElementObjectLocalPositionArray": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "PaletteObjectNameHash": [
+        4195309154
+      ],
+      "DetailTextureArrayInfoObjectNameHash": [
+        3847054184
+      ],
+      "Flag": [
+        28
+      ],
+      "BilinearRate": [
+        0.5
+      ],
+      "NearFarBlendingOffset": [
+        60000.0
+      ],
+      "NearFarBlendingRange": [
+        15000.0
+      ],
+      "LODDistanceScale": [
+        5.0
+      ]
+    }
+  },
+  {
+    "id": "8009d0b2",
+    "type": "468415d9",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "QuadtreeFileResourceHash": [
+        2095398573
+      ],
+      "SheetTexturesRenderStateObjectHash": [
+        357071602
+      ],
+      "KTGLHeightMapFileResourceHash": [
+        2571509733
+      ],
+      "ExAlbedoTexturesRenderStateObjectHash": [
+        2593431116
+      ],
+      "ExNormalTexturesRenderStateObjectHash": [
+        0
+      ]
+    }
+  },
+  {
+    "id": "fa0f5662",
+    "type": "c388ea58",
+    "props": {
+      "PaletteNum": [
+        18
+      ],
+      "MaterialNameHashArray": {
+        "count": 18,
+        "type": 5,
+        "offset": 140
+      },
+      "BlendSharpnessArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 212
+      },
+      "TexScaleUArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 284
+      },
+      "TexScaleVArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 356
+      },
+      "TessScaleArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 428
+      },
+      "TessBiasArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 500
+      }
+    }
+  },
+  {
+    "id": "ff30c1fe",
+    "type": "8e1ecb72",
+    "props": {
+      "GroupMask": [
+        4294967287
+      ],
+      "CompositionObjectNameHash": [
+        165099972
+      ],
+      "HeightRenderTargetObjectNameHash": [
+        0
+      ],
+      "ControlRenderTargetObjectNameHash": [
+        0
+      ],
+      "AlbedoOcclusionRenderTargetObjectNameHash": [
+        0
+      ],
+      "NormalHeightRenderTargetObjectNameHash": [
+        0
+      ],
+      "ReflectanceLinearRoughnessRenderTargetObjectNameHash": [
+        0
+      ],
+      "PB2DSGbG1SFileResourceHash": [
+        3696426268
+      ],
+      "HeightMapEditorG1SFileResourceHash": [
+        1818052676
+      ],
+      "ControlMapEditorG1SFileResourceHash": [
+        1126194802
+      ],
+      "CommandBufferSize": [
+        4096
+      ],
+      "LandscapeObjectNameHash": [
+        4281385470
+      ],
+      "ProceduralPlacementObjectResourceHash": [
+        472235243
+      ],
+      "HeightMapCopyG1SFileResourceHash": [
+        3949332988
+      ],
+      "ControlMapCopyG1SFileResourceHash": [
+        2771375034
+      ],
+      "ShadowMapG1SFileResourceHash": [
+        2221360481
+      ],
+      "ShadowMapLSPG1SFileResourceHash": [
+        2346645045
+      ],
+      "ShadowMapGeneralG1SFileResourceHash": [
+        2346645045
+      ],
+      "ReflectiveShadowMapG1SFileResourceHash": [
+        0
+      ]
+    }
+  },
+  {
+    "id": "5f441cb4",
+    "type": "774ddc07",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "DetailTexturesRenderStateObjectHash": [
+        1969133996
+      ],
+      "ElementObjectArray": [
+        3653086114
+      ],
+      "ElementObjectLocalPositionArray": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "PaletteObjectNameHash": [
+        2985368082
+      ],
+      "DetailTextureArrayInfoObjectNameHash": [
+        1002993432
+      ],
+      "Flag": [
+        28
+      ],
+      "BilinearRate": [
+        0.5
+      ],
+      "NearFarBlendingOffset": [
+        60000.0
+      ],
+      "NearFarBlendingRange": [
+        15000.0
+      ],
+      "LODDistanceScale": [
+        5.0
+      ]
+    }
+  },
+  {
+    "id": "d9bdaba2",
+    "type": "468415d9",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "QuadtreeFileResourceHash": [
+        531695005
+      ],
+      "SheetTexturesRenderStateObjectHash": [
+        3692834338
+      ],
+      "KTGLHeightMapFileResourceHash": [
+        1802165973
+      ],
+      "ExAlbedoTexturesRenderStateObjectHash": [
+        1265821180
+      ],
+      "ExNormalTexturesRenderStateObjectHash": [
+        0
+      ]
+    }
+  }
+]

@@ -1,0 +1,279 @@
+{
+  "d3c18f06": {
+    "label": "持长兵器步兵 A · 525 面",
+    "role": "infantry_low",
+    "path": "res://assets/armies/rtk14/models/d3c18f06.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "d3c18f06",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "f1fae035",
+    "materials": [
+      {
+        "texture": "24b4dfb4",
+        "normal": "5c01f0c2"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "5b38b582": {
+    "label": "持长兵器步兵 B · 2625 面",
+    "role": "infantry_high",
+    "path": "res://assets/armies/rtk14/models/5b38b582.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "5b38b582",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "59688939",
+    "materials": [
+      {
+        "texture": "1c13cfb8",
+        "normal": "5360e0c6"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "cdf4bc12": {
+    "label": "马匹 · 高面数待简化",
+    "role": "horse_high",
+    "path": "res://assets/armies/rtk14/models/cdf4bc12.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "cdf4bc12",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "3e2d54a9",
+    "materials": [
+      {
+        "texture": "90e56d46",
+        "normal": "92913554"
+      },
+      {
+        "texture": "e67ffb54",
+        "normal": "1dcd0c62"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "a9a19ea3": {
+    "label": "象兵 · 姿态待校正",
+    "role": "elephant",
+    "path": "res://assets/armies/rtk14/models/a9a19ea3.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "a9a19ea3",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "d81cc438",
+    "materials": [
+      {
+        "texture": "2e636714",
+        "normal": "c6b06ca2"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "80c82506": {
+    "label": "三角军旗",
+    "role": "flag_triangle",
+    "path": "res://assets/armies/rtk14/models/80c82506.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "80c82506",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "e5c70a35",
+    "materials": [
+      {
+        "texture": "77eaf0da",
+        "normal": "abb82a8c"
+      },
+      {
+        "texture": "654ed598",
+        "normal": "66fa9da6"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [
+      "77eaf0da"
+    ],
+    "verification": "original geometry preview and native material references"
+  },
+  "9eea5b67": {
+    "label": "燕尾军旗",
+    "role": "flag_forked",
+    "path": "res://assets/armies/rtk14/models/9eea5b67.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "9eea5b67",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "8beb9ff4",
+    "materials": [
+      {
+        "texture": "7b60bd33",
+        "normal": "2db5cde5"
+      },
+      {
+        "texture": "8fe3acba",
+        "normal": "c3b0e66c"
+      },
+      {
+        "texture": "7d479178",
+        "normal": "7ef35986"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [
+      "7b60bd33",
+      "8fe3acba"
+    ],
+    "verification": "original geometry preview and native material references"
+  },
+  "682039a2": {
+    "label": "攻城器械 A",
+    "role": "siege_frame",
+    "path": "res://assets/armies/rtk14/models/682039a2.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "682039a2",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "e9718919",
+    "materials": [
+      {
+        "texture": "0d25acdc",
+        "normal": "40f2e68e"
+      },
+      {
+        "texture": "05fcca9b",
+        "normal": "39ca044d"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "e5dc4fba": {
+    "label": "攻城器械 · 楼车",
+    "role": "siege_tower",
+    "path": "res://assets/armies/rtk14/models/e5dc4fba.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "e5dc4fba",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "23383601",
+    "materials": [
+      {
+        "texture": "74da3a1d",
+        "normal": "7686022b"
+      },
+      {
+        "texture": "8ddb8bbc",
+        "normal": "8f8753ca"
+      },
+      {
+        "texture": "6fd29f16",
+        "normal": "b5ac9ba4"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "c0d5fa9c": {
+    "label": "攻城器械 · 箱式车辆",
+    "role": "siege_vehicle",
+    "path": "res://assets/armies/rtk14/models/c0d5fa9c.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "c0d5fa9c",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "a773e75f",
+    "materials": [
+      {
+        "texture": "d3fa6361",
+        "normal": "07c79d13"
+      },
+      {
+        "texture": "db2345a2",
+        "normal": "0ef07f54"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "bd1ef9be": {
+    "label": "船只 · 桨船",
+    "role": "ship_rowed",
+    "path": "res://assets/armies/rtk14/models/bd1ef9be.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "bd1ef9be",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "344acc7d",
+    "materials": [
+      {
+        "texture": "71f42061",
+        "normal": "f3b60313"
+      },
+      {
+        "texture": "f7ea6b35",
+        "normal": "35e86a43"
+      },
+      {
+        "texture": "a5a24b22",
+        "normal": "27642dd4"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "9962ab33": {
+    "label": "船只 · 双体船",
+    "role": "ship_double",
+    "path": "res://assets/armies/rtk14/models/9962ab33.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "9962ab33",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "e07d49a8",
+    "materials": [
+      {
+        "texture": "930d974e",
+        "normal": "14cf7a00"
+      },
+      {
+        "texture": "b1f8c281",
+        "normal": "caccc0b3"
+      },
+      {
+        "texture": "87bedec1",
+        "normal": "896aa6cf"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  },
+  "9a851cde": {
+    "label": "船只 · 帆船",
+    "role": "ship_sail",
+    "path": "res://assets/armies/rtk14/models/9a851cde.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "9a851cde",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "03a90d5d",
+    "materials": [
+      {
+        "texture": "5db650c2",
+        "normal": "91838a74"
+      },
+      {
+        "texture": "64df3303",
+        "normal": "98ac6cb5"
+      },
+      {
+        "texture": "828431f2",
+        "normal": "38fea580"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "original_height_samples_identical": 4198401,
+  "control_bytes_identical": 16793604,
+  "density_samples_identical": 1048576,
+  "resource_cells_identical": 1048576,
+  "plant_cache_records_inside_native_painting": 10734,
+  "native_bake_tile_period_correlations": {
+    "0": {
+      "1": 0.8831410953625157,
+      "0.1": -0.01930133391965463,
+      "10": -0.018983146830214515
+    },
+    "1": {
+      "1": 0.7657960864738559,
+      "0.1": -0.014393148867039974,
+      "10": -0.018665141375456152
+    },
+    "5": {
+      "1": 0.8619199239487528,
+      "0.1": 0.019030553807073313,
+      "10": -0.006596743745911422
+    },
+    "6": {
+      "1": 0.9247110436188403,
+      "0.1": -0.05392547825862994,
+      "10": -0.00963169843118035
+    },
+    "9": {
+      "1": 0.8465385878571949,
+      "0.1": -1.3478997112265205e-15,
+      "10": -0.00965512786831333
+    }
+  },
+  "unverified": "PRNG, density-to-candidate interpretation, original renderer environment and dynamic building registration"
+}

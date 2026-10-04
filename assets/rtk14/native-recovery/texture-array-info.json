@@ -1,0 +1,28 @@
+[
+  {
+    "file": "KIDSSystemResource_9d2ae2c1.kidsobjdb",
+    "id": "e54d6368",
+    "type": "TypeInfo::Object::3D::TextureArrayInfo",
+    "parent": "00000000",
+    "props": {
+      "Textures": {
+        "count": 19,
+        "type": 5,
+        "offset": 1024
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f029fe04.kidsobjdb",
+    "id": "3bc87718",
+    "type": "TypeInfo::Object::3D::TextureArrayInfo",
+    "parent": "00000000",
+    "props": {
+      "Textures": {
+        "count": 19,
+        "type": 5,
+        "offset": 176
+      }
+    }
+  }
+]

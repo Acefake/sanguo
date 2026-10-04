@@ -1,0 +1,40 @@
+{
+  "overrides": {
+    "changan": {
+      "name": "长安",
+      "profile": "central",
+      "reason": "按用户要求，长安采用宫城、石城墙与灰瓦坊市的都城布局。原版泛北方分类呈现为西凉边城，不适合作为本项目长安城景。"
+    }
+  },
+  "aliases": {
+    "jianye": {"name": "建业", "source_city": "秣陵", "reason": "本项目建业对应原城市表的秣陵城位，采用扬南江南布局。"}
+  },
+  "extensions": {
+    "jiuquan": {"name": "酒泉", "source_city": "武威", "state": "凉州", "reason": "河西城镇与武威使用同一北方布局。"},
+    "zhangye": {"name": "张掖", "source_city": "武威", "state": "凉州", "reason": "河西城镇与武威使用同一北方布局。"},
+    "jincheng": {"name": "金城", "source_city": "武威", "state": "凉州", "reason": "凉州扩展城镇参照武威，而非中原布局。"},
+    "yunzhong": {"name": "云中", "source_city": "晋阳", "state": "并州", "reason": "并州扩展城镇参照晋阳。"},
+    "yanmen": {"name": "雁门", "source_city": "晋阳", "state": "并州", "reason": "并州扩展城镇参照晋阳。"},
+    "dingxiang": {"name": "定襄", "source_city": "晋阳", "state": "并州", "reason": "并州扩展城镇参照晋阳。"},
+    "yuyang": {"name": "渔阳", "source_city": "蓟", "state": "幽州", "reason": "幽州扩展城镇参照蓟。"},
+    "liaoxi": {"name": "辽西", "source_city": "北平", "state": "幽州", "reason": "幽州东部扩展城镇参照北平。"},
+    "zhongshan": {"name": "中山", "source_city": "邺", "state": "冀州", "reason": "冀州扩展城镇参照邺。"},
+    "changshan": {"name": "常山", "source_city": "邺", "state": "冀州", "reason": "冀州扩展城镇参照邺。"},
+    "donglai": {"name": "东莱", "source_city": "北海", "state": "青州", "reason": "青州扩展城镇参照北海。"},
+    "linzi": {"name": "临淄", "source_city": "北海", "state": "青州", "reason": "青州扩展城镇参照北海。"},
+    "hedong": {"name": "河东", "source_city": "弘农", "state": "司隶", "reason": "司隶扩展城镇参照弘农；按城市配置，不由大地图整区推导。"},
+    "henei": {"name": "河内", "source_city": "洛阳", "state": "司隶", "reason": "司隶扩展城镇参照洛阳。"},
+    "dingtao": {"name": "定陶", "source_city": "陈留", "state": "兖州", "reason": "兖州扩展城镇参照陈留。"},
+    "shanyang": {"name": "山阳", "source_city": "陈留", "state": "兖州", "reason": "兖州扩展城镇参照陈留。"},
+    "langye": {"name": "琅琊", "source_city": "下邳", "state": "徐州", "reason": "徐州扩展城镇参照下邳；广陵在原配置属于扬北，使用江南布局。"},
+    "yingchuan": {"name": "颍川", "source_city": "许昌", "state": "豫州", "reason": "豫州扩展城镇参照许昌。"},
+    "peiguo": {"name": "沛国", "source_city": "谯", "state": "豫州", "reason": "豫州扩展城镇参照谯。"},
+    "baxi": {"name": "巴西", "source_city": "梓潼", "state": "益州", "reason": "川北扩展城镇参照梓潼。"},
+    "yuesui": {"name": "越嶲", "source_city": "建宁", "state": "南中", "reason": "本项目将南中扩展城镇越嶲配置为建宁的南蛮布局；原城市表没有越嶲独立条目。"},
+    "yuzhang": {"name": "豫章", "source_city": "鄱阳", "state": "扬南", "reason": "扬南扩展城镇参照鄱阳。"},
+    "jianan": {"name": "建安", "source_city": "会稽", "state": "扬南", "reason": "扬南扩展城镇参照会稽。"},
+    "hepu": {"name": "合浦", "source_city": "交趾", "state": "交州", "reason": "交州扩展城镇参照交趾，应使用江南而非南蛮布局。"},
+    "cangwu": {"name": "苍梧", "source_city": "交趾", "state": "交州", "reason": "交州扩展城镇参照交趾，应使用江南而非南蛮布局。"},
+    "nanhai": {"name": "南海", "source_city": "交趾", "state": "交州", "reason": "交州扩展城镇参照交趾，应使用江南而非南蛮布局。"}
+  }
+}

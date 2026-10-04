@@ -1,0 +1,344 @@
+{
+  "袁绍": {
+    "image_number": 5,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体静态半身_补全\\face_0005_00_unique_f42413eb_0x662e1db5.png",
+    "alpha_bounds": [
+      119,
+      2,
+      905,
+      1014
+    ],
+    "head_crop": [
+      340,
+      200,
+      600,
+      480
+    ],
+    "portrait": "res://assets/officers/portraits/0005.png",
+    "thumbnail": "res://assets/officers/portraits/0005-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/袁紹"
+  },
+  "袁尚": {
+    "image_number": 34,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0034_00_31b64d32_0x16fdb2ee.png",
+    "alpha_bounds": [
+      0,
+      37,
+      636,
+      900
+    ],
+    "head_crop": [
+      220,
+      45,
+      440,
+      275
+    ],
+    "portrait": "res://assets/officers/portraits/0034.png",
+    "thumbnail": "res://assets/officers/portraits/0034-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/袁尚"
+  },
+  "孙策": {
+    "image_number": 63,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体静态半身_补全\\face_0063_00_unique_bc14df23_0x662e1db5.png",
+    "alpha_bounds": [
+      119,
+      3,
+      905,
+      1014
+    ],
+    "head_crop": [
+      400,
+      170,
+      660,
+      450
+    ],
+    "portrait": "res://assets/officers/portraits/0063.png",
+    "thumbnail": "res://assets/officers/portraits/0063-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/孫策"
+  },
+  "田丰": {
+    "image_number": 107,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0107_00_d377c4ab_0x16fdb2ee.png",
+    "alpha_bounds": [
+      10,
+      33,
+      817,
+      900
+    ],
+    "head_crop": [
+      385,
+      115,
+      605,
+      375
+    ],
+    "portrait": "res://assets/officers/portraits/0107.png",
+    "thumbnail": "res://assets/officers/portraits/0107-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/田豊"
+  },
+  "颜良": {
+    "image_number": 10,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0010_00_da345734_0x16fdb2ee.png",
+    "alpha_bounds": [
+      0,
+      0,
+      636,
+      900
+    ],
+    "head_crop": [
+      220,
+      190,
+      460,
+      450
+    ],
+    "portrait": "res://assets/officers/portraits/0010.png",
+    "thumbnail": "res://assets/officers/portraits/0010-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/顔良"
+  },
+  "文丑": {
+    "image_number": 11,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0011_00_db6aaa13_0x16fdb2ee.png",
+    "alpha_bounds": [
+      47,
+      0,
+      636,
+      900
+    ],
+    "head_crop": [
+      140,
+      150,
+      380,
+      410
+    ],
+    "portrait": "res://assets/officers/portraits/0011.png",
+    "thumbnail": "res://assets/officers/portraits/0011-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/文醜"
+  },
+  "袁谭": {
+    "image_number": 35,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0035_00_32eca011_0x16fdb2ee.png",
+    "alpha_bounds": [
+      19,
+      42,
+      636,
+      900
+    ],
+    "head_crop": [
+      150,
+      90,
+      400,
+      350
+    ],
+    "portrait": "res://assets/officers/portraits/0035.png",
+    "thumbnail": "res://assets/officers/portraits/0035-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/袁譚"
+  },
+  "袁熙": {
+    "image_number": 33,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0033_00_307ffa53_0x16fdb2ee.png",
+    "alpha_bounds": [
+      0,
+      13,
+      606,
+      900
+    ],
+    "head_crop": [
+      205,
+      70,
+      445,
+      330
+    ],
+    "portrait": "res://assets/officers/portraits/0033.png",
+    "thumbnail": "res://assets/officers/portraits/0033-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/袁煕"
+  },
+  "廖化": {
+    "image_number": 121,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0121_00_1eda7df3_0x16fdb2ee.png",
+    "alpha_bounds": [
+      151,
+      20,
+      956,
+      900
+    ],
+    "head_crop": [
+      400,
+      110,
+      650,
+      390
+    ],
+    "portrait": "res://assets/officers/portraits/0121.png",
+    "thumbnail": "res://assets/officers/portraits/0121-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/廖化"
+  },
+  "关兴": {
+    "image_number": 81,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0081_00_fcb8feda_0x16fdb2ee.png",
+    "alpha_bounds": [
+      0,
+      0,
+      636,
+      900
+    ],
+    "head_crop": [
+      220,
+      90,
+      440,
+      340
+    ],
+    "portrait": "res://assets/officers/portraits/0081.png",
+    "thumbnail": "res://assets/officers/portraits/0081-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/関興"
+  },
+  "张苞": {
+    "image_number": 103,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0103_00_ce9e792f_0x16fdb2ee.png",
+    "alpha_bounds": [
+      0,
+      14,
+      636,
+      900
+    ],
+    "head_crop": [
+      250,
+      90,
+      470,
+      360
+    ],
+    "portrait": "res://assets/officers/portraits/0103.png",
+    "thumbnail": "res://assets/officers/portraits/0103-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/張苞"
+  },
+  "张遵": {
+    "image_number": 631,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0631_00_cab84c4f_0x16fdb2ee.png",
+    "alpha_bounds": [
+      0,
+      0,
+      636,
+      900
+    ],
+    "head_crop": [
+      220,
+      180,
+      440,
+      430
+    ],
+    "portrait": "res://assets/officers/portraits/0631.png",
+    "thumbnail": "res://assets/officers/portraits/0631-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/張遵"
+  },
+  "诸葛亮": {
+    "image_number": 45,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体静态半身_补全\\face_0045_00_unique_65dc0567_0x662e1db5.png",
+    "alpha_bounds": [
+      119,
+      61,
+      905,
+      1012
+    ],
+    "head_crop": [
+      410,
+      200,
+      660,
+      470
+    ],
+    "portrait": "res://assets/officers/portraits/0045.png",
+    "thumbnail": "res://assets/officers/portraits/0045-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/諸葛亮"
+  },
+  "关凤": {
+    "image_number": 571,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0571_00_55ee22b4_0x16fdb2ee.png",
+    "alpha_bounds": [
+      0,
+      40,
+      636,
+      900
+    ],
+    "head_crop": [
+      160,
+      80,
+      380,
+      310
+    ],
+    "portrait": "res://assets/officers/portraits/0571.png",
+    "thumbnail": "res://assets/officers/portraits/0571-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/関銀屏"
+  },
+  "周仓": {
+    "image_number": 20,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0020_00_0388ac75_0x16fdb2ee.png",
+    "alpha_bounds": [
+      0,
+      16,
+      636,
+      900
+    ],
+    "head_crop": [
+      180,
+      150,
+      420,
+      400
+    ],
+    "portrait": "res://assets/officers/portraits/0020.png",
+    "thumbnail": "res://assets/officers/portraits/0020-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/周倉"
+  },
+  "关羽": {
+    "image_number": 2,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体静态半身_补全\\face_0002_00_unique_202f6568_0x662e1db5.png",
+    "alpha_bounds": [
+      119,
+      40,
+      905,
+      1014
+    ],
+    "head_crop": [
+      340,
+      100,
+      600,
+      400
+    ],
+    "portrait": "res://assets/officers/portraits/0002.png",
+    "thumbnail": "res://assets/officers/portraits/0002-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/関羽"
+  },
+  "黄忠": {
+    "image_number": 23,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0023_00_072ba512_0x16fdb2ee.png",
+    "alpha_bounds": [
+      99,
+      14,
+      1082,
+      1170
+    ],
+    "head_crop": [
+      440,
+      300,
+      710,
+      620
+    ],
+    "portrait": "res://assets/officers/portraits/0023.png",
+    "thumbnail": "res://assets/officers/portraits/0023-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/黄忠"
+  },
+  "魏延": {
+    "image_number": 15,
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\武将立绘\\本体半身立绘_补全\\anime_0015_00_e043f58f_0x16fdb2ee.png",
+    "alpha_bounds": [
+      215,
+      46,
+      1028,
+      900
+    ],
+    "head_crop": [
+      440,
+      100,
+      700,
+      380
+    ],
+    "portrait": "res://assets/officers/portraits/0015.png",
+    "thumbnail": "res://assets/officers/portraits/0015-head.png",
+    "verification": "https://wikiwiki.jp/sangokushi8r/魏延"
+  }
+}

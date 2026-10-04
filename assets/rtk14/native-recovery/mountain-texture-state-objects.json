@@ -1,0 +1,58 @@
+[
+  {
+    "file": "KIDSSystemResource_e755daee.kidsobjdb",
+    "id": "ab8c49b9",
+    "type": "TypeInfo::Object::Render::State::3D::Textures",
+    "parent": "00000000",
+    "props": {
+      "TextureBindTableCSVFileResourceHash": [
+        3638149908
+      ],
+      "TextureObjectNameHash": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e755daee.kidsobjdb",
+    "id": "6e78b318",
+    "type": "TypeInfo::Object::Render::State::3D::Textures",
+    "parent": "00000000",
+    "props": {
+      "TextureBindTableCSVFileResourceHash": [
+        3189453269
+      ],
+      "TextureObjectNameHash": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e755daee.kidsobjdb",
+    "id": "73ad12ce",
+    "type": "TypeInfo::Object::Render::State::3D::Textures",
+    "parent": "00000000",
+    "props": {
+      "TextureBindTableCSVFileResourceHash": [
+        698418015
+      ],
+      "TextureObjectNameHash": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e755daee.kidsobjdb",
+    "id": "31651c77",
+    "type": "TypeInfo::Object::Render::State::3D::Textures",
+    "parent": "00000000",
+    "props": {
+      "TextureBindTableCSVFileResourceHash": [
+        2740756630
+      ],
+      "TextureObjectNameHash": [
+        0
+      ]
+    }
+  }
+]

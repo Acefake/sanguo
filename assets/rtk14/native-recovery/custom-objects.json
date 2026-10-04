@@ -1,0 +1,8937 @@
+[
+  {
+    "file": "KIDSSystemResource_016dc5f1.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        384619227
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_0f033490.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        1576791220
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_28f6e011.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        2209410961
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3215c4d1.kidsobjdb",
+    "id": "b1f11a12",
+    "type": "c388ea58",
+    "parent": "00000000",
+    "props": {
+      "f7a82aeb": [
+        18
+      ],
+      "497cb2c7": {
+        "count": 18,
+        "type": 5,
+        "offset": 140
+      },
+      "859d80f7": {
+        "count": 18,
+        "type": 8,
+        "offset": 212
+      },
+      "a69bbd47": {
+        "count": 18,
+        "type": 8,
+        "offset": 284
+      },
+      "9ae52e66": {
+        "count": 18,
+        "type": 8,
+        "offset": 356
+      },
+      "d2a48180": {
+        "count": 18,
+        "type": 8,
+        "offset": 428
+      },
+      "03bb19b1": {
+        "count": 18,
+        "type": 8,
+        "offset": 500
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3215c4d1.kidsobjdb",
+    "id": "bef4550e",
+    "type": "8e1ecb72",
+    "parent": "00000000",
+    "props": {
+      "GroupMask": [
+        4294967287
+      ],
+      "445d803e": [
+        1598299316
+      ],
+      "cc8a8926": [
+        0
+      ],
+      "0b6dd6a4": [
+        0
+      ],
+      "6868a78d": [
+        0
+      ],
+      "c9c926ad": [
+        0
+      ],
+      "fa5136be": [
+        0
+      ],
+      "3af82377": [
+        3696426268
+      ],
+      "a8c0c79f": [
+        1818052676
+      ],
+      "b5ff674b": [
+        1126194802
+      ],
+      "CommandBufferSize": [
+        4096
+      ],
+      "LandscapeObjectNameHash": [
+        3203683598
+      ],
+      "ProceduralPlacementObjectResourceHash": [
+        3843603451
+      ],
+      "88a0d797": [
+        3949332988
+      ],
+      "d2215653": [
+        2771375034
+      ],
+      "4d0b6005": [
+        2221360481
+      ],
+      "679b61cc": [
+        2346645045
+      ],
+      "a21c16eb": [
+        2346645045
+      ],
+      "c87d92e0": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "071afbe8",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "2249f164",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        440.0,
+        -59.5,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        1851116723
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.45454543828964233
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        46.0,
+        -48.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        3061262632
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        3700765063,
+        2745243784,
+        1789722505,
+        834201226,
+        4173647243,
+        3218125964
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "31b8e68a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "400f14e7",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "5c3eb0eb",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "6aacff89",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "79032de6",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        45.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "9532c9ea",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "a3a11888",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "bfd0b48c",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "ce26e2e9",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "dbc17f03",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        440.0,
+        -59.5,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        1851116723
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        46.0,
+        -48.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        3061262632
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        2030251494,
+        1074730215,
+        119208936,
+        3458654953,
+        2503133674,
+        1547612395
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "dc953187",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        45.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3bae4bc1.kidsobjdb",
+    "id": "f8c4cd8b",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "071afbe8",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "2249f164",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        433.0,
+        -59.5,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        384619227
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.45454543828964233
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        46.0,
+        -48.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        3061262632
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        3700765063,
+        2745243784,
+        1789722505,
+        834201226,
+        4173647243,
+        3218125964
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "31b8e68a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "400f14e7",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "5c3eb0eb",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "6aacff89",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "79032de6",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        45.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "9532c9ea",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "a3a11888",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "bfd0b48c",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "ce26e2e9",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "dbc17f03",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        433.0,
+        -59.5,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        384619227
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        46.0,
+        -48.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        3061262632
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        2030251494,
+        1074730215,
+        119208936,
+        3458654953,
+        2503133674,
+        1547612395
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "dc953187",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        45.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3deb6ddf.kidsobjdb",
+    "id": "f8c4cd8b",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_427bcca2.kidsobjdb",
+    "id": "ab56d709",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        1523752993
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        1276624802
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_63835d0f.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        2962262037
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "071afbe8",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        55.29999923706055,
+        18.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "2249f164",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        130.0,
+        -107.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        850975162
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.45454543828964233
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        130.0,
+        -107.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        3700765063,
+        2745243784,
+        1789722505,
+        834201226,
+        4173647243,
+        3218125964
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "31b8e68a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        34.0,
+        -47.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "400f14e7",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "5c3eb0eb",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -34.0,
+        -47.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "6aacff89",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        55.29999923706055,
+        18.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "79032de6",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        58.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "9532c9ea",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -55.29999923706055,
+        18.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "a3a11888",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "bfd0b48c",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -34.0,
+        -47.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "ce26e2e9",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        34.0,
+        -47.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "dbc17f03",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        130.0,
+        -107.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        850975162
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        130.0,
+        -107.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        2030251494,
+        1074730215,
+        119208936,
+        3458654953,
+        2503133674,
+        1547612395
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "dc953187",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        58.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_6aafb8a0.kidsobjdb",
+    "id": "f8c4cd8b",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -55.29999923706055,
+        18.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "1c25bceb",
+    "type": "1a83479f",
+    "parent": "00000000",
+    "props": {
+      "FieldSize": [
+        204800,
+        204800
+      ],
+      "FieldOffset": [
+        0,
+        0
+      ],
+      "6f1ab58b": [
+        1024,
+        1024
+      ],
+      "NumBlocks": [
+        128,
+        128
+      ],
+      "79c02ffe": [
+        100000
+      ],
+      "a2dd60a1": [
+        120000
+      ],
+      "e9567eeb": {
+        "count": 70,
+        "type": 5,
+        "offset": 492
+      },
+      "7c441a6e": {
+        "count": 68,
+        "type": 5,
+        "offset": 772
+      },
+      "ElementInfoArray": {
+        "count": 243,
+        "type": 8,
+        "offset": 1044
+      },
+      "ElementTypeArray": {
+        "count": 27,
+        "type": 5,
+        "offset": 2016
+      },
+      "5c9ee311": {
+        "count": 27,
+        "type": 5,
+        "offset": 2124
+      },
+      "e3c9c8f0": {
+        "count": 27,
+        "type": 5,
+        "offset": 2232
+      },
+      "DisplaySetNameHashArray": {
+        "count": 31,
+        "type": 5,
+        "offset": 2340
+      },
+      "DensityMap": {
+        "count": 1048576,
+        "type": 8,
+        "offset": 2464
+      },
+      "ResourceMap": {
+        "count": 1048576,
+        "type": 1,
+        "offset": 4196768
+      },
+      "e065f0e9": {
+        "count": 27,
+        "type": 5,
+        "offset": 5245344
+      },
+      "711a5f43": {
+        "count": 31,
+        "type": 1,
+        "offset": 5245452
+      },
+      "0fd0f003": {
+        "count": 108,
+        "type": 8,
+        "offset": 5245483
+      },
+      "4b80cfb1": [
+        2
+      ],
+      "a3dae7da": [
+        20000
+      ],
+      "dd5651bc": [
+        0
+      ],
+      "dd271667": [
+        1000
+      ],
+      "f709a219": [
+        1000
+      ],
+      "d25c3aa6": {
+        "count": 217,
+        "type": 5,
+        "offset": 5245935
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_8374438a.kidsobjdb",
+    "id": "ebcec5a6",
+    "type": "e6379ba2",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "a9a7e56c": [
+        0,
+        0,
+        0
+      ],
+      "46843ca3": [
+        0.0
+      ],
+      "4621a92f": [
+        256
+      ],
+      "4633440d": [
+        4096
+      ],
+      "4929d408": [
+        500.0
+      ],
+      "GroupMask": [
+        0
+      ],
+      "MaxPrimitiveNum": [
+        1000
+      ],
+      "4a4a850d": [
+        2048
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_893786df.kidsobjdb",
+    "id": "2249f164",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        46.0,
+        -48.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        2962262037
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.45454543828964233
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        46.0,
+        -48.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2144182820
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        3700765063,
+        2745243784,
+        1789722505,
+        834201226,
+        4173647243,
+        3218125964
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_893786df.kidsobjdb",
+    "id": "31b8e68a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_893786df.kidsobjdb",
+    "id": "6aacff89",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_893786df.kidsobjdb",
+    "id": "a3a11888",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_893786df.kidsobjdb",
+    "id": "bfd0b48c",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -28.0,
+        -39.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_893786df.kidsobjdb",
+    "id": "dc953187",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        45.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_893786df.kidsobjdb",
+    "id": "f8c4cd8b",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -44.0,
+        13.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_8cf9a1af.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        384619227
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "071afbe8",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "15712a45",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        99.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "31a0c649",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "400f14e7",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "5c3eb0eb",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "6a94df48",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "79032de6",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        99.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "9532c9ea",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "95390ca2",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        2964808804
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        359737925,
+        3699183942,
+        2743662663,
+        1788141384,
+        832620105,
+        4172066122
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "a388f847",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "ce26e2e9",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "dbc17f03",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        2964808804
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        2030251494,
+        1074730215,
+        119208936,
+        3458654953,
+        2503133674,
+        1547612395
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "dc7d1146",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_98b372f6.kidsobjdb",
+    "id": "f8acad4a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_9d2ae2c1.kidsobjdb",
+    "id": "09d739c4",
+    "type": "774ddc07",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "0c47e481": [
+        3179075068
+      ],
+      "e9cc029e": [
+        2148126898
+      ],
+      "a45ad0e0": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "f4553a8d": [
+        4195309154
+      ],
+      "45b41815": [
+        3847054184
+      ],
+      "Flag": [
+        28
+      ],
+      "43aea90c": [
+        0.5
+      ],
+      "70cb1a2d": [
+        60000.0
+      ],
+      "2913bb1d": [
+        15000.0
+      ],
+      "0575b6f4": [
+        5.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_9d2ae2c1.kidsobjdb",
+    "id": "8009d0b2",
+    "type": "468415d9",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "f981bc3d": [
+        2095398573
+      ],
+      "dc491051": [
+        357071602
+      ],
+      "f17661e1": [
+        2571509733
+      ],
+      "848cf8fc": [
+        2593431116
+      ],
+      "52cbb8aa": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_a2657070.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        3647664786
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b34957f2.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        3647664786
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "e518bbfb",
+    "type": "1a83479f",
+    "parent": "00000000",
+    "props": {
+      "FieldSize": [
+        204800,
+        204800
+      ],
+      "FieldOffset": [
+        0,
+        0
+      ],
+      "6f1ab58b": [
+        1024,
+        1024
+      ],
+      "NumBlocks": [
+        128,
+        128
+      ],
+      "79c02ffe": [
+        100000
+      ],
+      "a2dd60a1": [
+        120000
+      ],
+      "e9567eeb": {
+        "count": 70,
+        "type": 5,
+        "offset": 2620
+      },
+      "7c441a6e": {
+        "count": 68,
+        "type": 5,
+        "offset": 2900
+      },
+      "ElementInfoArray": {
+        "count": 243,
+        "type": 8,
+        "offset": 3172
+      },
+      "ElementTypeArray": {
+        "count": 27,
+        "type": 5,
+        "offset": 4144
+      },
+      "5c9ee311": {
+        "count": 27,
+        "type": 5,
+        "offset": 4252
+      },
+      "e3c9c8f0": {
+        "count": 27,
+        "type": 5,
+        "offset": 4360
+      },
+      "DisplaySetNameHashArray": {
+        "count": 31,
+        "type": 5,
+        "offset": 4468
+      },
+      "DensityMap": {
+        "count": 1048576,
+        "type": 8,
+        "offset": 4592
+      },
+      "ResourceMap": {
+        "count": 1048576,
+        "type": 1,
+        "offset": 4198896
+      },
+      "e065f0e9": {
+        "count": 27,
+        "type": 5,
+        "offset": 5247472
+      },
+      "711a5f43": {
+        "count": 31,
+        "type": 1,
+        "offset": 5247580
+      },
+      "0fd0f003": {
+        "count": 108,
+        "type": 8,
+        "offset": 5247611
+      },
+      "4b80cfb1": [
+        2
+      ],
+      "a3dae7da": [
+        20000
+      ],
+      "dd5651bc": [
+        0
+      ],
+      "dd271667": [
+        1000
+      ],
+      "f709a219": [
+        1000
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b6dcc68e.kidsobjdb",
+    "id": "fa0f5662",
+    "type": "c388ea58",
+    "parent": "00000000",
+    "props": {
+      "f7a82aeb": [
+        18
+      ],
+      "497cb2c7": {
+        "count": 18,
+        "type": 5,
+        "offset": 140
+      },
+      "859d80f7": {
+        "count": 18,
+        "type": 8,
+        "offset": 212
+      },
+      "a69bbd47": {
+        "count": 18,
+        "type": 8,
+        "offset": 284
+      },
+      "9ae52e66": {
+        "count": 18,
+        "type": 8,
+        "offset": 356
+      },
+      "d2a48180": {
+        "count": 18,
+        "type": 8,
+        "offset": 428
+      },
+      "03bb19b1": {
+        "count": 18,
+        "type": 8,
+        "offset": 500
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b6dcc68e.kidsobjdb",
+    "id": "ff30c1fe",
+    "type": "8e1ecb72",
+    "parent": "00000000",
+    "props": {
+      "GroupMask": [
+        4294967287
+      ],
+      "445d803e": [
+        165099972
+      ],
+      "cc8a8926": [
+        0
+      ],
+      "0b6dd6a4": [
+        0
+      ],
+      "6868a78d": [
+        0
+      ],
+      "c9c926ad": [
+        0
+      ],
+      "fa5136be": [
+        0
+      ],
+      "3af82377": [
+        3696426268
+      ],
+      "a8c0c79f": [
+        1818052676
+      ],
+      "b5ff674b": [
+        1126194802
+      ],
+      "CommandBufferSize": [
+        4096
+      ],
+      "LandscapeObjectNameHash": [
+        4281385470
+      ],
+      "ProceduralPlacementObjectResourceHash": [
+        472235243
+      ],
+      "88a0d797": [
+        3949332988
+      ],
+      "d2215653": [
+        2771375034
+      ],
+      "4d0b6005": [
+        2221360481
+      ],
+      "679b61cc": [
+        2346645045
+      ],
+      "a21c16eb": [
+        2346645045
+      ],
+      "c87d92e0": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_be5b6a67.kidsobjdb",
+    "id": "ab56d709",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        1523752993
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        2207513213
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c326c037.kidsobjdb",
+    "id": "2249f164",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        50.0,
+        -1.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        0.10000000149011612,
+        0.0020000000949949026
+      ],
+      "DisplaysetObjectNameHash": [
+        1523752993
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        2207513213
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454978942871
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        50.0,
+        -1.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        0.10000000149011612,
+        0.0020000000949949026
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        3700765063,
+        2745243784,
+        1789722505,
+        834201226
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c326c037.kidsobjdb",
+    "id": "31b8e68a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        -500.0,
+        500.0,
+        0.0
+      ],
+      "253bba26": [
+        0.03160826861858368,
+        0.031546179205179214
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c326c037.kidsobjdb",
+    "id": "6aacff89",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        500.0,
+        500.0,
+        0.0
+      ],
+      "253bba26": [
+        0.03162704035639763,
+        0.031546179205179214
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c326c037.kidsobjdb",
+    "id": "a3a11888",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        500.0,
+        -500.0,
+        0.0
+      ],
+      "253bba26": [
+        0.03162704035639763,
+        0.03156489133834839
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c326c037.kidsobjdb",
+    "id": "dc953187",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        -500.0,
+        -500.0,
+        0.0
+      ],
+      "253bba26": [
+        0.03160826861858368,
+        0.03156489133834839
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c3dab0c8.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        78785340
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e152c013.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        2209410961
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "071afbe8",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        55.29999923706055,
+        18.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "2249f164",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        130.0,
+        -107.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        3647664786
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.45454543828964233
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        130.0,
+        -107.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        3700765063,
+        2745243784,
+        1789722505,
+        834201226,
+        4173647243,
+        3218125964
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "31b8e68a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        34.0,
+        -47.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "400f14e7",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "5c3eb0eb",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -34.0,
+        -47.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "6aacff89",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        55.29999923706055,
+        18.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "79032de6",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        58.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "9532c9ea",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -55.29999923706055,
+        18.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "a3a11888",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "bfd0b48c",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -34.0,
+        -47.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "ce26e2e9",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        34.0,
+        -47.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "dbc17f03",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        130.0,
+        -107.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        3647664786
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        130.0,
+        -107.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        2030251494,
+        1074730215,
+        119208936,
+        3458654953,
+        2503133674,
+        1547612395
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "dc953187",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        58.29999923706055,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e26f7dc2.kidsobjdb",
+    "id": "f8c4cd8b",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -55.29999923706055,
+        18.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "071afbe8",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "15712a45",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        99.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "31a0c649",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "400f14e7",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "5c3eb0eb",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "6a94df48",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "79032de6",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        99.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "9532c9ea",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "95390ca2",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        78785340
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        359737925,
+        3699183942,
+        2743662663,
+        1788141384,
+        832620105,
+        4172066122
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "a388f847",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "ce26e2e9",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "dbc17f03",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        78785340
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        2988654691
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        2030251494,
+        1074730215,
+        119208936,
+        3458654953,
+        2503133674,
+        1547612395
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "dc7d1146",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_e98eda98.kidsobjdb",
+    "id": "f8acad4a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f029fe04.kidsobjdb",
+    "id": "5f441cb4",
+    "type": "774ddc07",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "0c47e481": [
+        1969133996
+      ],
+      "e9cc029e": [
+        3653086114
+      ],
+      "a45ad0e0": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "f4553a8d": [
+        2985368082
+      ],
+      "45b41815": [
+        1002993432
+      ],
+      "Flag": [
+        28
+      ],
+      "43aea90c": [
+        0.5
+      ],
+      "70cb1a2d": [
+        60000.0
+      ],
+      "2913bb1d": [
+        15000.0
+      ],
+      "0575b6f4": [
+        5.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f029fe04.kidsobjdb",
+    "id": "d9bdaba2",
+    "type": "468415d9",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "f981bc3d": [
+        531695005
+      ],
+      "dc491051": [
+        3692834338
+      ],
+      "f17661e1": [
+        1802165973
+      ],
+      "848cf8fc": [
+        1265821180
+      ],
+      "52cbb8aa": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f7e5aec6.kidsobjdb",
+    "id": "18643629",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        78785340
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545449912548065
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        0
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "071afbe8",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "2249f164",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        1576791220
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.45454543828964233
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        455239078
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        3700765063,
+        2745243784,
+        1789722505,
+        834201226,
+        4173647243,
+        3218125964
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "31b8e68a",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "400f14e7",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "5c3eb0eb",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "6aacff89",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        2
+      ],
+      "3e6831c9": [
+        97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "79032de6",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        99.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "9532c9ea",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        -60.0,
+        -86.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "a3a11888",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        1
+      ],
+      "3e6831c9": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "bfd0b48c",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        5
+      ],
+      "3e6831c9": [
+        -60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "ce26e2e9",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        3
+      ],
+      "3e6831c9": [
+        60.0,
+        -86.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "dbc17f03",
+    "type": "6e1381fe",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0
+      ],
+      "DisplaysetObjectNameHash": [
+        384051009
+      ],
+      "WorldPosFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "WorldRotationFCurveAnimationDataObjectNameHash": [
+        0,
+        0,
+        0
+      ],
+      "TransparencyFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "VisibilityFCurveAnimationDataObjectNameHash": [
+        0
+      ],
+      "AnimationState": [
+        0
+      ],
+      "AnimationFrame": [
+        0
+      ],
+      "AnimationLoopSectionFrame": [
+        0,
+        0
+      ],
+      "TexturesRenderStateObjectHash": [
+        1576791220
+      ],
+      "MainTextureNameHash": [
+        0
+      ],
+      "Transparency": [
+        1.0
+      ],
+      "BlackColorInterpolationRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WhiteColorInterpolationRGBA": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "BlendTexture1NameHash": [
+        0
+      ],
+      "BlendTexture2NameHash": [
+        0
+      ],
+      "BlendTexture1BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture1BlendModeOfAlpha": [
+        0
+      ],
+      "BlendTexture2BlendModeOfColor": [
+        2
+      ],
+      "BlendTexture2BlendModeOfAlpha": [
+        0
+      ],
+      "AlphaBlendOp": [
+        0
+      ],
+      "AlphaBlendSrcFunc": [
+        4
+      ],
+      "AlphaBlendDstFunc": [
+        5
+      ],
+      "AlphaBlendOpAlpha": [
+        0
+      ],
+      "AlphaBlendSrcFuncAlpha": [
+        4
+      ],
+      "AlphaBlendDstFuncAlpha": [
+        5
+      ],
+      "AlphaThreshold": [
+        0.0
+      ],
+      "ScaleForCalcOfIndirectTexture": [
+        1.0,
+        1.0
+      ],
+      "SaturationScale": [
+        1.0
+      ],
+      "IsEnableGammaCorrection": [
+        0
+      ],
+      "GammaCorrectionValue": [
+        0.4545454680919647
+      ],
+      "ContrastCorrectionValueOfTexture0": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture1": [
+        0
+      ],
+      "ContrastCorrectionValueOfTexture2": [
+        0
+      ],
+      "LocalPosition": [
+        180.0,
+        -157.0,
+        0.0
+      ],
+      "LocalQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LocalScale": [
+        1.0,
+        1.0
+      ],
+      "ParentSpriteNameHash": [
+        455239078
+      ],
+      "IsOpaque": [
+        0
+      ],
+      "AlphaTestCmpType": [
+        7
+      ],
+      "InfluencedAlpha": [
+        1
+      ],
+      "WorldScaleFCurveAnimationDataObjectNameHash": [
+        0,
+        0
+      ],
+      "79a746df": [
+        2030251494,
+        1074730215,
+        119208936,
+        3458654953,
+        2503133674,
+        1547612395
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "dc953187",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        0
+      ],
+      "3e6831c9": [
+        0.0,
+        99.0,
+        0.0
+      ],
+      "253bba26": [
+        0.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_f844c260.kidsobjdb",
+    "id": "f8c4cd8b",
+    "type": "9187d19d",
+    "parent": "00000000",
+    "props": {
+      "8040835f": [
+        4
+      ],
+      "3e6831c9": [
+        -97.0,
+        28.0,
+        0.0
+      ],
+      "253bba26": [
+        -60.0,
+        -86.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "2f93c2ec": [
+        0,
+        0,
+        0
+      ],
+      "ad3b225a": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "system_1a318d26.kidsobjdb",
+    "id": "1a318d26",
+    "type": "1d8d8bb6",
+    "parent": "00000000",
+    "props": {
+      "ByteCode": {
+        "count": 115652,
+        "type": 1,
+        "offset": 64
+      }
+    }
+  },
+  {
+    "file": "system_1e7d16fd.kidsobjdb",
+    "id": "1e7d16fd",
+    "type": "1d8d8bb6",
+    "parent": "00000000",
+    "props": {
+      "ByteCode": {
+        "count": 23400,
+        "type": 1,
+        "offset": 64
+      }
+    }
+  },
+  {
+    "file": "system_38770f76.kidsobjdb",
+    "id": "e110088f",
+    "type": "ffa5876c",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        3967450155
+      ],
+      "KTGL3DShaderRenderStateObjectHash": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "system_538913bd.kidsobjdb",
+    "id": "538913bd",
+    "type": "1d8d8bb6",
+    "parent": "00000000",
+    "props": {
+      "ByteCode": {
+        "count": 22728,
+        "type": 1,
+        "offset": 64
+      }
+    }
+  },
+  {
+    "file": "system_718ccb8b.kidsobjdb",
+    "id": "d1eb2b6a",
+    "type": "0fb246db",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        3497002621
+      ]
+    }
+  },
+  {
+    "file": "system_92aa20ca.kidsobjdb",
+    "id": "92aa20ca",
+    "type": "1d8d8bb6",
+    "parent": "00000000",
+    "props": {
+      "ByteCode": {
+        "count": 85184,
+        "type": 1,
+        "offset": 64
+      }
+    }
+  },
+  {
+    "file": "system_a1c83e34.kidsobjdb",
+    "id": "a1c83e34",
+    "type": "1d8d8bb6",
+    "parent": "00000000",
+    "props": {
+      "ByteCode": {
+        "count": 116348,
+        "type": 1,
+        "offset": 64
+      }
+    }
+  }
+]

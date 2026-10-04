@@ -1,0 +1,38 @@
+{
+	"fine": {
+		"cpu_render_ms": 1.40499997138977,
+		"draw_calls": 172,
+		"fps": 15.7741146778137,
+		"gpu_ms": 60.5040016174316,
+		"median_ms": 63.395,
+		"p95_ms": 68.513,
+		"primitives": 300223
+	},
+	"flow": {
+		"cpu_render_ms": 1.21399998664856,
+		"draw_calls": 172,
+		"fps": 20.5376763672958,
+		"gpu_ms": 46.898998260498,
+		"median_ms": 48.691,
+		"p95_ms": 53.98,
+		"primitives": 300223
+	},
+	"flow_repeat": {
+		"cpu_render_ms": 1.19000005722046,
+		"draw_calls": 172,
+		"fps": 19.3106111808439,
+		"gpu_ms": 49.3110008239746,
+		"median_ms": 51.785,
+		"p95_ms": 55.616,
+		"primitives": 300223
+	},
+	"no_vegetation": {
+		"cpu_render_ms": 0.611000001430511,
+		"draw_calls": 60,
+		"fps": 81.8062827225131,
+		"gpu_ms": 9.98200035095215,
+		"median_ms": 12.224,
+		"p95_ms": 15.942,
+		"primitives": 201952
+	}
+}

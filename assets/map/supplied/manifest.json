@@ -1,0 +1,25 @@
+{
+  "image_size": [
+    1920,
+    1080
+  ],
+  "crop": [
+    0,
+    0,
+    1920,
+    1080
+  ],
+  "source_sheets": {
+    "packing": "a950faa2-f121-451a-aca1-2d5fdea50cae",
+    "overview": "fadb8535-6d86-4129-a75b-d773d3732873",
+    "boundaries": "9c00516e-11bf-4e95-bfe6-69e4b0331ad7",
+    "region-fill-a": "3e182681-b3ed-4c1d-9ba3-a34ea8d5b127",
+    "region-fill-b": "97a50386-e57f-471c-a5bd-5b663c86c377",
+    "region-edge-a": "0b0e310e-2af8-43b7-9b01-3dc6d02defe2",
+    "region-edge-b": "14498d53-3633-4a60-b219-ef03bc816b2d",
+    "base": "728a9456-a46f-4c5d-82ee-6aaf1d0a81ed",
+    "terrain": "ea344590-1964-4f1e-9e70-da63ac66d31b",
+    "composite": "cadede1a-a69a-4e4a-be9c-741cd2b94d5c"
+  },
+  "note": "图集未标注州名或城市编号，不能按图集排列顺序推定归属。城市和州的语义沿用 world_map.json。"
+}

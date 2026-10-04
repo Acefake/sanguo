@@ -1,0 +1,827 @@
+[
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "035b748d",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        18.259719848632812,
+        1.0,
+        103.07689666748047
+      ],
+      "WorldPosition": [
+        147175.953125,
+        390.0,
+        57940.4375
+      ],
+      "WorldQuaternion": [
+        0.0,
+        -0.4020578861236572,
+        0.0,
+        0.9156141877174377
+      ],
+      "PositionArray": {
+        "count": 48,
+        "type": 8,
+        "offset": 168
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2891327943
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "0679d071",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        100.0,
+        5.0,
+        100.0
+      ],
+      "WorldPosition": [
+        156386.0,
+        1627.0,
+        7630.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "PositionArray": [
+        268.2232971191406,
+        -50.0,
+        2.2016448974609375,
+        170.8166961669922,
+        -50.0,
+        -289.2178039550781,
+        -288.0032043457031,
+        -50.0,
+        -200.17660522460938,
+        -178.15280151367188,
+        -50.0,
+        113.1364974975586
+      ],
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        4070806318
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "1d3b686e",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        30.0,
+        1.0,
+        12.0
+      ],
+      "WorldPosition": [
+        105171.125,
+        400.0,
+        171043.9375
+      ],
+      "WorldQuaternion": [
+        8.06876698788983e-09,
+        0.6087614297866821,
+        8.06876698788983e-09,
+        0.7933533191680908
+      ],
+      "PositionArray": {
+        "count": 30,
+        "type": 8,
+        "offset": 704
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "2397bc94",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        30.0,
+        1.0,
+        10.0
+      ],
+      "WorldPosition": [
+        108207.6015625,
+        400.0,
+        104333.8984375
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.2588190734386444,
+        0.0,
+        0.965925931930542
+      ],
+      "PositionArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 972
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "33fd006b",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        40.0,
+        1.0,
+        10.0
+      ],
+      "WorldPosition": [
+        102594.421875,
+        499.0703125,
+        129135.7421875
+      ],
+      "WorldQuaternion": [
+        0.0,
+        -0.2588190734386444,
+        0.0,
+        0.965925931930542
+      ],
+      "PositionArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 1192
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "3a595491",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        10.0,
+        1.0,
+        50.0
+      ],
+      "WorldPosition": [
+        160711.34375,
+        578.0098266601562,
+        54604.40234375
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.866025447845459,
+        0.0,
+        0.4999999701976776
+      ],
+      "PositionArray": {
+        "count": 90,
+        "type": 8,
+        "offset": 1412
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "511aec8e",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        82.62040710449219,
+        1.0,
+        56.07189178466797
+      ],
+      "WorldPosition": [
+        177689.28125,
+        410.0,
+        103751.953125
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "PositionArray": {
+        "count": 165,
+        "type": 8,
+        "offset": 1920
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2891327943
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "6afae06f",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        30.0,
+        1.0,
+        12.0
+      ],
+      "WorldPosition": [
+        156149.421875,
+        400.0,
+        153867.921875
+      ],
+      "WorldQuaternion": [
+        0.0,
+        -0.1736481934785843,
+        0.0,
+        0.9848078489303589
+      ],
+      "Height": [
+        100.00019836425781
+      ],
+      "PositionArray": {
+        "count": 72,
+        "type": 8,
+        "offset": 2744
+      },
+      "BankObjectNameHash": [
+        2150588249
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "71573495",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        40.0,
+        1.0,
+        13.0
+      ],
+      "WorldPosition": [
+        84578.5,
+        400.0,
+        137582.6875
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.5,
+        0.0,
+        0.8660253882408142
+      ],
+      "PositionArray": {
+        "count": 114,
+        "type": 8,
+        "offset": 3180
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "73628e84",
+    "type": "8374438a",
+    "parent": "415ec9ec",
+    "props": {
+      "WorldScale": [
+        8518.0,
+        200.0,
+        11298.0
+      ],
+      "WorldPosition": [
+        170467.0,
+        699.0,
+        144174.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2435632560
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "7fd30a43",
+    "type": "8374438a",
+    "parent": "415ec9ec",
+    "props": {
+      "WorldScale": [
+        19561.7109375,
+        1.0,
+        25007.591796875
+      ],
+      "WorldPosition": [
+        60809.03125,
+        1636.0150146484375,
+        175124.21875
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2435632560
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "81bc786c",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        30.0,
+        1.0,
+        10.0
+      ],
+      "WorldPosition": [
+        76620.546875,
+        463.0595703125,
+        94359.578125
+      ],
+      "WorldQuaternion": [
+        0.0,
+        -0.1736481934785843,
+        0.0,
+        0.9848078489303589
+      ],
+      "PositionArray": {
+        "count": 18,
+        "type": 8,
+        "offset": 4056
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "8818cc92",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        52.51565170288086,
+        1.0,
+        15.630940437316895
+      ],
+      "WorldPosition": [
+        80617.1484375,
+        522.982421875,
+        29450.408203125
+      ],
+      "WorldQuaternion": [
+        0.0,
+        -0.08715573698282242,
+        0.0,
+        0.9961947202682495
+      ],
+      "PositionArray": {
+        "count": 54,
+        "type": 8,
+        "offset": 4276
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "8c438602",
+    "type": "8374438a",
+    "parent": "415ec9ec",
+    "props": {
+      "WorldScale": [
+        30706.794921875,
+        1.0,
+        33068.47265625
+      ],
+      "WorldPosition": [
+        50905.10546875,
+        1000.0,
+        34931.52734375
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        4070806318
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "9eda648f",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        8.180519104003906,
+        1.0,
+        100.72440338134766
+      ],
+      "WorldPosition": [
+        172390.09375,
+        1078.085693359375,
+        18353.21484375
+      ],
+      "WorldQuaternion": [
+        0.0,
+        -0.1567792445421219,
+        0.0,
+        0.9876337647438049
+      ],
+      "PositionArray": [
+        50.0,
+        -50.0,
+        50.0,
+        50.0,
+        -50.0,
+        -50.0,
+        -50.0,
+        -50.0,
+        -50.0,
+        -588.1616821289062,
+        -50.0,
+        34.841190338134766,
+        -50.0,
+        -50.0,
+        50.0
+      ],
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "b59bfc8c",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        86.12837219238281,
+        1.0,
+        191.226806640625
+      ],
+      "WorldPosition": [
+        166513.90625,
+        400.0,
+        36138.48046875
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "PositionArray": {
+        "count": 108,
+        "type": 8,
+        "offset": 4984
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        153020772
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "b8ba5870",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        100.0,
+        6.0,
+        100.0
+      ],
+      "WorldPosition": [
+        5409.853515625,
+        2691.4296875,
+        64787.6875
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "PositionArray": [
+        58.174461364746094,
+        -50.0,
+        189.0543975830078,
+        60.682838439941406,
+        -50.0,
+        -254.22360229492188,
+        -36.789100646972656,
+        -50.0,
+        -168.75469970703125,
+        -42.048160552978516,
+        -50.0,
+        215.51300048828125
+      ],
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        4070806318
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "cf7bf06d",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        30.0,
+        1.0,
+        10.0
+      ],
+      "WorldPosition": [
+        135284.59375,
+        400.0,
+        52805.21875
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.7071068286895752,
+        0.0,
+        0.7071068286895752
+      ],
+      "PositionArray": {
+        "count": 81,
+        "type": 8,
+        "offset": 5760
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "d5d84493",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        40.0,
+        1.0,
+        10.0
+      ],
+      "WorldPosition": [
+        80030.8828125,
+        694.1787109375,
+        58373.6015625
+      ],
+      "WorldQuaternion": [
+        0.0,
+        -0.3420201539993286,
+        0.0,
+        0.9396927356719971
+      ],
+      "PositionArray": {
+        "count": 33,
+        "type": 8,
+        "offset": 6232
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "ec99dc90",
+    "type": "8374438a",
+    "parent": "90f5edf6",
+    "props": {
+      "WorldScale": [
+        150.0,
+        1.0,
+        4.546584129333496
+      ],
+      "WorldPosition": [
+        171878.8125,
+        400.0,
+        89095.953125
+      ],
+      "WorldQuaternion": [
+        0.0012657990446314216,
+        0.28032293915748596,
+        -0.0043344092555344105,
+        0.959895133972168
+      ],
+      "Height": [
+        99.99994659423828
+      ],
+      "PositionArray": {
+        "count": 102,
+        "type": 8,
+        "offset": 6528
+      },
+      "BankObjectNameHash": [
+        3320215277
+      ],
+      "ProgId": [
+        2051753876
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_4cd1e77a.kidsobjdb",
+    "id": "fd8475d6",
+    "type": "TypeInfo::Object::Sound::ReverbSetting",
+    "parent": "00000000",
+    "props": {
+      "DefaultPresetNameHash": [
+        1508413918
+      ],
+      "DefaultVolume": [
+        1.0
+      ],
+      "DefaultFadeTime": [
+        2000
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c94c99cf.kidsobjdb",
+    "id": "9eeb16c5",
+    "type": "8374438a",
+    "parent": "21418f6e",
+    "props": {
+      "WorldPosition": [
+        122850.0,
+        420.0,
+        161110.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        300000.0,
+        11900.0,
+        250000.0
+      ],
+      "SnowCoverFade": [
+        1.0,
+        1.0,
+        0.3518005609512329
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c94c99cf.kidsobjdb",
+    "id": "c83f6c06",
+    "type": "8374438a",
+    "parent": "21418f6e",
+    "props": {
+      "WorldPosition": [
+        155820.0,
+        1260.0,
+        95230.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        145400.0,
+        3197.0,
+        220000.0
+      ],
+      "SnowCoverFade": [
+        0.8217821717262268,
+        0.801980197429657,
+        0.8448845148086548
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_c94c99cf.kidsobjdb",
+    "id": "f193c147",
+    "type": "8374438a",
+    "parent": "21418f6e",
+    "props": {
+      "WorldPosition": [
+        66540.2421875,
+        1586.8505859375,
+        74220.484375
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "WorldScale": [
+        75140.375,
+        4835.05859375,
+        131300.8125
+      ],
+      "SnowCoverFade": [
+        0.7755775451660156,
+        0.801980197429657,
+        0.7491748929023743
+      ]
+    }
+  }
+]

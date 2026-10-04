@@ -1,0 +1,17 @@
+{
+  "6f1ab58b": "NumCells",
+  "0fd0f003": "LODDistanceArray",
+  "4b80cfb1": "TerrainType",
+  "711a5f43": "IsInstancingDisplaySetArray",
+  "a2dd60a1": "FreeDistance",
+  "e9567eeb": "BiomeInfoArray",
+  "dd5651bc": "GlobalFlags",
+  "dd271667": "AbsolutelyRenderDistanceH",
+  "a3dae7da": "ViewDistance",
+  "f709a219": "AbsolutelyRenderDistanceV",
+  "5c9ee311": "ElementFlagArray",
+  "e065f0e9": "ElementRandomSeedArray",
+  "79c02ffe": "UpdateDistance",
+  "e3c9c8f0": "ElementObjectHashArray",
+  "7c441a6e": "ComponentInfoArray"
+}

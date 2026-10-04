@@ -1,0 +1,262 @@
+extends SceneTree
+
+const Store = preload("res://scripts/game_state.gd")
+const Combat = preload("res://scripts/war/combat_system.gd")
+const Adapter = preload("res://scripts/agents/agent_adapter.gd")
+const Policy = preload("res://scripts/agents/baseline_policy.gd")
+var failures: Array = []
+
+class DecisionStub extends Node:
+	var model := "test-stub"
+	var metrics: Dictionary = {"fallbacks": 0}
+	var desired := "hold"
+	func choose_batch(contexts: Array) -> Dictionary:
+		var results: Dictionary = {}
+		for context in contexts:
+			var result: Dictionary = {}
+			for candidate in context["candidates"]:
+				if candidate["action"]["type"] == desired:
+					result = {"candidate_id": candidate["id"], "reason_summary": "测试选择", "source": "model"}
+					break
+			if result.is_empty(): result = Policy.choose(context)
+			results[context["request_id"]] = result
+		return results
+
+
+func _initialize() -> void:
+	call_deferred("_run")
+
+
+func _check(condition: bool, message: String) -> void:
+	if not condition:
+		failures.append(message)
+		push_error(message)
+
+
+func _sandbox() -> Node:
+	var sandbox := Store.new()
+	sandbox.persist_enabled = false
+	sandbox._load_demo()
+	return sandbox
+
+
+func _officer(sandbox: Node, name: String) -> String:
+	for officer in sandbox.war.roster.officers.values():
+		if officer["name"] == name: return str(officer["id"])
+	return ""
+
+
+func _city(sandbox: Node, id: String, faction: String, troops: int, grain: int = 10000) -> void:
+	var city: Dictionary = sandbox.city_state(id)
+	city["faction"] = faction
+	city["garrison"] = troops
+	city["grain"] = grain
+	city["training"] = 70
+	city["equipment"] = 70
+	city["defense"] = 20
+	city["units"] = {"infantry": troops, "archers": 0, "cavalry": 0}
+
+
+func _ledger(sandbox: Node) -> int:
+	var total: int = 0
+	for city in sandbox.scenario["places"].values():
+		total += int(city.get("garrison", 0)) + int(city.get("wounded", 0)) + int(city.get("war_dead", 0)) + int(city.get("prisoners", 0))
+	for army in sandbox.war.state["armies"].values():
+		total += int(army["dead"]) + int(army["captured"])
+		if army["status"] != "ended": total += Combat.strength(army) + int(army["wounded"])
+	return total
+
+
+func _run() -> void:
+	var sandbox: Node = _sandbox()
+	_city(sandbox, "luoyang", "liu_bei", 10000)
+	_city(sandbox, "hongnong", "yuan_shao", 1600)
+	var id: String = _officer(sandbox, "关羽")
+	var total: int = _ledger(sandbox)
+	var grain: int = int(sandbox.city_state("luoyang")["grain"])
+	var preview: Dictionary = sandbox.war.preview_dispatch("luoyang", "hongnong", id)
+	_check(bool(preview["ok"]) and int(preview["strength"]) == 6000, "自动动员人数错误")
+	_check(int(sandbox.city_state("luoyang")["grain"]) == grain and _ledger(sandbox) == total, "预览不应改变库存")
+	var dispatch: Dictionary = sandbox.war.dispatch("luoyang", "hongnong", id)
+	_check(bool(dispatch["ok"]), "派遣未成功")
+	var army: Dictionary = sandbox.war.state["armies"][dispatch["army_id"]]
+	_check(_ledger(sandbox) == total and int(sandbox.city_state("luoyang")["grain"]) + int(army["grain"]) == grain, "派遣未保持兵粮守恒")
+	_check(not bool(sandbox.war.dispatch("luoyang", "hongnong", id)["ok"]), "同一将领能够重复出征")
+	_check(not bool(sandbox.war.dispatch("hongnong", "luoyang", id)["ok"]), "玩家能够动员敌城")
+	var context: Dictionary = sandbox.war.context_for(army)
+	var secret_city: Dictionary = sandbox.city_state("xiangping")
+	secret_city["garrison"] += 5000
+	_check(context == sandbox.war.context_for(army), "隐藏军情泄露到上下文")
+	secret_city["garrison"] -= 5000
+	_check(not bool(sandbox.war.validate_decision(context, {"candidate_id": "spawn:9999"})["ok"]), "非法模型行动通过校验")
+	_check(sandbox.war.roster.officers[id]["personality"].size() == 14, "人物人格轴未限制为14项")
+	_check(not bool(sandbox.war.preview_dispatch("hongnong", "luoyang", id)["ok"]), "敌方城池能够使用本方主将")
+	_check(sandbox.action_error("hongnong", "recruit").contains("敌方"), "开战后玩家仍能在敌城征兵")
+	_check(sandbox.war.player_city_intel("xiangping").is_empty(), "未送达的侦察数据直接显示给玩家")
+	var fake := DecisionStub.new()
+	root.add_child(fake)
+	await sandbox.war.step(fake)
+	_check(str(army["location"]["edge"]) == "" and army["last_decision"] == 1, "模型选择等待未改变实际行动")
+	_check(not bool(sandbox.war.validate_decision(context, {"candidate_id": "hold"})["ok"]), "旧请求能够重复执行")
+	fake.queue_free()
+	for index in range(100):
+		await sandbox.war.step()
+		_check(_ledger(sandbox) == total, "战争过程中兵员账本失衡，第%d日" % index)
+		if army["status"] == "ended" and sandbox.war.active_armies().is_empty(): break
+	_check(army["status"] == "ended", "自主战争没有结束")
+	_check(not sandbox.war.visible_reports().is_empty(), "军报没有送达")
+	_check(sandbox.war.state["decisions"].size() > 1, "没有记录实际决策")
+	print("WAR_RESULT ", army["outcome"], " days=", sandbox.war.state["tick"], " decisions=", sandbox.war.state["decisions"].size())
+	# Snapshot restoration must preserve the 64-bit RNG state without JSON rounding.
+	var encoded: Dictionary = JSON.parse_string(JSON.stringify(sandbox.war.export_state()))
+	var clone: Node = _sandbox()
+	clone.scenario = sandbox.scenario.duplicate(true)
+	clone.war.setup(clone, encoded)
+	_check(sandbox.war.rng.state == clone.war.rng.state, "随机状态经过JSON后丢失精度")
+	await sandbox.war.step()
+	await clone.war.step()
+	var original_state: Dictionary = sandbox.war.export_state()
+	var restored_state: Dictionary = clone.war.export_state()
+	_check(_equivalent(original_state, restored_state), "载入快照后战争状态出现分歧")
+	clone.free()
+	sandbox.free()
+	await _road_contact()
+	await _supply_and_withdrawal()
+	await _save_migration()
+	await _adapter_checks()
+	_personality_checks()
+	await _clock_checks()
+	if failures.is_empty():
+		print("WAR_VALIDATION_OK: dispatch, conservation, authority, fog, personality, model actions, road contact, supply, siege, return, migration, RNG and adapter failures")
+	quit(0 if failures.is_empty() else 1)
+
+
+func _road_contact() -> void:
+	var sandbox: Node = _sandbox()
+	_city(sandbox, "luoyang", "liu_bei", 10000)
+	_city(sandbox, "hongnong", "yuan_shao", 10000)
+	var attacker_id: String = _officer(sandbox, "关羽")
+	var defender_id: String = _officer(sandbox, "颜良")
+	var a: Dictionary = sandbox.war._mobilize(sandbox.war.preview_dispatch("luoyang", "hongnong", attacker_id))
+	var b: Dictionary = sandbox.war._mobilize(sandbox.war.preview_dispatch("hongnong", "luoyang", defender_id))
+	var c: Dictionary = sandbox.war._mobilize(sandbox.war.preview_dispatch("luoyang", "hongnong", _officer(sandbox, "魏延")))
+	var path: Dictionary = sandbox.war.graph.path("luoyang", "hongnong")
+	_check(path["edges"].size() == 1, "道路接敌测试需要直连路线")
+	var edge: String = str(path["edges"][0])
+	a["location"] = {"node": "luoyang", "edge": edge, "from": "luoyang", "to": "hongnong", "progress": 0.4}
+	b["location"] = {"node": "hongnong", "edge": edge, "from": "hongnong", "to": "luoyang", "progress": 0.4}
+	c["location"] = a["location"].duplicate(true)
+	a["action"] = {"type": "continue"}
+	b["action"] = {"type": "continue"}
+	c["action"] = {"type": "continue"}
+	var total: int = _ledger(sandbox)
+	var motions: Dictionary = sandbox.war._move_all()
+	sandbox.war._resolve_contacts(motions)
+	_check(int(a["dead"]) > 0 and int(b["dead"]) > 0, "相向行军发生穿透，未接敌")
+	_check(int(c["dead"]) > 0, "同场援军没有参与战斗")
+	_check(_ledger(sandbox) == total, "道路战斗未保持兵员守恒")
+	var restored: Node = _sandbox()
+	restored.scenario = sandbox.scenario.duplicate(true)
+	restored.war.setup(restored, JSON.parse_string(JSON.stringify(sandbox.war.export_state())))
+	await sandbox.war.step()
+	await restored.war.step()
+	_check(_equivalent(sandbox.war.export_state(), restored.war.export_state()), "交战中恢复快照后，后续决策或战损出现分歧")
+	restored.free()
+	sandbox.free()
+
+
+func _supply_and_withdrawal() -> void:
+	var sandbox: Node = _sandbox()
+	_city(sandbox, "luoyang", "liu_bei", 10000)
+	var preview: Dictionary = sandbox.war.preview_dispatch("luoyang", "hongnong", _officer(sandbox, "关羽"))
+	var army: Dictionary = sandbox.war._mobilize(preview)
+	army["grain"] = 0.0
+	var food_before: int = int(sandbox.city_state("luoyang")["grain"])
+	sandbox.war._execute(army, {"type": "resupply"})
+	_check(int(army["grain"]) + int(sandbox.city_state("luoyang")["grain"]) == food_before, "补给凭空产生或损失粮草")
+	var total: int = _ledger(sandbox)
+	sandbox.war._execute(army, {"type": "withdraw"})
+	_check(army["status"] == "ended" and _ledger(sandbox) == total, "归营重复增加或丢失兵员")
+	var before_return: int = int(sandbox.city_state("luoyang")["garrison"])
+	sandbox.war._finish(army, "撤退")
+	_check(int(sandbox.city_state("luoyang")["garrison"]) == before_return, "重复归营导致复制军队")
+	sandbox.free()
+
+
+func _save_migration() -> void:
+	var sandbox: Node = _sandbox()
+	sandbox.save_path = "user://war_validation_temp.json"
+	var legacy: Dictionary = {"version": 1, "year": 192, "month": 3, "action_points": 2, "places": sandbox.scenario["places"].duplicate(true), "chronicles": []}
+	var file := FileAccess.open(sandbox.save_path, FileAccess.WRITE)
+	file.store_string(JSON.stringify(legacy))
+	file.close()
+	sandbox._load_save()
+	_check(sandbox.year == 192 and sandbox.month == 3 and sandbox.day == 1 and sandbox.war.active_armies().is_empty(), "旧存档迁移错误")
+	_city(sandbox, "luoyang", "liu_bei", 10000)
+	var dispatch: Dictionary = sandbox.war.dispatch("luoyang", "hongnong", _officer(sandbox, "关羽"))
+	await sandbox.war.step()
+	sandbox.persist_enabled = true
+	sandbox._save()
+	var restored: Node = _sandbox()
+	restored.save_path = sandbox.save_path
+	restored._load_save()
+	_check(restored.war.state["armies"].has(dispatch["army_id"]) and restored.war.rng.state == sandbox.war.rng.state, "新存档丢失军队或随机状态")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(sandbox.save_path))
+	restored.free()
+	sandbox.free()
+
+
+func _adapter_checks() -> void:
+	var adapter := Adapter.new()
+	root.add_child(adapter)
+	_check(adapter.configure({"enabled": true, "endpoint": "file:///secret", "model": "x"}, false).contains("http"), "接口配置没有拒绝非法URL")
+	_check(adapter._decode_response(0, 401, "{}".to_utf8_buffer()).has("error"), "HTTP错误没有回退")
+	_check(adapter._decode_response(0, 200, "{\"choices\":[]}".to_utf8_buffer()).has("error"), "空模型响应未被拒绝")
+	var decoded: Dictionary = adapter._decode_response(0, 200, JSON.stringify({"choices": [{"message": {"content": "{\"candidate_id\":\"hold\",\"reason_summary\":\"整顿部队\"}"}}]}).to_utf8_buffer())
+	_check(decoded.get("candidate_id", "") == "hold" and decoded.get("source", "") == "model", "合法模型响应解析失败")
+	adapter.configure({"enabled": true, "endpoint": "http://127.0.0.1:1/v1/chat/completions", "model": "unavailable", "timeout": 2}, false)
+	var results: Dictionary = await adapter.choose_batch([{"request_id": "timeout-test", "candidates": [{"id": "hold", "action": {"type": "hold"}}]}])
+	_check(results.get("timeout-test", {}).get("source", "") == "baseline" and int(adapter.metrics["failures"]) == 1, "连接失败后未正常接管")
+	adapter.queue_free()
+
+
+func _personality_checks() -> void:
+	var situation: Dictionary = {"officer": {"personality": {"风险承受": 90, "耐心": 50}}, "army": {"strength": 1000, "grain_days": 20, "morale": 90, "organization": 90}, "enemies": [{"strength_estimate": 1300}], "candidates": [{"id": "engage", "action": {"type": "engage"}}, {"id": "withdraw", "action": {"type": "withdraw"}}]}
+	var daring: Dictionary = Policy.choose(situation)
+	situation["officer"]["personality"]["风险承受"] = 10
+	var cautious: Dictionary = Policy.choose(situation)
+	_check(daring["candidate_id"] == "engage" and cautious["candidate_id"] == "withdraw", "风险人格没有改变实际行动选择")
+
+
+func _clock_checks() -> void:
+	var bulk: Node = _sandbox()
+	var daily: Node = _sandbox()
+	for sandbox in [bulk, daily]:
+		for city in sandbox.scenario["places"].values():
+			if not city.has("population"): continue
+			city["population"] = 0
+			city["economy"] = 0
+			city["garrison"] = 1000
+			city["grain"] = 10000
+	bulk.advance_month()
+	for index in range(30): await daily.advance_day()
+	_check(bulk.month == daily.month and bulk.day == daily.day and int(bulk.city_state("luoyang")["grain"]) == int(daily.city_state("luoyang")["grain"]), "按日与按月推进重复或遗漏驻军粮耗")
+	_check(int(bulk.city_state("luoyang")["grain"]) == 9880, "驻军30日口粮计算不正确")
+	bulk.free()
+	daily.free()
+
+
+func _equivalent(a: Variant, b: Variant) -> bool:
+	if typeof(a) in [TYPE_INT, TYPE_FLOAT] and typeof(b) in [TYPE_INT, TYPE_FLOAT]:
+		return absf(float(a) - float(b)) < 0.00000001
+	if a is Dictionary and b is Dictionary:
+		if a.size() != b.size(): return false
+		for key in a:
+			if not b.has(key) or not _equivalent(a[key], b[key]): return false
+		return true
+	if a is Array and b is Array:
+		if a.size() != b.size(): return false
+		for index in range(a.size()):
+			if not _equivalent(a[index], b[index]): return false
+		return true
+	return a == b

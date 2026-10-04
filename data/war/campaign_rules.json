@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "days_per_month": 30,
+  "grain_per_soldier_day": 0.004,
+  "reserve_ratio": 0.35,
+  "minimum_reserve": 1000,
+  "mobilization_ratio": 0.6,
+  "minimum_army": 500,
+  "carry_days": 24,
+  "mission_days": 90,
+  "route_days_per_cost": 3.0,
+  "report_delay_days": 1,
+  "intel_expiry_days": 4,
+  "units": {
+    "infantry": {"name": "步兵", "damage": 1.0, "toughness": 1.2, "pursuit": 0.5},
+    "archers": {"name": "弓兵", "damage": 1.3, "toughness": 0.8, "pursuit": 0.3},
+    "cavalry": {"name": "骑兵", "damage": 1.5, "toughness": 1.4, "pursuit": 1.5}
+  },
+  "faction_mapping": {"袁绍集团": "yuan_shao", "孙吴集团": "sun_jian", "蜀汉集团": "liu_bei"},
+  "terrain_regions": {"yizhou": "mountains", "liangzhou": "hills", "bingzhou": "hills", "jingzhou": "river", "yangzhou": "river"},
+  "scenario_note": "沿用演示剧本与人物设计卡，不作为191年历史人物状态。旧驻军迁为步兵，新征募在训练、军备达标后可包含弓骑。"
+}

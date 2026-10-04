@@ -1,0 +1,1009 @@
+{
+  "schema_version": 2,
+  "reference": "res://data/city_scene_reference.json",
+  "profiles": {
+    "north": {
+      "name": "北方",
+      "scene_id": 101,
+      "scene": "res://assets/city/regional/north/scene.json",
+      "art": "res://assets/city/regional/north/preview-perspective.png",
+      "locations": {
+        "government": [
+          695,
+          177
+        ],
+        "farm": [
+          300,
+          231
+        ],
+        "market": [
+          400,
+          568
+        ],
+        "barracks": [
+          825,
+          391
+        ],
+        "workshop": [
+          451,
+          365
+        ],
+        "tavern": [
+          746,
+          548
+        ]
+      }
+    },
+    "central": {
+      "name": "中原",
+      "scene_id": 102,
+      "scene": "res://assets/city/luoyang/scene.json",
+      "art": "res://assets/city/luoyang/preview-perspective.png",
+      "locations": {
+        "government": [
+          658,
+          177
+        ],
+        "market": [
+          345,
+          565
+        ],
+        "farm": [
+          302,
+          233
+        ],
+        "barracks": [
+          1060,
+          409
+        ],
+        "workshop": [
+          395,
+          394
+        ],
+        "tavern": [
+          758,
+          418
+        ]
+      }
+    },
+    "south": {
+      "name": "江南",
+      "scene_id": 103,
+      "scene": "res://assets/city/regional/south/scene.json",
+      "art": "res://assets/city/regional/south/preview-perspective.png",
+      "locations": {
+        "government": [
+          674,
+          178
+        ],
+        "farm": [
+          351,
+          288
+        ],
+        "market": [
+          407,
+          520
+        ],
+        "barracks": [
+          762,
+          388
+        ],
+        "workshop": [
+          460,
+          376
+        ],
+        "tavern": [
+          752,
+          587
+        ]
+      }
+    },
+    "shu": {
+      "name": "西蜀",
+      "scene_id": 104,
+      "scene": "res://assets/city/regional/shu/scene.json",
+      "art": "res://assets/city/regional/shu/preview-perspective.png",
+      "locations": {
+        "government": [
+          706,
+          164
+        ],
+        "farm": [
+          295,
+          222
+        ],
+        "market": [
+          744,
+          380
+        ],
+        "barracks": [
+          791,
+          523
+        ],
+        "workshop": [
+          462,
+          351
+        ],
+        "tavern": [
+          1060,
+          445
+        ]
+      }
+    },
+    "nanman": {
+      "name": "南蛮",
+      "scene_id": 105,
+      "scene": "res://assets/city/regional/nanman/scene.json",
+      "art": "res://assets/city/regional/nanman/preview-perspective.png",
+      "locations": {
+        "government": [
+          674,
+          156
+        ],
+        "farm": [
+          338,
+          266
+        ],
+        "market": [
+          421,
+          353
+        ],
+        "barracks": [
+          780,
+          373
+        ],
+        "workshop": [
+          356,
+          434
+        ],
+        "tavern": [
+          689,
+          589
+        ]
+      }
+    }
+  },
+  "cities": {
+    "jiuquan": {
+      "name": "酒泉",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "武威",
+      "source_city_id": 22,
+      "source_state": "凉州",
+      "source_state_id": 10,
+      "reason": "河西城镇与武威使用同一北方布局。"
+    },
+    "zhangye": {
+      "name": "张掖",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "武威",
+      "source_city_id": 22,
+      "source_state": "凉州",
+      "source_state_id": 10,
+      "reason": "河西城镇与武威使用同一北方布局。"
+    },
+    "wuwei": {
+      "name": "武威",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "武威",
+      "source_city_id": 22,
+      "source_state": "凉州",
+      "source_state_id": 10,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "jincheng": {
+      "name": "金城",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "武威",
+      "source_city_id": 22,
+      "source_state": "凉州",
+      "source_state_id": 10,
+      "reason": "凉州扩展城镇参照武威，而非中原布局。"
+    },
+    "tianshui": {
+      "name": "天水",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "天水",
+      "source_city_id": 21,
+      "source_state": "雍州",
+      "source_state_id": 9,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "yunzhong": {
+      "name": "云中",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "晋阳",
+      "source_city_id": 9,
+      "source_state": "并州",
+      "source_state_id": 4,
+      "reason": "并州扩展城镇参照晋阳。"
+    },
+    "yanmen": {
+      "name": "雁门",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "晋阳",
+      "source_city_id": 9,
+      "source_state": "并州",
+      "source_state_id": 4,
+      "reason": "并州扩展城镇参照晋阳。"
+    },
+    "dingxiang": {
+      "name": "定襄",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "晋阳",
+      "source_city_id": 9,
+      "source_state": "并州",
+      "source_state_id": 4,
+      "reason": "并州扩展城镇参照晋阳。"
+    },
+    "jinyang": {
+      "name": "晋阳",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "晋阳",
+      "source_city_id": 9,
+      "source_state": "并州",
+      "source_state_id": 4,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "shangdang": {
+      "name": "上党",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "上党",
+      "source_city_id": 10,
+      "source_state": "并州",
+      "source_state_id": 4,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "ji": {
+      "name": "蓟",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "蓟",
+      "source_city_id": 3,
+      "source_state": "幽州",
+      "source_state_id": 1,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "yuyang": {
+      "name": "渔阳",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "蓟",
+      "source_city_id": 3,
+      "source_state": "幽州",
+      "source_state_id": 1,
+      "reason": "幽州扩展城镇参照蓟。"
+    },
+    "beiping": {
+      "name": "北平",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "北平",
+      "source_city_id": 2,
+      "source_state": "幽州",
+      "source_state_id": 1,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "liaoxi": {
+      "name": "辽西",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "北平",
+      "source_city_id": 2,
+      "source_state": "幽州",
+      "source_state_id": 1,
+      "reason": "幽州东部扩展城镇参照北平。"
+    },
+    "xiangping": {
+      "name": "襄平",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "襄平",
+      "source_city_id": 1,
+      "source_state": "幽州",
+      "source_state_id": 1,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "ye": {
+      "name": "邺",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "邺",
+      "source_city_id": 5,
+      "source_state": "冀州",
+      "source_state_id": 2,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "nanpi": {
+      "name": "南皮",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "南皮",
+      "source_city_id": 4,
+      "source_state": "冀州",
+      "source_state_id": 2,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "pingyuan": {
+      "name": "平原",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "original_city_table",
+      "source_scene_id": 101,
+      "source_city": "平原",
+      "source_city_id": 6,
+      "source_state": "冀州",
+      "source_state_id": 2,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "zhongshan": {
+      "name": "中山",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "邺",
+      "source_city_id": 5,
+      "source_state": "冀州",
+      "source_state_id": 2,
+      "reason": "冀州扩展城镇参照邺。"
+    },
+    "changshan": {
+      "name": "常山",
+      "profile": "north",
+      "scene_id": 101,
+      "mapping": "configured_extension",
+      "source_scene_id": 101,
+      "source_city": "邺",
+      "source_city_id": 5,
+      "source_state": "冀州",
+      "source_state_id": 2,
+      "reason": "冀州扩展城镇参照邺。"
+    },
+    "jinan": {
+      "name": "济南",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "济南",
+      "source_city_id": 8,
+      "source_state": "青州",
+      "source_state_id": 3,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "beihai": {
+      "name": "北海",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "北海",
+      "source_city_id": 7,
+      "source_state": "青州",
+      "source_state_id": 3,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "donglai": {
+      "name": "东莱",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "北海",
+      "source_city_id": 7,
+      "source_state": "青州",
+      "source_state_id": 3,
+      "reason": "青州扩展城镇参照北海。"
+    },
+    "linzi": {
+      "name": "临淄",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "北海",
+      "source_city_id": 7,
+      "source_state": "青州",
+      "source_state_id": 3,
+      "reason": "青州扩展城镇参照北海。"
+    },
+    "changan": {
+      "name": "长安",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "visual_override",
+      "source_scene_id": 101,
+      "source_city": "长安",
+      "source_city_id": 20,
+      "source_state": "雍州",
+      "source_state_id": 9,
+      "reason": "按用户要求，长安采用宫城、石城墙与灰瓦坊市的都城布局。原版泛北方分类呈现为西凉边城，不适合作为本项目长安城景。",
+      "reference_mapping": "original_city_table"
+    },
+    "hongnong": {
+      "name": "弘农",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "弘农",
+      "source_city_id": 19,
+      "source_state": "司隶",
+      "source_state_id": 8,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "luoyang": {
+      "name": "洛阳",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "洛阳",
+      "source_city_id": 18,
+      "source_state": "司隶",
+      "source_state_id": 8,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "hedong": {
+      "name": "河东",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "弘农",
+      "source_city_id": 19,
+      "source_state": "司隶",
+      "source_state_id": 8,
+      "reason": "司隶扩展城镇参照弘农；按城市配置，不由大地图整区推导。"
+    },
+    "henei": {
+      "name": "河内",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "洛阳",
+      "source_city_id": 18,
+      "source_state": "司隶",
+      "source_state_id": 8,
+      "reason": "司隶扩展城镇参照洛阳。"
+    },
+    "chenliu": {
+      "name": "陈留",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "陈留",
+      "source_city_id": 14,
+      "source_state": "兖州",
+      "source_state_id": 6,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "puyang": {
+      "name": "濮阳",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "濮阳",
+      "source_city_id": 13,
+      "source_state": "兖州",
+      "source_state_id": 6,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "dingtao": {
+      "name": "定陶",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "陈留",
+      "source_city_id": 14,
+      "source_state": "兖州",
+      "source_state_id": 6,
+      "reason": "兖州扩展城镇参照陈留。"
+    },
+    "shanyang": {
+      "name": "山阳",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "陈留",
+      "source_city_id": 14,
+      "source_state": "兖州",
+      "source_state_id": 6,
+      "reason": "兖州扩展城镇参照陈留。"
+    },
+    "xiaopei": {
+      "name": "小沛",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "小沛",
+      "source_city_id": 12,
+      "source_state": "徐州",
+      "source_state_id": 5,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "xiapi": {
+      "name": "下邳",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "下邳",
+      "source_city_id": 11,
+      "source_state": "徐州",
+      "source_state_id": 5,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "langye": {
+      "name": "琅琊",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "下邳",
+      "source_city_id": 11,
+      "source_state": "徐州",
+      "source_state_id": 5,
+      "reason": "徐州扩展城镇参照下邳；广陵在原配置属于扬北，使用江南布局。"
+    },
+    "guangling": {
+      "name": "广陵",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "广陵",
+      "source_city_id": 23,
+      "source_state": "扬北",
+      "source_state_id": 15,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "xuchang": {
+      "name": "许昌",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "许昌",
+      "source_city_id": 15,
+      "source_state": "豫州",
+      "source_state_id": 7,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "qiao": {
+      "name": "谯",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "谯",
+      "source_city_id": 16,
+      "source_state": "豫州",
+      "source_state_id": 7,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "runan": {
+      "name": "汝南",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "original_city_table",
+      "source_scene_id": 102,
+      "source_city": "汝南",
+      "source_city_id": 17,
+      "source_state": "豫州",
+      "source_state_id": 7,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "yingchuan": {
+      "name": "颍川",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "许昌",
+      "source_city_id": 15,
+      "source_state": "豫州",
+      "source_state_id": 7,
+      "reason": "豫州扩展城镇参照许昌。"
+    },
+    "peiguo": {
+      "name": "沛国",
+      "profile": "central",
+      "scene_id": 102,
+      "mapping": "configured_extension",
+      "source_scene_id": 102,
+      "source_city": "谯",
+      "source_city_id": 16,
+      "source_state": "豫州",
+      "source_state_id": 7,
+      "reason": "豫州扩展城镇参照谯。"
+    },
+    "wudu": {
+      "name": "武都",
+      "profile": "shu",
+      "scene_id": 104,
+      "mapping": "original_city_table",
+      "source_scene_id": 104,
+      "source_city": "武都",
+      "source_city_id": 26,
+      "source_state": "益州",
+      "source_state_id": 11,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "hanzhong": {
+      "name": "汉中",
+      "profile": "shu",
+      "scene_id": 104,
+      "mapping": "original_city_table",
+      "source_scene_id": 104,
+      "source_city": "汉中",
+      "source_city_id": 25,
+      "source_state": "益州",
+      "source_state_id": 11,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "zitong": {
+      "name": "梓潼",
+      "profile": "shu",
+      "scene_id": 104,
+      "mapping": "original_city_table",
+      "source_scene_id": 104,
+      "source_city": "梓潼",
+      "source_city_id": 29,
+      "source_state": "益州",
+      "source_state_id": 11,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "chengdu": {
+      "name": "成都",
+      "profile": "shu",
+      "scene_id": 104,
+      "mapping": "original_city_table",
+      "source_scene_id": 104,
+      "source_city": "成都",
+      "source_city_id": 27,
+      "source_state": "益州",
+      "source_state_id": 11,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "baxi": {
+      "name": "巴西",
+      "profile": "shu",
+      "scene_id": 104,
+      "mapping": "configured_extension",
+      "source_scene_id": 104,
+      "source_city": "梓潼",
+      "source_city_id": 29,
+      "source_state": "益州",
+      "source_state_id": 11,
+      "reason": "川北扩展城镇参照梓潼。"
+    },
+    "jiangzhou": {
+      "name": "江州",
+      "profile": "shu",
+      "scene_id": 104,
+      "mapping": "original_city_table",
+      "source_scene_id": 104,
+      "source_city": "江州",
+      "source_city_id": 30,
+      "source_state": "益州",
+      "source_state_id": 11,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "yuesui": {
+      "name": "越嶲",
+      "profile": "nanman",
+      "scene_id": 105,
+      "mapping": "configured_extension",
+      "source_scene_id": 105,
+      "source_city": "建宁",
+      "source_city_id": 49,
+      "source_state": "南中",
+      "source_state_id": 12,
+      "reason": "本项目将南中扩展城镇越嶲配置为建宁的南蛮布局；原城市表没有越嶲独立条目。"
+    },
+    "yongchang": {
+      "name": "永昌",
+      "profile": "nanman",
+      "scene_id": 105,
+      "mapping": "original_city_table",
+      "source_scene_id": 105,
+      "source_city": "永昌",
+      "source_city_id": 31,
+      "source_state": "南中",
+      "source_state_id": 12,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "jianning": {
+      "name": "建宁",
+      "profile": "nanman",
+      "scene_id": 105,
+      "mapping": "original_city_table",
+      "source_scene_id": 105,
+      "source_city": "建宁",
+      "source_city_id": 49,
+      "source_state": "南中",
+      "source_state_id": 12,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "xiangyang": {
+      "name": "襄阳",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "襄阳",
+      "source_city_id": 34,
+      "source_state": "荆北",
+      "source_state_id": 13,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "jiangling": {
+      "name": "江陵",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "江陵",
+      "source_city_id": 37,
+      "source_state": "荆南",
+      "source_state_id": 14,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "jiangxia": {
+      "name": "江夏",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "江夏",
+      "source_city_id": 35,
+      "source_state": "荆北",
+      "source_state_id": 13,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "changsha": {
+      "name": "长沙",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "长沙",
+      "source_city_id": 38,
+      "source_state": "荆南",
+      "source_state_id": 14,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "lingling": {
+      "name": "零陵",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "零陵",
+      "source_city_id": 39,
+      "source_state": "荆南",
+      "source_state_id": 14,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "guiyang": {
+      "name": "桂阳",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "桂阳",
+      "source_city_id": 41,
+      "source_state": "荆南",
+      "source_state_id": 14,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "wuling": {
+      "name": "武陵",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "武陵",
+      "source_city_id": 40,
+      "source_state": "荆南",
+      "source_state_id": 14,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "shouchun": {
+      "name": "寿春",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "寿春",
+      "source_city_id": 42,
+      "source_state": "扬北",
+      "source_state_id": 15,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "jianye": {
+      "name": "建业",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_alias",
+      "source_scene_id": 103,
+      "source_city": "秣陵",
+      "source_city_id": 44,
+      "source_state": "扬南",
+      "source_state_id": 16,
+      "reason": "本项目建业对应原城市表的秣陵城位，采用扬南江南布局。"
+    },
+    "wu": {
+      "name": "吴",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "吴",
+      "source_city_id": 45,
+      "source_state": "扬南",
+      "source_state_id": 16,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "kuaiji": {
+      "name": "会稽",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "会稽",
+      "source_city_id": 46,
+      "source_state": "扬南",
+      "source_state_id": 16,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "chaisang": {
+      "name": "柴桑",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "柴桑",
+      "source_city_id": 47,
+      "source_state": "扬南",
+      "source_state_id": 16,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "yuzhang": {
+      "name": "豫章",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "configured_extension",
+      "source_scene_id": 103,
+      "source_city": "鄱阳",
+      "source_city_id": 48,
+      "source_state": "扬南",
+      "source_state_id": 16,
+      "reason": "扬南扩展城镇参照鄱阳。"
+    },
+    "lujiang": {
+      "name": "庐江",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "庐江",
+      "source_city_id": 43,
+      "source_state": "扬北",
+      "source_state_id": 15,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "jianan": {
+      "name": "建安",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "configured_extension",
+      "source_scene_id": 103,
+      "source_city": "会稽",
+      "source_city_id": 46,
+      "source_state": "扬南",
+      "source_state_id": 16,
+      "reason": "扬南扩展城镇参照会稽。"
+    },
+    "jiaozhi": {
+      "name": "交趾",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "original_city_table",
+      "source_scene_id": 103,
+      "source_city": "交趾",
+      "source_city_id": 51,
+      "source_state": "交州",
+      "source_state_id": 17,
+      "reason": "已核对原始城市表→州表→场景类型字段。"
+    },
+    "hepu": {
+      "name": "合浦",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "configured_extension",
+      "source_scene_id": 103,
+      "source_city": "交趾",
+      "source_city_id": 51,
+      "source_state": "交州",
+      "source_state_id": 17,
+      "reason": "交州扩展城镇参照交趾，应使用江南而非南蛮布局。"
+    },
+    "cangwu": {
+      "name": "苍梧",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "configured_extension",
+      "source_scene_id": 103,
+      "source_city": "交趾",
+      "source_city_id": 51,
+      "source_state": "交州",
+      "source_state_id": 17,
+      "reason": "交州扩展城镇参照交趾，应使用江南而非南蛮布局。"
+    },
+    "nanhai": {
+      "name": "南海",
+      "profile": "south",
+      "scene_id": 103,
+      "mapping": "configured_extension",
+      "source_scene_id": 103,
+      "source_city": "交趾",
+      "source_city_id": 51,
+      "source_state": "交州",
+      "source_state_id": 17,
+      "reason": "交州扩展城镇参照交趾，应使用江南而非南蛮布局。"
+    }
+  }
+}

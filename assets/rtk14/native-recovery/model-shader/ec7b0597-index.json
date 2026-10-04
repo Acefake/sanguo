@@ -1,0 +1,20 @@
+[
+  {
+    "file": "ec7b0597-000.asm",
+    "offset": 1669,
+    "size": 1744,
+    "sha256": "4469a6029c48e1eb552676ac7acf95153d541686975831a8dc1ab441ec738f3d"
+  },
+  {
+    "file": "ec7b0597-001.asm",
+    "offset": 3413,
+    "size": 13448,
+    "sha256": "b0833e1ea0a4e9054e5031895a9f576821cde178300f864c4c5405a4f30babe0"
+  },
+  {
+    "file": "ec7b0597-002.asm",
+    "offset": 16861,
+    "size": 3848,
+    "sha256": "fe45b8a82c1a89f18b8137d5be2cf54812471b7223a26a5109f2a2573895984b"
+  }
+]

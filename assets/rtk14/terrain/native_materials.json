@@ -1,0 +1,199 @@
+{
+  "composition_file": "KIDSSystemResource_f029fe04.kidsobjdb",
+  "composition_id": "5f441cb4",
+  "palette_id": "b1f11a12",
+  "array_id": "3bc87718",
+  "world_g1t": "239167e0",
+  "array_g1t": "57ee6cea",
+  "heightmap_resource": "6b6aded5",
+  "shader_resource": "dc52fd1c",
+  "shader_variant": "PB2LS-Gbi",
+  "flag": 28,
+  "bilinear_rate": 0.5,
+  "near_far_blending_offset": 600.0,
+  "near_far_blending_range": 150.0,
+  "lod_distance_scale": 5.0,
+  "control_storage": "BGRA8: B=primary index, G=secondary index, R=blend, A=255",
+  "materials": [
+    {
+      "control_index": 0,
+      "material_hash": "86092982",
+      "texture_layer": 12,
+      "scale_u": 60.0,
+      "scale_v": 60.0,
+      "blend_sharpness": 0.0,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 1,
+      "material_hash": "2055160b",
+      "texture_layer": 16,
+      "scale_u": 40.0,
+      "scale_v": 40.0,
+      "blend_sharpness": 0.0,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 2,
+      "material_hash": "a3fcf2ec",
+      "texture_layer": 15,
+      "scale_u": 40.0,
+      "scale_v": 40.0,
+      "blend_sharpness": 0.0,
+      "tess_scale": 50.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 3,
+      "material_hash": "6d1c2298",
+      "texture_layer": 10,
+      "scale_u": 80.0,
+      "scale_v": 80.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 4,
+      "material_hash": "00d8c029",
+      "texture_layer": 9,
+      "scale_u": 60.0,
+      "scale_v": 60.0,
+      "blend_sharpness": 0.0,
+      "tess_scale": 200.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 5,
+      "material_hash": "b442dab3",
+      "texture_layer": 11,
+      "scale_u": 30.0,
+      "scale_v": 30.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 200.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 6,
+      "material_hash": "c7d9976c",
+      "texture_layer": 8,
+      "scale_u": 20.0,
+      "scale_v": 20.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 7,
+      "material_hash": "7068d36e",
+      "texture_layer": 17,
+      "scale_u": 50.0,
+      "scale_v": 50.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 8,
+      "material_hash": "25bac114",
+      "texture_layer": 13,
+      "scale_u": 50.0,
+      "scale_v": 50.0,
+      "blend_sharpness": 0.0,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 9,
+      "material_hash": "8b9936c0",
+      "texture_layer": 14,
+      "scale_u": 10.0,
+      "scale_v": 10.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 80.0,
+      "tess_bias": -80.0
+    },
+    {
+      "control_index": 10,
+      "material_hash": "2cfb7ed2",
+      "texture_layer": 18,
+      "scale_u": 50.0,
+      "scale_v": 50.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 5.0,
+      "tess_bias": -2.5
+    },
+    {
+      "control_index": 11,
+      "material_hash": "12a95483",
+      "texture_layer": 0,
+      "scale_u": 60.0,
+      "scale_v": 60.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 5.0,
+      "tess_bias": -2.5
+    },
+    {
+      "control_index": 12,
+      "material_hash": "fd08fe6f",
+      "texture_layer": 4,
+      "scale_u": 40.0,
+      "scale_v": 40.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 13,
+      "material_hash": "777306ea",
+      "texture_layer": 3,
+      "scale_u": 60.0,
+      "scale_v": 60.0,
+      "blend_sharpness": 0.0,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 14,
+      "material_hash": "183961c1",
+      "texture_layer": 2,
+      "scale_u": 15.0,
+      "scale_v": 15.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 80.0,
+      "tess_bias": -80.0
+    },
+    {
+      "control_index": 15,
+      "material_hash": "fa549f91",
+      "texture_layer": 5,
+      "scale_u": 50.0,
+      "scale_v": 50.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 5.0,
+      "tess_bias": -2.5
+    },
+    {
+      "control_index": 16,
+      "material_hash": "2d1ff633",
+      "texture_layer": 6,
+      "scale_u": 40.0,
+      "scale_v": 40.0,
+      "blend_sharpness": 0.699999988079071,
+      "tess_scale": 100.0,
+      "tess_bias": -100.0
+    },
+    {
+      "control_index": 17,
+      "material_hash": "083df548",
+      "texture_layer": 7,
+      "scale_u": 60.0,
+      "scale_v": 60.0,
+      "blend_sharpness": 0.0,
+      "tess_scale": 200.0,
+      "tess_bias": -100.0
+    }
+  ]
+}

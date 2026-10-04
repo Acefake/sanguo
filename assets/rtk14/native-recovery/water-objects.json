@@ -1,0 +1,891 @@
+[
+  {
+    "file": "KIDSSystemResource_9d858483.kidsobjdb",
+    "id": "ecb1e6a0",
+    "type": "TypeInfo::Object::3D::Displayset::StreamWaterRiver",
+    "parent": "00000000",
+    "props": {
+      "KTGLShaderObjectHash": [
+        3030332115
+      ],
+      "TexturesRenderStateObjectHash": [
+        605419483
+      ],
+      "PositionArray": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "system_53b3b820.kidsobjdb",
+    "id": "b49f32d3",
+    "type": "TypeInfo::Object::Render::State::3D::Shader::StreamWater",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        1386132710
+      ]
+    }
+  },
+  {
+    "file": "system_53b3b820.kidsobjdb",
+    "id": "dc048898",
+    "type": "TypeInfo::Object::Render::State::3D::Shader::PhysicallyBased2StreamWater",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        3852827194
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_8374438a.kidsobjdb",
+    "id": "09fd1806",
+    "type": "TypeInfo::Object::3D::Placeable::StreamWaterRiver",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "Diffuse": [
+        1.0,
+        1.0,
+        1.0,
+        0.5
+      ],
+      "Ambient": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Specular": [
+        1.0,
+        1.0,
+        1.0,
+        32.0
+      ],
+      "Emission": [
+        1.0,
+        1.0,
+        1.0,
+        0.0
+      ],
+      "RefractiveFactor": [
+        1.3300000429153442,
+        1.3300000429153442,
+        1.3300000429153442,
+        1.0
+      ],
+      "ReflactionPower": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Depth": [
+        500.0
+      ],
+      "Speed1": [
+        0.30000001192092896
+      ],
+      "Speed2": [
+        0.4000000059604645
+      ],
+      "ScaleU": [
+        1.0
+      ],
+      "ScaleV": [
+        2.0
+      ],
+      "AlphaWidthRatio": [
+        0.10000000149011612
+      ],
+      "WidthDivNum": [
+        4
+      ],
+      "IsUseEdgeAlpha": [
+        1
+      ],
+      "IsLoop": [
+        0
+      ],
+      "GroupMask": [
+        4294967293
+      ],
+      "DisplaysetObjectNameHash": [
+        0
+      ],
+      "NodeArray": [
+        0.0,
+        0.0,
+        0.0,
+        -1000.0,
+        0.0,
+        0.0,
+        1000.0,
+        0.0,
+        0.0
+      ],
+      "PreviewVisibilitySet": [
+        -1
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_8374438a.kidsobjdb",
+    "id": "9ae740ca",
+    "type": "TypeInfo::Object::3D::Placeable::StatisticalRiver",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LightGroupID": [
+        2
+      ],
+      "VerticalDiffuse": [
+        0.0,
+        0.10000000149011612,
+        0.4000000059604645
+      ],
+      "HorizonalDiffuse": [
+        0.20000000298023224,
+        0.30000001192092896,
+        0.699999988079071
+      ],
+      "SurfaceDiffuseMax": [
+        0.10000000149011612,
+        0.10000000149011612,
+        0.10000000149011612
+      ],
+      "Specular": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "SpecularDecay": [
+        256.0
+      ],
+      "RefractionIndex": [
+        1.332990050315857
+      ],
+      "RefractionTransparencyHalfReductionLength": [
+        1000.0
+      ],
+      "ReflectionTremor": [
+        0.10000000149011612
+      ],
+      "ReflectionIntensity": [
+        0.6000000238418579
+      ],
+      "SurfaceEffectFovScale": [
+        1.0
+      ],
+      "SurfaceWaterLevel": [
+        0.0
+      ],
+      "SurfaceWindX": [
+        1000.0
+      ],
+      "SurfaceWindZ": [
+        100.0
+      ],
+      "Amplitude": [
+        1000.0
+      ],
+      "ChoppyFactor": [
+        1.0
+      ],
+      "SmallWavesSupressLength": [
+        3.0
+      ],
+      "Gravity": [
+        10.0
+      ],
+      "GradationTime": [
+        10.0
+      ],
+      "FlatDistance": [
+        20000.0
+      ],
+      "SurfaceTextureSpeedX": [
+        200.0
+      ],
+      "SurfaceTextureSpeedZ": [
+        0.0
+      ],
+      "SurfaceTextureScaleX": [
+        3000.0
+      ],
+      "SurfaceTextureScaleZ": [
+        3000.0
+      ],
+      "NormalTextureSpeedX": [
+        200.0
+      ],
+      "NormalTextureSpeedZ": [
+        0.0
+      ],
+      "NormalTextureScaleX": [
+        1000.0
+      ],
+      "NormalTextureScaleZ": [
+        50.0
+      ],
+      "NormalTextureSizeU": [
+        1.0
+      ],
+      "NormalTextureSizeV": [
+        1.0
+      ],
+      "SurfaceTextureAScaler": [
+        1.0
+      ],
+      "SurfaceTextureRGBScaler": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Albedo": [
+        0.0,
+        0.10000000149011612,
+        0.6000000238418579,
+        0.5
+      ],
+      "Reflectance": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "Glossiness": [
+        0.5
+      ],
+      "SurfaceMapTexturesRenderStateObjectHash": [
+        0
+      ],
+      "NormalMapTexturesRenderStateObjectHash": [
+        4065534848
+      ],
+      "NormalMapNoiseTextureRenderStateObjectHash": [
+        0
+      ],
+      "LinearRoughness": [
+        0.0
+      ],
+      "DiffuseTransparency": [
+        0.0
+      ],
+      "NormalMapNoiseSizeX": [
+        10250.0
+      ],
+      "NormalMapNoiseSizeZ": [
+        10250.0
+      ],
+      "Flag": [
+        0
+      ],
+      "NodeArray": [
+        0.0,
+        0.0,
+        0.0,
+        2000.0
+      ],
+      "AlbedoMapSpeedX": [
+        200.0
+      ],
+      "AlbedoMapSpeedZ": [
+        0.0
+      ],
+      "AlbedoMapScaleX": [
+        3000.0
+      ],
+      "AlbedoMapScaleZ": [
+        3000.0
+      ],
+      "AlbedoMapAScaler": [
+        1.0
+      ],
+      "AlbedoMapRGBScaler": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "ReflectanceMapSpeedX": [
+        200.0
+      ],
+      "ReflectanceMapSpeedZ": [
+        0.0
+      ],
+      "ReflectanceMapScaleX": [
+        3000.0
+      ],
+      "ReflectanceMapScaleZ": [
+        3000.0
+      ],
+      "ReflectanceMapAScaler": [
+        1.0
+      ],
+      "ReflectanceMapRGBScaler": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "AlbedoMapTexturesRenderStateObjectHash": [
+        0
+      ],
+      "ReflectanceMapTexturesRenderStateObjectHash": [
+        0
+      ],
+      "ShaderAccessoryID": [
+        0
+      ],
+      "ShoalingHeightMapHash": [
+        0
+      ],
+      "ShoalingScale": [
+        1.0
+      ],
+      "HeightMapTextureScaleX": [
+        64000.0
+      ],
+      "HeightMapTextureScaleZ": [
+        64000.0
+      ],
+      "HeightMapTextureOffsetX": [
+        0.0
+      ],
+      "HeightMapTextureOffsetZ": [
+        0.0
+      ],
+      "BubbleMapHash": [
+        0
+      ],
+      "BubbleSpawnScale": [
+        1000.0
+      ],
+      "BubbleSpawnInterval": [
+        1.0
+      ],
+      "BubbleSpeedScale": [
+        1.0
+      ],
+      "BubblePower": [
+        1.0
+      ],
+      "BubbleLifeSpan": [
+        10.0
+      ],
+      "WaveShoreBubbleBubbleTextureScaleX": [
+        1000.0
+      ],
+      "WaveShoreBubbleBubbleTextureScaleZ": [
+        1000.0
+      ],
+      "WaveShoreBubbleColor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "WaveShoreBubbleColorA": [
+        1.0
+      ],
+      "WaveShoreBubbleReflectance": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WaveShoreBubbleRoughness": [
+        0.5
+      ],
+      "WaveShoreBubbleGlossiness": [
+        0.5
+      ],
+      "WaveShoreBubbleGlossinessDumping": [
+        500.0
+      ],
+      "BubbleShoalingScale": [
+        1.0
+      ],
+      "WaveShoreBubbleDisplacementScale": [
+        0.4000000059604645
+      ],
+      "WaveShoreBubbleNormalScale": [
+        1.0
+      ],
+      "WaveShoreBubbleAlphaThreshold": [
+        0.0
+      ],
+      "WaveShoreBubbleBanishingScale": [
+        0.0
+      ],
+      "WaveShoreBubbleAnimationSpeed": [
+        0.0
+      ],
+      "WaveShoreBubbleWaterTransparencyDampScale": [
+        0.0
+      ],
+      "WaveShoreBubbleNormalThreshold": [
+        0.0
+      ],
+      "PreviewVisibilitySet": [
+        -1
+      ],
+      "ConnectedRiverObjectNameHash": [
+        0
+      ],
+      "NodeArrayStride": [
+        4
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_8374438a.kidsobjdb",
+    "id": "e3ec5b7a",
+    "type": "TypeInfo::Object::3D::Placeable::StatisticalRiver",
+    "parent": "00000000",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "LightGroupID": [
+        2
+      ],
+      "VerticalDiffuse": [
+        0.0,
+        0.10000000149011612,
+        0.4000000059604645
+      ],
+      "HorizonalDiffuse": [
+        0.20000000298023224,
+        0.30000001192092896,
+        0.699999988079071
+      ],
+      "SurfaceDiffuseMax": [
+        0.10000000149011612,
+        0.10000000149011612,
+        0.10000000149011612
+      ],
+      "Specular": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "SpecularDecay": [
+        256.0
+      ],
+      "RefractionIndex": [
+        1.332990050315857
+      ],
+      "RefractionTransparencyHalfReductionLength": [
+        1000.0
+      ],
+      "ReflectionTremor": [
+        0.10000000149011612
+      ],
+      "ReflectionIntensity": [
+        0.6000000238418579
+      ],
+      "SurfaceEffectFovScale": [
+        1.0
+      ],
+      "SurfaceWaterLevel": [
+        0.0
+      ],
+      "SurfaceWindX": [
+        1000.0
+      ],
+      "SurfaceWindZ": [
+        100.0
+      ],
+      "Amplitude": [
+        1000.0
+      ],
+      "ChoppyFactor": [
+        1.0
+      ],
+      "SmallWavesSupressLength": [
+        3.0
+      ],
+      "Gravity": [
+        980.0
+      ],
+      "GradationTime": [
+        10.0
+      ],
+      "FlatDistance": [
+        20000.0
+      ],
+      "SurfaceTextureSpeedX": [
+        200.0
+      ],
+      "SurfaceTextureSpeedZ": [
+        0.0
+      ],
+      "SurfaceTextureScaleX": [
+        3000.0
+      ],
+      "SurfaceTextureScaleZ": [
+        3000.0
+      ],
+      "NormalTextureSpeedX": [
+        200.0
+      ],
+      "NormalTextureSpeedZ": [
+        0.0
+      ],
+      "NormalTextureScaleX": [
+        1000.0
+      ],
+      "NormalTextureScaleZ": [
+        50.0
+      ],
+      "NormalTextureSizeU": [
+        1.0
+      ],
+      "NormalTextureSizeV": [
+        1.0
+      ],
+      "SurfaceTextureAScaler": [
+        1.0
+      ],
+      "SurfaceTextureRGBScaler": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Albedo": [
+        0.05700000002980232,
+        0.2669999897480011,
+        0.31299999356269836,
+        0.5
+      ],
+      "Reflectance": [
+        0.019999999552965164,
+        0.019999999552965164,
+        0.019999999552965164
+      ],
+      "Glossiness": [
+        0.5
+      ],
+      "SurfaceMapTexturesRenderStateObjectHash": [
+        0
+      ],
+      "NormalMapTexturesRenderStateObjectHash": [
+        4065534848
+      ],
+      "NormalMapNoiseTextureRenderStateObjectHash": [
+        0
+      ],
+      "LinearRoughness": [
+        0.0
+      ],
+      "DiffuseTransparency": [
+        0.9599999785423279
+      ],
+      "NormalMapNoiseSizeX": [
+        10250.0
+      ],
+      "NormalMapNoiseSizeZ": [
+        10250.0
+      ],
+      "Flag": [
+        0
+      ],
+      "NodeArray": [
+        0.0,
+        0.0,
+        0.0,
+        2000.0
+      ],
+      "AlbedoMapSpeedX": [
+        200.0
+      ],
+      "AlbedoMapSpeedZ": [
+        0.0
+      ],
+      "AlbedoMapScaleX": [
+        3000.0
+      ],
+      "AlbedoMapScaleZ": [
+        3000.0
+      ],
+      "AlbedoMapAScaler": [
+        1.0
+      ],
+      "AlbedoMapRGBScaler": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "ReflectanceMapSpeedX": [
+        200.0
+      ],
+      "ReflectanceMapSpeedZ": [
+        0.0
+      ],
+      "ReflectanceMapScaleX": [
+        3000.0
+      ],
+      "ReflectanceMapScaleZ": [
+        3000.0
+      ],
+      "ReflectanceMapAScaler": [
+        1.0
+      ],
+      "ReflectanceMapRGBScaler": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "AlbedoMapTexturesRenderStateObjectHash": [
+        0
+      ],
+      "ReflectanceMapTexturesRenderStateObjectHash": [
+        0
+      ],
+      "ShaderAccessoryID": [
+        0
+      ],
+      "ShoalingHeightMapHash": [
+        0
+      ],
+      "ShoalingScale": [
+        1.0
+      ],
+      "HeightMapTextureScaleX": [
+        64000.0
+      ],
+      "HeightMapTextureScaleZ": [
+        64000.0
+      ],
+      "HeightMapTextureOffsetX": [
+        0.0
+      ],
+      "HeightMapTextureOffsetZ": [
+        0.0
+      ],
+      "BubbleMapHash": [
+        0
+      ],
+      "BubbleSpawnScale": [
+        1000.0
+      ],
+      "BubbleSpawnInterval": [
+        1.0
+      ],
+      "BubbleSpeedScale": [
+        1.0
+      ],
+      "BubblePower": [
+        1.0
+      ],
+      "BubbleLifeSpan": [
+        10.0
+      ],
+      "WaveShoreBubbleBubbleTextureScaleX": [
+        1000.0
+      ],
+      "WaveShoreBubbleBubbleTextureScaleZ": [
+        1000.0
+      ],
+      "WaveShoreBubbleColor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "WaveShoreBubbleColorA": [
+        1.0
+      ],
+      "WaveShoreBubbleReflectance": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WaveShoreBubbleRoughness": [
+        0.5
+      ],
+      "WaveShoreBubbleGlossiness": [
+        0.5
+      ],
+      "WaveShoreBubbleGlossinessDumping": [
+        500.0
+      ],
+      "BubbleShoalingScale": [
+        1.0
+      ],
+      "WaveShoreBubbleDisplacementScale": [
+        0.4000000059604645
+      ],
+      "WaveShoreBubbleNormalScale": [
+        1.0
+      ],
+      "WaveShoreBubbleAlphaThreshold": [
+        0.0
+      ],
+      "WaveShoreBubbleBanishingScale": [
+        0.0
+      ],
+      "WaveShoreBubbleAnimationSpeed": [
+        0.0
+      ],
+      "WaveShoreBubbleWaterTransparencyDampScale": [
+        0.0
+      ],
+      "WaveShoreBubbleNormalThreshold": [
+        0.0
+      ],
+      "PreviewVisibilitySet": [
+        -1
+      ],
+      "ConnectedRiverObjectNameHash": [
+        0
+      ],
+      "NodeArrayStride": [
+        4
+      ]
+    }
+  },
+  {
+    "file": "system_718ccb8b.kidsobjdb",
+    "id": "1cf77044",
+    "type": "TypeInfo::Object::Render::State::3D::Shader::CalmWater",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        235381494
+      ]
+    }
+  },
+  {
+    "file": "system_718ccb8b.kidsobjdb",
+    "id": "2e8f59cd",
+    "type": "TypeInfo::Object::Render::State::3D::Shader::StreamWater",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        89939756
+      ]
+    }
+  },
+  {
+    "file": "system_718ccb8b.kidsobjdb",
+    "id": "b49f32d3",
+    "type": "TypeInfo::Object::Render::State::3D::Shader::StreamWater",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        1386132710
+      ],
+      "KTGL3DShaderRenderStateObjectHash": [
+        781146573,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "file": "system_718ccb8b.kidsobjdb",
+    "id": "cccc3324",
+    "type": "TypeInfo::Object::Render::State::3D::Shader::CalmWater2",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        2430760676
+      ]
+    }
+  },
+  {
+    "file": "system_718ccb8b.kidsobjdb",
+    "id": "dc048898",
+    "type": "TypeInfo::Object::Render::State::3D::Shader::PhysicallyBased2StreamWater",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        3852827194
+      ],
+      "KTGL3DShaderRenderStateObjectHash": {
+        "count": 19,
+        "type": 5,
+        "offset": 3349064
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_72d85840.kidsobjdb",
+    "id": "92c4e7b0",
+    "type": "TypeInfo::Object::3D::Displayset::StreamWaterRiver",
+    "parent": "00000000",
+    "props": {
+      "KTGLShaderObjectHash": [
+        3030332115
+      ],
+      "TexturesRenderStateObjectHash": [
+        605419483
+      ],
+      "PositionArray": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  }
+]

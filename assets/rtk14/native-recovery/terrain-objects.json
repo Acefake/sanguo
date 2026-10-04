@@ -1,0 +1,419 @@
+[
+  {
+    "file": "system_dab638b2.kidsobjdb",
+    "id": "40d744d4",
+    "type": "TypeInfo::Object::3D::StaticNature",
+    "parent": "00000000",
+    "props": {
+      "SkyPlaneG1SFileResourceHash": [
+        3454757647
+      ],
+      "StarResourceHash": [
+        0
+      ],
+      "StarG1SFileResourceHash": [
+        0
+      ],
+      "StatisticalOceanG1SFileResourceHash": [
+        0
+      ],
+      "StarTexturesRenderStateObjectHash": [
+        0
+      ],
+      "StatisticalOceanNormalMapTexturesRenderStateObjectHash": [
+        0
+      ],
+      "StatisticalOceanResolutionXZ": [
+        64,
+        64
+      ],
+      "StatisticalOceanSizeXZ": [
+        10000.0,
+        10000.0
+      ],
+      "StatisticalOceanCycleTime": [
+        100.0
+      ],
+      "StatisticalOceanLODLevel": [
+        4
+      ],
+      "StatisticalOceanFlatDistance": [
+        500000.0
+      ],
+      "HeightFogG1SFileResourceHash": [
+        0
+      ],
+      "CloudPlaneG1SFileResourceHash": [
+        0
+      ],
+      "CloudParticleG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanG1SFileResourceHash": [
+        0
+      ],
+      "PreLightStatisticalOceanG1SFileResourceHash": [
+        0
+      ],
+      "StatisticalRiverG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverG1SFileResourceHash": [
+        0
+      ],
+      "PreLightStatisticalRiverG1SFileResourceHash": [
+        0
+      ],
+      "CloudPlaneHeightG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForDSG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForSGIDSG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForDSG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForSGIDSG1SFileResourceHash": [
+        0
+      ],
+      "FormatRStatisticalOceanG1SFileResourceHash": [
+        0
+      ],
+      "FormatRStatisticalRiverG1SFileResourceHash": [
+        0
+      ],
+      "CloudCircleG1SFileResourceHash": [
+        0
+      ],
+      "CloudCircleHeight2NormalG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForDSWVG1SFileResourceHash": [
+        0
+      ],
+      "Sky2PlaneG1SFileResourceHash": [
+        0
+      ],
+      "Sky2StarG1SFileResourceHash": [
+        0
+      ],
+      "StatisticalOceanNoRefractionG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForDSWV_TG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForDSWVRPG1SFileResourceHash": [
+        0
+      ],
+      "VolumetricCloudG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForPB2DSG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForPB2DSWVG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForPB2DSWV_TG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForPB2DSWVRPG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForPB2DSG1SFileResourceHash": [
+        0
+      ],
+      "StatisticalOceanNormalMapNoiseTextureRenderStateObjectHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForDSBBG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForPB2DSBBG1SFileResourceHash": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "system_dab638b2.kidsobjdb",
+    "id": "685d1ac0",
+    "type": "TypeInfo::Object::3D::StaticNature",
+    "parent": "00000000",
+    "props": {
+      "SkyPlaneG1SFileResourceHash": [
+        3454757647
+      ],
+      "StarResourceHash": [
+        342923644
+      ],
+      "StarG1SFileResourceHash": [
+        3824075800
+      ],
+      "StatisticalOceanG1SFileResourceHash": [
+        593648631
+      ],
+      "StarTexturesRenderStateObjectHash": [
+        2485954393
+      ],
+      "StatisticalOceanNormalMapTexturesRenderStateObjectHash": [
+        4065534848
+      ],
+      "StatisticalOceanResolutionXZ": [
+        64,
+        64
+      ],
+      "StatisticalOceanSizeXZ": [
+        10000.0,
+        10000.0
+      ],
+      "StatisticalOceanCycleTime": [
+        100.0
+      ],
+      "StatisticalOceanLODLevel": [
+        4
+      ],
+      "StatisticalOceanFlatDistance": [
+        500000.0
+      ],
+      "HeightFogG1SFileResourceHash": [
+        3470395937
+      ],
+      "CloudPlaneG1SFileResourceHash": [
+        1482534499
+      ],
+      "CloudParticleG1SFileResourceHash": [
+        1808727845
+      ],
+      "GBufferStatisticalOceanG1SFileResourceHash": [
+        2319326449
+      ],
+      "PreLightStatisticalOceanG1SFileResourceHash": [
+        3321278281
+      ],
+      "StatisticalRiverG1SFileResourceHash": [
+        4048570793
+      ],
+      "GBufferStatisticalRiverG1SFileResourceHash": [
+        1479281315
+      ],
+      "PreLightStatisticalRiverG1SFileResourceHash": [
+        2481233147
+      ],
+      "CloudPlaneHeightG1SFileResourceHash": [
+        4171332220
+      ],
+      "GBufferStatisticalOceanForDSG1SFileResourceHash": [
+        3067657823
+      ],
+      "GBufferStatisticalOceanForSGIDSG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForDSG1SFileResourceHash": [
+        2227612689
+      ],
+      "GBufferStatisticalRiverForSGIDSG1SFileResourceHash": [
+        0
+      ],
+      "FormatRStatisticalOceanG1SFileResourceHash": [
+        2202966670
+      ],
+      "FormatRStatisticalRiverG1SFileResourceHash": [
+        1362921536
+      ],
+      "CloudCircleG1SFileResourceHash": [
+        3463986671
+      ],
+      "CloudCircleHeight2NormalG1SFileResourceHash": [
+        2905984496
+      ],
+      "GBufferStatisticalOceanForDSWVG1SFileResourceHash": [
+        725909568
+      ],
+      "Sky2PlaneG1SFileResourceHash": [
+        873120565
+      ],
+      "Sky2StarG1SFileResourceHash": [
+        1904256295
+      ],
+      "StatisticalOceanNoRefractionG1SFileResourceHash": [
+        3045788119
+      ],
+      "GBufferStatisticalOceanForDSWV_TG1SFileResourceHash": [
+        2639763403
+      ],
+      "GBufferStatisticalOceanForDSWVRPG1SFileResourceHash": [
+        1212626978
+      ],
+      "VolumetricCloudG1SFileResourceHash": [
+        1122849517
+      ],
+      "GBufferStatisticalOceanForPB2DSG1SFileResourceHash": [
+        2896089406
+      ],
+      "GBufferStatisticalOceanForPB2DSWVG1SFileResourceHash": [
+        554341151
+      ],
+      "GBufferStatisticalOceanForPB2DSWV_TG1SFileResourceHash": [
+        2468194986
+      ],
+      "GBufferStatisticalOceanForPB2DSWVRPG1SFileResourceHash": [
+        1041058561
+      ],
+      "GBufferStatisticalRiverForPB2DSG1SFileResourceHash": [
+        2056044272
+      ],
+      "StatisticalOceanNormalMapNoiseTextureRenderStateObjectHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForDSBBG1SFileResourceHash": [
+        2915521585
+      ],
+      "GBufferStatisticalRiverForPB2DSBBG1SFileResourceHash": [
+        2743953168
+      ]
+    }
+  },
+  {
+    "file": "system_dab638b2.kidsobjdb",
+    "id": "994f588a",
+    "type": "TypeInfo::Object::3D::StaticNature",
+    "parent": "00000000",
+    "props": {
+      "SkyPlaneG1SFileResourceHash": [
+        0
+      ],
+      "StarResourceHash": [
+        0
+      ],
+      "StarG1SFileResourceHash": [
+        0
+      ],
+      "StatisticalOceanG1SFileResourceHash": [
+        593648631
+      ],
+      "StarTexturesRenderStateObjectHash": [
+        0
+      ],
+      "StatisticalOceanNormalMapTexturesRenderStateObjectHash": [
+        2906999898
+      ],
+      "StatisticalOceanResolutionXZ": [
+        64,
+        64
+      ],
+      "StatisticalOceanSizeXZ": [
+        10000.0,
+        10000.0
+      ],
+      "StatisticalOceanCycleTime": [
+        100.0
+      ],
+      "StatisticalOceanLODLevel": [
+        4
+      ],
+      "StatisticalOceanFlatDistance": [
+        500000.0
+      ],
+      "HeightFogG1SFileResourceHash": [
+        0
+      ],
+      "CloudPlaneG1SFileResourceHash": [
+        0
+      ],
+      "CloudParticleG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanG1SFileResourceHash": [
+        0
+      ],
+      "PreLightStatisticalOceanG1SFileResourceHash": [
+        0
+      ],
+      "StatisticalRiverG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverG1SFileResourceHash": [
+        0
+      ],
+      "PreLightStatisticalRiverG1SFileResourceHash": [
+        0
+      ],
+      "CloudPlaneHeightG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForDSG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForSGIDSG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForDSG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForSGIDSG1SFileResourceHash": [
+        0
+      ],
+      "FormatRStatisticalOceanG1SFileResourceHash": [
+        0
+      ],
+      "FormatRStatisticalRiverG1SFileResourceHash": [
+        0
+      ],
+      "CloudCircleG1SFileResourceHash": [
+        0
+      ],
+      "CloudCircleHeight2NormalG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForDSWVG1SFileResourceHash": [
+        0
+      ],
+      "Sky2PlaneG1SFileResourceHash": [
+        873120565
+      ],
+      "Sky2StarG1SFileResourceHash": [
+        1904256295
+      ],
+      "StatisticalOceanNoRefractionG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForDSWV_TG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalOceanForDSWVRPG1SFileResourceHash": [
+        0
+      ],
+      "VolumetricCloudG1SFileResourceHash": [
+        1122849517
+      ],
+      "GBufferStatisticalOceanForPB2DSG1SFileResourceHash": [
+        2896089406
+      ],
+      "GBufferStatisticalOceanForPB2DSWVG1SFileResourceHash": [
+        554341151
+      ],
+      "GBufferStatisticalOceanForPB2DSWV_TG1SFileResourceHash": [
+        2468194986
+      ],
+      "GBufferStatisticalOceanForPB2DSWVRPG1SFileResourceHash": [
+        1041058561
+      ],
+      "GBufferStatisticalRiverForPB2DSG1SFileResourceHash": [
+        2056044272
+      ],
+      "StatisticalOceanNormalMapNoiseTextureRenderStateObjectHash": [
+        1577272582
+      ],
+      "GBufferStatisticalRiverForDSBBG1SFileResourceHash": [
+        0
+      ],
+      "GBufferStatisticalRiverForPB2DSBBG1SFileResourceHash": [
+        2743953168
+      ]
+    }
+  }
+]

@@ -1,0 +1,105 @@
+{
+  "displayset": {
+    "file": "KIDSSystemResource_9d858483.kidsobjdb",
+    "id": "ecb1e6a0",
+    "type": "TypeInfo::Object::3D::Displayset::StreamWaterRiver",
+    "parent": "00000000",
+    "props": {
+      "KTGLShaderObjectHash": [
+        3030332115
+      ],
+      "TexturesRenderStateObjectHash": [
+        605419483
+      ],
+      "PositionArray": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "texture_state": {
+    "file": "system_dab638b2.kidsobjdb",
+    "id": "2415f7db",
+    "type": "TypeInfo::Object::Render::State::3D::Textures",
+    "parent": "00000000",
+    "props": {
+      "TextureBindTableCSVFileResourceHash": [
+        106608145
+      ],
+      "TextureObjectNameHash": [
+        0
+      ]
+    }
+  },
+  "shader_object": {
+    "file": "system_718ccb8b.kidsobjdb",
+    "id": "b49f32d3",
+    "type": "TypeInfo::Object::Render::State::3D::Shader::StreamWater",
+    "parent": "00000000",
+    "props": {
+      "G1SFileResourceHash": [
+        1386132710
+      ],
+      "KTGL3DShaderRenderStateObjectHash": [
+        781146573,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "shader_g1s": "529eb4e6",
+  "shader_sha256": "133dbf9b16fc19408d410e237396d890b1e3633f72be1f8bdee09ef8ce0073a1",
+  "binding_table": "065ab611",
+  "binding_sha256": "0dbbf54203501203dcae2368227c7f4194098727818ea50dd2ea28cc018643b5",
+  "textures": [
+    {
+      "binding": 0,
+      "object_name": "EE1ResourceStaticTexture［river_TID000］",
+      "texture_id": "4cf245dc",
+      "g1t": "bf537a03",
+      "slot": 0,
+      "g1t_sha256": "b3da84bff67d1a3fe1dc8b6b99c68eec48e93d55e56ce0fba1057a92044ce4ce",
+      "dimensions": [
+        512,
+        512
+      ],
+      "path": "res://assets/rtk14/water/4cf245dc.png"
+    },
+    {
+      "binding": 1,
+      "object_name": "EE1ResourceStaticTexture［river_TID001］",
+      "texture_id": "a41036bb",
+      "g1t": "bf537a03",
+      "slot": 1,
+      "g1t_sha256": "b3da84bff67d1a3fe1dc8b6b99c68eec48e93d55e56ce0fba1057a92044ce4ce",
+      "dimensions": [
+        512,
+        512
+      ],
+      "path": "res://assets/rtk14/water/a41036bb.png"
+    }
+  ],
+  "status": "Native StreamWater resources recovered. Whole-map control points, water levels and runtime material constants are not confirmed."
+}

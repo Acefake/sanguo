@@ -1,0 +1,22 @@
+{
+  "parameters": [
+    7.0262152091680585,
+    8.099884983366083,
+    373.47135065768504,
+    135.15016650235845
+  ],
+  "parameter_order": [
+    "column_spacing",
+    "row_spacing",
+    "origin_x",
+    "origin_z"
+  ],
+  "basis": "Source heightmap river valleys and city terrain slopes; column stagger 0.5",
+  "status": "terrain-registration estimate, original runtime constants unconfirmed",
+  "previous_parameters": [
+    7.5,
+    8,
+    250,
+    160
+  ]
+}

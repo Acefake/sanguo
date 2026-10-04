@@ -1,0 +1,852 @@
+[
+  {
+    "package": "CharacterEditor",
+    "id": "f893127a",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 29852,
+    "flags": 1179648,
+    "address": "8412a52@4df0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\f893127a.obj",
+    "extent": [
+      111.504,
+      5.747,
+      5.169
+    ],
+    "triangles": 630,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "d3c18f06",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 39624,
+    "flags": 1179648,
+    "address": "802dbeb@54d3",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\d3c18f06.obj",
+    "extent": [
+      341.401,
+      179.171,
+      39.757
+    ],
+    "triangles": 525,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "80c82506",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 44812,
+    "flags": 1179648,
+    "address": "820c7a4@352f",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\80c82506.obj",
+    "extent": [
+      7.921,
+      210.775,
+      211.845
+    ],
+    "triangles": 596,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "9eea5b67",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 54500,
+    "flags": 1179648,
+    "address": "8207bbd@41a5",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\9eea5b67.obj",
+    "extent": [
+      11.486,
+      249.715,
+      242.999
+    ],
+    "triangles": 722,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "a9a19ea3",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 67836,
+    "flags": 1179648,
+    "address": "10a104d@8bef#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\a9a19ea3.obj",
+    "extent": [
+      283.372,
+      341.262,
+      541.618
+    ],
+    "triangles": 817,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "682039a2",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 92444,
+    "flags": 1179648,
+    "address": "805c577@6837",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\682039a2.obj",
+    "extent": [
+      214.24,
+      504.806,
+      452.791
+    ],
+    "triangles": 962,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "e5dc4fba",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 94236,
+    "flags": 1179648,
+    "address": "804c2a7@8ad7",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\e5dc4fba.obj",
+    "extent": [
+      211.43,
+      574.794,
+      260.917
+    ],
+    "triangles": 990,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "c0d5fa9c",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 98584,
+    "flags": 1179648,
+    "address": "8054f33@748e",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\c0d5fa9c.obj",
+    "extent": [
+      201.635,
+      171.193,
+      456.716
+    ],
+    "triangles": 1005,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "bd1ef9be",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 132712,
+    "flags": 1179648,
+    "address": "8062fca@c727",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\bd1ef9be.obj",
+    "extent": [
+      261.172,
+      120.158,
+      638.655
+    ],
+    "triangles": 1434,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "9962ab33",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 139844,
+    "flags": 1179648,
+    "address": "807d852@9de0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\9962ab33.obj",
+    "extent": [
+      619.035,
+      254.14,
+      809.292
+    ],
+    "triangles": 1154,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "9a851cde",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 142032,
+    "flags": 1179648,
+    "address": "806f8fc@dcf7",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\9a851cde.obj",
+    "extent": [
+      385.672,
+      462.743,
+      908.571
+    ],
+    "triangles": 1483,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "179118ca",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 155636,
+    "flags": 1179648,
+    "address": "820ff94@16384",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\179118ca.obj",
+    "extent": [
+      149.895,
+      6.989,
+      22.69
+    ],
+    "triangles": 2722,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "8160af8a",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 156080,
+    "flags": 1179648,
+    "address": "8417b02@18820",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\8160af8a.obj",
+    "extent": [
+      189.994,
+      34.548,
+      33.019
+    ],
+    "triangles": 3828,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "5448057e",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 159852,
+    "flags": 1179648,
+    "address": "61bbf44@ccbb",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\5448057e.obj",
+    "extent": [
+      268.05,
+      716.959,
+      325.775
+    ],
+    "triangles": 4032,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "26112e32",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 161096,
+    "flags": 1179648,
+    "address": "83fbefa@16813",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\26112e32.obj",
+    "extent": [
+      147.527,
+      9.778,
+      40.556
+    ],
+    "triangles": 3300,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "5b38b582",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 204136,
+    "flags": 1179648,
+    "address": "803353d@18b9a",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\5b38b582.obj",
+    "extent": [
+      341.401,
+      179.171,
+      39.757
+    ],
+    "triangles": 2625,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "2230448e",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 206996,
+    "flags": 1179648,
+    "address": "8440000@22ed6",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\2230448e.obj",
+    "extent": [
+      55.868,
+      3.968,
+      6.574
+    ],
+    "triangles": 4412,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "647286ff",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 209528,
+    "flags": 1179648,
+    "address": "8260000@21f96",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\647286ff.obj",
+    "extent": [
+      299.981,
+      11.237,
+      27.314
+    ],
+    "triangles": 4094,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "26f8ff97",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 266564,
+    "flags": 1179648,
+    "address": "8230000@27815",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\26f8ff97.obj",
+    "extent": [
+      150.257,
+      15.588,
+      27.906
+    ],
+    "triangles": 5451,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "7f631b49",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 297000,
+    "flags": 1179648,
+    "address": "82e0000@3593e",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\7f631b49.obj",
+    "extent": [
+      250.627,
+      15.941,
+      25.427
+    ],
+    "triangles": 7762,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "dd52108d",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 354888,
+    "flags": 1179648,
+    "address": "8380000@38a51",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\dd52108d.obj",
+    "extent": [
+      300.623,
+      14.878,
+      18.88
+    ],
+    "triangles": 6830,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "d4302697",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 377388,
+    "flags": 1179648,
+    "address": "83c0000@3bb72",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\d4302697.obj",
+    "extent": [
+      301.315,
+      14.974,
+      35.18
+    ],
+    "triangles": 7660,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "ddfc9d4b",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 498036,
+    "flags": 1179648,
+    "address": "8290000@4ad46",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\ddfc9d4b.obj",
+    "extent": [
+      191.084,
+      16.174,
+      69.787
+    ],
+    "triangles": 10280,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "7b9c1268",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 572436,
+    "flags": 1179648,
+    "address": "8320000@571fc",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\7b9c1268.obj",
+    "extent": [
+      283.114,
+      23.103,
+      45.569
+    ],
+    "triangles": 11640,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "b650f992",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 1772352,
+    "flags": 1179648,
+    "address": "e70000@108f6e#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\b650f992.obj",
+    "extent": [
+      139.685,
+      181.37,
+      40.451
+    ],
+    "triangles": 37159,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "8b919cd3",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 1975464,
+    "flags": 1179648,
+    "address": "f80000@12072c#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\8b919cd3.obj",
+    "extent": [
+      139.686,
+      185.68,
+      37.502
+    ],
+    "triangles": 39211,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "439da610",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 2208704,
+    "flags": 1179648,
+    "address": "d10000@15d500#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\439da610.obj",
+    "extent": [
+      139.686,
+      186.567,
+      47.712
+    ],
+    "triangles": 48671,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "65b0a803",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 2371512,
+    "flags": 1179648,
+    "address": "7d30000@15c785",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\65b0a803.obj",
+    "extent": [
+      139.686,
+      184.31,
+      38.997
+    ],
+    "triangles": 45948,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "8c55fd7d",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 2597672,
+    "flags": 1179648,
+    "address": "7860000@174e90",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\8c55fd7d.obj",
+    "extent": [
+      139.686,
+      190.63,
+      47.142
+    ],
+    "triangles": 49282,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "cdf4bc12",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 2756332,
+    "flags": 1179648,
+    "address": "8090000@176fed",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\cdf4bc12.obj",
+    "extent": [
+      75.373,
+      260.412,
+      445.482
+    ],
+    "triangles": 41891,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "4fdaf9f5",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 2855068,
+    "flags": 1179648,
+    "address": "79e0000@1b1618",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\4fdaf9f5.obj",
+    "extent": [
+      139.686,
+      187.666,
+      47.184
+    ],
+    "triangles": 58114,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "b7548635",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 2914708,
+    "flags": 1179648,
+    "address": "7ba0000@18d623",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\b7548635.obj",
+    "extent": [
+      139.686,
+      186.441,
+      37.202
+    ],
+    "triangles": 50348,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "cdbd3adf",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 2961248,
+    "flags": 1179648,
+    "address": "76c0000@195d9f",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\cdbd3adf.obj",
+    "extent": [
+      139.686,
+      182.971,
+      38.949
+    ],
+    "triangles": 51021,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "c8315f9a",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 3246600,
+    "flags": 1179648,
+    "address": "6d40000@1cde88",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\c8315f9a.obj",
+    "extent": [
+      147.038,
+      197.087,
+      109.673
+    ],
+    "triangles": 61052,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "407a9723",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 3316664,
+    "flags": 1179648,
+    "address": "580000@1ff6fc#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\407a9723.obj",
+    "extent": [
+      157.038,
+      191.425,
+      115.342
+    ],
+    "triangles": 68988,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "b6e1937d",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 3322176,
+    "flags": 1179648,
+    "address": "7e90000@19d8cf",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\b6e1937d.obj",
+    "extent": [
+      120.695,
+      171.07,
+      34.919
+    ],
+    "triangles": 51119,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "8916ba44",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 3352456,
+    "flags": 1179648,
+    "address": "5ca0000@1d159b",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\8916ba44.obj",
+    "extent": [
+      139.686,
+      181.483,
+      72.89
+    ],
+    "triangles": 62160,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "00fc92aa",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 3476384,
+    "flags": 1179648,
+    "address": "6400000@20313e",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\00fc92aa.obj",
+    "extent": [
+      147.038,
+      195.08,
+      107.558
+    ],
+    "triangles": 69594,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "706a87d6",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 3846332,
+    "flags": 1179648,
+    "address": "68b0000@238844",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\706a87d6.obj",
+    "extent": [
+      147.038,
+      221.31,
+      97.006
+    ],
+    "triangles": 71365,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "f271cacc",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 3971188,
+    "flags": 1179648,
+    "address": "6af0000@24385c",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\f271cacc.obj",
+    "extent": [
+      179.808,
+      264.254,
+      112.732
+    ],
+    "triangles": 76753,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "ce0f195b",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 4040168,
+    "flags": 1179648,
+    "address": "330000@2438dc#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\ce0f195b.obj",
+    "extent": [
+      157.038,
+      199.18,
+      52.384
+    ],
+    "triangles": 72926,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "eeec17f6",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 4142360,
+    "flags": 1179648,
+    "address": "71e0000@2622ab",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\eeec17f6.obj",
+    "extent": [
+      143.362,
+      193.325,
+      103.001
+    ],
+    "triangles": 78906,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "9679502f",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 4513732,
+    "flags": 1179648,
+    "address": "6610000@29b82f",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\9679502f.obj",
+    "extent": [
+      139.686,
+      187.736,
+      86.343
+    ],
+    "triangles": 86506,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "0738cb85",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 4575824,
+    "flags": 1179648,
+    "address": "7450000@26e624",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\0738cb85.obj",
+    "extent": [
+      139.686,
+      194.764,
+      51.67
+    ],
+    "triangles": 81579,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "65462d76",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 4671720,
+    "flags": 1179648,
+    "address": "790000@276dc2#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\65462d76.obj",
+    "extent": [
+      157.038,
+      195.992,
+      66.584
+    ],
+    "triangles": 81140,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "1aa96581",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 4832080,
+    "flags": 1179648,
+    "address": "61d0000@2278f2",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\1aa96581.obj",
+    "extent": [
+      158.608,
+      194.339,
+      65.215
+    ],
+    "triangles": 69436,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "84bf9d62",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 5396588,
+    "flags": 1179648,
+    "address": "a10000@2efdc2#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\84bf9d62.obj",
+    "extent": [
+      120.695,
+      172.805,
+      48.541
+    ],
+    "triangles": 98460,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "8edce9d9",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 5530568,
+    "flags": 1179648,
+    "address": "10000@3187f7#e&0",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\8edce9d9.obj",
+    "extent": [
+      157.038,
+      199.001,
+      66.182
+    ],
+    "triangles": 98123,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "b753eee2",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 5671008,
+    "flags": 1179648,
+    "address": "6f10000@2c25b2",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\b753eee2.obj",
+    "extent": [
+      143.362,
+      192.729,
+      108.388
+    ],
+    "triangles": 83558,
+    "classification": "unverified"
+  },
+  {
+    "package": "CharacterEditor",
+    "id": "db901a0f",
+    "type": "563bdef1",
+    "ext": "g1m",
+    "size": 5772316,
+    "flags": 1179648,
+    "address": "5e80000@33bc98",
+    "obj": "C:\\Users\\10228\\OneDrive\\桌面\\项目\\sanguo\\tools\\army-source-cache\\db901a0f.obj",
+    "extent": [
+      178.238,
+      216.311,
+      90.705
+    ],
+    "triangles": 100566,
+    "classification": "unverified"
+  }
+]

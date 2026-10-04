@@ -1,0 +1,70 @@
+{
+  "flag_reference": "https://github.com/VitaSmith/gust_tools/blob/master/gust_g1t.c",
+  "status": "G1T flags decoded; game runtime sampler format override unconfirmed.",
+  "textures": [
+    {
+      "resource": "239167e0",
+      "slot": 0,
+      "format": 2,
+      "flags": "0000000011000001",
+      "srgb_flag": false,
+      "extra_flags": "00000000"
+    },
+    {
+      "resource": "239167e0",
+      "slot": 1,
+      "format": 1,
+      "flags": "0000000000011201",
+      "srgb_flag": false,
+      "extra_flags": "00000000"
+    },
+    {
+      "resource": "239167e0",
+      "slot": 2,
+      "format": 91,
+      "flags": "0000000000011201",
+      "srgb_flag": false,
+      "extra_flags": "00000001"
+    },
+    {
+      "resource": "239167e0",
+      "slot": 3,
+      "format": 91,
+      "flags": "0000030000011201",
+      "srgb_flag": false,
+      "extra_flags": "00000000"
+    },
+    {
+      "resource": "239167e0",
+      "slot": 4,
+      "format": 91,
+      "flags": "0000000000011201",
+      "srgb_flag": false,
+      "extra_flags": "00000000"
+    },
+    {
+      "resource": "57ee6cea",
+      "slot": 0,
+      "format": 91,
+      "flags": "0000000000011201",
+      "srgb_flag": false,
+      "extra_flags": "30010001"
+    },
+    {
+      "resource": "57ee6cea",
+      "slot": 1,
+      "format": 91,
+      "flags": "0000030000011201",
+      "srgb_flag": false,
+      "extra_flags": "30010000"
+    },
+    {
+      "resource": "57ee6cea",
+      "slot": 2,
+      "format": 91,
+      "flags": "0000000000011201",
+      "srgb_flag": false,
+      "extra_flags": "30010000"
+    }
+  ]
+}

@@ -1,0 +1,905 @@
+[
+  {
+    "model": "dbc1dbf6",
+    "material": 0,
+    "binding": "ea043145",
+    "color_slot": 0,
+    "texture": "099e64d3"
+  },
+  {
+    "model": "bb180ebf",
+    "material": 0,
+    "binding": "f574579c",
+    "color_slot": 0,
+    "texture": "fad3fa95"
+  },
+  {
+    "model": "13348925",
+    "material": 0,
+    "binding": "a0e729f6",
+    "color_slot": 0,
+    "texture": "5f696556"
+  },
+  {
+    "model": "81b761fc",
+    "material": 0,
+    "binding": "02bf6bff",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "81b761fc",
+    "material": 1,
+    "binding": "02bf6bff",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "81b761fc",
+    "material": 2,
+    "binding": "02bf6bff",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "81b761fc",
+    "material": 3,
+    "binding": "02bf6bff",
+    "color_slot": 12,
+    "texture": "54f37992"
+  },
+  {
+    "model": "d3d2edf9",
+    "material": 0,
+    "binding": "f4155fa2",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "d3d2edf9",
+    "material": 1,
+    "binding": "f4155fa2",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "d3d2edf9",
+    "material": 2,
+    "binding": "f4155fa2",
+    "color_slot": 12,
+    "texture": "54f37992"
+  },
+  {
+    "model": "d3d2edf9",
+    "material": 3,
+    "binding": "f4155fa2",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "3b8dfcd1",
+    "material": 0,
+    "binding": "83bc2bca",
+    "color_slot": 0,
+    "texture": "5f696556"
+  },
+  {
+    "model": "c99eeb4c",
+    "material": 0,
+    "binding": "b7c90caf",
+    "color_slot": 19,
+    "texture": null
+  },
+  {
+    "model": "c99eeb4c",
+    "material": 1,
+    "binding": "b7c90caf",
+    "color_slot": 15,
+    "texture": "c3635ce4"
+  },
+  {
+    "model": "c99eeb4c",
+    "material": 2,
+    "binding": "b7c90caf",
+    "color_slot": 12,
+    "texture": "c3d9c2e3"
+  },
+  {
+    "model": "c99eeb4c",
+    "material": 3,
+    "binding": "b7c90caf",
+    "color_slot": 0,
+    "texture": "c6a026dd"
+  },
+  {
+    "model": "c99eeb4c",
+    "material": 4,
+    "binding": "b7c90caf",
+    "color_slot": 4,
+    "texture": "c629c0de"
+  },
+  {
+    "model": "c99eeb4c",
+    "material": 5,
+    "binding": "b7c90caf",
+    "color_slot": 8,
+    "texture": "c45028e2"
+  },
+  {
+    "model": "a03980fd",
+    "material": 0,
+    "binding": "b4812d1e",
+    "color_slot": 12,
+    "texture": "4d8e4473"
+  },
+  {
+    "model": "a03980fd",
+    "material": 1,
+    "binding": "b4812d1e",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "a03980fd",
+    "material": 2,
+    "binding": "b4812d1e",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "a03980fd",
+    "material": 3,
+    "binding": "b4812d1e",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "a03980fd",
+    "material": 4,
+    "binding": "b4812d1e",
+    "color_slot": 20,
+    "texture": "e8f8d9b2"
+  },
+  {
+    "model": "a03980fd",
+    "material": 5,
+    "binding": "b4812d1e",
+    "color_slot": 16,
+    "texture": "54f37992"
+  },
+  {
+    "model": "f3fd5f40",
+    "material": 0,
+    "binding": "d939173b",
+    "color_slot": 0,
+    "texture": "31df7d4c"
+  },
+  {
+    "model": "e8febd1a",
+    "material": 0,
+    "binding": "846374a1",
+    "color_slot": 4,
+    "texture": "4d8e4473"
+  },
+  {
+    "model": "e8febd1a",
+    "material": 1,
+    "binding": "846374a1",
+    "color_slot": 12,
+    "texture": "f7c343f0"
+  },
+  {
+    "model": "e8febd1a",
+    "material": 2,
+    "binding": "846374a1",
+    "color_slot": 0,
+    "texture": "46290f54"
+  },
+  {
+    "model": "e8febd1a",
+    "material": 3,
+    "binding": "846374a1",
+    "color_slot": 8,
+    "texture": "54f37992"
+  },
+  {
+    "model": "d0f45e3a",
+    "material": 0,
+    "binding": "9b21f781",
+    "color_slot": 0,
+    "texture": "e193a493"
+  },
+  {
+    "model": "fbadff7b",
+    "material": 0,
+    "binding": "c79c7e60",
+    "color_slot": 0,
+    "texture": "c0ee1972"
+  },
+  {
+    "model": "f682d334",
+    "material": 0,
+    "binding": "276221c7",
+    "color_slot": 0,
+    "texture": "5f696556"
+  },
+  {
+    "model": "6c54710c",
+    "material": 0,
+    "binding": "6bc43eef",
+    "color_slot": 0,
+    "texture": "5f696556"
+  },
+  {
+    "model": "353f3c01",
+    "material": 0,
+    "binding": "c032d29a",
+    "color_slot": 0,
+    "texture": "ec099057"
+  },
+  {
+    "model": "139591c0",
+    "material": 0,
+    "binding": "aca734bb",
+    "color_slot": 0,
+    "texture": "5f696556"
+  },
+  {
+    "model": "7e04781e",
+    "material": 0,
+    "binding": "90151a1d",
+    "color_slot": 0,
+    "texture": "02392fb4"
+  },
+  {
+    "model": "bbb0ae6c",
+    "material": 0,
+    "binding": "07efad8f",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "bbb0ae6c",
+    "material": 1,
+    "binding": "07efad8f",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "bbb0ae6c",
+    "material": 2,
+    "binding": "07efad8f",
+    "color_slot": 12,
+    "texture": "4d8e4473"
+  },
+  {
+    "model": "bbb0ae6c",
+    "material": 3,
+    "binding": "07efad8f",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "bbb0ae6c",
+    "material": 4,
+    "binding": "07efad8f",
+    "color_slot": 20,
+    "texture": "e8f8d9b2"
+  },
+  {
+    "model": "bbb0ae6c",
+    "material": 5,
+    "binding": "07efad8f",
+    "color_slot": 24,
+    "texture": "f7c343f0"
+  },
+  {
+    "model": "bbb0ae6c",
+    "material": 6,
+    "binding": "07efad8f",
+    "color_slot": 16,
+    "texture": "54f37992"
+  },
+  {
+    "model": "0475ea89",
+    "material": 0,
+    "binding": "d7d1f512",
+    "color_slot": 4,
+    "texture": "54f37992"
+  },
+  {
+    "model": "0475ea89",
+    "material": 1,
+    "binding": "d7d1f512",
+    "color_slot": 0,
+    "texture": "4d8e4473"
+  },
+  {
+    "model": "0475ea89",
+    "material": 2,
+    "binding": "d7d1f512",
+    "color_slot": 8,
+    "texture": "f7c343f0"
+  },
+  {
+    "model": "a43161ea",
+    "material": 0,
+    "binding": "2f8569d1",
+    "color_slot": 12,
+    "texture": "c5b35adf"
+  },
+  {
+    "model": "a43161ea",
+    "material": 1,
+    "binding": "2f8569d1",
+    "color_slot": 16,
+    "texture": "c53cf4e0"
+  },
+  {
+    "model": "a43161ea",
+    "material": 2,
+    "binding": "2f8569d1",
+    "color_slot": 0,
+    "texture": "c6a026dd"
+  },
+  {
+    "model": "a43161ea",
+    "material": 3,
+    "binding": "2f8569d1",
+    "color_slot": 28,
+    "texture": "c45028e2"
+  },
+  {
+    "model": "a43161ea",
+    "material": 4,
+    "binding": "2f8569d1",
+    "color_slot": 8,
+    "texture": "c629c0de"
+  },
+  {
+    "model": "a43161ea",
+    "material": 5,
+    "binding": "2f8569d1",
+    "color_slot": 24,
+    "texture": "c4c68ee1"
+  },
+  {
+    "model": "a43161ea",
+    "material": 6,
+    "binding": "2f8569d1",
+    "color_slot": 47,
+    "texture": null
+  },
+  {
+    "model": "a43161ea",
+    "material": 7,
+    "binding": "2f8569d1",
+    "color_slot": 55,
+    "texture": null
+  },
+  {
+    "model": "a43161ea",
+    "material": 8,
+    "binding": "2f8569d1",
+    "color_slot": 4,
+    "texture": "8a340190"
+  },
+  {
+    "model": "a43161ea",
+    "material": 9,
+    "binding": "2f8569d1",
+    "color_slot": 51,
+    "texture": null
+  },
+  {
+    "model": "a43161ea",
+    "material": 10,
+    "binding": "2f8569d1",
+    "color_slot": 35,
+    "texture": "876d9d96"
+  },
+  {
+    "model": "a43161ea",
+    "material": 11,
+    "binding": "2f8569d1",
+    "color_slot": 39,
+    "texture": "c3635ce4"
+  },
+  {
+    "model": "a43161ea",
+    "material": 12,
+    "binding": "2f8569d1",
+    "color_slot": 32,
+    "texture": "c3d9c2e3"
+  },
+  {
+    "model": "a43161ea",
+    "material": 13,
+    "binding": "2f8569d1",
+    "color_slot": 43,
+    "texture": "c2ecf6e5"
+  },
+  {
+    "model": "a43161ea",
+    "material": 14,
+    "binding": "2f8569d1",
+    "color_slot": 20,
+    "texture": "88d0cf93"
+  },
+  {
+    "model": "4237580b",
+    "material": 0,
+    "binding": "523e37d0",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "4237580b",
+    "material": 1,
+    "binding": "523e37d0",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "4237580b",
+    "material": 2,
+    "binding": "523e37d0",
+    "color_slot": 12,
+    "texture": "4d8e4473"
+  },
+  {
+    "model": "4237580b",
+    "material": 3,
+    "binding": "523e37d0",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "4237580b",
+    "material": 4,
+    "binding": "523e37d0",
+    "color_slot": 16,
+    "texture": "54f37992"
+  },
+  {
+    "model": "4237580b",
+    "material": 5,
+    "binding": "523e37d0",
+    "color_slot": 20,
+    "texture": "e8f8d9b2"
+  },
+  {
+    "model": "41d45517",
+    "material": 0,
+    "binding": "4640dc44",
+    "color_slot": 0,
+    "texture": "00e12ebb"
+  },
+  {
+    "model": "8c8b54ab",
+    "material": 0,
+    "binding": "5269cf30",
+    "color_slot": 12,
+    "texture": "c3d9c2e3"
+  },
+  {
+    "model": "8c8b54ab",
+    "material": 1,
+    "binding": "5269cf30",
+    "color_slot": 15,
+    "texture": "c3635ce4"
+  },
+  {
+    "model": "8c8b54ab",
+    "material": 2,
+    "binding": "5269cf30",
+    "color_slot": 0,
+    "texture": "c6a026dd"
+  },
+  {
+    "model": "8c8b54ab",
+    "material": 3,
+    "binding": "5269cf30",
+    "color_slot": 19,
+    "texture": null
+  },
+  {
+    "model": "8c8b54ab",
+    "material": 4,
+    "binding": "5269cf30",
+    "color_slot": 4,
+    "texture": "c629c0de"
+  },
+  {
+    "model": "8c8b54ab",
+    "material": 5,
+    "binding": "5269cf30",
+    "color_slot": 8,
+    "texture": "c45028e2"
+  },
+  {
+    "model": "6325ea5c",
+    "material": 0,
+    "binding": "4f21ef9f",
+    "color_slot": 0,
+    "texture": "c0ee1972"
+  },
+  {
+    "model": "abeb2679",
+    "material": 0,
+    "binding": "1f043722",
+    "color_slot": 0,
+    "texture": "e8f8d9b2"
+  },
+  {
+    "model": "abeb2679",
+    "material": 1,
+    "binding": "1f043722",
+    "color_slot": 4,
+    "texture": "f05e0ed1"
+  },
+  {
+    "model": "f82ba560",
+    "material": 0,
+    "binding": "5ad3951b",
+    "color_slot": 0,
+    "texture": "f36ec576"
+  },
+  {
+    "model": "40f0e17d",
+    "material": 0,
+    "binding": "2ab5dc9e",
+    "color_slot": 0,
+    "texture": "099e64d3"
+  },
+  {
+    "model": "3468c4d7",
+    "material": 0,
+    "binding": "a63a6484",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "3468c4d7",
+    "material": 1,
+    "binding": "a63a6484",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "3468c4d7",
+    "material": 2,
+    "binding": "a63a6484",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "3468c4d7",
+    "material": 3,
+    "binding": "a63a6484",
+    "color_slot": 16,
+    "texture": "e8f8d9b2"
+  },
+  {
+    "model": "3468c4d7",
+    "material": 4,
+    "binding": "a63a6484",
+    "color_slot": 12,
+    "texture": "54f37992"
+  },
+  {
+    "model": "b85c8d16",
+    "material": 0,
+    "binding": "a0bfa425",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "b85c8d16",
+    "material": 1,
+    "binding": "a0bfa425",
+    "color_slot": 16,
+    "texture": "e8f8d9b2"
+  },
+  {
+    "model": "b85c8d16",
+    "material": 2,
+    "binding": "a0bfa425",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "b85c8d16",
+    "material": 3,
+    "binding": "a0bfa425",
+    "color_slot": 12,
+    "texture": "54f37992"
+  },
+  {
+    "model": "b85c8d16",
+    "material": 4,
+    "binding": "a0bfa425",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "cd6b8215",
+    "material": 0,
+    "binding": "2d8f4f06",
+    "color_slot": 0,
+    "texture": "099e64d3"
+  },
+  {
+    "model": "8e9e21c1",
+    "material": 0,
+    "binding": "92b0a4da",
+    "color_slot": 0,
+    "texture": "1720ec0d"
+  },
+  {
+    "model": "5c30af13",
+    "material": 0,
+    "binding": "776fc1c8",
+    "color_slot": 0,
+    "texture": "8a340190"
+  },
+  {
+    "model": "24fc4525",
+    "material": 0,
+    "binding": "c816edf6",
+    "color_slot": 0,
+    "texture": "5f696556"
+  },
+  {
+    "model": "c57c9418",
+    "material": 0,
+    "binding": "37a07d63",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "c57c9418",
+    "material": 1,
+    "binding": "37a07d63",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "c57c9418",
+    "material": 2,
+    "binding": "37a07d63",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "c57c9418",
+    "material": 3,
+    "binding": "37a07d63",
+    "color_slot": 12,
+    "texture": "4d8e4473"
+  },
+  {
+    "model": "c57c9418",
+    "material": 4,
+    "binding": "37a07d63",
+    "color_slot": 16,
+    "texture": "f7c343f0"
+  },
+  {
+    "model": "beee9e96",
+    "material": 0,
+    "binding": "6c6fc2a5",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "beee9e96",
+    "material": 1,
+    "binding": "6c6fc2a5",
+    "color_slot": 12,
+    "texture": "4d8e4473"
+  },
+  {
+    "model": "beee9e96",
+    "material": 2,
+    "binding": "6c6fc2a5",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "beee9e96",
+    "material": 3,
+    "binding": "6c6fc2a5",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "beee9e96",
+    "material": 4,
+    "binding": "6c6fc2a5",
+    "color_slot": 16,
+    "texture": "f7c343f0"
+  },
+  {
+    "model": "6cabae7e",
+    "material": 0,
+    "binding": "7654afbd",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "6cabae7e",
+    "material": 1,
+    "binding": "7654afbd",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "6cabae7e",
+    "material": 2,
+    "binding": "7654afbd",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "6cabae7e",
+    "material": 3,
+    "binding": "7654afbd",
+    "color_slot": 16,
+    "texture": "e8f8d9b2"
+  },
+  {
+    "model": "6cabae7e",
+    "material": 4,
+    "binding": "7654afbd",
+    "color_slot": 12,
+    "texture": "54f37992"
+  },
+  {
+    "model": "b288b606",
+    "material": 0,
+    "binding": "ec189935",
+    "color_slot": 7,
+    "texture": "a9a58097"
+  },
+  {
+    "model": "b288b606",
+    "material": 1,
+    "binding": "ec189935",
+    "color_slot": 11,
+    "texture": "e3702276"
+  },
+  {
+    "model": "b288b606",
+    "material": 2,
+    "binding": "ec189935",
+    "color_slot": 3,
+    "texture": "6fdadeb8"
+  },
+  {
+    "model": "b288b606",
+    "material": 3,
+    "binding": "ec189935",
+    "color_slot": 0,
+    "texture": "00e12ebb"
+  },
+  {
+    "model": "06b281ed",
+    "material": 0,
+    "binding": "1d284a2e",
+    "color_slot": 15,
+    "texture": "c3635ce4"
+  },
+  {
+    "model": "06b281ed",
+    "material": 1,
+    "binding": "1d284a2e",
+    "color_slot": 0,
+    "texture": "c6a026dd"
+  },
+  {
+    "model": "06b281ed",
+    "material": 2,
+    "binding": "1d284a2e",
+    "color_slot": 12,
+    "texture": "c3d9c2e3"
+  },
+  {
+    "model": "06b281ed",
+    "material": 3,
+    "binding": "1d284a2e",
+    "color_slot": 19,
+    "texture": null
+  },
+  {
+    "model": "06b281ed",
+    "material": 4,
+    "binding": "1d284a2e",
+    "color_slot": 8,
+    "texture": "c45028e2"
+  },
+  {
+    "model": "06b281ed",
+    "material": 5,
+    "binding": "1d284a2e",
+    "color_slot": 4,
+    "texture": "c629c0de"
+  },
+  {
+    "model": "b0c513a6",
+    "material": 0,
+    "binding": "b567ef95",
+    "color_slot": 0,
+    "texture": "5f696556"
+  },
+  {
+    "model": "261253bb",
+    "material": 0,
+    "binding": "e9c2b220",
+    "color_slot": 0,
+    "texture": "c8534e91"
+  },
+  {
+    "model": "49747855",
+    "material": 0,
+    "binding": "32a520c6",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "49747855",
+    "material": 1,
+    "binding": "32a520c6",
+    "color_slot": 8,
+    "texture": "46290f54"
+  },
+  {
+    "model": "49747855",
+    "material": 2,
+    "binding": "32a520c6",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "49747855",
+    "material": 3,
+    "binding": "32a520c6",
+    "color_slot": 12,
+    "texture": "54f37992"
+  },
+  {
+    "model": "f731883d",
+    "material": 0,
+    "binding": "3c8a0dde",
+    "color_slot": 4,
+    "texture": "d5d5d5cb"
+  },
+  {
+    "model": "f731883d",
+    "material": 1,
+    "binding": "3c8a0dde",
+    "color_slot": 12,
+    "texture": "4d8e4473"
+  },
+  {
+    "model": "f731883d",
+    "material": 2,
+    "binding": "3c8a0dde",
+    "color_slot": 0,
+    "texture": "b988e453"
+  },
+  {
+    "model": "f731883d",
+    "material": 3,
+    "binding": "3c8a0dde",
+    "color_slot": 16,
+    "texture": "f7c343f0"
+  },
+  {
+    "model": "f731883d",
+    "material": 4,
+    "binding": "3c8a0dde",
+    "color_slot": 8,
+    "texture": "46290f54"
+  }
+]

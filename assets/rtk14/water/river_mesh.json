@@ -1,0 +1,13 @@
+{
+  "mesh": "res://assets/rtk14/water/river_mesh.bin",
+  "sha256": "445a6f7988aab4eeb78ef893e20d9798e2a77b280f6925a03444507e44cdad47",
+  "sampling_step_m": 1,
+  "block_size_m": 256,
+  "blocks": 50,
+  "vertices": 448797,
+  "triangles": 809140,
+  "mask_threshold": 0.45,
+  "source_mask_sha256": "7f059ff1b1eec947a9f30eded775ca41aa73a5d360aa5ead86b2211ca94bd2ad",
+  "water_heights_sha256": "93177b75cf897dd1a42b0bb93ddfed2167ecd504b21681c3da318da90df0506c",
+  "status": "Source painted footprint and one-metre relief sampling. Water levels remain reconstructed, not native river control points."
+}

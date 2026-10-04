@@ -1,0 +1,384 @@
+{
+  "provenance": {
+    "source": "城市全景_已核对/城市对应表.json",
+    "fixdata_sha256": "53387c39ec4af14ae0cfe31db58439f2e517539952ee1c57f22038bba9ad377d",
+    "city_table": {
+      "header_offset": 127187,
+      "count": 52,
+      "record_size": 42,
+      "state_id_offset": 5
+    },
+    "state_table": {
+      "header_offset": 482258,
+      "count": 23,
+      "record_size": 14,
+      "scene_type_offset": 5
+    },
+    "scene_ids": [
+      101,
+      102,
+      103,
+      104,
+      105
+    ]
+  },
+  "cities": [
+    {
+      "city_id": 1,
+      "name": "襄平",
+      "state_id": 1,
+      "state": "幽州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 2,
+      "name": "北平",
+      "state_id": 1,
+      "state": "幽州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 3,
+      "name": "蓟",
+      "state_id": 1,
+      "state": "幽州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 4,
+      "name": "南皮",
+      "state_id": 2,
+      "state": "冀州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 5,
+      "name": "邺",
+      "state_id": 2,
+      "state": "冀州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 6,
+      "name": "平原",
+      "state_id": 2,
+      "state": "冀州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 7,
+      "name": "北海",
+      "state_id": 3,
+      "state": "青州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 8,
+      "name": "济南",
+      "state_id": 3,
+      "state": "青州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 9,
+      "name": "晋阳",
+      "state_id": 4,
+      "state": "并州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 10,
+      "name": "上党",
+      "state_id": 4,
+      "state": "并州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 11,
+      "name": "下邳",
+      "state_id": 5,
+      "state": "徐州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 12,
+      "name": "小沛",
+      "state_id": 5,
+      "state": "徐州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 13,
+      "name": "濮阳",
+      "state_id": 6,
+      "state": "兖州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 14,
+      "name": "陈留",
+      "state_id": 6,
+      "state": "兖州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 15,
+      "name": "许昌",
+      "state_id": 7,
+      "state": "豫州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 16,
+      "name": "谯",
+      "state_id": 7,
+      "state": "豫州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 17,
+      "name": "汝南",
+      "state_id": 7,
+      "state": "豫州",
+      "scene_id": 102
+    },
+    {
+      "city_id": 18,
+      "name": "洛阳",
+      "state_id": 8,
+      "state": "司隶",
+      "scene_id": 102
+    },
+    {
+      "city_id": 19,
+      "name": "弘农",
+      "state_id": 8,
+      "state": "司隶",
+      "scene_id": 102
+    },
+    {
+      "city_id": 20,
+      "name": "长安",
+      "state_id": 9,
+      "state": "雍州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 21,
+      "name": "天水",
+      "state_id": 9,
+      "state": "雍州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 22,
+      "name": "武威",
+      "state_id": 10,
+      "state": "凉州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 23,
+      "name": "广陵",
+      "state_id": 15,
+      "state": "扬北",
+      "scene_id": 103
+    },
+    {
+      "city_id": 24,
+      "name": "西平",
+      "state_id": 10,
+      "state": "凉州",
+      "scene_id": 101
+    },
+    {
+      "city_id": 25,
+      "name": "汉中",
+      "state_id": 11,
+      "state": "益州",
+      "scene_id": 104
+    },
+    {
+      "city_id": 26,
+      "name": "武都",
+      "state_id": 11,
+      "state": "益州",
+      "scene_id": 104
+    },
+    {
+      "city_id": 27,
+      "name": "成都",
+      "state_id": 11,
+      "state": "益州",
+      "scene_id": 104
+    },
+    {
+      "city_id": 28,
+      "name": "永安",
+      "state_id": 11,
+      "state": "益州",
+      "scene_id": 104
+    },
+    {
+      "city_id": 29,
+      "name": "梓潼",
+      "state_id": 11,
+      "state": "益州",
+      "scene_id": 104
+    },
+    {
+      "city_id": 30,
+      "name": "江州",
+      "state_id": 11,
+      "state": "益州",
+      "scene_id": 104
+    },
+    {
+      "city_id": 31,
+      "name": "永昌",
+      "state_id": 12,
+      "state": "南中",
+      "scene_id": 105
+    },
+    {
+      "city_id": 32,
+      "name": "宛",
+      "state_id": 13,
+      "state": "荆北",
+      "scene_id": 103
+    },
+    {
+      "city_id": 33,
+      "name": "新野",
+      "state_id": 13,
+      "state": "荆北",
+      "scene_id": 103
+    },
+    {
+      "city_id": 34,
+      "name": "襄阳",
+      "state_id": 13,
+      "state": "荆北",
+      "scene_id": 103
+    },
+    {
+      "city_id": 35,
+      "name": "江夏",
+      "state_id": 13,
+      "state": "荆北",
+      "scene_id": 103
+    },
+    {
+      "city_id": 36,
+      "name": "上庸",
+      "state_id": 13,
+      "state": "荆北",
+      "scene_id": 103
+    },
+    {
+      "city_id": 37,
+      "name": "江陵",
+      "state_id": 14,
+      "state": "荆南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 38,
+      "name": "长沙",
+      "state_id": 14,
+      "state": "荆南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 39,
+      "name": "零陵",
+      "state_id": 14,
+      "state": "荆南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 40,
+      "name": "武陵",
+      "state_id": 14,
+      "state": "荆南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 41,
+      "name": "桂阳",
+      "state_id": 14,
+      "state": "荆南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 42,
+      "name": "寿春",
+      "state_id": 15,
+      "state": "扬北",
+      "scene_id": 103
+    },
+    {
+      "city_id": 43,
+      "name": "庐江",
+      "state_id": 15,
+      "state": "扬北",
+      "scene_id": 103
+    },
+    {
+      "city_id": 44,
+      "name": "秣陵",
+      "state_id": 16,
+      "state": "扬南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 45,
+      "name": "吴",
+      "state_id": 16,
+      "state": "扬南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 46,
+      "name": "会稽",
+      "state_id": 16,
+      "state": "扬南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 47,
+      "name": "柴桑",
+      "state_id": 16,
+      "state": "扬南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 48,
+      "name": "鄱阳",
+      "state_id": 16,
+      "state": "扬南",
+      "scene_id": 103
+    },
+    {
+      "city_id": 49,
+      "name": "建宁",
+      "state_id": 12,
+      "state": "南中",
+      "scene_id": 105
+    },
+    {
+      "city_id": 50,
+      "name": "云南",
+      "state_id": 12,
+      "state": "南中",
+      "scene_id": 105
+    },
+    {
+      "city_id": 51,
+      "name": "交趾",
+      "state_id": 17,
+      "state": "交州",
+      "scene_id": 103
+    }
+  ]
+}

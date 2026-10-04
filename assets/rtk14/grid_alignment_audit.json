@@ -1,0 +1,29 @@
+{
+  "old": [
+    7.5,
+    8,
+    250,
+    160
+  ],
+  "candidate": [
+    7.0262152091680585,
+    8.099884983366083,
+    373.47135065768504,
+    135.15016650235845
+  ],
+  "old_components": {
+    "river": -0.23335185647010803,
+    "city": 0.39260709285736084,
+    "mountain": 0.5860413312911987,
+    "coast_land": 0.02013535425066948,
+    "coast_sea": 0.05524296313524246
+  },
+  "candidate_components": {
+    "river": -1.4615379571914673,
+    "city": 0.040746111422777176,
+    "mountain": 0.7045702934265137,
+    "coast_land": 0.05254141986370087,
+    "coast_sea": 0.014264531433582306
+  },
+  "status": "terrain-registration estimate, original runtime transform unconfirmed"
+}

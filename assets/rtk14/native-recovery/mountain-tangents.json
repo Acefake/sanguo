@@ -1,0 +1,50 @@
+[
+  {
+    "model": "14d3de0c",
+    "vertices": 422,
+    "source_vertex_match_max_cm": 7.2479248046875e-05,
+    "handedness_storage": "COLOR_0.a * 2 - 1",
+    "source_sha256": "4c9df3f13132658dbe55011b72f453ff0f53ccc21e791629673d29f2d7257023",
+    "native_tangent_sha256": "b3b5cb765c927a5b55306ba6a1cb2147176c460a2138dbec54248dedacb27cc2"
+  },
+  {
+    "model": "4b17a777",
+    "vertices": 317,
+    "source_vertex_match_max_cm": 7.62939453125e-05,
+    "handedness_storage": "COLOR_0.a * 2 - 1",
+    "source_sha256": "784724e7752bae7dc29426c58741b36b173451caed2036783f6006faf443040f",
+    "native_tangent_sha256": "668ae4256c0d2f9027d9fd6e80bc6b482ad44dda2caf6534d8b9d7af6b083d34"
+  },
+  {
+    "model": "5b5c506d",
+    "vertices": 465,
+    "source_vertex_match_max_cm": 0.00012969970703125,
+    "handedness_storage": "COLOR_0.a * 2 - 1",
+    "source_sha256": "c2b4a2629de7babe7737116a96aa5322782e48fabb43034b12dde60860b77d9b",
+    "native_tangent_sha256": "f1fc569c36ba16d3159373004ffa3f8cdf6d5a7a2b7e67d192bc31fb01c1cf1d"
+  },
+  {
+    "model": "beaceb35",
+    "vertices": 426,
+    "source_vertex_match_max_cm": 8.0108642578125e-05,
+    "handedness_storage": "COLOR_0.a * 2 - 1",
+    "source_sha256": "3c260118e44cceb4661eeca3c7245e55e1894d94a30d4197b5db4efaabded060",
+    "native_tangent_sha256": "3a654e62da570f9b88c4041793711c4e8273a4cca3d4d391fad9cd839e533269"
+  },
+  {
+    "model": "84e24956",
+    "vertices": 374,
+    "source_vertex_match_max_cm": 0.00012969970703125,
+    "handedness_storage": "COLOR_0.a * 2 - 1",
+    "source_sha256": "5312c9d6507531b78d1801b23d10007d95cf309df619e318d14a7512e3ac9bf0",
+    "native_tangent_sha256": "8db0af8527a209235d1234e86f4ba0007b524232f49fb24f1de4b6b0f9fd472e"
+  },
+  {
+    "model": "ce4b6bab",
+    "vertices": 515,
+    "source_vertex_match_max_cm": 0.00012969970703125,
+    "handedness_storage": "COLOR_0.a * 2 - 1",
+    "source_sha256": "d26d1c1512cb2f061021ef7cdf91eae47078be67a8e13b5010717b2c373d2b53",
+    "native_tangent_sha256": "0a81002aa17e825b29e195b07d4f1fd9f5b9af9c8f90cf34dffdb419e4071425"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "title": "群雄并起 · 演示剧本",
+  "disclaimer": "势力与数值为界面演示，尚未按具体年份校定",
+  "factions": {
+    "dong_zhuo": { "name": "董卓", "short": "董", "color": "#b78a62" },
+    "cao_cao": { "name": "曹操", "short": "曹", "color": "#8fae72" },
+    "yuan_shao": { "name": "袁绍", "short": "袁", "color": "#75aebb" },
+    "liu_bei": { "name": "刘备", "short": "刘", "color": "#c7b367" },
+    "lu_bu": { "name": "吕布", "short": "吕", "color": "#c5796e" },
+    "yuan_shu": { "name": "袁术", "short": "袁", "color": "#a18bb2" }
+  },
+  "places": {
+    "hongnong": { "faction": "dong_zhuo", "population": 148000, "economy": 51, "garrison": 9800, "grain": 42000, "treasury": 1900, "order": 63, "training": 49, "defense": 66, "description": "西接关中，东扼洛阳，是往来要冲。" },
+    "west_pass": { "faction": "dong_zhuo", "garrison": 4200, "defense": 79, "description": "西路关隘，可据险控制通道。" },
+    "luoyang": { "faction": "dong_zhuo", "population": 286000, "economy": 72, "garrison": 18000, "grain": 84000, "treasury": 4400, "order": 58, "training": 67, "defense": 83, "description": "洛水穿城，关中与中原在此相接。" },
+    "east_pass": { "faction": "dong_zhuo", "garrison": 3600, "defense": 75, "description": "东路关隘，控制洛阳通往中原的道路。" },
+    "chenliu": { "faction": "cao_cao", "population": 214000, "economy": 68, "garrison": 12600, "grain": 61000, "treasury": 3500, "order": 72, "training": 61, "defense": 61, "description": "中原道口，商旅和军粮汇聚之地。" },
+    "puyang": { "faction": "cao_cao", "population": 168000, "economy": 59, "garrison": 10400, "grain": 50000, "treasury": 2600, "order": 64, "training": 54, "defense": 58, "description": "临近黄河，便于水陆转运。" },
+    "jinan": { "faction": "yuan_shao", "population": 192000, "economy": 63, "garrison": 9200, "grain": 55000, "treasury": 2800, "order": 70, "training": 55, "defense": 57, "description": "青州西缘，连接海岱与中原。" },
+    "beihai": { "faction": "yuan_shao", "population": 176000, "economy": 65, "garrison": 8100, "grain": 57000, "treasury": 3000, "order": 73, "training": 51, "defense": 54, "description": "东临海岱，渔盐与农桑并重。" },
+    "xiaopei": { "faction": "liu_bei", "population": 133000, "economy": 48, "garrison": 7600, "grain": 35000, "treasury": 1500, "order": 78, "training": 58, "defense": 53, "description": "徐州北门，多方势力交汇。" },
+    "xiapi": { "faction": "lu_bu", "population": 205000, "economy": 66, "garrison": 14700, "grain": 59000, "treasury": 3300, "order": 55, "training": 68, "defense": 72, "description": "河渠环绕，控扼徐州诸路。" },
+    "xuchang": { "faction": "cao_cao", "population": 247000, "economy": 74, "garrison": 15800, "grain": 73000, "treasury": 4100, "order": 76, "training": 66, "defense": 69, "description": "中原腹心，四方道路由此延伸。" },
+    "qiao": { "faction": "cao_cao", "population": 151000, "economy": 55, "garrison": 6900, "grain": 41000, "treasury": 2000, "order": 71, "training": 50, "defense": 50, "description": "豫州东部，连接陈留与徐州。" },
+    "runan": { "faction": "yuan_shu", "population": 268000, "economy": 70, "garrison": 13200, "grain": 68000, "treasury": 3600, "order": 62, "training": 57, "defense": 60, "description": "沃野连绵，是南北往来的门户。" }
+  }
+}

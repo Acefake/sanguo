@@ -1,0 +1,406 @@
+{
+  "positions": {
+    "jiuquan": {
+      "x": 494.86884620876424,
+      "z": 470.7255937313771,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "zhangye": {
+      "x": 493.352380655917,
+      "z": 460.7642950605562,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "wuwei": {
+      "x": 415.62864191269347,
+      "z": 374.67533672475537,
+      "source": "matched_city_name"
+    },
+    "jincheng": {
+      "x": 552.6477922769503,
+      "z": 499.61722444124587,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "tianshui": {
+      "x": 528.0480852593823,
+      "z": 674.3710811093006,
+      "source": "matched_city_name"
+    },
+    "yunzhong": {
+      "x": 1328.6836340680238,
+      "z": 301.6551271716037,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "yanmen": {
+      "x": 1169.7796745882517,
+      "z": 418.57421648342887,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "dingxiang": {
+      "x": 985.5556528946793,
+      "z": 509.658247984783,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "jinyang": {
+      "x": 1125.2763780386672,
+      "z": 418.0675777070738,
+      "source": "matched_city_name"
+    },
+    "shangdang": {
+      "x": 1214.0562570653638,
+      "z": 606.9097459706709,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "ji": {
+      "x": 1322.0104038953727,
+      "z": 247.96999305638607,
+      "source": "matched_city_name"
+    },
+    "yuyang": {
+      "x": 1426.7863489415467,
+      "z": 410.16429259637147,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "beiping": {
+      "x": 1546.8492905887506,
+      "z": 272.26964800648426,
+      "source": "matched_city_name"
+    },
+    "liaoxi": {
+      "x": 1532.4928094330944,
+      "z": 336.34559027692234,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "xiangping": {
+      "x": 1785.7406077004648,
+      "z": 231.77022308965388,
+      "source": "matched_city_name"
+    },
+    "ye": {
+      "x": 1251.7482518036923,
+      "z": 531.4659674741989,
+      "source": "matched_city_name"
+    },
+    "nanpi": {
+      "x": 1455.5084928695658,
+      "z": 415.1747616415859,
+      "source": "matched_city_name"
+    },
+    "pingyuan": {
+      "x": 1448.4822776603978,
+      "z": 547.665737440931,
+      "source": "matched_city_name"
+    },
+    "zhongshan": {
+      "x": 1336.3056532862324,
+      "z": 436.84019353772163,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "changshan": {
+      "x": 1303.4794730309404,
+      "z": 564.554097136693,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "jinan": {
+      "x": 1432.2431919284177,
+      "z": 523.8758924164407,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "beihai": {
+      "x": 1715.478455608784,
+      "z": 531.4659674741989,
+      "source": "matched_city_name"
+    },
+    "donglai": {
+      "x": 1715.4629652212268,
+      "z": 531.4673729267431,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "linzi": {
+      "x": 1636.8979168407834,
+      "z": 609.6780614166812,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "changan": {
+      "x": 851.253984881113,
+      "z": 706.7706210427648,
+      "source": "matched_city_name"
+    },
+    "hongnong": {
+      "x": 773.3513321551343,
+      "z": 790.1878100829064,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "west_pass": {
+      "x": 1071.0683912278384,
+      "z": 849.4385437954845,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "luoyang": {
+      "x": 1069.0666563653228,
+      "z": 733.9630920583512,
+      "source": "matched_city_name"
+    },
+    "east_pass": {
+      "x": 1092.3159509527263,
+      "z": 854.0493815462747,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "hedong": {
+      "x": 1021.0935920211347,
+      "z": 565.4826352086529,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "henei": {
+      "x": 1134.9060758329654,
+      "z": 794.3091177779813,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "chenliu": {
+      "x": 1258.7744670128602,
+      "z": 795.8693558597918,
+      "source": "matched_city_name"
+    },
+    "puyang": {
+      "x": 1371.1939103595491,
+      "z": 682.4709660926667,
+      "source": "matched_city_name"
+    },
+    "dingtao": {
+      "x": 1259.2548672844007,
+      "z": 797.741592715847,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "shanyang": {
+      "x": 1260.9609734514472,
+      "z": 795.3521853147764,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "xiaopei": {
+      "x": 1511.7182145429106,
+      "z": 763.4698159263274,
+      "source": "matched_city_name"
+    },
+    "xiapi": {
+      "x": 1673.3211643537759,
+      "z": 798.7621719252796,
+      "source": "matched_city_name"
+    },
+    "langye": {
+      "x": 1673.090890971925,
+      "z": 802.0490819546498,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "guangling": {
+      "x": 1743.5833164454564,
+      "z": 944.5601016258692,
+      "source": "matched_city_name"
+    },
+    "xuchang": {
+      "x": 1209.5909605486838,
+      "z": 936.460216642503,
+      "source": "matched_city_name"
+    },
+    "qiao": {
+      "x": 1313.3505452721731,
+      "z": 1086.1801727326745,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "runan": {
+      "x": 1307.9579734770366,
+      "z": 1082.2581463430927,
+      "source": "matched_city_name"
+    },
+    "yingchuan": {
+      "x": 1209.5779979979668,
+      "z": 936.4775829242186,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "peiguo": {
+      "x": 1454.9339851543482,
+      "z": 928.8945175723675,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "wudu": {
+      "x": 653.9262652635508,
+      "z": 1029.3310428430734,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "hanzhong": {
+      "x": 710.729680697752,
+      "z": 901.1678606435509,
+      "source": "matched_city_name"
+    },
+    "zitong": {
+      "x": 640.4675286060713,
+      "z": 1087.4652152609708,
+      "source": "matched_city_name"
+    },
+    "chengdu": {
+      "x": 450.75971795853366,
+      "z": 1300.955040893977,
+      "source": "matched_city_name"
+    },
+    "baxi": {
+      "x": 707.06377506344,
+      "z": 907.2259359077433,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "jiangzhou": {
+      "x": 703.7034654885838,
+      "z": 1438.6530856112001,
+      "source": "matched_city_name"
+    },
+    "yuesui": {
+      "x": 703.6975587182377,
+      "z": 1438.6628609741497,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "yongchang": {
+      "x": 578.0737323234271,
+      "z": 1427.4334044585341,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "jianning": {
+      "x": 570.2053765143907,
+      "z": 1703.0564739967929,
+      "source": "matched_city_name"
+    },
+    "xiangyang": {
+      "x": 1062.0404411561549,
+      "z": 1225.163259978194,
+      "source": "matched_city_name"
+    },
+    "jiangling": {
+      "x": 1104.197732411163,
+      "z": 1370.9611896787835,
+      "source": "matched_city_name"
+    },
+    "jiangxia": {
+      "x": 1329.036619104541,
+      "z": 1217.063374994828,
+      "source": "matched_city_name"
+    },
+    "changsha": {
+      "x": 1272.8268974311964,
+      "z": 1541.0587743294714,
+      "source": "matched_city_name"
+    },
+    "lingling": {
+      "x": 1005.8307194828103,
+      "z": 1711.1563589801592,
+      "source": "matched_city_name"
+    },
+    "guiyang": {
+      "x": 1237.695821385356,
+      "z": 1722.149060029013,
+      "source": "matched_city_name"
+    },
+    "wuling": {
+      "x": 970.6996434369701,
+      "z": 1503.452165478129,
+      "source": "matched_city_name"
+    },
+    "shouchun": {
+      "x": 1476.58713849707,
+      "z": 976.9596415593334,
+      "source": "matched_city_name"
+    },
+    "jianye": {
+      "x": 1715.478455608784,
+      "z": 1130.857456243289,
+      "source": "matched_city_name"
+    },
+    "wu": {
+      "x": 1856.0027597921453,
+      "z": 1244.2558460104142,
+      "source": "matched_city_name"
+    },
+    "kuaiji": {
+      "x": 1820.8716837463048,
+      "z": 1451.9600395124446,
+      "source": "matched_city_name"
+    },
+    "chaisang": {
+      "x": 1462.5347080787342,
+      "z": 1341.4544658108073,
+      "source": "matched_city_name"
+    },
+    "yuzhang": {
+      "x": 1469.781500874555,
+      "z": 1342.2325087745205,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "lujiang": {
+      "x": 1546.8492905887506,
+      "z": 1171.3568811601194,
+      "source": "matched_city_name"
+    },
+    "jianan": {
+      "x": 1659.2687339354395,
+      "z": 1657.3499801620844,
+      "source": "matched_city_name"
+    },
+    "jiaozhi": {
+      "x": 893.4112761361213,
+      "z": 1897.4537135975793,
+      "source": "matched_city_name"
+    },
+    "hepu": {
+      "x": 1265.1813484055924,
+      "z": 1822.0948189313774,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "cangwu": {
+      "x": 1332.0577279511801,
+      "z": 1816.744690870884,
+      "source": "estimated_from_three_nearest_strategic_anchors"
+    },
+    "nanhai": {
+      "x": 1343.0890495228773,
+      "z": 1816.4548637639184,
+      "source": "matched_city_name"
+    }
+  },
+  "city_aliases": {
+    "city_179": "wuwei",
+    "city_173": "tianshui",
+    "city_20": "jinyang",
+    "city_14": "ji",
+    "beiping": "beiping",
+    "xiangping": "xiangping",
+    "ye": "ye",
+    "city_26": "nanpi",
+    "city_46": "pingyuan",
+    "beihai": "beihai",
+    "changan": "changan",
+    "luoyang": "luoyang",
+    "city_102": "chenliu",
+    "city_92": "puyang",
+    "city_66": "xiaopei",
+    "xiapi": "xiapi",
+    "city_71": "guangling",
+    "xuchang": "xuchang",
+    "city_124": "runan",
+    "hanzhong": "hanzhong",
+    "city_303": "zitong",
+    "chengdu": "chengdu",
+    "city_310": "jiangzhou",
+    "city_326": "jianning",
+    "xiangyang": "xiangyang",
+    "jiangling": "jiangling",
+    "city_233": "jiangxia",
+    "changsha": "changsha",
+    "city_281": "lingling",
+    "city_275": "guiyang",
+    "city_268": "wuling",
+    "city_76": "shouchun",
+    "jianye": "jianye",
+    "city_193": "wu",
+    "city_200": "kuaiji",
+    "city_208": "chaisang",
+    "city_85": "lujiang",
+    "city_216": "jianan",
+    "city_227": "jiaozhi",
+    "nanhai": "nanhai"
+  }
+}

@@ -1,0 +1,52 @@
+{
+	"far_transition": {
+		"cpu_render_ms": 0.938000023365021,
+		"draw_calls": 330,
+		"fps": 375.516334960571,
+		"gpu_ms": 2.13000011444092,
+		"median_ms": 2.663,
+		"p95_ms": 3.158,
+		"primitives": 705617,
+		"shadow_primitives": 804844
+	},
+	"fine": {
+		"cpu_render_ms": 0.893999993801117,
+		"draw_calls": 258,
+		"fps": 227.946204695692,
+		"gpu_ms": 3.90899991989136,
+		"median_ms": 4.387,
+		"p95_ms": 4.884,
+		"primitives": 800337,
+		"shadow_primitives": 1076245
+	},
+	"flow": {
+		"cpu_render_ms": 0.741999983787537,
+		"draw_calls": 258,
+		"fps": 301.841231512225,
+		"gpu_ms": 2.81299996376038,
+		"median_ms": 3.313,
+		"p95_ms": 13.123,
+		"primitives": 789869,
+		"shadow_primitives": 1065995
+	},
+	"flow_repeat": {
+		"cpu_render_ms": 0.680999994277954,
+		"draw_calls": 258,
+		"fps": 326.9042170644,
+		"gpu_ms": 2.58899998664856,
+		"median_ms": 3.059,
+		"p95_ms": 3.486,
+		"primitives": 789869,
+		"shadow_primitives": 1065995
+	},
+	"overview": {
+		"cpu_render_ms": 1.55299997329712,
+		"draw_calls": 715,
+		"fps": 359.324469996407,
+		"gpu_ms": 1.33399999141693,
+		"median_ms": 2.783,
+		"p95_ms": 3.086,
+		"primitives": 568186,
+		"shadow_primitives": 0
+	}
+}

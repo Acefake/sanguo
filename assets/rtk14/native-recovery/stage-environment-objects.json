@@ -1,0 +1,438 @@
+[
+  {
+    "file": "KIDSSystemResource_0449ac47.kidsobjdb",
+    "id": "3744cdc1",
+    "type": "TypeInfo::Object::ResourceKeeper",
+    "parent": "00000000",
+    "props": {
+      "ResourceNameHashArray": [
+        2006017138,
+        3142306580,
+        891890771,
+        281771027,
+        1569404673,
+        810804384
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_0449ac47.kidsobjdb",
+    "id": "59bcf9aa",
+    "type": "TypeInfo::Object::MotorStageVisibilitySet",
+    "parent": "00000000",
+    "props": {
+      "ElementNumArray": [
+        173,
+        105,
+        834,
+        162,
+        1,
+        8,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "ObjectNameHashArray": {
+        "count": 1290,
+        "type": 5,
+        "offset": 200
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_0449ac47.kidsobjdb",
+    "id": "92379d4a",
+    "type": "TypeInfo::Object::MotorStageSetting",
+    "parent": "00000000",
+    "props": {
+      "ObjectDatabaseNameHashArray": {
+        "count": 23,
+        "type": 5,
+        "offset": 5600
+      },
+      "DefaultEnviromnentNameHashArray": [
+        276645498
+      ],
+      "OctreeObjectNameHash": [
+        1174525921
+      ],
+      "OccluderUnitObjectNameHash": [
+        2021965718
+      ],
+      "StaticTerrainObjectNameHash": [
+        0
+      ],
+      "FieldStageNameHash": [
+        1742914044
+      ],
+      "ResourceKeeperObjectNameHash": [
+        927256001
+      ],
+      "MotorSettingObjectDatabaseResourceNameHash": [
+        810804384
+      ],
+      "AutomatonContextObjectDefineNameHash": [
+        464917364
+      ],
+      "SetModelObjectDatabaseResourceNameHash": [
+        2006017138
+      ],
+      "VisibilitySetObjectNameHash": [
+        1505556906
+      ],
+      "ObjectDatabaseTypeFlagArray": {
+        "count": 23,
+        "type": 5,
+        "offset": 5732
+      },
+      "SoundObjectDatabaseNameHash": [
+        1288824698
+      ],
+      "LandscapeObjectNameHash": [
+        4281385470
+      ],
+      "1424ad27": {
+        "count": 23,
+        "type": 5,
+        "offset": 5832
+      },
+      "fd01b611": [
+        1204237818
+      ],
+      "4143b3e9": [
+        2202683682
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b6dcc68e.kidsobjdb",
+    "id": "fa0f5662",
+    "type": "c388ea58",
+    "parent": "00000000",
+    "props": {
+      "f7a82aeb": [
+        18
+      ],
+      "497cb2c7": {
+        "count": 18,
+        "type": 5,
+        "offset": 140
+      },
+      "859d80f7": {
+        "count": 18,
+        "type": 8,
+        "offset": 212
+      },
+      "a69bbd47": {
+        "count": 18,
+        "type": 8,
+        "offset": 284
+      },
+      "9ae52e66": {
+        "count": 18,
+        "type": 8,
+        "offset": 356
+      },
+      "d2a48180": {
+        "count": 18,
+        "type": 8,
+        "offset": 428
+      },
+      "03bb19b1": {
+        "count": 18,
+        "type": 8,
+        "offset": 500
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b6dcc68e.kidsobjdb",
+    "id": "ff30c1fe",
+    "type": "8e1ecb72",
+    "parent": "00000000",
+    "props": {
+      "GroupMask": [
+        4294967287
+      ],
+      "445d803e": [
+        165099972
+      ],
+      "cc8a8926": [
+        0
+      ],
+      "0b6dd6a4": [
+        0
+      ],
+      "6868a78d": [
+        0
+      ],
+      "c9c926ad": [
+        0
+      ],
+      "fa5136be": [
+        0
+      ],
+      "3af82377": [
+        3696426268
+      ],
+      "a8c0c79f": [
+        1818052676
+      ],
+      "b5ff674b": [
+        1126194802
+      ],
+      "CommandBufferSize": [
+        4096
+      ],
+      "LandscapeObjectNameHash": [
+        4281385470
+      ],
+      "ProceduralPlacementObjectResourceHash": [
+        472235243
+      ],
+      "88a0d797": [
+        3949332988
+      ],
+      "d2215653": [
+        2771375034
+      ],
+      "4d0b6005": [
+        2221360481
+      ],
+      "679b61cc": [
+        2346645045
+      ],
+      "a21c16eb": [
+        2346645045
+      ],
+      "c87d92e0": [
+        0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b041e18a.kidsobjdb",
+    "id": "0037ccd1",
+    "type": "TypeInfo::Object::ResourceKeeper",
+    "parent": "00000000",
+    "props": {
+      "ResourceNameHashArray": [
+        63979189,
+        85123927,
+        3168179606,
+        671950166,
+        3591508548,
+        3059658979
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b041e18a.kidsobjdb",
+    "id": "63f9f0ba",
+    "type": "TypeInfo::Object::MotorStageVisibilitySet",
+    "parent": "00000000",
+    "props": {
+      "ElementNumArray": [
+        0,
+        105,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "ObjectNameHashArray": {
+        "count": 105,
+        "type": 5,
+        "offset": 200
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b041e18a.kidsobjdb",
+    "id": "6eff205a",
+    "type": "TypeInfo::Object::MotorStageSetting",
+    "parent": "00000000",
+    "props": {
+      "ObjectDatabaseNameHashArray": {
+        "count": 23,
+        "type": 5,
+        "offset": 860
+      },
+      "DefaultEnviromnentNameHashArray": [
+        557189814
+      ],
+      "OctreeObjectNameHash": [
+        3905789649
+      ],
+      "OccluderUnitObjectNameHash": [
+        1086034566
+      ],
+      "StaticTerrainObjectNameHash": [
+        0
+      ],
+      "FieldStageNameHash": [
+        3696783935
+      ],
+      "ResourceKeeperObjectNameHash": [
+        3656913
+      ],
+      "MotorSettingObjectDatabaseResourceNameHash": [
+        3059658979
+      ],
+      "AutomatonContextObjectDefineNameHash": [
+        636684932
+      ],
+      "SetModelObjectDatabaseResourceNameHash": [
+        63979189
+      ],
+      "VisibilitySetObjectNameHash": [
+        1677324474
+      ],
+      "ObjectDatabaseTypeFlagArray": {
+        "count": 23,
+        "type": 5,
+        "offset": 992
+      },
+      "SoundObjectDatabaseNameHash": [
+        1073822141
+      ],
+      "LandscapeObjectNameHash": [
+        3203683598
+      ],
+      "1424ad27": {
+        "count": 23,
+        "type": 5,
+        "offset": 1092
+      },
+      "fd01b611": [
+        2709197034
+      ],
+      "4143b3e9": [
+        3707642898
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3215c4d1.kidsobjdb",
+    "id": "b1f11a12",
+    "type": "c388ea58",
+    "parent": "00000000",
+    "props": {
+      "f7a82aeb": [
+        18
+      ],
+      "497cb2c7": {
+        "count": 18,
+        "type": 5,
+        "offset": 140
+      },
+      "859d80f7": {
+        "count": 18,
+        "type": 8,
+        "offset": 212
+      },
+      "a69bbd47": {
+        "count": 18,
+        "type": 8,
+        "offset": 284
+      },
+      "9ae52e66": {
+        "count": 18,
+        "type": 8,
+        "offset": 356
+      },
+      "d2a48180": {
+        "count": 18,
+        "type": 8,
+        "offset": 428
+      },
+      "03bb19b1": {
+        "count": 18,
+        "type": 8,
+        "offset": 500
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_3215c4d1.kidsobjdb",
+    "id": "bef4550e",
+    "type": "8e1ecb72",
+    "parent": "00000000",
+    "props": {
+      "GroupMask": [
+        4294967287
+      ],
+      "445d803e": [
+        1598299316
+      ],
+      "cc8a8926": [
+        0
+      ],
+      "0b6dd6a4": [
+        0
+      ],
+      "6868a78d": [
+        0
+      ],
+      "c9c926ad": [
+        0
+      ],
+      "fa5136be": [
+        0
+      ],
+      "3af82377": [
+        3696426268
+      ],
+      "a8c0c79f": [
+        1818052676
+      ],
+      "b5ff674b": [
+        1126194802
+      ],
+      "CommandBufferSize": [
+        4096
+      ],
+      "LandscapeObjectNameHash": [
+        3203683598
+      ],
+      "ProceduralPlacementObjectResourceHash": [
+        3843603451
+      ],
+      "88a0d797": [
+        3949332988
+      ],
+      "d2215653": [
+        2771375034
+      ],
+      "4d0b6005": [
+        2221360481
+      ],
+      "679b61cc": [
+        2346645045
+      ],
+      "a21c16eb": [
+        2346645045
+      ],
+      "c87d92e0": [
+        0
+      ]
+    }
+  }
+]

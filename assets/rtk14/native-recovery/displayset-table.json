@@ -1,0 +1,158 @@
+[
+  {
+    "file": "KIDSSystemResource_0d421fe3.kidsobjdb",
+    "id": "8367ac3b",
+    "type": "TypeInfo::Object::3D::Displayset::Effect",
+    "parent": "00000000",
+    "props": {
+      "KTGLEffectDataResourceHash": [
+        208033914
+      ],
+      "KTGLEffectMeshDataResourceHash": [
+        3496495592
+      ],
+      "KTGLShaderObjectHash": [
+        4161368072
+      ],
+      "TexturesRenderStateObjectHash": [
+        1381106356
+      ],
+      "KTGLEffectSystemID": [
+        0
+      ],
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "Flag": [
+        0
+      ],
+      "SourceLifeSpan": [
+        0.0
+      ],
+      "SourceScale": [
+        0.0
+      ],
+      "SourceMass": [
+        0.0
+      ],
+      "SourceAirResistance": [
+        0.0
+      ],
+      "SourceCharge": [
+        0.0
+      ],
+      "SourceSpeed": [
+        0.0
+      ],
+      "SourceRed": [
+        0.0
+      ],
+      "SourceGreen": [
+        0.0
+      ],
+      "SourceBlue": [
+        0.0
+      ],
+      "SourceAlpha": [
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "SourceUser0": [
+        0.0
+      ],
+      "SourceUser1": [
+        0.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_0d421fe3.kidsobjdb",
+    "id": "c6ab9534",
+    "type": "TypeInfo::Object::3D::Displayset::Effect",
+    "parent": "00000000",
+    "props": {
+      "KTGLEffectDataResourceHash": [
+        3896124193
+      ],
+      "KTGLEffectMeshDataResourceHash": [
+        3496495592
+      ],
+      "KTGLShaderObjectHash": [
+        4161368072
+      ],
+      "TexturesRenderStateObjectHash": [
+        3560935789
+      ],
+      "KTGLEffectSystemID": [
+        0
+      ],
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldQuaternion": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "Flag": [
+        0
+      ],
+      "SourceLifeSpan": [
+        0.0
+      ],
+      "SourceScale": [
+        0.0
+      ],
+      "SourceMass": [
+        0.0
+      ],
+      "SourceAirResistance": [
+        0.0
+      ],
+      "SourceCharge": [
+        0.0
+      ],
+      "SourceSpeed": [
+        0.0
+      ],
+      "SourceRed": [
+        0.0
+      ],
+      "SourceGreen": [
+        0.0
+      ],
+      "SourceBlue": [
+        0.0
+      ],
+      "SourceAlpha": [
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "SourceUser0": [
+        0.0
+      ],
+      "SourceUser1": [
+        0.0
+      ]
+    }
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "file": "a1e22461-000.asm",
+    "offset": 2097,
+    "size": 1820,
+    "sha256": "313cbdffef5cfa449b2bb61357af00eb7f3dcb3ea686e065260d6ce4457b7799"
+  },
+  {
+    "file": "a1e22461-001.asm",
+    "offset": 3917,
+    "size": 13524,
+    "sha256": "74588c5c97c39e0e4ae00d67ec580e527fc8906d0b669cf5137e968f2a297623"
+  },
+  {
+    "file": "a1e22461-002.asm",
+    "offset": 17441,
+    "size": 5276,
+    "sha256": "6e5bc1f51fef24f53466bd61e8464ad71838c0641dcfa8bc95bff5159f26aef1"
+  }
+]

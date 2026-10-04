@@ -1,0 +1,81 @@
+{
+  "advisor": {
+    "role": "军师",
+    "source": "assets\\officers\\position-references\\advisor.png",
+    "rect": [
+      6,
+      1,
+      51,
+      45
+    ]
+  },
+  "commander": {
+    "role": "主帅",
+    "source": "assets\\officers\\position-references\\commander.png",
+    "rect": [
+      2,
+      0,
+      51,
+      54
+    ]
+  },
+  "warrior": {
+    "role": "前锋",
+    "source": "assets\\officers\\position-references\\warrior.png",
+    "rect": [
+      5,
+      1,
+      58,
+      54
+    ]
+  },
+  "politics": {
+    "role": "政治",
+    "source": "assets\\officers\\position-references\\politics.png",
+    "rect": [
+      0,
+      3,
+      55,
+      58
+    ]
+  },
+  "diplomat": {
+    "role": "外交",
+    "source": "assets\\officers\\position-references\\diplomat.png",
+    "rect": [
+      3,
+      0,
+      56,
+      54
+    ]
+  },
+  "governor": {
+    "role": "太守",
+    "source": "assets\\officers\\position-references\\governor.png",
+    "rect": [
+      0,
+      1,
+      54,
+      57
+    ]
+  },
+  "staff": {
+    "role": "参军",
+    "source": "assets\\officers\\position-references\\staff.png",
+    "rect": [
+      4,
+      1,
+      53,
+      54
+    ]
+  },
+  "background": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x0bf91892_1be678dd_10_023.png",
+    "rect": [
+      929,
+      123,
+      1023,
+      217
+    ]
+  }
+}

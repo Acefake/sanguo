@@ -1,0 +1,20 @@
+[
+  {
+    "file": "ecdf3474-000.asm",
+    "offset": 1709,
+    "size": 5132,
+    "sha256": "9e25561550e70d9f6dfe44ec514b895fb1d30ace75e621a8fe6f1ebe2294b775"
+  },
+  {
+    "file": "ecdf3474-001.asm",
+    "offset": 6841,
+    "size": 16412,
+    "sha256": "cecd580535a049660a0b51486595af85a3da7adeb8ffb7ae4697d36dce64013d"
+  },
+  {
+    "file": "ecdf3474-002.asm",
+    "offset": 23253,
+    "size": 3848,
+    "sha256": "fe45b8a82c1a89f18b8137d5be2cf54812471b7223a26a5109f2a2573895984b"
+  }
+]

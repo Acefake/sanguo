@@ -1,0 +1,37 @@
+{
+	"baseline": {
+		"draw_calls": 774,
+		"fps": 21.1479084718521,
+		"median_ms": 47.286,
+		"p95_ms": 175.1,
+		"primitives": 295625
+	},
+	"no_screen_effects": {
+		"draw_calls": 774,
+		"fps": 13.8596296706952,
+		"median_ms": 72.152,
+		"p95_ms": 205.555,
+		"primitives": 295625
+	},
+	"no_shadows": {
+		"draw_calls": 774,
+		"fps": 20.3894382709756,
+		"median_ms": 49.045,
+		"p95_ms": 1200.443,
+		"primitives": 295625
+	},
+	"no_static_rocks": {
+		"draw_calls": 755,
+		"fps": 11.6384627918345,
+		"median_ms": 85.922,
+		"p95_ms": 96.2,
+		"primitives": 289315
+	},
+	"no_vegetation": {
+		"draw_calls": 60,
+		"fps": 140.154169586545,
+		"median_ms": 7.135,
+		"p95_ms": 10.333,
+		"primitives": 201952
+	}
+}

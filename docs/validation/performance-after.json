@@ -1,0 +1,37 @@
+{
+	"baseline": {
+		"draw_calls": 172,
+		"fps": 23.1401133865556,
+		"median_ms": 43.215,
+		"p95_ms": 66.114,
+		"primitives": 300223
+	},
+	"baseline_repeat": {
+		"draw_calls": 172,
+		"fps": 14.955731036133,
+		"median_ms": 66.864,
+		"p95_ms": 70.923,
+		"primitives": 300223
+	},
+	"no_grass": {
+		"draw_calls": 133,
+		"fps": 15.3607471467412,
+		"median_ms": 65.101,
+		"p95_ms": 68.186,
+		"primitives": 292768
+	},
+	"no_msaa": {
+		"draw_calls": 172,
+		"fps": 29.2448967655144,
+		"median_ms": 34.194,
+		"p95_ms": 59.427,
+		"primitives": 300223
+	},
+	"no_vegetation": {
+		"draw_calls": 60,
+		"fps": 75.9705234369065,
+		"median_ms": 13.163,
+		"p95_ms": 19.77,
+		"primitives": 201952
+	}
+}

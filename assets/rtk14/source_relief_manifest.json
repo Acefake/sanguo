@@ -1,0 +1,8 @@
+{
+  "height_source": "heightmap.r32",
+  "height_identical_before_runtime_foundations": true,
+  "water_source": "239167e0 control palette 9, BGRA index/weight",
+  "removed_generated_villages": 87,
+  "native_static_villages": 105,
+  "water_surface_height": "estimated source relief + 0.035m, min 0.3m"
+}

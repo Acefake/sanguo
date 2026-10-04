@@ -1,0 +1,9 @@
+.godot/
+*.tmp
+*.log
+.commandcode/
+tools/army-source-cache/
+tools/city-source-cache/
+__pycache__/
+/atlas-candidate-*.png.import
+/atlas-search.jpg.import

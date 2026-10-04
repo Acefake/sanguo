@@ -1,0 +1,204 @@
+[
+  {
+    "id": "gate_21",
+    "region": 21,
+    "model": "90ca3c38",
+    "x": 1132.3025932478354,
+    "z": 556.3441856373947,
+    "rotation": 1.5707963267948966,
+    "footprint_width": 24.299654950098297,
+    "model_scale": 0.6741692396927159,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      11328,
+      11548,
+      11768
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_131",
+    "region": 131,
+    "model": "90ca3c38",
+    "x": 1146.3550236661715,
+    "z": 718.3418853047165,
+    "rotation": 1.5707963267948966,
+    "footprint_width": 24.299654950098297,
+    "model_scale": 0.6741692396927159,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      15730,
+      15950,
+      16170
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_132",
+    "region": 132,
+    "model": "90ca3c38",
+    "x": 984.7520738553062,
+    "z": 738.5915977631316,
+    "rotation": 1.5707963267948966,
+    "footprint_width": 24.299654950098297,
+    "model_scale": 0.6741692396927159,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      16147,
+      16367,
+      16587
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_144",
+    "region": 144,
+    "model": "90ca3c38",
+    "x": 956.6472130186339,
+    "z": 881.1495734703747,
+    "rotation": -1.9052130829715306,
+    "footprint_width": 30.622637583693916,
+    "model_scale": 0.8495939691152281,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      20103,
+      20104,
+      20322,
+      20323,
+      20543
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_151",
+    "region": 151,
+    "model": "90ca3c38",
+    "x": 921.5161369727936,
+    "z": 726.4417702880825,
+    "rotation": 1.5707963267948966,
+    "footprint_width": 24.2996549500983,
+    "model_scale": 0.674169239692716,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      15918,
+      16138,
+      16358
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_294",
+    "region": 294,
+    "model": "90ca3c38",
+    "x": 640.4675286060713,
+    "z": 843.080114048554,
+    "rotation": -1.9052130829715428,
+    "footprint_width": 30.622637583693958,
+    "model_scale": 0.8495939691152293,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      18958,
+      19178,
+      19179,
+      19397,
+      19398
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_304",
+    "region": 304,
+    "model": "90ca3c38",
+    "x": 570.2053765143908,
+    "z": 943.5186878422935,
+    "rotation": -0.0,
+    "footprint_width": 23.420717363893555,
+    "model_scale": 0.6497840093079279,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      21807,
+      21808,
+      21809,
+      22027,
+      22029
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_305",
+    "region": 305,
+    "model": "90ca3c38",
+    "x": 661.5461742335754,
+    "z": 1026.9475031709642,
+    "rotation": -1.2363795706182625,
+    "footprint_width": 30.622637583694125,
+    "model_scale": 0.849593969115234,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      24020,
+      24021,
+      24241,
+      24242,
+      24461
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_306",
+    "region": 306,
+    "model": "90ca3c38",
+    "x": 549.1267308868864,
+    "z": 1156.5456629048215,
+    "rotation": -1.2363795706182625,
+    "footprint_width": 30.622637583693916,
+    "model_scale": 0.8495939691152281,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      27524,
+      27525,
+      27745,
+      27746,
+      27965
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  },
+  {
+    "id": "gate_318",
+    "region": 318,
+    "model": "90ca3c38",
+    "x": 471.8383635860379,
+    "z": 1227.0146622601064,
+    "rotation": -0.0,
+    "footprint_width": 23.420717363893555,
+    "model_scale": 0.6497840093079279,
+    "scale_status": "Estimated from native hex footprint; original runtime scale unresolved",
+    "cells": [
+      29493,
+      29494,
+      29495,
+      29713,
+      29715
+    ],
+    "source": "Map.bin type 17",
+    "coordinate_status": "Shared source-terrain registration; original runtime transform unresolved",
+    "orientation_status": "Principal axis of native footprint; original runtime orientation unresolved"
+  }
+]

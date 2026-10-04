@@ -1,0 +1,1333 @@
+[
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "02d9517a",
+    "type": "03d03eb5",
+    "parent": "256ebe06",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "02f3db22",
+    "type": "03d03eb5",
+    "parent": "30b0aeae",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "1186a2d4",
+    "type": "03d03eb5",
+    "parent": "2f65c260",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "1310b2a4",
+    "type": "03d03eb5",
+    "parent": "4328d798",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "15d72ad2",
+    "type": "03d03eb5",
+    "parent": "33b64a5e",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "15f57861",
+    "type": "03d03eb5",
+    "parent": "1f2e3755",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "19cb87dd",
+    "type": "03d03eb5",
+    "parent": "ecb80169",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "1a46005f",
+    "type": "03d03eb5",
+    "parent": "237ebf53",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "1a75e7c3",
+    "type": "03d03eb5",
+    "parent": "4a8e0cb7",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "2f1b9458",
+    "type": "03d03eb5",
+    "parent": "9dd1ed4c",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "336c1c56",
+    "type": "03d03eb5",
+    "parent": "a222754a",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "3377eb61",
+    "type": "03d03eb5",
+    "parent": "3cb0aa55",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "37bca454",
+    "type": "03d03eb5",
+    "parent": "a672fd48",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "44493ea1",
+    "type": "03d03eb5",
+    "parent": "81a9f72d",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "4899c69f",
+    "type": "03d03eb5",
+    "parent": "85fa7f2b",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "4cea4e9d",
+    "type": "03d03eb5",
+    "parent": "8a4b0729",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "661c399f",
+    "type": "03d03eb5",
+    "parent": "a37cf22b",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "6c3b5877",
+    "type": "03d03eb5",
+    "parent": "daf1b16b",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "74dc6873",
+    "type": "03d03eb5",
+    "parent": "e392c167",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "93cd3462",
+    "type": "03d03eb5",
+    "parent": "9d05f356",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "9412b1a2",
+    "type": "03d03eb5",
+    "parent": "66ff2b2e",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "981dbc60",
+    "type": "03d03eb5",
+    "parent": "a1567b54",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "acf35059",
+    "type": "03d03eb5",
+    "parent": "1ba9a94d",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "aed142e1",
+    "type": "03d03eb5",
+    "parent": "81bdbc6d",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "c220faa2",
+    "type": "03d03eb5",
+    "parent": "ff81b32e",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "c67182a0",
+    "type": "03d03eb5",
+    "parent": "03d23b2c",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "c98fd420",
+    "type": "03d03eb5",
+    "parent": "9c7c4dac",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "cac20a9e",
+    "type": "03d03eb5",
+    "parent": "0822c32a",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "e44e655f",
+    "type": "03d03eb5",
+    "parent": "b73adeeb",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "e518bbfb",
+    "type": "1a83479f",
+    "parent": "00000000",
+    "props": {
+      "FieldSize": [
+        204800,
+        204800
+      ],
+      "FieldOffset": [
+        0,
+        0
+      ],
+      "6f1ab58b": [
+        1024,
+        1024
+      ],
+      "NumBlocks": [
+        128,
+        128
+      ],
+      "79c02ffe": [
+        100000
+      ],
+      "a2dd60a1": [
+        120000
+      ],
+      "e9567eeb": {
+        "count": 70,
+        "type": 5,
+        "offset": 2620
+      },
+      "7c441a6e": {
+        "count": 68,
+        "type": 5,
+        "offset": 2900
+      },
+      "ElementInfoArray": {
+        "count": 243,
+        "type": 8,
+        "offset": 3172
+      },
+      "ElementTypeArray": {
+        "count": 27,
+        "type": 5,
+        "offset": 4144
+      },
+      "5c9ee311": {
+        "count": 27,
+        "type": 5,
+        "offset": 4252
+      },
+      "e3c9c8f0": {
+        "count": 27,
+        "type": 5,
+        "offset": 4360
+      },
+      "DisplaySetNameHashArray": {
+        "count": 31,
+        "type": 5,
+        "offset": 4468
+      },
+      "DensityMap": {
+        "count": 1048576,
+        "type": 8,
+        "offset": 4592
+      },
+      "ResourceMap": {
+        "count": 1048576,
+        "type": 1,
+        "offset": 4198896
+      },
+      "e065f0e9": {
+        "count": 27,
+        "type": 5,
+        "offset": 5247472
+      },
+      "711a5f43": {
+        "count": 31,
+        "type": 1,
+        "offset": 5247580
+      },
+      "0fd0f003": {
+        "count": 108,
+        "type": 8,
+        "offset": 5247611
+      },
+      "4b80cfb1": [
+        2
+      ],
+      "a3dae7da": [
+        20000
+      ],
+      "dd5651bc": [
+        0
+      ],
+      "dd271667": [
+        1000
+      ],
+      "f709a219": [
+        1000
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "f1d0213c",
+    "type": "03d03eb5",
+    "parent": "5ea4ac30",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_b43fcef2.kidsobjdb",
+    "id": "ff0cf69e",
+    "type": "03d03eb5",
+    "parent": "d1f9702a",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "0216acae",
+    "type": "77916472",
+    "parent": "d1f9702a",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "1c25bceb",
+    "type": "1a83479f",
+    "parent": "00000000",
+    "props": {
+      "FieldSize": [
+        204800,
+        204800
+      ],
+      "FieldOffset": [
+        0,
+        0
+      ],
+      "6f1ab58b": [
+        1024,
+        1024
+      ],
+      "NumBlocks": [
+        128,
+        128
+      ],
+      "79c02ffe": [
+        100000
+      ],
+      "a2dd60a1": [
+        120000
+      ],
+      "e9567eeb": {
+        "count": 70,
+        "type": 5,
+        "offset": 492
+      },
+      "7c441a6e": {
+        "count": 68,
+        "type": 5,
+        "offset": 772
+      },
+      "ElementInfoArray": {
+        "count": 243,
+        "type": 8,
+        "offset": 1044
+      },
+      "ElementTypeArray": {
+        "count": 27,
+        "type": 5,
+        "offset": 2016
+      },
+      "5c9ee311": {
+        "count": 27,
+        "type": 5,
+        "offset": 2124
+      },
+      "e3c9c8f0": {
+        "count": 27,
+        "type": 5,
+        "offset": 2232
+      },
+      "DisplaySetNameHashArray": {
+        "count": 31,
+        "type": 5,
+        "offset": 2340
+      },
+      "DensityMap": {
+        "count": 1048576,
+        "type": 8,
+        "offset": 2464
+      },
+      "ResourceMap": {
+        "count": 1048576,
+        "type": 1,
+        "offset": 4196768
+      },
+      "e065f0e9": {
+        "count": 27,
+        "type": 5,
+        "offset": 5245344
+      },
+      "711a5f43": {
+        "count": 31,
+        "type": 1,
+        "offset": 5245452
+      },
+      "0fd0f003": {
+        "count": 108,
+        "type": 8,
+        "offset": 5245483
+      },
+      "4b80cfb1": [
+        2
+      ],
+      "a3dae7da": [
+        20000
+      ],
+      "dd5651bc": [
+        0
+      ],
+      "dd271667": [
+        1000
+      ],
+      "f709a219": [
+        1000
+      ],
+      "d25c3aa6": {
+        "count": 217,
+        "type": 5,
+        "offset": 5245935
+      }
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "1cd53ded",
+    "type": "77916472",
+    "parent": "ecb80169",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "2bedf452",
+    "type": "77916472",
+    "parent": "9d05f356",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "2beffa94",
+    "type": "77916472",
+    "parent": "4328d798",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "303e7c50",
+    "type": "77916472",
+    "parent": "a1567b54",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "33552fb3",
+    "type": "77916472",
+    "parent": "4a8e0cb7",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "4df94b8a",
+    "type": "77916472",
+    "parent": "256ebe06",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "4fa404b2",
+    "type": "77916472",
+    "parent": "ff81b32e",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "51f9cc48",
+    "type": "77916472",
+    "parent": "9dd1ed4c",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "53f48cb0",
+    "type": "77916472",
+    "parent": "03d23b2c",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "564a5446",
+    "type": "77916472",
+    "parent": "a222754a",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "584514ae",
+    "type": "77916472",
+    "parent": "0822c32a",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "5a9adc44",
+    "type": "77916472",
+    "parent": "a672fd48",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "5f140932",
+    "type": "77916472",
+    "parent": "30b0aeae",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "78e9f12c",
+    "type": "77916472",
+    "parent": "5ea4ac30",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "7d7de0e4",
+    "type": "77916472",
+    "parent": "2f65c260",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "81ce68e2",
+    "type": "77916472",
+    "parent": "33b64a5e",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "8f199067",
+    "type": "77916472",
+    "parent": "daf1b16b",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "971c67b2",
+    "type": "77916472",
+    "parent": "66ff2b2e",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "97baa063",
+    "type": "77916472",
+    "parent": "e392c167",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "ae163851",
+    "type": "77916472",
+    "parent": "1f2e3755",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "b1daf8f1",
+    "type": "77916472",
+    "parent": "81bdbc6d",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "b266c04f",
+    "type": "77916472",
+    "parent": "237ebf53",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "cb98ab51",
+    "type": "77916472",
+    "parent": "3cb0aa55",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "cc998a30",
+    "type": "77916472",
+    "parent": "9c7c4dac",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "cfd18849",
+    "type": "77916472",
+    "parent": "1ba9a94d",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "d1cc48b1",
+    "type": "77916472",
+    "parent": "81a9f72d",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "d61cd0af",
+    "type": "77916472",
+    "parent": "85fa7f2b",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "da6d58ad",
+    "type": "77916472",
+    "parent": "8a4b0729",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "e7581b6f",
+    "type": "77916472",
+    "parent": "b73adeeb",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  {
+    "file": "KIDSSystemResource_811f81af.kidsobjdb",
+    "id": "f39f43af",
+    "type": "77916472",
+    "parent": "a37cf22b",
+    "props": {
+      "WorldPosition": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "WorldScale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  }
+]

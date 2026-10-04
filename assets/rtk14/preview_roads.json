@@ -1,0 +1,182 @@
+[
+  {
+    "from": "xiangping",
+    "to": "beiping"
+  },
+  {
+    "from": "beiping",
+    "to": "city_26"
+  },
+  {
+    "from": "city_26",
+    "to": "city_46"
+  },
+  {
+    "from": "city_46",
+    "to": "city_92"
+  },
+  {
+    "from": "city_92",
+    "to": "city_102"
+  },
+  {
+    "from": "city_102",
+    "to": "xuchang"
+  },
+  {
+    "from": "city_92",
+    "to": "city_66"
+  },
+  {
+    "from": "city_66",
+    "to": "xiapi"
+  },
+  {
+    "from": "xiapi",
+    "to": "city_71"
+  },
+  {
+    "from": "xuchang",
+    "to": "city_143"
+  },
+  {
+    "from": "xuchang",
+    "to": "city_124"
+  },
+  {
+    "from": "city_124",
+    "to": "city_233"
+  },
+  {
+    "from": "city_143",
+    "to": "city_162"
+  },
+  {
+    "from": "city_233",
+    "to": "city_208"
+  },
+  {
+    "from": "city_124",
+    "to": "city_239"
+  },
+  {
+    "from": "city_239",
+    "to": "xiangyang"
+  },
+  {
+    "from": "xiangyang",
+    "to": "jiangling"
+  },
+  {
+    "from": "jiangling",
+    "to": "city_268"
+  },
+  {
+    "from": "city_71",
+    "to": "jianye"
+  },
+  {
+    "from": "jianye",
+    "to": "city_85"
+  },
+  {
+    "from": "jianye",
+    "to": "city_193"
+  },
+  {
+    "from": "city_92",
+    "to": "ye"
+  },
+  {
+    "from": "ye",
+    "to": "city_20"
+  },
+  {
+    "from": "city_143",
+    "to": "luoyang"
+  },
+  {
+    "from": "city_124",
+    "to": "city_76"
+  },
+  {
+    "from": "xiangyang",
+    "to": "yongan"
+  },
+  {
+    "from": "city_268",
+    "to": "city_281"
+  },
+  {
+    "from": "city_193",
+    "to": "city_200"
+  },
+  {
+    "from": "city_162",
+    "to": "hanzhong"
+  },
+  {
+    "from": "hanzhong",
+    "to": "city_303"
+  },
+  {
+    "from": "city_26",
+    "to": "city_14"
+  },
+  {
+    "from": "city_281",
+    "to": "city_227"
+  },
+  {
+    "from": "luoyang",
+    "to": "changan"
+  },
+  {
+    "from": "changan",
+    "to": "city_167"
+  },
+  {
+    "from": "yongan",
+    "to": "city_310"
+  },
+  {
+    "from": "city_281",
+    "to": "city_275"
+  },
+  {
+    "from": "city_275",
+    "to": "nanhai"
+  },
+  {
+    "from": "city_275",
+    "to": "changsha"
+  },
+  {
+    "from": "city_167",
+    "to": "city_173"
+  },
+  {
+    "from": "city_200",
+    "to": "city_216"
+  },
+  {
+    "from": "city_46",
+    "to": "beihai"
+  },
+  {
+    "from": "city_303",
+    "to": "chengdu"
+  },
+  {
+    "from": "city_310",
+    "to": "city_326"
+  },
+  {
+    "from": "city_326",
+    "to": "city_333"
+  },
+  {
+    "from": "city_173",
+    "to": "city_179"
+  }
+]

@@ -66,8 +66,8 @@ func _focus_battle() -> void:
 	center /= maxf(destinations.size(), 1)
 	map.camera_target = center
 	map.target_goal = center
-	map.distance = 270
-	map.distance_goal = 270
+	map.distance = 200
+	map.distance_goal = 200
 	map.pitch = deg_to_rad(58)
 	map._update_camera()
 
@@ -160,7 +160,7 @@ func refresh() -> void:
 			var direction: Vector2 = points.get(str(army["location"].get("to", "")), Vector2.ZERO) - points.get(str(army["location"].get("from", "")), Vector2.ZERO)
 			if direction.length_squared() > 0.01: formations[id].rotation.y = atan2(direction.x, direction.y)
 		badge.strength = int(army["strength_estimate"]) if enemy else store.war.Combat.strength(army)
-		badge.estimated = enemy
+		badge.estimated = enemy and not store.battle_test
 		badge.morale = float(army["morale"])
 		badge.faction_color = Color("c86650") if enemy else Color(str(store.scenario["factions"].get(army["faction"], {}).get("color", "#8ac56b")))
 		badge.queue_redraw()

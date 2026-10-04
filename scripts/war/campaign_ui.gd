@@ -25,6 +25,7 @@ var toolbar_offset := Vector2(14, 14)
 var dispatch_home := ""
 var flow_button: Button
 var speed_choice: OptionButton
+var battle_label: Label
 
 
 func _ready() -> void:
@@ -37,6 +38,16 @@ func _ready() -> void:
 	toolbar.position = toolbar_offset
 	toolbar.add_theme_constant_override("separation", 8)
 	canvas.add_child(toolbar)
+	if store.battle_test:
+		battle_label = _label("", 15)
+		battle_label.position = Vector2(16, 158)
+		battle_label.size = Vector2(760, 48)
+		battle_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		battle_label.add_theme_color_override("font_color", Color.WHITE)
+		battle_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+		battle_label.add_theme_constant_override("shadow_offset_x", 1)
+		battle_label.add_theme_constant_override("shadow_offset_y", 1)
+		canvas.add_child(battle_label)
 	toolbar.add_child(_button("军情", show_reports))
 	var targets := OptionButton.new()
 	targets.add_item("选择出征目标")
@@ -453,6 +464,9 @@ func _refresh_time_label() -> void:
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(date_label) and store.busy: _refresh_time_label()
+	if is_instance_valid(battle_label):
+		var metrics: Dictionary = store.agent.metrics
+		battle_label.text = "小沛对战测试 · 18将 · 双方初始各2万人\n%s · 累计请求%d / 失败%d / 回退%d" % ["当前模型：" + str(store.agent.model) if store.agent.enabled else "本地策略（请在设置中启用模型）", metrics.get("calls", 0), metrics.get("failures", 0), metrics.get("fallbacks", 0)]
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not is_instance_valid(flow_button): return

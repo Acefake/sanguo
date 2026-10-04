@@ -14,7 +14,7 @@ func _ready() -> void:
 	store = get_node("/root/GameState")
 	window = Window.new()
 	window.title = "游戏主设置 · 武将智能体"
-	window.size = Vector2i(640, 720)
+	window.size = Vector2i(640, 600)
 	window.transient = true
 	window.exclusive = true
 	window.visible = false

@@ -31,6 +31,6 @@ static func setup(store: Node) -> void:
 			army["location"] = {"node": home, "from": home, "to": target, "edge": path["edges"][0], "progress": 0.04 if faction == "liu_bei" else 0.92}
 			army["action"] = {"type": "continue"}
 			army["last_reason"] = "小沛对战测试：敌军近在前方，由主将自主判断。"
-			store.battle_offsets[army["id"]] = Vector3((index % 4 - 1.5) * 24, 0, (index / 4) * 24 + (-42 if faction == "liu_bei" else 42))
+			store.battle_offsets[army["id"]] = Vector3((index % 4 - 1.5) * 24, 0, ((index / 4) * 24 + 12) * (-1 if faction == "liu_bei" else 1))
 			index += 1
 	store.war._observe_all()

@@ -69,12 +69,13 @@ func _ready() -> void:
 	territories = WorldTerritories.build(map_data)
 	for block in map_data.get("territory_blocks", []):
 		block_textures[str(block["id"])] = load(str(block["texture"]))
-	shared_boundaries = load(str(map_data["shared_boundaries"]))
+	if not str(map_data.get("shared_boundaries", "")).is_empty():
+		shared_boundaries = load(str(map_data["shared_boundaries"]))
 	marker_font = CitySkin.font()
 	shield_shadow = _create_shield_shadow()
 	shield_outline = _create_shield_shadow(true)
 	var background := Sprite2D.new()
-	background.texture = load(MAP_IMAGE_PATH)
+	background.texture = load(str(map_data.get("background_texture", MAP_IMAGE_PATH)))
 	background.centered = false
 	background.scale = map_size / background.texture.get_size()
 	background.z_index = -10
@@ -523,7 +524,7 @@ func _place_position(place_id: String) -> Vector2:
 
 func _zoom_at(screen_pos: Vector2, factor: float) -> void:
 	var before := get_global_mouse_position()
-	var next_zoom := clampf(camera.zoom.x * factor, 0.45, 3.2)
+	var next_zoom := clampf(camera.zoom.x * factor, float(map_data.get("zoom_min", 0.45)), float(map_data.get("zoom_max", 3.2)))
 	camera.zoom = Vector2.ONE * next_zoom
 	var viewport_center := get_viewport_rect().size * 0.5
 	camera.position = before - (screen_pos - viewport_center) / next_zoom
@@ -932,7 +933,8 @@ func _on_city_changed(_city_id: String) -> void:
 	if str(ownership_snapshot.get(_city_id, "")) != _faction_id(_city_id):
 		_refresh_faction_labels()
 	if _city_id == selected_id:
-		_schedule_ui_refresh()
+		# 选中城市的归属变化立即同步详情面板，不等下帧。
+		_refresh_ui()
 	else:
 		queue_redraw()
 

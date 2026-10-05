@@ -1,0 +1,123 @@
+{
+  "note": "按原始标字地形图核对；未识别码回退plains。原blocked集合仅追加已核对的川(13)，浅滩(12)允许渡河。毒地(7)原型归湿地。",
+  "default": "plains",
+  "codes": {
+    "1": "plains",
+    "2": "plains",
+    "3": "plains",
+    "4": "marsh",
+    "5": "forest",
+    "6": "forest",
+    "7": "marsh",
+    "8": "hills",
+    "9": "mountains",
+    "10": "mountains",
+    "11": "mountains",
+    "12": "ford",
+    "13": "river",
+    "14": "river",
+    "15": "plains",
+    "16": "plains",
+    "17": "plains",
+    "18": "plains"
+  },
+  "candidates": {
+    "8": "forest",
+    "9": "forest",
+    "15": "ford",
+    "16": "ford",
+    "13": "marsh"
+  },
+  "evidence": {
+    "1": {
+      "label": "平",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "2": {
+      "label": "街",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "3": {
+      "label": "砂",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "4": {
+      "label": "湿",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "5": {
+      "label": "森",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "6": {
+      "label": "密",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "7": {
+      "label": "毒",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "8": {
+      "label": "低",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "9": {
+      "label": "中",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "10": {
+      "label": "高",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "11": {
+      "label": "山",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "12": {
+      "label": "浅",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "13": {
+      "label": "川",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "14": {
+      "label": "大",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "15": {
+      "label": "府",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "16": {
+      "label": "都",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "17": {
+      "label": "关",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    },
+    "18": {
+      "label": "港",
+      "source": "world_2d.png 原始标字地形图 + map_grid.bin 同格核对",
+      "note": "原型类别映射；毒地暂归湿地，不额外实现毒害"
+    }
+  }
+}

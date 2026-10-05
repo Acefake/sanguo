@@ -1,0 +1,22 @@
+{
+  "slash": {
+    "source": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_动画与战斗资源\\纹理预览\\RRPreview\\d1e25cec_000.png",
+    "file": "res://assets/armies/rtk14/effects/slash.png",
+    "usage": "visually selected texture; original emitter binding unverified"
+  },
+  "spark": {
+    "source": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_动画与战斗资源\\纹理预览\\RRPreview\\035f1bcf_000.png",
+    "file": "res://assets/armies/rtk14/effects/spark.png",
+    "usage": "visually selected texture; original emitter binding unverified"
+  },
+  "dust": {
+    "source": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_动画与战斗资源\\纹理预览\\RRPreview\\bfbff8cd_000.png",
+    "file": "res://assets/armies/rtk14/effects/dust.png",
+    "usage": "visually selected texture; original emitter binding unverified"
+  },
+  "duel_flare": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\06_特效与辅助\\光效与闪电\\0x02dd8dbc_3c21f048_55f180_000.png",
+    "file": "res://assets/armies/rtk14/effects/duel-flare.png",
+    "usage": "Visually inspected white spindle flare, reused for crossed weapon impacts; original game emitter not reconstructed."
+  }
+}

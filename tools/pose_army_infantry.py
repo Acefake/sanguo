@@ -69,22 +69,32 @@ for frame in range(21):
     adjustments = {15:('z',-1.05),16:('z',1.05),17:('z',0.45),18:('z',-1.6),
                    3:('x',swing),4:('x',-swing),5:('x',max(0,-swing)*0.5),6:('x',max(0,swing)*0.5)}
     if fighting:
-        strike = math.sin(phase)
-        adjustments.update({9:('y',strike*0.16),15:('z',-0.65+strike*0.15),16:('z',0.45+strike*0.4),
-                            17:('z',0.8),18:('z',-0.9+strike*0.3)})
+        # Grounded spear thrust: recover, prepare, extend, then recover.
+        t = (frame - 9) / 12
+        thrust = -0.12 * t / 0.2 if t < 0.2 else -0.12 + 0.77 * (t - 0.2) / 0.25 if t < 0.45 else 0.65 * (1 - (t - 0.45) / 0.55)
+        adjustments.update({9:('x',-thrust*0.40),16:('z',1.05-thrust*0.30),18:('z',-1.6+thrust*0.45)})
     for bone in locals:
         matrix = pose[parents[bone]] @ locals[bone] if parents[bone] >= 0 else locals[bone].copy()
         if bone in adjustments:
             axis, angle = adjustments[bone]
             matrix[:3,:3] = rotate(axis,angle) @ matrix[:3,:3]
+        if bone == 22:
+            # The spear is bound sideways in the source T-pose. Align the wrist
+            # weapon with the body's -Z forward, rather than interpreting -X as forward.
+            matrix[:3,:3] = rotate('y', -math.pi / 2) @ bind[bone][:3,:3]
+            if fighting: matrix[:3,3] += np.array([0, 0, -thrust * 100])
         pose[bone] = matrix
         transforms[bone] = matrix @ inverse[bone]
     moved, moved_normals = [], []
     for vertex, normal, links in zip(vertices,normals,weights):
         matrix = sum((transforms[bone] * weight for bone, weight in links), np.zeros((4,4)))
-        moved.append((matrix @ np.append(vertex,1))[:3] * 0.01)
-        direction = matrix[:3,:3] @ normal
+        # Normalize the baked asset to +Z forward once; all map headings use +Z.
+        facing = rotate('y', math.pi)
+        moved.append(facing @ (matrix @ np.append(vertex,1))[:3] * 0.01)
+        direction = facing @ matrix[:3,:3] @ normal
         moved_normals.append(direction / max(np.linalg.norm(direction),1e-8))
+    assert np.isfinite(moved).all(), 'Invalid posed vertex'
+    assert np.asarray(moved)[:,2].max() > 1.4, 'Spear must point along normalized +Z forward'
     pos_id = add(moved,'VEC3'); normal_id = add(moved_normals,'VEC3')
     name = 'idle' if frame == 0 else (f'combat_{frame-9}' if fighting else f'march_{frame-1}')
     meshes.append({'name':name, 'primitives':[{'attributes':{'POSITION':pos_id,'NORMAL':normal_id,'TEXCOORD_0':uv_id},'material':0}]})
@@ -94,7 +104,7 @@ gltf = {'asset':{'version':'2.0','generator':'RTK14 native weights; procedural i
         'pbrMetallicRoughness':{'baseColorTexture':{'index':0},'metallicFactor':0,'roughnessFactor':0.9}}],
         'images':[{'uri':'../textures/24b4dfb4.png'}],'textures':[{'source':0}],
         'bufferViews':views,'accessors':accessors,'buffers':[{'byteLength':len(binary)}],
-        'extras':{'source_model':'d3c18f06','native_bones':len(bind),'animation':'procedural_baked_8_frame_march_12_frame_combat'}}
+        'extras':{'source_model':'d3c18f06','native_bones':len(bind),'animation':'procedural_baked_8_frame_march_12_frame_spear_thrust', 'forward_axis':'+Z'}}
 # Add nodes so Godot can generate every mesh, without displaying them all together.
 gltf['nodes'] += [{'mesh':i,'name':meshes[i]['name']} for i in range(1,21)]
 gltf['scenes'][0]['nodes'] = list(range(21))

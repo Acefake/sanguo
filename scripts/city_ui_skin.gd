@@ -95,10 +95,7 @@ static func _button_style(key: String) -> StyleBoxTexture:
 
 static func style_tab_button(button: Button, selected: bool = false) -> void:
 	style_button(button, true)
-	button.add_theme_stylebox_override("normal", _button_style("button_pressed" if selected else "button_red"))
-	button.add_theme_color_override("font_color", INK if selected else PALE)
-	button.add_theme_color_override("font_focus_color", INK if selected else PALE)
-	button.add_theme_color_override("icon_normal_color", INK if selected else PALE)
+	button.add_theme_stylebox_override("normal", primary_button_style(selected))
 
 
 static func tab_icon(key: String) -> Texture2D:
@@ -106,17 +103,12 @@ static func tab_icon(key: String) -> Texture2D:
 
 
 static func octagonal_button(primary: bool = true, hover: bool = false) -> StyleBoxTexture:
-	return sprite_style("octagon_hover" if hover else "octagon_red", 12, 0)
+	return primary_button_style(hover)
 
 
 static func style_confirm_button(button: Button, primary: bool = true) -> void:
 	style_button(button, primary)
-	button.add_theme_stylebox_override("normal", octagonal_button(primary))
-	button.add_theme_stylebox_override("hover", octagonal_button(primary, true))
-	button.add_theme_stylebox_override("pressed", sprite_style("octagon_pressed", 12, 0))
-	button.add_theme_stylebox_override("disabled", sprite_style("octagon_disabled", 12, 0))
-	button.add_theme_stylebox_override("focus", sprite_style("octagon_outline", 0, 0))
-	button.custom_minimum_size = Vector2(64, 64)
+	button.custom_minimum_size = Vector2(86, 36)
 	button.add_theme_font_size_override("font_size", 22)
 
 
@@ -135,14 +127,30 @@ static func nameplate() -> StyleBoxTexture:
 	return dark_panel(0.92, 5)
 
 
+static func primary_button_style(highlight: bool = false) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = load("res://assets/ui/buttons/primary-%s.png" % ("highlight" if highlight else "normal"))
+	style.texture_margin_left = 4
+	style.texture_margin_right = 4
+	style.texture_margin_top = 4
+	style.texture_margin_bottom = 4
+	style.content_margin_left = 12
+	style.content_margin_right = 12
+	style.content_margin_top = 5
+	style.content_margin_bottom = 5
+	return style
+
+
 static func style_button(button: Button, primary: bool = false) -> void:
-	button.add_theme_stylebox_override("normal", _button_style("button_red" if primary else "button_normal"))
-	button.add_theme_stylebox_override("hover", _button_style("button_red_hover" if primary else "button_hover"))
-	button.add_theme_stylebox_override("pressed", _button_style("button_red_pressed" if primary else "button_pressed"))
-	button.add_theme_stylebox_override("disabled", _button_style("button_small_disabled" if primary else "button_disabled"))
-	button.add_theme_stylebox_override("focus", focus_frame())
+	button.add_theme_stylebox_override("normal", primary_button_style())
+	button.add_theme_stylebox_override("hover", primary_button_style(true))
+	button.add_theme_stylebox_override("pressed", primary_button_style(true))
+	var disabled := primary_button_style()
+	disabled.modulate_color = Color(0.75, 0.75, 0.75, 0.70)
+	button.add_theme_stylebox_override("disabled", disabled)
+	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	for state in ["font_color", "font_focus_color"]:
-		button.add_theme_color_override(state, PALE)
+		button.add_theme_color_override(state, INK)
 	for state in ["font_hover_color", "font_pressed_color"]:
 		button.add_theme_color_override(state, INK)
 	button.add_theme_color_override("font_disabled_color", Color("a7a397"))

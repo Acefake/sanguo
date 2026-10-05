@@ -1,6 +1,6 @@
 extends RefCounted
 
-static func setup(store: Node) -> void:
+static func setup(store: Node, preformed: bool = false) -> void:
 	store._load_demo()
 	store.year = 191
 	store.month = 9
@@ -14,7 +14,7 @@ static func setup(store: Node) -> void:
 		sides[faction].append(officer)
 	for faction in sides:
 		var home := "xiaopei" if faction == "liu_bei" else "puyang"
-		var target := "puyang" if faction == "liu_bei" else "xiaopei"
+		var target := "puyang" if preformed and faction == "liu_bei" else "xiaopei"
 		var city: Dictionary = store.city_state(home)
 		city["faction"] = faction
 		city["garrison"] = 20000
@@ -22,15 +22,24 @@ static func setup(store: Node) -> void:
 		city["grain"] = 100000
 		city["training"] = 70
 		city["equipment"] = 70
-		var path: Dictionary = store.war.graph.path(home, target)
-		var index := 0
-		for officer in sides[faction]:
-			var count := int(20000 / sides[faction].size())
-			var food := int(count * store.war.rules["grain_per_soldier_day"] * 45)
-			var army: Dictionary = store.war._mobilize({"home": home, "target": target, "officer_id": officer["id"], "strength": count, "grain": food, "mission_type": "capture"})
-			army["location"] = {"node": home, "from": home, "to": target, "edge": path["edges"][0], "progress": 0.04 if faction == "liu_bei" else 0.92}
-			army["action"] = {"type": "continue"}
-			army["last_reason"] = "小沛对战测试：敌军近在前方，由主将自主判断。"
-			store.battle_offsets[army["id"]] = Vector3((index % 4 - 1.5) * 24, 0, ((index / 4) * 24 + 12) * (-1 if faction == "liu_bei" else 1))
-			index += 1
+		var path: Dictionary = store.war.graph.path(home, "puyang" if home == "xiaopei" else "xiaopei")
+		var members: Array = sides[faction].map(func(officer): return officer["id"])
+		var leader: String = preload("res://scripts/war/army_corps.gd").best_member(store.war, members, "主帅")
+		var army: Dictionary = store.war._mobilize({"home": home, "target": target, "officer_id": leader, "strength": 20000, "grain": 3600, "mission_type": "defend" if not preformed and faction == "liu_bei" else "capture"})
+		army["location"] = {"node": home, "from": home, "to": "puyang" if home == "xiaopei" else "xiaopei", "edge": path["edges"][0], "progress": 0.04 if faction == "liu_bei" else 0.92}
+		preload("res://scripts/war/army_corps.gd").form(store.war, army, members, not preformed)
+
+	if not preformed:
+		var city: Dictionary = store.city_state("xiaopei")
+		city.merge({"garrison": 3000, "units": {"infantry": 2400, "archers": 600, "cavalry": 0}, "grain": 18000, "defense": 65}, true)
 	store.war._observe_all()
+	preload("res://scripts/war/tactical_battlefield.gd").setup(store.war)
+	preload("res://scripts/war/army_corps.gd").deploy(store.war)
+	if not preformed:
+		var grid = preload("res://scripts/war/tactical_battlefield.gd").grid()
+		var cities: Array = JSON.parse_string(FileAccess.get_file_as_string("res://assets/rtk14/cities_map.json"))
+		for city in cities:
+			if city["name"] == "小沛": store.war.state["battlefield"]["objectives"] = {"xiaopei": grid.pick(Vector2(city["x"], city["z"]))}
+	for army in store.war.active_armies(): army["intel"]["enemies"].clear()
+	store.war._observe_all()
+	store.war._update_operations()

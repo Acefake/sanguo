@@ -74,6 +74,7 @@ var map_environment: Environment
 var map_sun: DirectionalLight3D
 var officer_page: CanvasLayer
 var army_world: Node3D
+var hex_world: Node3D
 
 func _ready() -> void:
 	_build_environment()
@@ -110,6 +111,9 @@ func _ready() -> void:
 	_build_world_districts()
 	await _build_vegetation()
 	_build_selection_ring()
+	hex_world = preload("res://scripts/rtk14_hex_world_3d.gd").new()
+	hex_world.map = self
+	add_child(hex_world)
 	loaded = true
 	army_world = preload("res://scripts/war/army_world_3d.gd").new()
 	army_world.map = self
@@ -992,7 +996,10 @@ func _unhandled_input(event: InputEvent) -> void:
 				drag_distance = 0
 			else:
 				if dragging_button == MOUSE_BUTTON_LEFT and drag_distance < 5:
-					_select_at(event.position)
+					if hex_world != null:
+						hex_world.select_screen(event.position, event.shift_pressed)
+					if not event.shift_pressed:
+						_select_at(event.position)
 				dragging_button = 0
 	elif event is InputEventMouseMotion and dragging_button != 0:
 		drag_distance += event.relative.length()
@@ -1008,12 +1015,18 @@ func _unhandled_input(event: InputEvent) -> void:
 			_show_overview()
 		elif event.keycode == KEY_ESCAPE:
 			_clear_selection()
+			if hex_world != null:
+				hex_world.clear_selection()
+		elif event.keycode == KEY_G and hex_world != null:
+			hex_world.toggle()
 		elif event.keycode == KEY_HOME:
 			focus_city("luoyang")
 		elif event.keycode == KEY_TAB:
 			for child in get_children():
 				if child is CanvasLayer:
 					child.visible = not child.visible
+			if hex_world != null:
+				hex_world.ui_visible = not hex_world.ui_visible
 
 func _select_at(screen: Vector2) -> void:
 	var closest := ""
@@ -1103,73 +1116,43 @@ func _show_overview(immediate := false) -> void:
 func _build_ui() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
-	var top := PanelContainer.new()
-	top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	top.offset_left = 16
-	top.offset_right = -16
-	top.offset_top = 14
-	top.offset_bottom = 62
-	top.add_theme_stylebox_override("panel", _panel_style())
-	layer.add_child(top)
-	var bar := HBoxContainer.new()
-	bar.add_theme_constant_override("separation", 12)
-	top.add_child(bar)
-	bar.add_child(_label("山河 · 三国", 23, Color("f7eed4")))
-	bar.add_child(_label("3D 地图画面", 14, Color("bbbfad")))
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bar.add_child(spacer)
-	bar.add_child(_button("全图  F", _show_overview))
-	bar.add_child(_button("武将", _open_officers))
-	bar.add_child(_button("返回洛阳", func() -> void: focus_city("luoyang")))
+	var hud := preload("res://scripts/world_map_hud.gd").new()
+	hud.map = self
+	layer.layer = 10
+	layer.add_child(hud)
+	status = Label.new()
+	status.hide()
+	layer.add_child(status)
+	# Map tools remain available inside the upper-right tools menu.
+	vegetation_button = _button("植被：开", _toggle_vegetation)
+	labels_button = _button("城名：开", _toggle_labels)
+	city_button = _button("城池：开", _toggle_cities)
+	hud.add_tool(vegetation_button)
+	hud.add_tool(labels_button)
+	hud.add_tool(city_button)
+	hud.add_tool(_button("全国视野  F", _show_overview))
+	hud.add_tool(_button("返回洛阳", func() -> void: focus_city("luoyang")))
+	hud.add_tool(_button("查看林地", _focus_forest))
 	var cities := OptionButton.new()
-	cities.name = "CitySelector"
 	cities.add_item("前往城池")
 	var data: Array = _read_json(ASSET_DIR + "cities_map.json", [])
-	for city in data:
-		cities.add_item(str(city["name"]))
+	for city in data: cities.add_item(str(city["name"]))
 	cities.item_selected.connect(func(index: int) -> void:
-		if index > 0:
-			focus_city(str(data[index - 1]["id"])))
-	bar.add_child(cities)
+		if index > 0: focus_city(str(data[index - 1]["id"])))
+	hud.add_tool(cities)
 	var gates := OptionButton.new()
-	gates.name = "GateSelector"
 	gates.add_item("前往关口")
 	var gate_data: Array = _read_json(ASSET_DIR + "source_gates.json", [])
-	for gate in gate_data:
-		gates.add_item("关口 %s" % str(gate["region"]))
+	for gate in gate_data: gates.add_item("关口 %s" % str(gate["region"]))
 	gates.item_selected.connect(func(index: int) -> void:
-		if index > 0:
-			focus_gate(str(gate_data[index - 1]["id"])))
-	bar.add_child(gates)
-	bar.add_child(_button("林地", _focus_forest))
+		if index > 0: focus_gate(str(gate_data[index - 1]["id"])))
+	hud.add_tool(gates)
 	var quality := OptionButton.new()
-	quality.name = "QualitySelector"
 	quality.add_item("画质：流畅")
 	quality.add_item("画质：精细")
 	quality.item_selected.connect(_set_map_quality)
-	bar.add_child(quality)
-	vegetation_button = _button("植被：开", _toggle_vegetation)
-	bar.add_child(vegetation_button)
-	labels_button = _button("城名：开", _toggle_labels)
-	bar.add_child(labels_button)
-	city_button = _button("城池：开", _toggle_cities)
-	bar.add_child(city_button)
-	bar.add_child(_button("切换2D地图", func() -> void: get_tree().change_scene_to_file("res://scenes/map_slice.tscn")))
-	bar.add_child(_button("设置", func() -> void: get_node("/root/GameState").open_settings()))
-	var bottom := PanelContainer.new()
-	bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	bottom.offset_left = 16
-	bottom.offset_right = -16
-	bottom.offset_top = -66
-	bottom.offset_bottom = -14
-	bottom.add_theme_stylebox_override("panel", _panel_style())
-	layer.add_child(bottom)
-	var column := VBoxContainer.new()
-	bottom.add_child(column)
-	column.add_child(_label("滚轮缩放 · 左键/中键拖动平移 · 右键旋转 · 点选城池查看 · WASD 移动 · Q/E 环绕 · Home 朝北", 14, Color("e4e7d8")))
-	status = _label("", 12, Color("aeb7a4"))
-	column.add_child(status)
+	hud.add_tool(quality)
+	hud.add_tool(_button("切换2D地图", func() -> void: get_tree().change_scene_to_file("res://scenes/map_slice.tscn")))
 	badge_layer = CanvasLayer.new()
 	badge_layer.layer = 1
 	add_child(badge_layer)
@@ -1189,16 +1172,7 @@ func _build_ui() -> void:
 		button.add_theme_font_size_override("font_size", 28)
 		button.add_theme_color_override("font_color", Color("423f31"))
 		button.add_theme_color_override("font_hover_color", Color("423f31"))
-		var paper := StyleBoxFlat.new()
-		paper.bg_color = Color("e0e3d1")
-		paper.border_color = Color("959e86")
-		paper.set_border_width_all(1)
-		paper.set_corner_radius_all(3)
-		button.add_theme_stylebox_override("normal", paper)
-		var hover := paper.duplicate()
-		hover.bg_color = Color("f0d87b")
-		button.add_theme_stylebox_override("hover", hover)
-		button.add_theme_stylebox_override("pressed", hover)
+		CitySkin.style_button(button)
 		commands.add_child(button)
 	city_popup.hide()
 
@@ -1240,6 +1214,7 @@ func _open_officers() -> void:
 func _button(text: String, callback: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
+	CitySkin.style_button(button)
 	button.add_theme_font_size_override("font_size", 14)
 	button.pressed.connect(callback)
 	return button

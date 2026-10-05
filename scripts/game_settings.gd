@@ -8,6 +8,9 @@ var model: LineEdit
 var key: LineEdit
 var enabled: CheckButton
 var timeout: SpinBox
+var parallel: SpinBox
+var budget: SpinBox
+var reasoning: CheckButton
 var notice: Label
 
 func _ready() -> void:
@@ -31,12 +34,12 @@ func _ready() -> void:
 	rows.add_theme_constant_override("separation", 10)
 	scroll.add_child(rows)
 	_label(rows, "武将智能体")
-	_label(rows, "每位武将独立判断，共用下方模型服务；未启用或请求失败时由本地策略接管。")
+	_label(rows, "编军后由主帅智能体统筹任务、拆分小队；部将按军令执行。各军团共用模型服务，失败时由本地指挥策略接管。")
 	enabled = CheckButton.new()
 	enabled.text = "启用模型自主决策"
 	enabled.add_theme_color_override("font_color", CitySkin.INK)
 	rows.add_child(enabled)
-	endpoint = _field(rows, "接口地址（包含 /chat/completions）")
+	endpoint = _field(rows, "接口地址（/chat/completions 或 Ollama /api/chat）")
 	model = _field(rows, "模型名")
 	key = _field(rows, "API Key（保存到本机配置，重启自动读取）")
 	key.secret = true
@@ -45,6 +48,41 @@ func _ready() -> void:
 	timeout.min_value = 2
 	timeout.max_value = 60
 	rows.add_child(timeout)
+	reasoning = CheckButton.new()
+	reasoning.text = "关闭模型思考（Ollama／OpenRouter）"
+	reasoning.add_theme_color_override("font_color", CitySkin.INK)
+	rows.add_child(reasoning)
+	_label(rows, "Ollama使用原生接口、结构化行动JSON和短上下文；各军团主帅共享模型权重，部将执行军令，无需API Key。")
+	var local := Button.new()
+	local.text = "使用本机小模型 · Ollama Qwen3 1.7B"
+	CitySkin.style_button(local)
+	local.pressed.connect(func():
+		enabled.button_pressed = true
+		endpoint.text = "http://127.0.0.1:11434/api/chat"
+		model.text = "qwen3:1.7b"
+		key.text = ""
+		parallel.value = 1
+		budget.value = 15
+		timeout.value = 15
+		reasoning.button_pressed = true
+		notice.text = "预设已填写，检测成功后保存。请先启动Ollama并运行 ollama pull qwen3:1.7b。"
+	)
+	rows.add_child(local)
+	var probe := Button.new()
+	probe.text = "检测本地服务与模型"
+	CitySkin.style_button(probe)
+	probe.pressed.connect(_probe_local)
+	rows.add_child(probe)
+	_label(rows, "同时请求主帅数（1–12）")
+	parallel = SpinBox.new()
+	parallel.min_value = 1
+	parallel.max_value = 12
+	rows.add_child(parallel)
+	_label(rows, "每个游戏日模型总等待上限（秒，超时由本地策略接管）")
+	budget = SpinBox.new()
+	budget.min_value = 2
+	budget.max_value = 30
+	rows.add_child(budget)
 	var save := Button.new()
 	save.text = "保存设置"
 	CitySkin.style_button(save, true)
@@ -79,6 +117,9 @@ func open() -> void:
 	model.text = store.agent.model
 	key.text = store.agent.api_key
 	timeout.value = store.agent.timeout_seconds
+	parallel.value = store.agent.concurrency
+	budget.value = store.agent.decision_budget_seconds
+	reasoning.button_pressed = store.agent.disable_reasoning
 	notice.text = ""
 	if store.busy and not store.time_paused: store.toggle_time_pause()
 	window.popup_centered()
@@ -87,7 +128,7 @@ func _save() -> void:
 	if store.busy:
 		notice.text = "请先完成本轮十日推进，再保存模型设置。"
 		return
-	notice.text = store.agent.configure({"enabled": enabled.button_pressed, "endpoint": endpoint.text, "model": model.text, "api_key": key.text, "timeout": timeout.value})
+	notice.text = store.agent.configure({"enabled": enabled.button_pressed, "endpoint": endpoint.text, "model": model.text, "api_key": key.text, "timeout": timeout.value, "concurrency": parallel.value, "decision_budget": budget.value, "disable_reasoning": reasoning.button_pressed})
 
 func _label(parent: Node, text: String) -> Label:
 	var label := Label.new()
@@ -105,3 +146,32 @@ func _field(parent: Node, caption: String) -> LineEdit:
 	parent.add_child(field)
 	return field
 
+
+func _probe_local() -> void:
+	if not endpoint.text.begins_with("http://127.0.0.1:11434/") and not endpoint.text.begins_with("http://localhost:11434/"):
+		notice.text = "检测按钮用于本机11434端口的Ollama服务。"
+		return
+	var request := HTTPRequest.new()
+	request.timeout = 3
+	request.body_size_limit = 1048576
+	add_child(request)
+	notice.text = "正在检测本地模型服务……"
+	var error := request.request(endpoint.text.get_slice("/api/", 0) + "/api/tags")
+	if error != OK:
+		notice.text = "无法发起检测，请先启动Ollama。"
+		request.queue_free()
+		return
+	var response: Array = await request.request_completed
+	request.queue_free()
+	if int(response[0]) != HTTPRequest.RESULT_SUCCESS or int(response[1]) != 200:
+		notice.text = "本地服务未就绪，请先启动Ollama。"
+		return
+	var data: Variant = JSON.parse_string(response[3].get_string_from_utf8())
+	if not data is Dictionary:
+		notice.text = "本地服务响应无效。"
+		return
+	for available in data.get("models", []):
+		if available.get("name", "") == model.text or available.get("model", "") == model.text:
+			notice.text = "服务正常，模型已安装；点击保存设置即可使用。"
+			return
+	notice.text = "服务正常，但未安装所选模型。运行 ollama pull " + model.text

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 4,
   "days_per_month": 30,
   "grain_per_soldier_day": 0.004,
   "reserve_ratio": 0.35,
@@ -12,11 +12,217 @@
   "report_delay_days": 1,
   "intel_expiry_days": 4,
   "units": {
-    "infantry": {"name": "步兵", "damage": 1.0, "toughness": 1.2, "pursuit": 0.5},
-    "archers": {"name": "弓兵", "damage": 1.3, "toughness": 0.8, "pursuit": 0.3},
-    "cavalry": {"name": "骑兵", "damage": 1.5, "toughness": 1.4, "pursuit": 1.5}
+    "infantry": {
+      "name": "步兵",
+      "damage": 1.0,
+      "toughness": 1.2,
+      "pursuit": 0.5
+    },
+    "archers": {
+      "name": "弓兵",
+      "damage": 1.3,
+      "toughness": 0.8,
+      "pursuit": 0.3
+    },
+    "cavalry": {
+      "name": "骑兵",
+      "damage": 1.5,
+      "toughness": 1.4,
+      "pursuit": 1.5
+    }
   },
-  "faction_mapping": {"袁绍集团": "yuan_shao", "孙吴集团": "sun_jian", "蜀汉集团": "liu_bei"},
-  "terrain_regions": {"yizhou": "mountains", "liangzhou": "hills", "bingzhou": "hills", "jingzhou": "river", "yangzhou": "river"},
-  "scenario_note": "沿用演示剧本与人物设计卡，不作为191年历史人物状态。旧驻军迁为步兵，新征募在训练、军备达标后可包含弓骑。"
+  "faction_mapping": {
+    "袁绍集团": "yuan_shao",
+    "孙吴集团": "sun_jian",
+    "蜀汉集团": "liu_bei"
+  },
+  "terrain_regions": {
+    "yizhou": "mountains",
+    "liangzhou": "hills",
+    "bingzhou": "hills",
+    "jingzhou": "river",
+    "yangzhou": "river"
+  },
+  "scenario_note": "沿用演示剧本与人物设计卡，不作为191年历史人物状态。旧驻军迁为步兵，新征募在训练、军备达标后可包含弓骑。",
+  "terrain": {
+    "plains": {
+      "name": "平原",
+      "defense": 1,
+      "attack": 1,
+      "cavalry_attack": 1,
+      "ranged_attack": 1,
+      "capacity": 1,
+      "entry_attack": 1,
+      "daily_fatigue": 0
+    },
+    "forest": {
+      "name": "森林",
+      "defense": 1.1,
+      "attack": 1,
+      "cavalry_attack": 0.9,
+      "ranged_attack": 0.85,
+      "capacity": 1,
+      "entry_attack": 1,
+      "daily_fatigue": 0
+    },
+    "hills": {
+      "name": "丘陵",
+      "defense": 1.08,
+      "attack": 1,
+      "cavalry_attack": 0.95,
+      "ranged_attack": 1,
+      "capacity": 1,
+      "entry_attack": 1,
+      "daily_fatigue": 0
+    },
+    "mountains": {
+      "name": "山地",
+      "defense": 1.15,
+      "attack": 1,
+      "cavalry_attack": 0.8,
+      "ranged_attack": 1,
+      "capacity": 0.6,
+      "entry_attack": 0.85,
+      "daily_fatigue": 0
+    },
+    "river": {
+      "name": "河川",
+      "defense": 1,
+      "attack": 1,
+      "cavalry_attack": 0.8,
+      "ranged_attack": 1,
+      "capacity": 1,
+      "entry_attack": 0,
+      "daily_fatigue": 0
+    },
+    "ford": {
+      "name": "渡口",
+      "defense": 1,
+      "attack": 1,
+      "cavalry_attack": 0.8,
+      "ranged_attack": 1,
+      "capacity": 1,
+      "entry_attack": 0,
+      "daily_fatigue": 0
+    },
+    "marsh": {
+      "name": "湿地",
+      "defense": 1,
+      "attack": 0.9,
+      "cavalry_attack": 0.85,
+      "ranged_attack": 1,
+      "capacity": 1,
+      "entry_attack": 1,
+      "daily_fatigue": 2
+    }
+  },
+  "formations": {
+    "change_organization": 10,
+    "contact_morale_cost": 5,
+    "cooldown_days": 3,
+    "proficiency_base": 0.7,
+    "proficiency_divisor": 200,
+    "proficiency_max": 1.25,
+    "definitions": {
+      "fish_scale": {
+        "name": "鱼鳞",
+        "attack": 0.1,
+        "flanked_loss": 0.15,
+        "description": "正面攻击增强，被侧击更易受损"
+      },
+      "crane_wing": {
+        "name": "鹤翼",
+        "flank_bonus": 0.12,
+        "defense": -0.08,
+        "description": "加强包抄，正面防护较弱"
+      },
+      "square_circle": {
+        "name": "方圆",
+        "received_loss": -0.12,
+        "attack": -0.12,
+        "preparation": 1,
+        "description": "减轻伤亡，守势整阵脱离需多一日"
+      },
+      "wild_goose": {
+        "name": "雁行",
+        "ranged": 0.15,
+        "melee_defense": -0.1,
+        "description": "加强远射，近战防护较弱"
+      },
+      "arrowhead": {
+        "name": "锋矢",
+        "opening_attack": 0.18,
+        "sustained_attack": 0.05,
+        "opening_days": 2,
+        "defense": -0.05,
+        "description": "前两日加强冲击，防护略弱"
+      },
+      "long_snake": {
+        "name": "长蛇",
+        "attack": -0.08,
+        "rough_received": -0.08,
+        "delay_immune": true,
+        "description": "适合山林，免山地迟滞，正面攻势略弱"
+      }
+    }
+  },
+  "duel": {
+    "enabled": true,
+    "initiation": 0.12,
+    "acceptance": 0.55,
+    "daily_pair_limit": 1,
+    "officer_battle_limit": 2,
+    "round_noise": 15,
+    "draw_margin": 1,
+    "recover_days": 10,
+    "wounded_attack": 0.9,
+    "allow_death": false,
+    "personality_threshold": 70,
+    "disadvantage_ratio": 0.8,
+    "initiative_disadvantage": 1.5,
+    "initiative_advantage": 0.8,
+    "risk": 1.3,
+    "pride": 1.3,
+    "control": 0.8,
+    "patience": 0.85,
+    "renown_gap": 20,
+    "renown_penalty": 0.3,
+    "accept_loyalty": 1.2,
+    "accept_pride": 1.25,
+    "accept_control": 0.85,
+    "accept_disadvantage": 0.8,
+    "aura_percent": 0.05,
+    "aura_scale": 100,
+    "weights": {
+      "武艺": 0.5,
+      "膂力": 0.3,
+      "体魄": 0.2,
+      "骑术": 0.1
+    },
+    "effects": {
+      "overwhelming": {
+        "loser_morale": 25,
+        "loser_org": 15,
+        "winner_morale": 8
+      },
+      "win": {
+        "loser_morale": 12,
+        "loser_org": 0,
+        "winner_morale": 5
+      },
+      "draw": {
+        "morale": 3
+      },
+      "refused": {
+        "challenger_morale": 6,
+        "defender_morale": 3
+      }
+    }
+  },
+  "feedback": {
+    "factor_threshold": 0.05,
+    "max_factors": 2,
+    "max_log": 240,
+    "max_floaters_per_day": 6
+  }
 }

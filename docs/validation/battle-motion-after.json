@@ -1,0 +1,2337 @@
+[
+	{
+		"tick": 1,
+		"units": [
+			{
+				"cell": 15126,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": ""
+			},
+			{
+				"cell": 16002,
+				"flank": false,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "接近",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "接近",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": ""
+			},
+			{
+				"cell": 17766,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": ""
+			},
+			{
+				"cell": 16882,
+				"flank": false,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16665,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "接近",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16667,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "接近",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17548,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 2,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": ""
+			},
+			{
+				"cell": 16222,
+				"flank": false,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17546,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": false,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17548,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 3,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": false,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17328,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备队随阵跟进",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 4,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17328,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 5,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17328,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 6,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17328,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 7,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17328,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 8,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17328,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 9,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "近战",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "近战",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17328,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 10,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "接战·准备脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "接战·准备脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17328,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 11,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16442,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "追击脱离部队",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16225,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "追击脱离部队",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16882,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16665,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 17108,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 12,
+		"units": [
+			{
+				"cell": 15346,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0009"
+			},
+			{
+				"cell": 16662,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16445,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "接近",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15348,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17326,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17102,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16885,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "近战",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 16888,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 13,
+		"units": [
+			{
+				"cell": 15566,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": "army-0009"
+			},
+			{
+				"cell": 16882,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16665,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15568,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备队随阵跟进",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17546,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "脱离",
+				"returning": true,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17102,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "接战·准备脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 16885,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "接战·准备脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "接战·准备脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 16888,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0003"
+			}
+		]
+	},
+	{
+		"tick": 14,
+		"units": [
+			{
+				"cell": 15566,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0009"
+			},
+			{
+				"cell": 16882,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "追击脱离部队",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16665,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "追击脱离部队",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "追击脱离部队",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15568,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17766,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "脱离",
+				"returning": true,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17322,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 17105,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16667,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 16888,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0003"
+			}
+		]
+	},
+	{
+		"tick": 15,
+		"units": [
+			{
+				"cell": 15566,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17102,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "追击脱离部队",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16885,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "追击脱离部队",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "近战",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0010"
+			},
+			{
+				"cell": 15568,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "预备待命",
+				"returning": false,
+				"role": "reserve",
+				"target": "army-0009"
+			},
+			{
+				"cell": 17986,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "脱离",
+				"returning": true,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17542,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 17325,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16887,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0004"
+			},
+			{
+				"cell": 16667,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 16,
+		"units": [
+			{
+				"cell": 15786,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17102,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16885,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0008"
+			},
+			{
+				"cell": 16447,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "接战·准备脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0010"
+			},
+			{
+				"cell": 15568,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0010"
+			},
+			{
+				"cell": 18206,
+				"flank": false,
+				"id": "army-0006",
+				"name": "孙策中军",
+				"phase": "脱离",
+				"returning": true,
+				"role": "command",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17762,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 17545,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17107,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16667,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "近战",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0004"
+			}
+		]
+	},
+	{
+		"tick": 17,
+		"units": [
+			{
+				"cell": 16006,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17102,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16885,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 16227,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0010"
+			},
+			{
+				"cell": 15788,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17982,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 17765,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17327,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 16887,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "追击脱离部队",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0003"
+			}
+		]
+	},
+	{
+		"tick": 18,
+		"units": [
+			{
+				"cell": 16226,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17102,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16885,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 16007,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 16008,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0010"
+			},
+			{
+				"cell": 18202,
+				"flank": true,
+				"id": "army-0007",
+				"name": "文丑分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "flank",
+				"target": "army-0002"
+			},
+			{
+				"cell": 17985,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17547,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17107,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0003"
+			}
+		]
+	},
+	{
+		"tick": 19,
+		"units": [
+			{
+				"cell": 16226,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17102,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0007"
+			},
+			{
+				"cell": 16885,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15787,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 16007,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0010"
+			},
+			{
+				"cell": 18205,
+				"flank": false,
+				"id": "army-0008",
+				"name": "颜良分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17767,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17327,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0003"
+			}
+		]
+	},
+	{
+		"tick": 20,
+		"units": [
+			{
+				"cell": 16226,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17103,
+				"flank": false,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0010"
+			},
+			{
+				"cell": 16885,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "停止追击·保持战线",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15567,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 16007,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17987,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0003"
+			},
+			{
+				"cell": 17547,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0003"
+			}
+		]
+	},
+	{
+		"tick": 21,
+		"units": [
+			{
+				"cell": 16226,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17324,
+				"flank": false,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17105,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "接近",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0010"
+			},
+			{
+				"cell": 15347,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0009"
+			},
+			{
+				"cell": 15787,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0010"
+			},
+			{
+				"cell": 18207,
+				"flank": false,
+				"id": "army-0009",
+				"name": "袁尚分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0002"
+			},
+			{
+				"cell": 17767,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0002"
+			}
+		]
+	},
+	{
+		"tick": 22,
+		"units": [
+			{
+				"cell": 16446,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17324,
+				"flank": false,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17325,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "接近",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0010"
+			},
+			{
+				"cell": 15127,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0010"
+			},
+			{
+				"cell": 15567,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17987,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0002"
+			}
+		]
+	},
+	{
+		"tick": 23,
+		"units": [
+			{
+				"cell": 16666,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17324,
+				"flank": false,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "侧翼绕行",
+				"returning": false,
+				"role": "flank",
+				"target": "army-0010"
+			},
+			{
+				"cell": 17545,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "接近",
+				"returning": false,
+				"role": "main_attack",
+				"target": "army-0010"
+			},
+			{
+				"cell": 14907,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": "army-0010"
+			},
+			{
+				"cell": 15347,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": "army-0010"
+			},
+			{
+				"cell": 18207,
+				"flank": false,
+				"id": "army-0010",
+				"name": "袁绍分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "rear_guard",
+				"target": "army-0003"
+			}
+		]
+	},
+	{
+		"tick": 24,
+		"units": [
+			{
+				"cell": 16886,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "中军跟进阵线",
+				"returning": false,
+				"role": "command",
+				"target": ""
+			},
+			{
+				"cell": 17324,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "驻守",
+				"returning": false,
+				"role": "flank",
+				"target": ""
+			},
+			{
+				"cell": 17545,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "驻守",
+				"returning": false,
+				"role": "main_attack",
+				"target": ""
+			},
+			{
+				"cell": 14687,
+				"flank": false,
+				"id": "army-0004",
+				"name": "关兴分队",
+				"phase": "脱离",
+				"returning": true,
+				"role": "main_attack",
+				"target": ""
+			},
+			{
+				"cell": 15127,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": ""
+			}
+		]
+	},
+	{
+		"tick": 25,
+		"units": [
+			{
+				"cell": 16886,
+				"flank": false,
+				"id": "army-0001",
+				"name": "诸葛亮中军",
+				"phase": "驻守",
+				"returning": false,
+				"role": "command",
+				"target": ""
+			},
+			{
+				"cell": 17324,
+				"flank": true,
+				"id": "army-0002",
+				"name": "魏延分队",
+				"phase": "驻守",
+				"returning": false,
+				"role": "flank",
+				"target": ""
+			},
+			{
+				"cell": 17545,
+				"flank": false,
+				"id": "army-0003",
+				"name": "关羽分队",
+				"phase": "驻守",
+				"returning": false,
+				"role": "main_attack",
+				"target": ""
+			},
+			{
+				"cell": 15127,
+				"flank": false,
+				"id": "army-0005",
+				"name": "张遵分队",
+				"phase": "接应撤退友军",
+				"returning": false,
+				"role": "rear_guard",
+				"target": ""
+			}
+		]
+	}
+]

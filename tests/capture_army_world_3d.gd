@@ -51,7 +51,7 @@ func _run() -> void:
 	check(world.march_meshes.size() == 8, "步兵行军帧没有加载")
 	check(world.combat_meshes.size() == 12, "步兵战斗帧没有加载")
 	world.deploy_city("chengdu")
-	check(world.ui.page == "dispatch" and world.ui.target_id != "chengdu" and str(world.ui.source_choice.get_item_metadata(world.ui.source_choice.selected)) == "chengdu", "3D出阵没有保留出发城")
+	check(is_instance_valid(world.ui.dispatch_view) and world.ui.dispatch_view.target != "chengdu" and world.ui.dispatch_view.selection(world.ui.dispatch_view.sources) == "chengdu", "3D出阵没有保留出发城")
 	world.badges[id].selected.emit()
 	check(world.ui.drawer.visible and world.ui.page == "army", "军队详情没有打开")
 	scene.camera_target = world.world_position(army["location"])
@@ -95,7 +95,7 @@ func _run() -> void:
 	world.begin_day({})
 	await create_timer(0.3).timeout
 	var soldiers: MultiMeshInstance3D = world.formations[id].get_node("Soldiers")
-	check(soldiers.multimesh.mesh in world.combat_meshes, "接战没有切换战斗动画")
+	check(soldiers.material_override.get_shader_parameter("pose_start") == 9 and soldiers.material_override.get_shader_parameter("pose_count") == 12, "接战没有切换战斗动画")
 	store.busy = true
 	store.toggle_time_pause()
 	var frozen_position: Vector3 = world.formations[id].position

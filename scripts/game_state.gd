@@ -49,10 +49,11 @@ var battle_snapshot: Dictionary = {}
 func start_battle_test() -> void:
 	if busy: return
 	prepare_battle_test()
+	if agent.enabled: war.Corps.plan_background(war, agent)
 	if is_instance_valid(settings_menu): settings_menu.window.hide()
 	get_tree().change_scene_to_file("res://scenes/rtk14_world_3d.tscn")
 
-func prepare_battle_test() -> void:
+func prepare_battle_test(preformed: bool = false) -> void:
 	if not battle_test:
 		_save()
 		battle_snapshot = {"scenario": scenario.duplicate(true), "war": war.export_state(), "year": year, "month": month, "day": day, "action_points": action_points, "chronicles": chronicles.duplicate(true), "persist": persist_enabled}
@@ -62,7 +63,7 @@ func prepare_battle_test() -> void:
 		battle_snapshot["urgent"] = war.urgent_event
 	persist_enabled = false
 	battle_offsets.clear()
-	preload("res://scripts/war/xiaopei_battle.gd").setup(self)
+	preload("res://scripts/war/xiaopei_battle.gd").setup(self, preformed)
 	time_phase = "strategy"
 	turn_days_done = 0
 	turn_days_total = 0
@@ -355,7 +356,7 @@ func date_text() -> String:
 
 func advance_day() -> String:
 	if busy:
-		return "正在等待将领决策。"
+		return "日期正在推进。"
 	turn_days_total = 0
 	_begin_advance()
 	if is_inside_tree():
@@ -409,7 +410,7 @@ func _consume_city_food() -> void:
 
 func advance_to_month() -> String:
 	if busy:
-		return "正在等待将领决策。"
+		return "日期正在推进。"
 	turn_days_total = 0
 	# Keep the operation locked until its single save completes. Offline policies
 	# return synchronously, so explicitly yield instead of relying on their await.
@@ -436,3 +437,4 @@ func _record(place_id: String, message: String) -> void:
 	chronicles.append({"year": year, "month": month, "city_id": place_id, "message": message})
 	if chronicles.size() > 40:
 		chronicles.pop_front()
+

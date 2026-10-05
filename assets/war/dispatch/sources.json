@@ -1,0 +1,62 @@
+[
+  {
+    "asset": "assets\\war\\dispatch\\paper.png",
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\03_界面\\按钮边框面板等混合图集\\0x01e1e380_1be678dd_10_006.png",
+    "rect": [
+      0,
+      0,
+      128,
+      128
+    ],
+    "source_sha256": "913a7187a8fc28ac00ba00b1e2934d703ef3d1d7574a8f1a4627336bd0327fd8",
+    "asset_sha256": "c756acd088dc93bea546100f517e8294568f818dca5427a3473c563162720ab7"
+  },
+  {
+    "asset": "assets\\war\\dispatch\\title.png",
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\03_界面\\按钮边框面板等混合图集\\0x0bf91892_1be678dd_10_005.png",
+    "rect": [
+      0,
+      247,
+      399,
+      315
+    ],
+    "source_sha256": "d560e5ad7643976dd2a1668e6b0c9d8ade7e3202280b5aced0e6cf9cd3aa3392",
+    "asset_sha256": "cb7c9223b84bdb5ce0951eb3ba915c36c309b9553475aa16538affae2956e280"
+  },
+  {
+    "asset": "assets\\war\\dispatch\\section.png",
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\03_界面\\按钮边框面板等混合图集\\0x0bf91892_1be678dd_10_005.png",
+    "rect": [
+      450,
+      470,
+      794,
+      532
+    ],
+    "source_sha256": "d560e5ad7643976dd2a1668e6b0c9d8ade7e3202280b5aced0e6cf9cd3aa3392",
+    "asset_sha256": "08ae51832e7ff50dab9db0f2f09416383fbe72d5a13cc5d85c08c562d320a2ce"
+  },
+  {
+    "asset": "assets\\war\\dispatch\\radar-base.png",
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\03_界面\\按钮边框面板等混合图集\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      2836,
+      2500,
+      3068,
+      2723
+    ],
+    "source_sha256": "407edd2d0956fd80f48781add9ea4f57c88e79d5681f36bf74a95edb2f74bb89",
+    "asset_sha256": "814673dc8a7b27a17ce6511d2db4f71c3071d1461a6e8807529e0818d45779da"
+  },
+  {
+    "asset": "assets\\war\\dispatch\\radar-grid.png",
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\03_界面\\按钮边框面板等混合图集\\0x35c27e14_8e889a5f_8eb0_032.png",
+    "rect": [
+      3070,
+      2499,
+      3302,
+      2723
+    ],
+    "source_sha256": "407edd2d0956fd80f48781add9ea4f57c88e79d5681f36bf74a95edb2f74bb89",
+    "asset_sha256": "23e2c4b18543bb9f3b32cbd3dcab2bd18cb3f23dc89237f561a0d30335e1e8cf"
+  }
+]

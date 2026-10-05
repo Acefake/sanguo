@@ -14,6 +14,10 @@ uniform vec4 palette[18];
 uniform float bilinear_rate = 0.5;
 uniform vec2 near_far_blending = vec2(600.0, 750.0);
 uniform vec4 map_bounds = vec4(0.0, 0.0, 2048.0, 2048.0);
+uniform bool hex_grid_enabled = false;
+uniform vec4 hex_transform = vec4(7.026215, 8.099885, 373.47135, 135.15017);
+uniform vec2 hex_hover = vec2(-1.0);
+uniform vec2 hex_selected = vec2(-1.0);
 varying vec3 world_position;
 varying vec3 world_normal;
 varying float view_distance;
@@ -79,6 +83,12 @@ void sample_plane(vec2 plane, vec2 dx, vec2 dy, vec3 a, vec3 b, vec3 c, vec3 d,
     parameters = pa*weights.x + pb*weights.y + pc*weights.z + pd*weights.w;
 }
 
+float hex_edge(vec2 point, vec2 cell) {
+    vec2 center = vec2(cell.x, cell.y + mod(cell.x, 2.0) * 0.5);
+    vec2 local = abs(point - center);
+    return max(local.y - 0.5, 0.75 * local.x + 0.5 * local.y - 0.5);
+}
+
 void fragment() {
     vec3 n = normalize(world_normal);
     vec2 map_uv = (world_position.xz - map_bounds.xy) / map_bounds.zw;
@@ -138,6 +148,44 @@ void fragment() {
     vec3 ts = normalize(detail * 2.0 - 1.0);
     vec3 surface_normal = normalize(n * ts.z + bitangent * ts.x + tangent * ts.y);
     NORMAL = normalize((VIEW_MATRIX * vec4(surface_normal, 0.0)).xyz);
+    if (hex_grid_enabled) {
+        vec2 point = (world_position.xz - hex_transform.zw) / hex_transform.xy;
+        float column = floor(point.x + 0.5);
+        float edge = -1.0;
+        bool inside_grid = false;
+        for (int offset = -1; offset <= 1; offset++) {
+            float c = column + float(offset);
+            float r = floor(point.y - mod(c, 2.0) * 0.5 + 0.5);
+            if (c >= 0.0 && c < 220.0 && r >= 0.0 && r < 220.0) {
+                float candidate = hex_edge(point, vec2(c, r));
+                if (candidate <= 0.001) {
+                    edge = candidate;
+                    inside_grid = true;
+                }
+            }
+        }
+        float aa = max(fwidth(edge), 0.004);
+        // Fade distant subpixel cells instead of making the terrain flicker.
+        float lod = 1.0 - smoothstep(380.0, 750.0, view_distance);
+        if (inside_grid) {
+            float line = smoothstep(-0.012 - aa, -0.012 + aa, edge) * lod;
+            color.rgb = mix(color.rgb, vec3(0.13, 0.10, 0.055), line * 0.65);
+        }
+        if (hex_hover.x >= 0.0) {
+            float hover_edge = hex_edge(point, hex_hover);
+            float hover_aa = max(fwidth(hover_edge), 0.004);
+            float fill = 1.0 - smoothstep(-hover_aa, hover_aa, hover_edge);
+            float border = (1.0 - smoothstep(0.014, 0.014 + hover_aa, abs(hover_edge))) * fill;
+            color.rgb = mix(color.rgb, vec3(0.95), fill * 0.12 + border * 0.8);
+        }
+        if (hex_selected.x >= 0.0) {
+            float selected_edge = hex_edge(point, hex_selected);
+            float selected_aa = max(fwidth(selected_edge), 0.004);
+            float fill = 1.0 - smoothstep(-selected_aa, selected_aa, selected_edge);
+            float border = (1.0 - smoothstep(0.018, 0.018 + selected_aa, abs(selected_edge))) * fill;
+            color.rgb = mix(color.rgb, vec3(1.0, 0.72, 0.16), fill * 0.2 + border * 0.8);
+        }
+    }
     ALBEDO = color.rgb;
     AO = color.a;
     ROUGHNESS = parameters.a;

@@ -23,14 +23,26 @@ class MeasuredStore extends "res://scripts/game_state.gd":
 		super._save()
 		save_usec += Time.get_ticks_usec() - started
 
-class MeasuredUI extends "res://scripts/war/campaign_ui.gd":
+class MeasuredReports extends "res://scripts/war/military_reports.gd":
 	var rebuilds := 0
 	var rebuild_usec := 0
-	func _build_reports() -> void:
+	func rebuild() -> void:
 		rebuilds += 1
 		var started := Time.get_ticks_usec()
-		super._build_reports()
+		super.rebuild()
 		rebuild_usec += Time.get_ticks_usec() - started
+
+class MeasuredUI extends "res://scripts/war/campaign_ui.gd":
+	var rebuilds: int:
+		get: return reports_view.rebuilds if is_instance_valid(reports_view) else 0
+		set(value):
+			if is_instance_valid(reports_view): reports_view.rebuilds = value
+	var rebuild_usec: int:
+		get: return reports_view.rebuild_usec if is_instance_valid(reports_view) else 0
+		set(value):
+			if is_instance_valid(reports_view): reports_view.rebuild_usec = value
+	func _create_reports_view() -> Control:
+		return MeasuredReports.new()
 
 class HoldAdapter extends Node:
 	var model := "performance-fixture"

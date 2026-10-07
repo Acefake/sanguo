@@ -45,7 +45,8 @@ func _initialize() -> void:
 	check(Battle.march_speed(chain) > Battle.march_speed(army()), "小霸王首次接敌移动加成")
 	check(Battle.opening(chain, shocked), "连胜首次接敌")
 	check(not Battle.opening(chain, shocked), "连胜只触发一次")
-	Combat.apply_loss(shocked, 100); Combat.apply_loss(unshocked, 100)
+	Combat.battle_morale(shocked, 200, 100, 2000, 2000, 2000, 2000)
+	Combat.battle_morale(unshocked, 200, 100, 2000, 2000, 2000, 2000)
 	check(shocked["morale"] < unshocked["morale"] and not shocked.has("incoming_shock"), "首次士气冲击消费")
 	var sandbox := Store.new(); sandbox.persist_enabled = false; sandbox._load_demo()
 	var guan: Dictionary

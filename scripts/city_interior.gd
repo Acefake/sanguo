@@ -3,6 +3,7 @@ extends CanvasLayer
 signal closed
 
 const CitySkin = preload("res://scripts/city_ui_skin.gd")
+const Layout = preload("res://scripts/ui_layout.gd")
 const IconEffects = preload("res://scripts/city_button_effects.gd")
 const BuildingAtlas = preload("res://scripts/building_sprite_atlas.gd")
 const CouncilView = preload("res://scripts/council_view.gd")
@@ -106,7 +107,8 @@ func _ready() -> void:
 
 
 func open_city(place_id: String, place_name: String, region: String) -> void:
-	city_id = place_id
+	city_id = store.canonical_city_id(place_id)
+	if city_id == "": return
 	city_name = place_name
 	region_name = region
 	var background: TextureRect = root_ui.get_node("CityBackground")
@@ -389,7 +391,7 @@ func _command_button(title: String, callback: Callable, hint: String, blocked: b
 	button.disabled = blocked
 	button.pressed.connect(callback)
 	button.mouse_entered.connect(func() -> void:
-		command_tip_label.text = hint.replace("  ·  ", "    ").replace(" · ", "    ")
+		command_tip_label.text = preload("res://scripts/ui_text.gd").clean(hint)
 		command_tip.reset_size()
 		command_tip.position = Vector2(maxf(8, action_panel.position.x - command_tip.size.x - 8), button.global_position.y)
 		command_tip.show())
@@ -400,11 +402,11 @@ func _command_button(title: String, callback: Callable, hint: String, blocked: b
 
 
 func _build_report_panel() -> void:
-	report_panel = _paper_panel(Rect2(0, 0, 1260, 710), 0.0, 0)
+	report_panel = _paper_panel(Rect2(Vector2.ZERO, Layout.DESIGN), 0.0, 0)
 	report_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	report_panel.hide()
 	var page := Control.new()
-	page.custom_minimum_size = Vector2(1260, 710)
+	page.custom_minimum_size = Layout.DESIGN
 	page.mouse_filter = Control.MOUSE_FILTER_STOP
 	report_panel.add_child(page)
 	var dim := ColorRect.new()
@@ -471,6 +473,10 @@ func _report_paper(parent: Control, rect: Rect2, style: StyleBox) -> PanelContai
 
 
 func _fill_city_stats(state: Dictionary) -> void:
+	if not store.war.player_has_city_access(city_id):
+		var intel: Dictionary = store.war.player_city_intel(city_id)
+		report_stats.add_child(CitySkin.label("尚未获得本城军事情报" if intel.is_empty() else "驻军约%d  城防%d  观测于第%d日" % [intel["strength_estimate"], intel["defense"], intel["observed_at"]], 20))
+		return
 	var pairs := [["人口", "population", "经济", "economy"], ["金钱", "treasury", "粮草", "grain"], ["兵力", "garrison", "训练", "training"], ["城防", "defense", "军备", "equipment"], ["民心", "order", "行动力", "ap"]]
 	for pair in pairs:
 		var row := HBoxContainer.new()
@@ -608,7 +614,7 @@ func _refresh() -> void:
 	var state: Dictionary = store.city_state(city_id)
 	var faction: Dictionary = store.faction_for(city_id)
 	city_title.text = city_name
-	city_subtitle.text = "%s · %s军" % [region_name, str(faction.get("name", "无主"))]
+	city_subtitle.text = "%s  %s军" % [region_name, str(faction.get("name", "无主"))]
 	var seasons := ["春", "春", "春", "夏", "夏", "夏", "秋", "秋", "秋", "冬", "冬", "冬"]
 	date_label.text = "%d年  %d月  %s" % [store.year, store.month, seasons[store.month - 1]]
 	ap_label.text = "行动力 %d/3" % store.action_points
@@ -620,7 +626,7 @@ func _refresh() -> void:
 		CouncilLettering.clear(end_month_button, "结束本月")
 	for key in resource_labels:
 		var amount := int(state.get(key, 50 if key == "equipment" else 0))
-		resource_labels[key].text = _format_count(amount) if key in ["population", "grain"] else str(amount)
+		resource_labels[key].text = (_format_count(amount) if key in ["population", "grain"] else str(amount)) if store.war.player_has_city_access(city_id) else "未知"
 	_refresh_actions()
 	_refresh_summary()
 	if report_panel.visible:
@@ -629,6 +635,10 @@ func _refresh() -> void:
 
 func _refresh_summary() -> void:
 	if selected_building == "":
+		return
+	if not store.war.player_has_city_access(city_id):
+		action_summary.text = "本城情报 · 只能查看公开信息与侦察结果"
+		command_summary_label.text = action_summary.text
 		return
 	var state: Dictionary = store.city_state(city_id)
 	if in_council:
@@ -679,7 +689,7 @@ func _refresh_actions() -> void:
 		var chosen_id := str(action_id)
 		var spec: Dictionary = store.ACTIONS[chosen_id]
 		var error: String = store.action_error(city_id, chosen_id)
-		_command_button(str(spec["title"]), func() -> void: _prepare_action(chosen_id), error if error != "" else str(spec["description"]) + " · 行动力 -1", error != "")
+		_command_button(str(spec["title"]), func() -> void: _prepare_action(chosen_id), error if error != "" else str(spec["description"]) + "  行动力 -1", error != "")
 		action_list.get_child(-1).get_child(0).set_meta("action_id", chosen_id)
 	_focus_command.call_deferred(preferred)
 
@@ -800,11 +810,15 @@ func _fill_report() -> void:
 		report_stats.remove_child(child)
 		child.queue_free()
 	report_stats.visible = report_kind == "city"
+	if not store.war.player_has_city_access(city_id) and report_kind in ["records", "personnel", "faction"]:
+		report_heading.text = city_name + " · 公开情报"
+		report_text.text = "所属势力：%s\n\n内部人事、资源与施政记录尚未获知。" % str(store.faction_for(city_id).get("name", "无主"))
+		return
 	for kind in report_nav:
 		CitySkin.style_tab_button(report_nav[kind], kind == report_kind)
 	match report_kind:
 		"city":
-			report_heading.text = city_name + " · 城池情报"
+			report_heading.text = city_name + "  城池情报"
 			_fill_city_stats(state)
 			report_text.text = city_subtitle.text + "\n\n人口、经济、兵力、粮草、城防与军备随城内命令实时更新。\n当前为演示剧本，城池数值与势力归属待校定。"
 		"records":
@@ -817,8 +831,10 @@ func _fill_report() -> void:
 					lines.append("%d年 %d月  %s" % [int(record["year"]), int(record["month"]), str(record["message"])])
 			report_text.text = "\n\n".join(lines) if not lines.is_empty() else "本城暂无施政记录。\n\n执行城内命令后，记录会自动保留。"
 		"personnel":
-			report_heading.text = city_name + " · 人事"
-			report_text.text = "所属势力：%s\n\n驻城武将资料尚未录入。\n\n武将任免与调遣暂未开放。" % str(store.faction_for(city_id).get("name", "无主"))
+			report_heading.text = city_name + "  人事"
+			var governor: Dictionary = store.war.roster.officers.get(str(state.get("governor_id", "")), {})
+			var guard: Dictionary = store.war.state["garrison_commanders"].get(city_id, {})
+			report_text.text = "所属势力：%s\n\n主政：%s\n守城主将：%s\n\n可在军情面板派遣本方可用武将。" % [str(store.faction_for(city_id).get("name", "无主")), str(governor.get("name", "地方吏员代管")), str(guard.get("name", "尚未任命"))]
 		"faction":
 			report_heading.text = "势力情报"
 			var faction_id := str(state.get("faction", ""))
@@ -838,7 +854,7 @@ func _fill_report() -> void:
 			report_text.text = "建筑名称：%s\n\n关闭名称后，仍可通过悬停图标查看建筑。\n\n该设置仅影响本次城内界面。" % ("显示" if show_building_names else "隐藏")
 		"help":
 			report_heading.text = "城内操作"
-			report_text.text = "点击建筑图标，打开该处事务菜单。\n\n官府 · 人事、军事、计略、外交、方针、谍报\n方针 · 安民、开垦、征税\n市场 · 购粮、售粮\n农田 · 开垦\n兵营 · 征募、操练\n工坊 · 锻造兵装、修筑城防\n酒肆 · 访察民情\n\n选择命令后先查看消耗与结果，按“决定”执行，按“返回”取消。\n每项命令消耗 1 点行动力，按“进行”结算本月并恢复行动力。\n\n灰色指令暂不可用。Esc 返回上一层。"
+			report_text.text = "点击建筑图标，打开该处事务菜单。\n\n官府  人事、军事、计略、外交、方针、谍报\n方针  安民、开垦、征税\n市场  购粮、售粮\n农田  开垦\n兵营  征募、操练\n工坊  锻造兵装、修筑城防\n酒肆  访察民情\n\n选择命令后先查看消耗与结果，按“决定”执行，按“返回”取消。\n每项命令消耗 1 点行动力，按“进行”结算本月并恢复行动力。\n\n灰色指令暂不可用。Esc 返回上一层。"
 
 
 func _toggle_building_names() -> void:

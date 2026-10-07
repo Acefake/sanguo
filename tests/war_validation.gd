@@ -37,6 +37,7 @@ func _sandbox() -> Node:
 	var sandbox := Store.new()
 	sandbox.persist_enabled = false
 	sandbox._load_demo()
+	sandbox.war.rules["strategy"] = {}
 	return sandbox
 
 
@@ -117,11 +118,15 @@ func _run() -> void:
 	await clone.war.step()
 	var original_state: Dictionary = sandbox.war.export_state()
 	var restored_state: Dictionary = clone.war.export_state()
+	if not _equivalent(original_state, restored_state):
+		var f := FileAccess.open("res://docs/validation/war-replay-debug.json", FileAccess.WRITE)
+		f.store_string(JSON.stringify({"original": original_state, "restored": restored_state}))
 	_check(_equivalent(original_state, restored_state), "载入快照后战争状态出现分歧")
 	clone.free()
 	sandbox.free()
 	await _road_contact()
 	await _supply_and_withdrawal()
+	_blocked_return()
 	await _save_migration()
 	await _adapter_checks()
 	_personality_checks()
@@ -152,14 +157,21 @@ func _road_contact() -> void:
 	var total: int = _ledger(sandbox)
 	var motions: Dictionary = sandbox.war._move_all()
 	sandbox.war._resolve_contacts(motions)
+	_check(a.has("tactical") and b.has("tactical") and c.has("tactical"), "道路遭遇没有部署实际战场")
+	for index in range(12):
+		await sandbox.war.step()
+		if int(a["dead"]) > 0 and int(b["dead"]) > 0 and int(c["dead"]) > 0: break
 	_check(int(a["dead"]) > 0 and int(b["dead"]) > 0, "相向行军发生穿透，未接敌")
-	_check(int(c["dead"]) > 0, "同场援军没有参与战斗")
+	_check(int(c.get("combat_tick", -1)) >= 0, "同场援军没有参与战斗")
 	_check(_ledger(sandbox) == total, "道路战斗未保持兵员守恒")
 	var restored: Node = _sandbox()
 	restored.scenario = sandbox.scenario.duplicate(true)
 	restored.war.setup(restored, JSON.parse_string(JSON.stringify(sandbox.war.export_state())))
 	await sandbox.war.step()
 	await restored.war.step()
+	if not _equivalent(sandbox.war.export_state(), restored.war.export_state()):
+		var file := FileAccess.open("res://docs/validation/war-road-replay-debug.json", FileAccess.WRITE)
+		file.store_string(JSON.stringify({"original": sandbox.war.export_state(), "replay": restored.war.export_state()}, "\t"))
 	_check(_equivalent(sandbox.war.export_state(), restored.war.export_state()), "交战中恢复快照后，后续决策或战损出现分歧")
 	restored.free()
 	sandbox.free()
@@ -180,6 +192,41 @@ func _supply_and_withdrawal() -> void:
 	var before_return: int = int(sandbox.city_state("luoyang")["garrison"])
 	sandbox.war._finish(army, "撤退")
 	_check(int(sandbox.city_state("luoyang")["garrison"]) == before_return, "重复归营导致复制军队")
+	sandbox.free()
+
+
+# 退路受阻：没有可达友城时部队不能无限期滞留。旧实现只发一条军报后返回，
+# returning 永远为真，月度推进被 active_armies 非空永久拒绝，且每日新增紧急军报。
+func _blocked_return() -> void:
+	var sandbox: Node = _sandbox()
+	sandbox.persist_enabled = false
+	var war = sandbox.war
+	_city(sandbox, "luoyang", "liu_bei", 10000)
+	var army: Dictionary = war._mobilize(war.preview_dispatch("luoyang", "hongnong", _officer(sandbox, "关羽")))
+	army.erase("tactical")
+	army["returning"] = true
+	army["outcome"] = "撤退"
+	# 临时让本方所有城池都不可达，模拟被困在敌后。
+	var hidden := {}
+	for id in sandbox.scenario.get("places", {}):
+		var city: Dictionary = sandbox.city_state(str(id))
+		if str(city.get("faction", "")) == str(war.state["player_faction"]):
+			hidden[id] = city["faction"]
+			city["faction"] = "yuan_shao"
+	var reports_before: int = war.state["reports"].size()
+	for day in range(3):
+		war.state["tick"] += 1
+		war._start_return(army)
+	_check(str(army["action"]["type"]) != "withdraw" and int(army["last_decision"]) == -10, "受阻断言污染了前置状态")
+	_check(army["returning"] and war.state["reports"].size() == reports_before + 1, "退路受阻每日重复发紧急军报")
+	_check(int(war.ledger(army)["missing"]) == 0, "散亡过程中兵员账本出现缺口")
+	var days: int = int(war.rules.get("return_stall_days", 10))
+	for day in range(days + 1):
+		war.state["tick"] += 1
+		war._start_return(army)
+	_check(str(army["status"]) == "ended" and str(army["outcome"]) == "退路断绝，部众散亡", "退路长期受阻的部队没有收束")
+	_check(int(war.ledger(army)["missing"]) == 0, "退路受阻收束时兵员账本出现缺口")
+	for id in hidden: sandbox.city_state(str(id))["faction"] = hidden[id]
 	sandbox.free()
 
 
@@ -238,10 +285,10 @@ func _clock_checks() -> void:
 			city["economy"] = 0
 			city["garrison"] = 1000
 			city["grain"] = 10000
-	bulk.advance_month()
+	await bulk.advance_month()
 	for index in range(30): await daily.advance_day()
 	_check(bulk.month == daily.month and bulk.day == daily.day and int(bulk.city_state("luoyang")["grain"]) == int(daily.city_state("luoyang")["grain"]), "按日与按月推进重复或遗漏驻军粮耗")
-	_check(int(bulk.city_state("luoyang")["grain"]) == 9880, "驻军30日口粮计算不正确")
+	_check(int(bulk.city_state("luoyang")["grain"]) == 10000, "停用断粮系统后驻军仍消耗粮草")
 	bulk.free()
 	daily.free()
 

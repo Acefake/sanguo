@@ -27,7 +27,5 @@ static func unit_factor(type: String, terrain: String, config: Dictionary = {}) 
 static func entry_factor(army: Dictionary, config: Dictionary = {}) -> float:
 	var terrain := str(army.get("tactical", {}).get("terrain_delay", ""))
 	if terrain.is_empty(): return 1.0
-	# A column formation avoids mountain hesitation, never the ford crossing lock.
-	var formations: Dictionary = config.get("formations",rules().get("formations",{}))
-	if terrain == "mountains" and formations.get("definitions",{}).get(army.get("formation","none"),{}).get("delay_immune",false): return 1.0
+	# Terrain entry delays apply independently of retired formations.
 	return float(settings(terrain, config).get("entry_attack", 1.0))

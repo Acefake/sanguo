@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "threshold": 65,
+  "edges": {
+    "steady": {
+      "name": "临阵稳军",
+      "score": {"skills": {"沉着": 0.5}, "personality": {"自制": 0.5}},
+      "trigger": "morale_below_40",
+      "effect": {"morale": 10},
+      "once": true
+    },
+    "surge": {
+      "name": "乘势突击",
+      "score": {"skills": {"武艺": 0.6}, "personality": {"风险承受": 0.4}},
+      "trigger": "prev_day_advantage",
+      "effect": {"attack_mult": 1.1},
+      "cooldown": 3
+    },
+    "ambush": {
+      "name": "设伏",
+      "score": {"skills": {"智计": 0.6}, "personality": {"耐心": 0.4}},
+      "trigger": "enemy_unobserved_in_range",
+      "effect": {"first_attack_mult": 1.2},
+      "once": true
+    },
+    "cover": {
+      "name": "断后",
+      "score": {"skills": {"应变": 0.5}, "personality": {"忠义": 0.5}},
+      "trigger": "ally_retreating_adjacent",
+      "effect": {"received_mult": 0.8},
+      "cooldown": 3
+    },
+    "rally": {
+      "name": "激将",
+      "score": {"skills": {"辩才": 0.5, "威仪": 0.5}},
+      "trigger": "ally_low_organization",
+      "effect": {"organization": 5},
+      "cooldown": 3
+    },
+    "awe": {
+      "name": "立威",
+      "score": {"skills": {"威仪": 0.5, "名望": 0.5}},
+      "trigger": "first_frontal_contact",
+      "effect": {"enemy_morale": -6},
+      "once": true
+    }
+  }
+}

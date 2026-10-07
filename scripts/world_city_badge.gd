@@ -43,7 +43,7 @@ func _draw() -> void:
 		draw_circle(Vector2(x, 53), 3.3, Color("ffe398"))
 		draw_colored_polygon(PackedVector2Array([Vector2(x-4,58),Vector2(x+4,58),Vector2(x+5,68),Vector2(x-5,68)]), Color("ffe398"))
 	draw_line(Vector2(18, 58), Vector2(18, 69), Color("ffe398"), 2)
-	var number := str(troops)
+	var number := "未知" if troops < 0 else str(troops)
 	draw_string_outline(lettering, Vector2(47, 67), number, HORIZONTAL_ALIGNMENT_LEFT, -1, 25, 1, Color("28281d"))
 	draw_string(lettering, Vector2(47, 67), number, HORIZONTAL_ALIGNMENT_LEFT, -1, 25, Color("fffdf3"))
 	draw_rect(Rect2(20, 75, 166, 4), Color("494c36"))

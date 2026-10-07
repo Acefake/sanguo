@@ -26,7 +26,7 @@ func _run() -> void:
 	home["units"] = {"infantry": 8000, "archers": 0, "cavalry": 0}
 	home["grain"] = 50000
 	var officer: String = store.war.available_officers("liu_bei")[0]["id"]
-	var dispatch: Dictionary = store.war.dispatch("chengdu", "zitong", officer)
+	var dispatch: Dictionary = store.war.dispatch("chengdu", "wudu", officer)
 	check(bool(dispatch["ok"]), "军令测试派遣失败")
 	var id: String = dispatch["army_id"]
 	var army: Dictionary = store.war.state["armies"][id]
@@ -36,17 +36,23 @@ func _run() -> void:
 		check(candidate["action"]["type"] not in ["engage", "pursue", "withdraw"], "被禁止的行动仍可选择")
 	check(not store.war.command_army(id, {"unknown": true})["ok"], "未知军令通过校验")
 	check(not store.war.command_army(id, {"engage": "false"})["ok"], "错误类型军令通过校验")
-	var enemy_city: Dictionary = store.city_state("zitong")
+	var enemy_city: Dictionary = store.city_state("wudu")
 	enemy_city["faction"] = "yuan_shao"
 	enemy_city["garrison"] = 3000
 	enemy_city["units"] = {"infantry": 3000, "archers": 0, "cavalry": 0}
 	enemy_city["grain"] = 50000
-	var enemy_officer: String = store.war.roster.militia("yuan_shao", "zitong")
-	var enemy: Dictionary = store.war._mobilize(store.war.preview_dispatch("zitong", "zitong", enemy_officer, true))
+	var enemy_officer: String = store.war.roster.militia("yuan_shao", "wudu")
+	var enemy: Dictionary = store.war._mobilize(store.war.preview_dispatch("wudu", "wudu", enemy_officer, true))
 	enemy["location"] = army["location"].duplicate(true)
 	enemy["action"] = {"type": "hold"}
 	var before: int = store.war.Combat.strength(army)
 	store.war._resolve_contacts({})
+	# Formal contact now deploys a board; move the two units into real adjacent contact.
+	if army.has("tactical"):
+		var point: int = army["tactical"]["cell"]
+		for cell in store.war.Tactical.neighbors(point):
+			if store.war.Tactical.can_enter(store.war, enemy, cell): enemy["tactical"]["cell"] = cell; break
+		store.war._observe_all()
 	check(store.war.Combat.strength(army) == before, "无视军令仍主动挑起交战")
 	enemy["action"] = {"type": "engage", "enemy": id}
 	store.war._resolve_contacts({})
@@ -70,15 +76,15 @@ func _run() -> void:
 	home["garrison"] = 8000
 	home["units"] = {"infantry": 8000, "archers": 0, "cavalry": 0}
 	home["grain"] = 50000
-	var target: Dictionary = store.city_state("zitong")
+	var target: Dictionary = store.city_state("wudu")
 	target["faction"] = "yuan_shao"
 	target["garrison"] = 0
 	target["units"] = {"infantry": 0, "archers": 0, "cavalry": 0}
-	dispatch = store.war.dispatch("chengdu", "zitong", officer)
+	dispatch = store.war.dispatch("chengdu", "wudu", officer)
 	id = dispatch["army_id"]
 	army = store.war.state["armies"][id]
 	store.war.command_army(id, {"after_battle": "hold"})
-	army["location"] = {"node": "zitong", "edge": "", "progress": 0.0}
+	army["location"] = {"node": "wudu", "edge": "", "progress": 0.0}
 	army["action"] = {"type": "besiege"}
 	store.war._resolve_sieges()
 	check(target["faction"] == "liu_bei" and not army["returning"], "攻取后待命仍自动撤退")

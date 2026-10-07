@@ -1,7 +1,13 @@
 extends Control
 
 const HudSkin = preload("res://scripts/city_ui_skin.gd")
+const Layout = preload("res://scripts/ui_layout.gd")
 const DIR := "res://assets/ui/world_hud/"
+# Right-hand furniture is authored against the design canvas and then anchored,
+# so it stays flush against the window edge at any width.
+const RIGHT_MARGIN := 10.0
+const TOOL_SIZE := Vector2(35, 25)
+const SIDE_SIZE := Vector2(212, 76)
 var map: Node3D
 var root: Control
 var tools: PopupPanel
@@ -16,7 +22,6 @@ var advance: TextureButton
 var advance_label: Label
 var dispatch: Label
 var last_ruler := ""
-var right_controls: Array[Control] = []
 var crest_style: StyleBoxFlat
 var portrait_paths: Dictionary
 
@@ -24,6 +29,9 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root = Control.new()
+	# Anchored children below resolve against this rect, so it must track the
+	# HUD rather than staying at its default zero size.
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	portrait_paths = JSON.parse_string(FileAccess.get_file_as_string(DIR + "portraits.json"))
@@ -66,12 +74,20 @@ func _ready() -> void:
 	advance_label = _text("进行\n▶", Rect2(0, 20, 102, 66), 27, Color("362a23"), advance)
 	advance_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tools = PopupPanel.new()
+	HudSkin.theme_window(tools)
 	tools.add_theme_stylebox_override("panel", HudSkin.paper(1.0, 10))
 	add_child(tools)
 	tool_list = VBoxContainer.new()
 	tool_list.custom_minimum_size.x = 180
 	tool_list.add_theme_constant_override("separation", 5)
 	tools.add_child(tool_list)
+	var tool_strip := HBoxContainer.new()
+	tool_strip.add_theme_constant_override("separation", 4)
+	tool_strip.anchor_left = 1.0
+	tool_strip.anchor_right = 1.0
+	tool_strip.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	tool_strip.offset_top = 12
+	root.add_child(tool_strip)
 	var actions := [
 		["trade", "在外军队", _show_armies],
 		["advantage", "地图工具", _show_tools],
@@ -84,8 +100,7 @@ func _ready() -> void:
 	for i in range(actions.size()):
 		var entry: Array = actions[i]
 		var button := Button.new()
-		button.position = Vector2(960 + i * 39, 12)
-		button.size = Vector2(35, 25)
+		button.custom_minimum_size = TOOL_SIZE
 		HudSkin.style_button(button)
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			var style: StyleBox = button.get_theme_stylebox(state).duplicate()
@@ -100,12 +115,8 @@ func _ready() -> void:
 		button.add_theme_color_override("icon_normal_color", Color("4a3530"))
 		button.tooltip_text = entry[1]
 		button.pressed.connect(entry[2])
-		root.add_child(button)
-		button.set_meta("design_x", button.position.x)
-		right_controls.append(button)
+		tool_strip.add_child(button)
 	var side := PanelContainer.new()
-	side.position = Vector2(1059, 65)
-	side.size = Vector2(212, 76)
 	var border := StyleBoxFlat.new()
 	border.bg_color = Color(0.12, 0.11, 0.06, 0.76)
 	border.border_color = Color("c8b570")
@@ -115,9 +126,14 @@ func _ready() -> void:
 	border.content_margin_left = 7
 	border.content_margin_right = 7
 	side.add_theme_stylebox_override("panel", border)
+	# Anchored under the tool strip rather than positioned by hand.
+	side.anchor_left = 1.0
+	side.anchor_right = 1.0
+	side.offset_left = Layout.right_offset(SIDE_SIZE.x, RIGHT_MARGIN)
+	side.offset_right = -RIGHT_MARGIN
+	side.offset_top = TOOL_SIZE.y + 14.0
+	side.offset_bottom = side.offset_top + SIDE_SIZE.y
 	root.add_child(side)
-	side.set_meta("design_x", side.position.x)
-	right_controls.append(side)
 	var column := VBoxContainer.new()
 	side.add_child(column)
 	var tabs := HBoxContainer.new()
@@ -140,9 +156,10 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_resize)
 
 func _resize() -> void:
-	root.scale = Vector2.ONE * minf(get_viewport_rect().size.x / 1280.0, get_viewport_rect().size.y / 720.0)
-	for control in right_controls:
-		control.position.x = float(control.get_meta("design_x")) + get_viewport_rect().size.x / root.scale.x - 1280.0
+	# The HUD lays out in design pixels; canvas_items stretch already scales it
+	# to the window, so no manual scaling is needed. Right-hand furniture uses
+	# anchors, which re-solve automatically.
+	pass
 
 func _process(_delta: float) -> void:
 	var store = get_node("/root/GameState")
@@ -188,7 +205,9 @@ func _text(value: String, rect: Rect2, font_size: int, color := Color("f1edda"),
 	return label
 
 func _show_tools() -> void:
-	tools.position = Vector2i(get_viewport_rect().size.x - 205, 55)
+	# `tools` is a child of this full-rect Control, so size.x is the correct
+	# coordinate space (it can exceed the design width under aspect="expand").
+	tools.position = Vector2i(int(size.x) - 205, 55)
 	tools.popup()
 
 func _reports() -> void:
@@ -211,6 +230,7 @@ func _settings() -> void:
 
 func _help() -> void:
 	var dialog := AcceptDialog.new()
+	HudSkin.theme_window(dialog)
 	dialog.title = "地图操作"
 	dialog.dialog_text = "滚轮缩放，左键 / 中键拖动，右键旋转\n点选城池查看，WASD 移动，Q / E 环绕\nF 全国视野，Home 朝北，G 切换格线\n空格推进 / 暂停，城池菜单可出阵或进入"
 	add_child(dialog)

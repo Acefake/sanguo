@@ -7,6 +7,7 @@ const Battle = preload("res://scripts/war/officer_battle.gd")
 
 
 func setup(cards: Array, mapping: Dictionary) -> void:
+	officers.clear()
 	for card in cards:
 		var skills: Dictionary = {}
 		var rows: Array = card.get("substats", [])
@@ -35,3 +36,50 @@ func militia(faction: String, city: String) -> String:
 			personality[axis] = 50
 		officers[id] = {"id": id, "name": "守备将", "faction": faction, "skills": skills, "personality": personality, "portrait": "", "profile_note": "地方守备，遵守守城与保全部队的任务。"}
 	return id
+
+# Deterministic local officers keep incomplete historical data playable. Their
+# names explicitly identify the role; they are not fabricated historical cards.
+func ensure_factions(scenario: Dictionary) -> void:
+	for faction in scenario.get("factions", {}):
+		var cities: Array = []
+		for city in scenario.get("places", {}):
+			if scenario["places"][city].has("population") and scenario["places"][city].get("faction", "") == faction: cities.append(city)
+		if cities.is_empty(): continue
+		cities.sort()
+		var count := 0
+		for officer in officers.values():
+			if officer.get("faction", "") == faction and not str(officer["id"]).begins_with("militia:"): count += 1
+		var index := -1
+		while count < maxi(3, cities.size() + 2):
+			index += 1
+			var id := "local:%s:%d" % [faction, index]
+			if officers.has(id): continue
+			count += 1
+			var skills := {}
+			for row in SKILLS:
+				for skill in row: skills[skill] = 55 + absi(hash(id + str(skill))) % 21
+			var personality := {}
+			for axis in AXES: personality[axis] = 40 + absi(hash(id + str(axis))) % 31
+			var name := str(scenario["factions"][faction].get("name", faction))
+			officers[id] = {"id": id, "name": name + ("·代行主政" if index == 0 else "·地方将%d" % index), "faction": faction, "skills": skills, "personality": personality, "battle_traits": [], "portrait": "", "positions": "核心位置：君主" if index == 0 else "地方将领", "generated": true, "home": cities[index % cities.size()], "profile_note": "地方代理将领，补足当前剧本缺少的武将资料。"}
+
+
+# 旧档可能带着已经不存在的占位 ID（势力前缀与存档不符时尤其明显）。登记之后必须
+# 把 ID 原样登记并回写，否则军队的 officer_id 仍是悬空引用，后续任何
+# roster.officers[...] 直接下标都会崩。
+func adopt_militia(army: Dictionary) -> String:
+	var faction := str(army.get("faction", ""))
+	var wanted := str(army.get("officer_id", ""))
+	if wanted != "" and officers.has(wanted): return wanted
+	var city := wanted.trim_prefix("militia:" + faction + ":")
+	if city == wanted or city == "":
+		city = str(army.get("home", "")).trim_prefix("militia:" + faction + ":")
+	if city == "": city = str(army.get("target", ""))
+	if city == "": city = str(army.get("home", army.get("id", "unknown")))
+	var template := militia(faction, city)
+	var resolved := wanted if wanted.begins_with("militia:") else template
+	if resolved != template:
+		officers[resolved] = officers[template].duplicate(true)
+		officers[resolved]["id"] = resolved
+	officers[resolved]["faction"] = faction
+	return resolved

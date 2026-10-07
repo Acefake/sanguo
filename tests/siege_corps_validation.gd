@@ -18,6 +18,11 @@ class DeploymentAgent extends Node:
 		return output
 
 func _initialize() -> void: call_deferred("run")
+func prepare_siege_fixture(store) -> void:
+	store.prepare_battle_test(false,"plains_clash")
+	# This checks autonomous deployment from two commanders at Xiaopei, not the
+	# startup picker's default field-battle scenario.
+	preload("res://scripts/war/xiaopei_battle.gd").setup(store,false)
 func check(ok: bool, message: String) -> void:
 	if not ok: failures.append(message); push_error(message)
 
@@ -44,7 +49,7 @@ func position_attackers(war, corps: Dictionary) -> void:
 func run() -> void:
 	var store: Node = root.get_node("GameState")
 	store.persist_enabled = false
-	store.prepare_battle_test()
+	prepare_siege_fixture(store)
 	var war = store.war
 	check(war.active_armies().size() == 2, "军团开场已经预先拆队")
 	var agent := DeploymentAgent.new()
@@ -56,7 +61,7 @@ func run() -> void:
 	var stock_before: float = float(corps["supply"]["stock"])
 	var food := stock_before
 	for id in corps["units"]: food += float(war.state["armies"][id]["grain"])
-	check(absf(food - 3520.0) < 0.01, "分兵后的粮草总量不等于初始粮草减单日消耗")
+	check(absf(food) < 0.01, "停用系统后分兵仍携带口粮")
 	position_attackers(war, corps)
 	corps["siege_approach"] = true
 	var root_army: Dictionary = war.state["armies"][corps["root_id"]]
@@ -78,15 +83,14 @@ func run() -> void:
 	check(siege["phase"] == "援军阻断" and siege["preparation"] == progress and siege["wall"] == walls, "敌援军未阻断攻城")
 	check(war.Feedback.book(war).get("pending_events",[]).any(func(e):return e["kind"] == "援军阻断"),"真实援军阻断没有写入会战事件")
 	relief["returning"] = true
-	check(war.Corps.issue(war, corps, {"type": "set_siege_mode", "mode": "blockade"}, "围困待粮")["ok"], "主帅无法选择围困")
+	check(not war.Corps.issue(war, corps, {"type": "set_siege_mode", "mode": "blockade"}, "围困待粮")["ok"], "移除系统后仍能选择断粮围困")
 	war.state["tick"] += 1
 	war._resolve_sieges()
-	check(siege["phase"] == "围困" and siege["wall"] == walls, "围困模式仍在强攻城墙")
+	check(siege["mode"] == "assault", "移除围困后没有改用强攻")
 	city["grain"] = 0
-	var morale: float = siege["morale"]
 	war.state["tick"] += 1
 	war._resolve_sieges()
-	check(float(siege["morale"]) < morale and int(city["garrison"]) < initial_defenders, "断粮围困没有削弱守军")
+	check(siege["grain_days"] == 999, "围城仍提供断粮判断")
 	city["grain"] = 18000
 	war.Corps.issue(war, corps, {"type": "set_siege_mode", "mode": "assault"}, "破墙入城")
 	# Force a final wall breach so its actual callback is covered independently of surrender.
@@ -106,7 +110,7 @@ func run() -> void:
 	var saved: Dictionary = war.export_state()
 	war.setup(store, saved)
 	check(war.state["sieges"]["xiaopei"]["phase"] == "occupied", "读档丢失攻城状态")
-	store.prepare_battle_test()
+	prepare_siege_fixture(store)
 	war = store.war
 	await war.step(null)
 	corps = war.state["corps"].values().filter(func(c): return c["faction"] == "yuan_shao")[0]

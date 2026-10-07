@@ -821,10 +821,10 @@ func _refresh_ui() -> void:
 	var region: Dictionary = regions.get(str(place["region_id"]), {})
 	var type_name := "关隘" if str(place["type"]) == "pass" else "城池"
 	enter_button.visible = str(place["type"]) == "city"
-	enter_button.disabled = not GameState.war.player_has_city_access(selected_id)
-	detail_meta.text = "%s  ·  %s" % [str(region.get("name", "未分区")), type_name]
+	enter_button.disabled = str(place["type"]) != "city"
+	detail_meta.text = "%s  %s" % [str(region.get("name", "未分区")), type_name]
 	detail_swatch.color = _faction_color(selected_id)
-	detail_faction.text = str(faction.get("name", "无主")) + "  ·  势力归属"
+	detail_faction.text = str(faction.get("name", "无主")) + "  势力归属"
 	detail_description.text = str(state.get("description", "暂无城池记述。"))
 	for child in detail_stats.get_children():
 		detail_stats.remove_child(child)
@@ -887,11 +887,11 @@ func _update_tooltip(screen_pos: Vector2) -> void:
 	var faction: Dictionary = scenario.get("factions", {}).get(str(state.get("faction", "")), {})
 	if not GameState.war.player_has_city_access(hovered_id):
 		var intel: Dictionary = GameState.war.player_city_intel(hovered_id)
-		tooltip_label.text = "%s · %s\n%s" % [place["name"], faction.get("name", "无主"), "尚无侦察军报" if intel.is_empty() else "估计驻军约" + _format_count(int(intel["strength_estimate"]))]
+		tooltip_label.text = "%s  %s\n%s" % [place["name"], faction.get("name", "无主"), "尚无侦察军报" if intel.is_empty() else "估计驻军约" + _format_count(int(intel["strength_estimate"]))]
 	elif str(place["type"]) == "pass":
-		tooltip_label.text = "%s  ·  %s\n守军 %s  ·  关防 %d" % [str(place["name"]), str(faction.get("name", "无主")), _format_count(int(state.get("garrison", 0))), int(state.get("defense", 0))]
+		tooltip_label.text = "%s  %s\n守军 %s  关防 %d" % [str(place["name"]), str(faction.get("name", "无主")), _format_count(int(state.get("garrison", 0))), int(state.get("defense", 0))]
 	else:
-		tooltip_label.text = "%s  ·  %s\n人口 %s  ·  驻军 %s" % [str(place["name"]), str(faction.get("name", "无主")), _format_count(int(state.get("population", 0))), _format_count(int(state.get("garrison", 0)))]
+		tooltip_label.text = "%s  %s\n人口 %s  驻军 %s" % [str(place["name"]), str(faction.get("name", "无主")), _format_count(int(state.get("population", 0))), _format_count(int(state.get("garrison", 0)))]
 	var viewport_size := get_viewport_rect().size
 	tooltip.position = Vector2(minf(screen_pos.x + 18.0, viewport_size.x - 212.0), minf(screen_pos.y + 18.0, viewport_size.y - 88.0))
 	tooltip.show()
@@ -905,8 +905,6 @@ func _clear_selection() -> void:
 
 func _enter_selected_city() -> void:
 	if selected_id == "" or str(places[selected_id]["type"]) != "city" or city_view != null:
-		return
-	if not GameState.war.player_has_city_access(selected_id):
 		return
 	var packed: PackedScene = load(CITY_SCENE_PATH)
 	city_view = packed.instantiate()

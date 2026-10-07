@@ -9,8 +9,8 @@ const OVERFLOW_BLUE := Color("367caf")
 func _draw() -> void:
 	if values.size() != 5:
 		return
-	var center := Vector2(115, 66)
-	var radius := 40.0
+	var center := Vector2(115, 82)
+	var radius := 46.0
 	var sprite_rect := Rect2(center - Vector2(radius * 0.951, radius), Vector2(radius * 1.902, radius * 1.809))
 	draw_texture_rect(BASE, sprite_rect, false)
 	var actual := PackedVector2Array()

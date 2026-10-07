@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 6,
   "days_per_month": 30,
   "grain_per_soldier_day": 0.004,
   "reserve_ratio": 0.35,
@@ -30,6 +30,120 @@
       "toughness": 1.4,
       "pursuit": 1.5
     }
+  },
+  "combat": {
+    "damage_scale": 0.035,
+    "min_loss": 1,
+    "death_ratio": 0.65,
+    "damage_band": [
+      0.9,
+      1.1
+    ],
+    "attributes": {
+      "command_base": 0.8,
+      "command_divisor": 250,
+      "command_min": 0.8,
+      "command_max": 1.28,
+      "command_weight": 0.002,
+      "morale_divisor": 100,
+      "morale_min": 0.25,
+      "training_base": 0.6,
+      "training_divisor": 125,
+      "equipment_base": 0.7,
+      "equipment_divisor": 166.7,
+      "organization_divisor": 100,
+      "organization_min": 0.3,
+      "fatigue_divisor": 180,
+      "morale_loss_weight": 85.0,
+      "organization_loss_weight": 70.0
+    },
+    "morale": {
+      "success_weight": 50.0,
+      "hurt_weight": 85.0,
+      "advantage_floor": 0.65,
+      "advantage_ceiling": 1.5,
+      "comfort_hurt": 0.03,
+      "comfort_advantage": 0.9,
+      "comfort_gain_base": 0.6,
+      "comfort_gain_per_success": 25.0,
+      "comfort_gain_cap": 2.5,
+      "comfort_organization": 1.5,
+      "panic_hurt": 0.08,
+      "panic_weight": 65.0,
+      "flank_penalty": 2.0,
+      "floor": -20.0,
+      "ceiling": 3.0
+    },
+    "personal": {
+      "prowess_offset": 30,
+      "prowess_divisor": 20,
+      "fatigue_divisor": 150,
+      "wounded_factor": 0.75
+    },
+    "counters": {
+      "cavalry_vs_archers": 0.15,
+      "archers_vs_infantry": 0.12,
+      "archers_vs_cavalry": 0.08,
+      "infantry_vs_cavalry": 0.08
+    },
+    "flank": {
+      "routing_target": 1.25,
+      "exploiting_flanked": 1.15,
+      "adjacent_range": 1,
+      "flank_attack": 1.15
+    },
+    "attack_range": 3
+  },
+  "officer": {
+    "attack_min": 0.8,
+    "attack_max": 1.2,
+    "defense_min": 0.9,
+    "defense_max": 1.1,
+    "total_min": 0.6,
+    "total_max": 1.6,
+    "aura_skill_weight": 0.003,
+    "aura_max": 0.15,
+    "aura_range": 3,
+    "aura_range_skill": 80,
+    "aura_range_bonus": 1,
+    "aura_org_scale": 0.5,
+    "aura_rout_shift": 20,
+    "leader_loss_morale": 8,
+    "leader_loss_org": 4
+  },
+  "orders": {
+    "intents": [
+      "速胜",
+      "稳扎",
+      "牵制",
+      "斩首",
+      "保存实力"
+    ],
+    "risk_levels": [
+      "保守",
+      "常规",
+      "放手"
+    ],
+    "default_intent": "稳扎",
+    "default_risk": "常规",
+    "default_report": "重大事件",
+    "dissent": {
+      "gap": 12,
+      "base": 0.15,
+      "personality_weight": 0.004,
+      "urgent_bonus": 0.1,
+      "max": 0.6,
+      "direct": false
+    }
+  },
+  "strategy": {
+    "eval_interval": 10,
+    "front_limit": 2,
+    "target_sample": 10,
+    "threshold": 0.0,
+    "unscouted_value": 1.0,
+    "max_ratio": 1.8,
+    "min_grain_days": 20
   },
   "faction_mapping": {
     "袁绍集团": "yuan_shao",
@@ -116,66 +230,16 @@
       "daily_fatigue": 2
     }
   },
-  "formations": {
-    "change_organization": 10,
-    "contact_morale_cost": 5,
-    "cooldown_days": 3,
-    "proficiency_base": 0.7,
-    "proficiency_divisor": 200,
-    "proficiency_max": 1.25,
-    "definitions": {
-      "fish_scale": {
-        "name": "鱼鳞",
-        "attack": 0.1,
-        "flanked_loss": 0.15,
-        "description": "正面攻击增强，被侧击更易受损"
-      },
-      "crane_wing": {
-        "name": "鹤翼",
-        "flank_bonus": 0.12,
-        "defense": -0.08,
-        "description": "加强包抄，正面防护较弱"
-      },
-      "square_circle": {
-        "name": "方圆",
-        "received_loss": -0.12,
-        "attack": -0.12,
-        "preparation": 1,
-        "description": "减轻伤亡，守势整阵脱离需多一日"
-      },
-      "wild_goose": {
-        "name": "雁行",
-        "ranged": 0.15,
-        "melee_defense": -0.1,
-        "description": "加强远射，近战防护较弱"
-      },
-      "arrowhead": {
-        "name": "锋矢",
-        "opening_attack": 0.18,
-        "sustained_attack": 0.05,
-        "opening_days": 2,
-        "defense": -0.05,
-        "description": "前两日加强冲击，防护略弱"
-      },
-      "long_snake": {
-        "name": "长蛇",
-        "attack": -0.08,
-        "rough_received": -0.08,
-        "delay_immune": true,
-        "description": "适合山林，免山地迟滞，正面攻势略弱"
-      }
-    }
-  },
   "duel": {
     "enabled": true,
     "initiation": 0.12,
     "acceptance": 0.55,
-    "daily_pair_limit": 1,
     "officer_battle_limit": 2,
     "round_noise": 15,
     "draw_margin": 1,
     "recover_days": 10,
-    "wounded_attack": 0.9,
+    "max_records": 240,
+    "wounded_attack": 0.75,
     "allow_death": false,
     "personality_threshold": 70,
     "disadvantage_ratio": 0.8,
@@ -201,13 +265,13 @@
     },
     "effects": {
       "overwhelming": {
-        "loser_morale": 25,
-        "loser_org": 15,
+        "loser_morale": 40,
+        "loser_org": 30,
         "winner_morale": 8
       },
       "win": {
-        "loser_morale": 12,
-        "loser_org": 0,
+        "loser_morale": 22,
+        "loser_org": 12,
         "winner_morale": 5
       },
       "draw": {
@@ -223,6 +287,63 @@
     "factor_threshold": 0.05,
     "max_factors": 2,
     "max_log": 240,
-    "max_floaters_per_day": 6
+    "max_floaters_per_day": 32
+  },
+  "supply_enabled": false,
+  "officer_fate": {
+    "duel_death": 0.18,
+    "duel_capture": 0.27,
+    "destroyed_death": 0.25,
+    "destroyed_capture": 0.5,
+    "rout_death": 0.02,
+    "rout_capture": 0.1,
+    "city_death": 0.15,
+    "city_capture": 0.55
+  },
+  "personal_combat": {
+    "max_damage": 4.0
+  },
+  "troop_traits": {
+    "infantry": {
+      "movement": {
+        "plains": 1.0,
+        "forest": 1.0,
+        "mountains": 0.8,
+        "ford": 0.7,
+        "hills": 0.9,
+        "marsh": 0.7
+      },
+      "role": "守线 掩护弓兵 近战攻城"
+    },
+    "cavalry": {
+      "movement": {
+        "plains": 1.5,
+        "forest": 0.75,
+        "mountains": 0.6,
+        "ford": 0.65,
+        "hills": 0.8,
+        "marsh": 0.55
+      },
+      "charge_attack": 1.2,
+      "role": "平原机动 侧击 追击"
+    },
+    "archers": {
+      "movement": {
+        "plains": 1.0,
+        "forest": 0.85,
+        "mountains": 0.7,
+        "ford": 0.7,
+        "hills": 0.8,
+        "marsh": 0.7
+      },
+      "range": 2,
+      "melee_attack": 0.45,
+      "melee_received": 1.2,
+      "role": "两格射击 视线受阻不能射击 近战弱势"
+    },
+    "engines": {
+      "movement": 0.7,
+      "role": "缓慢推进 强攻破墙 需要步兵操作"
+    }
   }
 }

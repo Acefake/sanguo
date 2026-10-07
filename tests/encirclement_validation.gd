@@ -13,7 +13,7 @@ func check(value: bool, message: String) -> void:
 func _run() -> void:
 	var store: Node = root.get_node("GameState")
 	store.persist_enabled = false
-	store.prepare_battle_test(true)
+	store.prepare_battle_test(true, "plains_clash")
 	var board: Dictionary = store.war.state["battlefield"]
 	var anchor: int = int(board["anchor"])
 	var own: Dictionary = store.war.active_armies("liu_bei")[0]
@@ -26,6 +26,9 @@ func _run() -> void:
 		enemies.append(extra)
 	for army in store.war.active_armies(): army["status"] = "ended"
 	store.war.state["battlefield"]["blocked"] = []
+	# This fixture isolates disengagement on open land, without a siege objective.
+	store.war.state["battlefield"]["objectives"] = {}
+	store.war.state["battlefield"]["fortifications"] = {}
 	own["units"] = {"infantry": 14000, "archers": 4000, "cavalry": 2000}
 	own["initial_strength"] = 20000
 	own["status"] = "active"
@@ -53,7 +56,7 @@ func _run() -> void:
 		Tactical.move(store.war)
 		if own["tactical"]["cell"] != anchor: break
 	check(own["tactical"]["cell"] != anchor, "打开缺口后仍不能准备突围")
-	# A lone healthy main force must not abandon its line to chase an enemy.
+	# A lone survivor cannot wait forever for ended comrades to rebuild a line.
 	for enemy in enemies: enemy["status"] = "ended"
 	enemies[0]["status"] = "active"
 	enemies[0]["tactical"]["cell"] = Tactical.offset_cell(board, 0, 6)
@@ -66,8 +69,8 @@ func _run() -> void:
 	own["action"] = {"type": "engage", "enemy": enemies[0]["id"]}
 	store.war._observe_all()
 	Tactical.move(store.war)
-	check(own["tactical"]["cell"] == anchor and own["tactical"]["phase"] == "等待友军跟进", "主攻孤立时仍脱离阵线追敌")
-	# Even a successful disengagement exposes the army to a parting attack.
+	check(own["tactical"]["cell"] != anchor, "仅存主攻仍在等待已结束的友军")
+	# A successful disengagement ends melee once the unit leaves legal range.
 	own["returning"] = true
 	own["tactical"]["cell"] = anchor
 	own["tactical"]["withdraw_preparation"] = 2
@@ -77,7 +80,7 @@ func _run() -> void:
 	check(Tactical.distance(own, enemies[0]) > 1, "已准备部队无法向空旷退路脱离")
 	before = store.war.Combat.strength(own)
 	Tactical.resolve(store.war)
-	check(store.war.Combat.strength(own) < before, "脱离接触瞬间没有承受追击")
+	check(store.war.Combat.strength(own) == before, "步兵脱离相邻格后仍受到远程追击伤害")
 	store.restore_battle_test()
 	print("ENCIRCLEMENT_OK: pinned retreat, occupied ring, attrition, breakout through opening" if failures.is_empty() else "ENCIRCLEMENT_FAILED")
 	quit(0 if failures.is_empty() else 1)

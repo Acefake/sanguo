@@ -26,10 +26,6 @@ func run():
 			var war = store.war
 			if not extended:
 				war.rules["duel"]["enabled"] = false
-				for formation in war.rules["formations"]["definitions"].values():
-					for key in formation:
-						if key != "name" and key != "description" and formation[key] is float: formation[key] = 0.0
-					formation["preparation"] = 0
 			war.rng.seed = seed_value
 			var start := Time.get_ticks_msec()
 			var trace := []
@@ -46,6 +42,11 @@ func run():
 				trace.append({"tick":war.state["tick"],"sides":sides,"active":war.active_armies().size(),"returning":war.active_armies().filter(func(a):return a["returning"]).size()})
 				if war.state["battlefield"].has("winner"): break
 			check(war.state["battlefield"].has("winner"),"会战120日未结束 seed=%d extended=%s" % [seed_value,extended])
+			# 收束账本：任何一条结束路径都不能让兵员凭空消失（家乡易手、退路断绝、
+			# 守援/期限到期时，存活兵员此前既不进城也不计俘/亡）。
+			for unit in war.state["armies"].values():
+				var book: Dictionary = war.ledger(unit)
+				check(int(book["missing"]) == 0, "兵员账本缺口 seed=%d %s 缺%d" % [seed_value, str(unit["id"]), int(book["missing"])])
 			var result := {"extended":extended,"seed":seed_value,"days":war.state["tick"],"winner":war.state["battlefield"].get("winner","unfinished"),"elapsed_ms":Time.get_ticks_msec()-start,"summary":Feedback.summary(war),"trace":trace}
 			results.append(result)
 			print("CAMPAIGN_SEED ",JSON.stringify({"extended":extended,"seed":seed_value,"days":result["days"],"winner":result["winner"],"ms":result["elapsed_ms"]}))
@@ -53,6 +54,6 @@ func run():
 	Terrain._table = original_table
 	store.restore_battle_test()
 	var file := FileAccess.open("res://docs/validation/battle-extension-campaign-seeds.json",FileAccess.WRITE)
-	file.store_string(JSON.stringify({"control":"关闭新增地形战斗修正、阵型加成和单挑，并保留旧川格通行；同一版本规则引擎，非旧提交快照","results":results},"\t"))
+	file.store_string(JSON.stringify({"control":"关闭新增地形战斗修正和单挑，并保留旧川格通行；阵型系统已移除，同一版本规则引擎，非旧提交快照","results":results},"\t"))
 	print("BATTLE_EXTENSION_CAMPAIGN_OK: five seeds, control and extended, termination, occupancy and conservation" if failures.is_empty() else "BATTLE_EXTENSION_CAMPAIGN_FAILED")
 	quit(0 if failures.is_empty() else 1)

@@ -1,6 +1,5 @@
 extends SceneTree
 
-const Formation = preload("res://scripts/war/battle_formation.gd")
 const Terrain = preload("res://scripts/war/battle_terrain.gd")
 var failures: Array[String] = []
 func _initialize(): call_deferred("run")
@@ -32,7 +31,7 @@ func run():
 	check(world.advantage_panel.visible and world.advantage_bar.value >= 0 and world.advantage_bar.value <= 100,"优势条没有显示或归一化越界")
 	store.time_paused = false
 	world.begin_day({})
-	await create_timer(0.3).timeout
+	while world.loss_floaters.is_empty() and world.presenting: await process_frame
 	check(world.loss_floaters.size() > 0 and world.loss_floaters.size() <= int(store.war.rules["feedback"]["max_floaters_per_day"]),"真实伤亡飘字缺失或超出上限")
 	var floated: int = world.loss_floaters.size()
 	world._spawn_loss_floaters()
@@ -44,29 +43,18 @@ func run():
 	await capture("battle-extension-live")
 	var own: Dictionary = store.war.active_armies("liu_bei")[0]
 	world.ui.show_army(own["id"])
-	check(world.ui.body.find_child("ChangeFormation",true,false) != null,"军队详情缺少变阵操作")
+	world.ui.show_army_orders(own["id"])
+	check(world.ui.body.find_child("ChangeFormation",true,false) == null and world.ui.body.find_child("FormationChoice",true,false) == null,"已移除的阵型操作仍显示")
 	await capture("battle-extension-army")
-	var corps: Dictionary = store.war.state["corps"][own["corps_id"]]
-	var choice: OptionButton = world.ui.body.find_child("FormationChoice",true,false)
-	var change_button: Button = world.ui.body.find_child("ChangeFormation",true,false)
-	if choice != null and change_button != null:
-		for index in range(choice.item_count):
-			var id: String = choice.get_item_metadata(index)
-			if Formation.can_change(store.war,corps,id):
-				choice.select(index)
-				choice.item_selected.emit(index)
-				check(not change_button.disabled,"合法阵型无法通过UI下令")
-				change_button.pressed.emit()
-				check(corps["formation"] == id and int(corps["formation_changed_at"]) == int(store.war.state["tick"])+1,"UI变阵没有应用到下一执行日")
-				break
-	await capture("battle-extension-formation")
 	world.ui.show_battle_summary()
-	check(world.ui.page == "battle_summary" and world.ui.drawer.visible,"会战总结没有打开")
+	check(world.ui.reports_view.mode == "summary" and world.ui.reports_view.visible,"会战总结没有打开")
 	await capture("battle-extension-summary")
 	store.time_paused = false
 	while world.presenting: await process_frame
+	world._update_loss_floaters(world.DAY_SECONDS)
 	check(world.loss_floaters.is_empty(),"日播放结束后残留飘字")
 	world.ui.drawer.hide()
+	world.ui.reports_view.hide()
 	world.advantage_panel.hide()
 	# Capture real 3D ground at the same native cells used by the labeled 2D audit.
 	var audit: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://docs/validation/terrain-code-audit.json"))
@@ -92,5 +80,5 @@ func run():
 	scene.queue_free()
 	await process_frame
 	store.restore_battle_test()
-	print("BATTLE_EXTENSION_UI_OK: Vulkan map, advantage, loss labels, pause, formation controls, summary and 7 native terrain samples" if failures.is_empty() else "BATTLE_EXTENSION_UI_FAILED")
+	print("BATTLE_EXTENSION_UI_OK: Vulkan map, advantage, loss labels, pause, formation removal, summary and 7 native terrain samples" if failures.is_empty() else "BATTLE_EXTENSION_UI_FAILED")
 	quit(0 if failures.is_empty() else 1)

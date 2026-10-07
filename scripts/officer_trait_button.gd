@@ -26,7 +26,7 @@ func _make_custom_tooltip(description: String) -> Object:
 		body = body.trim_prefix(text + "\n")
 	if body.begins_with(text + "："): body = body.trim_prefix(text + "：")
 	elif not "\n" in description and "：" in body: body = body.split("：", true, 1)[1]
-	label.text = body.replace("；", "；\n")
+	label.text = preload("res://scripts/ui_text.gd").clean(body.replace("；", "；\n"))
 	label.custom_minimum_size.x = 300
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.add_theme_color_override("font_color", Color("423b2c"))

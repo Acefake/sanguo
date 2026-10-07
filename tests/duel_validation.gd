@@ -11,6 +11,9 @@ func run():
 	store.persist_enabled = false
 	store.prepare_battle_test(true)
 	var war = store.war
+	# Wound recovery and pair limits use guaranteed non-terminal results here.
+	war.rules["officer_fate"]["duel_death"] = 0.0
+	war.rules["officer_fate"]["duel_capture"] = 0.0
 	var a: Dictionary = war.active_armies("liu_bei")[1]
 	var b: Dictionary = war.active_armies("yuan_shao")[1]
 	a["tactical"]["cell"] = war.Tactical.offset_cell(war.state["battlefield"],0,0)
@@ -53,18 +56,47 @@ func run():
 	war.rng.seed = 12345
 	var result := D.contest(war,a,b)
 	war.rng.seed = 12345
-	check(D.contest(war,a,b) == result,"三合结果无法种子复现")
+	check(D.contest(war,a,b) == result,"30回合单挑结果无法种子复现")
+	check(result["rounds"].size() <= 30 and result.has("winner"),"单挑回合不能超过30回合")
+	var saved_noise: float = war.rules["duel"]["round_noise"]
+	var saved_margin: float = war.rules["duel"]["draw_margin"]
+	war.rules["duel"]["round_noise"] = 0.0
+	war.rules["duel"]["draw_margin"] = 1000.0
+	war.rng.seed = 1701
+	var no_knockout: Dictionary = D.contest(war,a,b)
+	check(no_knockout["rounds"].size() == 30 and no_knockout["winner"] == -1 and no_knockout["result"] == "draw","30回合内双方未倒下必须判为平手")
+	war.rules["duel"]["round_noise"] = saved_noise
+	war.rules["duel"]["draw_margin"] = saved_margin
+	var saved_a_skills: Dictionary = a.get("skills", {}).duplicate(true)
+	var saved_b_skills: Dictionary = b.get("skills", {}).duplicate(true)
+	var test_a_skills: Dictionary = saved_a_skills.duplicate(true)
+	var test_b_skills: Dictionary = saved_b_skills.duplicate(true)
+	for skill_name in ["武艺", "膂力", "体魄", "骑术", "威仪"]:
+		test_a_skills[skill_name] = 100
+		test_b_skills[skill_name] = 0
+	a["skills"] = test_a_skills
+	b["skills"] = test_b_skills
+	war.rules["duel"]["round_noise"] = 0.0
+	war.rng.seed = 1702
+	var knockout: Dictionary = D.contest(war,a,b)
+	check(knockout["result"] == "overwhelming" and knockout["winner"] == 0 and knockout["rounds"].size() < 30 and knockout["rounds"][-1]["hp_b"] == 0.0,"Knockout must end the duel before 30 rounds")
+	a["skills"] = saved_a_skills
+	b["skills"] = saved_b_skills
+	war.rules["duel"]["round_noise"] = saved_noise
 	var strength := C.strength(b)
 	b["morale"] = 100
 	b["organization"] = 100
 	D.apply_result(war,a,b,{"result":"overwhelming","winner":0})
-	check(b["morale"] == 75 and b["organization"] == 85 and b["duel_wounded"],"压倒胜出效果不符合规则")
+	check(b["morale"] == 100 - war.rules["duel"]["effects"]["overwhelming"]["loser_morale"] and b["organization"] == 100 - war.rules["duel"]["effects"]["overwhelming"]["loser_org"] and b["duel_wounded"],"压倒胜出效果不符合规则")
 	check(C.strength(b) == strength,"单挑直接扣兵或秒杀军队")
+	check(not D.eligible(war,a,b), "负伤将领仍可发起单挑")
+	b["duel_wounded"] = false
 	D.challenge(war,a,b,true)
 	check(war.Feedback.book(war).get("pending_events",[]).any(func(e):return e["kind"] == "单挑"),"真实单挑挑战没有写入会战事件")
 	check(not D.eligible(war,a,b),"同一对将领重复单挑")
 	var enemies: Array = war.active_armies("yuan_shao").filter(func(e):return e["officer_id"] != b["officer_id"])
 	var second: Dictionary = enemies[0]
+	a["duel_wounded"] = false
 	second["tactical"]["cell"] = b["tactical"]["cell"]
 	second["action"] = {"type":"continue"}
 	check(not D.challenge(war,a,second,true).is_empty(),"无法对另一将领进行第二次单挑")
@@ -72,6 +104,7 @@ func run():
 	third["tactical"]["cell"] = b["tactical"]["cell"]
 	third["action"] = {"type":"continue"}
 	check(not D.eligible(war,a,third),"同一武将一战超过两次单挑")
+	b["duel_wounded"] = true
 	var saved: Dictionary = war.export_state()
 	var restored = War.new()
 	restored.setup(store,saved)

@@ -4,9 +4,12 @@ var places: Dictionary = {}
 var edges: Dictionary = {}
 var adjacent: Dictionary = {}
 var blocked: Array = []
+var closed_routes: Array = []
 
 
 func setup(data: Dictionary) -> void:
+	places.clear(); edges.clear(); adjacent.clear(); blocked.clear(); closed_routes.clear()
+	invalidate_paths()
 	for place in data.get("places", []):
 		places[str(place["id"])] = place
 		adjacent[str(place["id"])] = []
@@ -19,12 +22,40 @@ func setup(data: Dictionary) -> void:
 func neighbors(node: String) -> Array:
 	var result: Array = []
 	for link in adjacent.get(node, []):
-		if not blocked.has(node) and not blocked.has(link["node"]):
+		if not blocked.has(node) and not blocked.has(link["node"]) and not closed_routes.has(link["edge"]):
 			result.append(link)
 	return result
 
 
-func path(start: String, finish: String) -> Dictionary:
+# Candidate generation and the outcome forecast both ask for the same routes, so a
+# whole-graph Dijkstra per pair per army per decision dominated the day loop. Routes
+# only change when a pass is blocked, so memoise on that generation.
+var _path_cache: Dictionary = {}
+var _path_generation: int = 0
+
+
+func invalidate_paths() -> void:
+	_path_generation += 1
+	_path_cache.clear()
+
+
+func set_blocked(nodes: Array) -> void:
+	if str(blocked) == str(nodes): return
+	blocked = nodes
+	invalidate_paths()
+
+
+func path(start: String, finish: String, excluded: Array = []) -> Dictionary:
+	var exclusions := excluded.duplicate()
+	exclusions.sort()
+	var key := "%s>%s:%s" % [start, finish, str(exclusions)]
+	if _path_cache.has(key): return _path_cache[key]
+	var result := _search(start, finish, exclusions)
+	_path_cache[key] = result
+	return result
+
+
+func _search(start: String, finish: String, excluded: Array = []) -> Dictionary:
 	if not places.has(start) or not places.has(finish):
 		return {"found": false, "nodes": [], "edges": [], "cost": 0.0}
 	var distance: Dictionary = {start: 0.0}
@@ -32,7 +63,7 @@ func path(start: String, finish: String) -> Dictionary:
 	var visited: Dictionary = {}
 	var frontier: Array = [start]
 	while not frontier.is_empty():
-		frontier.sort_custom(func(a, b): return float(distance[a]) < float(distance[b]))
+		frontier.sort_custom(func(a, b): return float(distance[a]) < float(distance[b]) if float(distance[a]) != float(distance[b]) else str(a) < str(b))
 		var current: String = str(frontier.pop_front())
 		if visited.has(current):
 			continue
@@ -41,6 +72,7 @@ func path(start: String, finish: String) -> Dictionary:
 			break
 		for link in neighbors(current):
 			var next: String = str(link["node"])
+			if excluded.has(next) and next != finish: continue
 			var cost: float = float(distance[current]) + float(edges[link["edge"]].get("cost", 1))
 			if not visited.has(next) and (not distance.has(next) or cost < float(distance[next])):
 				distance[next] = cost

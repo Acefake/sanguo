@@ -75,7 +75,7 @@ func _ready() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 10)
 	panel.add_child(column)
-	column.add_child(label("出阵　·　决定主帅与随军编组", 30))
+	column.add_child(label("出阵  决定主帅与随军编组", 30))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 26)
 	row.size_flags_vertical = SIZE_EXPAND_FILL
@@ -101,7 +101,7 @@ func _ready() -> void:
 		targets.set_item_metadata(targets.item_count - 1, id)
 		if str(id) == target: targets.select(targets.item_count - 1)
 		var city: Dictionary = store.city_state(str(id))
-		if not city.has("population") or city.get("faction", "") != store.war.state["player_faction"]: continue
+		if not city.has("garrison") or city.get("faction", "") != store.war.state["player_faction"]: continue
 		sources.add_item(store.war.graph.name_of(str(id)))
 		sources.set_item_metadata(sources.item_count - 1, id)
 		var path: Dictionary = store.war.graph.path(str(id), target)
@@ -112,20 +112,20 @@ func _ready() -> void:
 		if str(sources.get_item_metadata(i)) == home_hint: sources.select(i)
 	cards = VBoxContainer.new()
 	left.add_child(cards)
-	section(left, "兵士 · 按城池库存综合编组")
+	section(left, "兵士  按城池库存综合编组")
 	troops = HSlider.new()
 	troops.min_value = int(store.war.rules["minimum_army"])
 	troops.step = 1
 	left.add_child(troops)
 	resources = label("", 16)
 	left.add_child(resources)
-	section(right, "能力 · 主帅军事能力（满刻度120）")
+	section(right, "能力  主帅军事能力（满刻度120）")
 	radar = preload("res://scripts/war/military_radar.gd").new()
 	radar.custom_minimum_size = Vector2(300, 200)
 	right.add_child(radar)
 	details = label("", 16)
 	right.add_child(details)
-	section(right, "随军人员 · 按人物位置分配任务")
+	section(right, "随军人员  按人物位置分配任务")
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size.y = 125
 	scroll.size_flags_vertical = SIZE_EXPAND_FILL
@@ -136,7 +136,7 @@ func _ready() -> void:
 	scroll.add_child(roster)
 	for officer in officers:
 		var check := CheckBox.new()
-		check.text = str(officer["name"]) + " · " + str(officer.get("positions", "")).split("\n")[0]
+		check.text = str(officer["name"]) + "  " + str(officer.get("positions", "")).split("\n")[0]
 		check.add_theme_font_override("font", CitySkin.font())
 		check.add_theme_color_override("font_color", CitySkin.INK)
 		check.add_theme_color_override("font_hover_color", CitySkin.INK)
@@ -150,7 +150,7 @@ func _ready() -> void:
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	column.add_child(buttons)
 	confirm = Button.new()
-	confirm.text = "决定 · 出阵"
+	confirm.text = "决定  出阵"
 	confirm.custom_minimum_size = Vector2(150, 44)
 	CitySkin.style_button(confirm)
 	confirm.modulate = Color(1, 0.70, 0.65)
@@ -219,11 +219,13 @@ func refresh(reset_count: bool = false) -> void:
 	radar.queue_redraw()
 	var formation_lines := PackedStringArray()
 	for item in layout["formations"]: formation_lines.append("%s %s %d" % [store.war.roster.officers[item["officer"]]["name"], Corps.TASKS[item["task"]], item["strength"]])
-	details.text = "主帅统一决策，下属执行军令。\n主阵：由主帅部署时选择（鱼鳞/鹤翼/方圆/雁行/锋矢/长蛇）。\n" + " · ".join(formation_lines) + "\n随军 %d 人 · 职务按人物位置适性任命" % (members().size() + 1)
+	details.text = "主帅统一决策，下属执行军令。\n" + "  ".join(formation_lines) + "\n随军 %d 人  职务按人物位置适性任命" % (members().size() + 1)
 	for id in checks:
-		checks[id].text = str(store.war.roster.officers[id]["name"]) + " · " + str(positions.get(id, "未随军"))
+		checks[id].text = str(store.war.roster.officers[id]["name"]) + "  " + str(positions.get(id, "未随军"))
 		checks[id].tooltip_text = str(store.war.roster.officers[id].get("positions", ""))
-	resources.text = "兵士 %d　留守 %d\n携粮 %d　约 %d 日份\n预计通路 %d 日 · 主帅可调整路线" % [preview["strength"], preview["reserve"], preview["grain"], preview["grain_days"], preview["travel_days"]]
+	resources.text = "兵士 %d　留守 %d\n预计通路 %d 日  主帅可调整路线" % [preview["strength"], preview["reserve"], preview["travel_days"]]
+	var gathering: int = store.war.Operations.assembly_days(store.war, selection(sources), [chief] + members())
+	if gathering > 0: resources.text += "\n异地将领集结：另需%d日" % gathering
 	updating = false
 
 func deploy() -> void:

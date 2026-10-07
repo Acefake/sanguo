@@ -4,10 +4,11 @@ signal cell_selected(cell: int, preview: bool)
 
 const Grid = preload("res://scripts/rtk14_hex_grid.gd")
 const MapSkin = preload("res://scripts/city_ui_skin.gd")
+const Fortifications = preload("res://scripts/war/city_fortifications.gd")
 var map: Node3D
 var grid = Grid.shared()
 var materials: Array[ShaderMaterial] = []
-var enabled := true
+var enabled := false
 var ui_visible := true
 var hovered_cell := -1
 var selected_cell := -1
@@ -144,7 +145,9 @@ func select_screen(screen: Vector2, preview := false) -> void:
 		return
 	var cell := cell_at_screen(screen)
 	if preview and grid.valid(selected_cell) and grid.valid(cell):
-		path = grid.find_path(selected_cell, cell)
+		var bounds := {"min_column": 0, "max_column": 219, "min_row": 0, "max_row": 219, "blocked": []}
+		Fortifications.attach(GameState.war, bounds)
+		path = grid.find_path(selected_cell, cell, Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state["player_faction"])))
 		path_message = "路径预览：%d 格" % path.size() if not path.is_empty() else "两格之间无地面通路"
 		_build_path_mesh()
 	else:
@@ -205,16 +208,19 @@ func _refresh_panel() -> void:
 	if label == null:
 		return
 	var cell := hovered_cell if hovered_cell >= 0 else selected_cell
-	var hint := "点击选格 · Shift 点击预览路径 · G 格线"
+	var hint := "点击选格  Shift 点击预览路径  G 格线"
 	if not grid.valid(cell):
-		label.text = "三维六角格 · 48,400 格\n" + hint
+		label.text = "三维六角格  48,400 格\n" + hint
 		return
 	var info: Dictionary = grid.info(cell)
+	var bounds := {"min_column": 0, "max_column": 219, "min_row": 0, "max_row": 219, "blocked": []}
+	Fortifications.attach(GameState.war, bounds)
+	info["walkable"] = info["walkable"] and not Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state["player_faction"])).has(cell)
 	var city_id: String = grid.controller(cell)
 	var city_name := "未归属城市"
 	for city in map.city_data:
 		if str(city["id"]) == city_id:
 			city_name = str(city["name"])
-	var owner := str(GameState.scenario.get("places", {}).get(city_id, {}).get("faction", ""))
+	var owner := str(GameState.city_state(city_id).get("faction", ""))
 	var faction := str(GameState.scenario.get("factions", {}).get(owner, {}).get("name", "无主"))
-	label.text = "格 %d · 列 %d / 行 %d\n地形 %d · 区域 %d · %s\n%s · %s\n%s" % [cell,info["column"],info["row"],info["terrain"],info["region"],"可通行" if info["walkable"] else "不可通行",city_name,faction,path_message if not path_message.is_empty() else hint]
+	label.text = "格 %d  列 %d / 行 %d\n地形 %d  区域 %d  %s\n%s  %s\n%s" % [cell,info["column"],info["row"],info["terrain"],info["region"],"可通行" if info["walkable"] else "不可通行",city_name,faction,path_message if not path_message.is_empty() else hint]

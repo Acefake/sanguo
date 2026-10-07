@@ -1,0 +1,49 @@
+[
+  {
+    "id": "plains_clash",
+    "name": "平原会战",
+    "kind": "field",
+    "anchor": 21238,
+    "terrain": "plains",
+    "description": "双方各两万人平原列阵。步兵守正、骑兵侧击、弓兵两格远射，验证兵种分工、侧翼包抄、预备轮换与单挑。开局即可见步、弓、骑独立分队。",
+    "troops": [
+      "infantry",
+      "cavalry",
+      "infantry",
+      "archers",
+      "infantry"
+    ],
+    "engines": 0
+  },
+  {
+    "id": "mountain_pass",
+    "name": "山地隘口战",
+    "kind": "field",
+    "anchor": 16110,
+    "terrain": "mountains",
+    "description": "双方各两万人山地对进。保留原地图不可通行山峰，验证窄路寻路、地形迟滞、弓兵掩护与骑兵受限。开局即可见步、弓、骑独立分队。",
+    "troops": [
+      "infantry",
+      "cavalry",
+      "archers",
+      "archers",
+      "infantry"
+    ],
+    "engines": 0
+  },
+  {
+    "id": "siege_assault",
+    "name": "攻城强袭",
+    "kind": "siege",
+    "anchor": 16442,
+    "description": "袁军两万人攻城，前锋配两辆投石车、两辆冲车；刘军六千人归城加原守军三千。验证集结、破墙、守军伤亡与占领，不以野战胜利直接结算。开局即可见步、弓、骑独立分队。",
+    "troops": [
+      "infantry",
+      "cavalry",
+      "infantry",
+      "archers",
+      "infantry"
+    ],
+    "engines": 4
+  }
+]

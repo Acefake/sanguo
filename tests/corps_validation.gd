@@ -84,8 +84,10 @@ func _run() -> void:
 	check(not Corps.split(war, corps, root_army, officer, 500, "raid_rear", Tactical.offset_cell(board, 0, 4))["ok"], "同一人物重复领队")
 	check(not Corps.split(war, corps, war.state["armies"][opposing["root_id"]], free[1], 500, "raid_rear", Tactical.offset_cell(board, 0, 4))["ok"], "主帅可拆敌方军队")
 	war.state["armies"][opposing["root_id"]]["tactical"]["cell"] = Tactical.neighbors(root_army["tactical"]["cell"])[0]
+	war._observe_all()
 	check(not Corps.split(war, corps, root_army, free[1], 500, "raid_rear", Tactical.offset_cell(board, 0, 4))["ok"], "接战拆队绕过包围")
 	war.state["armies"][opposing["root_id"]]["tactical"]["cell"] = Tactical.offset_cell(board, 7, 8)
+	war._observe_all()
 	check(not Corps.issue(war, corps, {"type": "detach", "source": root_army["id"], "officer": free[1], "strength": 500, "task": "cut_supply", "cell": opposing["supply"]["cell"], "enemy_corps": opposing["id"]}, "断粮")["ok"], "主帅攻击未发现的粮道")
 	corps["known_supplies"][opposing["id"]] = {"cell": int(opposing["supply"]["cell"]), "observed_at": war.state["tick"]}
 	child["corps_task"] = {"type": "cut_supply", "cell": int(opposing["supply"]["cell"]), "enemy_corps": opposing["id"], "issued_by": corps["commander_id"]}
@@ -95,22 +97,23 @@ func _run() -> void:
 	child["tactical"]["cell"] = int(opposing["supply"]["cell"])
 	var child_food: float = child["grain"]
 	Corps.logistics(war)
-	check(opposing["supply"]["blocked_until"] == war.state["tick"] + 4 and opposing["supply"]["stock"] < enemy_food and is_equal_approx(child["grain"] - child_food, enemy_food - opposing["supply"]["stock"]), "实际断粮与夺粮没有守恒")
+	check(opposing["supply"]["blocked_until"] == 0 and opposing["supply"]["stock"] == enemy_food and child["grain"] == child_food, "停用系统后截粮仍生效")
 	var enemy_army: Dictionary = war.state["armies"][opposing["root_id"]]
 	enemy_army["grain"] = 0.0
 	Corps.update(war)
 	check(enemy_army["grain"] == 0.0, "粮道已断仍能补给")
 	war.state["tick"] += 4
 	Corps.update(war)
-	check(enemy_army["grain"] > 0, "粮道恢复后无法补给")
+	check(enemy_army["grain"] == 0, "停用系统后仍在补给")
 	check(Corps.issue(war, corps, {"type": "assign_task", "unit": child["id"], "task": "regroup"}, "归建")["ok"], "主帅无法收拢分队")
 	child["tactical"]["cell"] = Tactical.neighbors(root_army["tactical"]["cell"])[0]
+	war._observe_all()
 	var merged_food: float = root_army["grain"] + child["grain"]
 	Corps.logistics(war)
 	check(child["status"] == "ended" and war.Combat.strength(root_army) == before and is_equal_approx(root_army["grain"], merged_food) and root_army["initial_strength"] == initial, "归建丢失或重复计算兵粮")
 	var saved: Dictionary = war.export_state()
 	war.setup(store, saved)
-	check(war.state["corps"].size() == 2 and war.state.has("battlefield") and war.state["corps"][corps["id"]]["known_supplies"].size() == 1, "军团存档恢复失败")
+	check(war.state["corps"].size() == 2 and war.state.has("battlefield") and war.state["corps"][corps["id"]]["known_supplies"].is_empty(), "军团存档恢复失败")
 	store.prepare_battle_test(true)
 	corps = war.state["corps"].values()[0]
 	check(Corps.issue(war, corps, {"type": "withdraw_corps"}, "全军有序撤退")["ok"], "主帅无法统一撤军")

@@ -37,10 +37,25 @@ static func unit_attack(army: Dictionary, type: String, terrain: String) -> floa
 	if terrain in ["mountains", "hills"] and has_trait(army, "险地用兵"): value *= 1.06
 	return value
 
-static func defense(army: Dictionary, terrain: String) -> float:
+static func defense(army: Dictionary, terrain: String, config: Dictionary = {}) -> float:
 	var value := factor(army, ["布阵", "应变", "治军"], 0.003)
 	if terrain in ["river", "ford"]: value *= factor(army, ["水练"], 0.003)
-	return value
+	# First layer: the officer's defensive composite is deliberately narrow.
+	var section: Dictionary = config.get("officer", {})
+	return clampf(value, float(section.get("defense_min", 0.9)), float(section.get("defense_max", 1.1)))
+
+
+static func aura_strength(army: Dictionary, config: Dictionary = {}) -> float:
+	var section: Dictionary = config.get("officer", {})
+	var average := (skill(army, "带兵") + skill(army, "威仪") + skill(army, "治军")) / 3.0
+	var value := maxf(0.0, average - 50.0) * float(section.get("aura_skill_weight", 0.003))
+	return clampf(value, 0.0, float(section.get("aura_max", 0.15)))
+
+
+static func aura_range(army: Dictionary, config: Dictionary = {}) -> int:
+	var section: Dictionary = config.get("officer", {})
+	var bonus := int(section.get("aura_range_bonus", 1)) if skill(army, "威仪") >= float(section.get("aura_range_skill", 80)) else 0
+	return int(section.get("aura_range", 3)) + bonus
 
 static func tactic(attacker: Dictionary, defender: Dictionary) -> float:
 	if attacker.has("components"):
@@ -88,6 +103,8 @@ static func first_contact(attacker: Dictionary, defender: Dictionary, melee: boo
 	var targets: Array = attacker.get("battle_contacts", [])
 	var target := str(defender.get("officer_id", defender.get("id", "")))
 	if target.is_empty() or target in targets: return false
+	# Bounded so the persisted list cannot grow without limit over a long campaign.
+	if targets.size() >= 64: targets.pop_front()
 	targets.append(target)
 	attacker["battle_contacts"] = targets
 	defender["morale"] = maxf(0, float(defender.get("morale", 100)) - 8)

@@ -71,7 +71,7 @@ func present(store: Node, city_id: String, city_name: String, chosen_action: Str
 	var after: Dictionary = projection["after"]
 	page_title.text = str(TITLES[action_id])
 	purpose_label.text = str(PURPOSE[action_id])
-	city_label.text = city_name + " · " + str(spec["title"])
+	city_label.text = city_name + "  " + str(spec["title"])
 	faction_label.text = str(store.faction_for(city_id).get("name", "无主")) + "军  /  本城事务"
 	_clear(cost_rows)
 	_clear(result_rows)

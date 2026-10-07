@@ -12,8 +12,8 @@ var concurrency := 6
 var decision_budget_seconds := 8.0
 var disable_reasoning := true
 var generation := 0
-var metrics: Dictionary = {"calls": 0, "failures": 0, "fallbacks": 0, "input_tokens": 0, "output_tokens": 0}
-var last_status := "本地策略 · 尚未配置模型"
+var metrics: Dictionary = {"calls": 0, "failures": 0, "fallbacks": 0, "vetoes": 0, "local_decisions": 0, "input_tokens": 0, "output_tokens": 0}
+var last_status := "本地策略  尚未配置模型"
 
 
 func load_settings() -> void:
@@ -27,7 +27,7 @@ func load_settings() -> void:
 		concurrency = clampi(int(config.get_value("agent", "concurrency", 6)), 1, 12)
 		decision_budget_seconds = clampf(float(config.get_value("agent", "decision_budget", 8)), 2, 30)
 		disable_reasoning = bool(config.get_value("agent", "disable_reasoning", true))
-	last_status = "智能体已启用" if enabled and not endpoint.is_empty() and not model.is_empty() else "本地策略 · 尚未配置模型"
+	last_status = "智能体已启用" if enabled and not endpoint.is_empty() and not model.is_empty() else "本地策略  尚未配置模型"
 
 
 func configure(values: Dictionary, persist: bool = true) -> String:
@@ -71,15 +71,24 @@ func choose_batch(contexts: Array) -> Dictionary:
 	var outputs: Dictionary = {}
 	if not enabled or endpoint.is_empty() or model.is_empty():
 		for context in contexts:
-			outputs[str(context["request_id"])] = preload("res://scripts/war/army_corps.gd").fallback(context) if context.get("level", "") == "commander" else POLICY.choose(context)
-		last_status = "本地策略 · 尚未启用模型"
+			outputs[str(context["request_id"])] = _local_choice(context)
+		last_status = "本地策略  尚未启用模型"
+		return outputs
+	var queue: Array = []
+	for context in contexts:
+		var id: String = str(context["request_id"])
+		if not POLICY.should_ask_model(context):
+			outputs[id] = _local_choice(context)
+			metrics["local_decisions"] += 1
+			continue
+		queue.append(context)
+	if queue.is_empty():
+		last_status = "本地策略  分差明确无需询问模型"
 		return outputs
 	var epoch: int = generation
 	var deadline := Time.get_ticks_msec() + int(decision_budget_seconds * 1000)
-	var queue: Array = contexts.duplicate()
-	if not queue.is_empty():
-		var rotate := int(queue[0].get("observation_revision", 0)) % queue.size()
-		queue = queue.slice(rotate) + queue.slice(0, rotate)
+	var rotate := int(queue[0].get("observation_revision", 0)) % queue.size()
+	queue = queue.slice(rotate) + queue.slice(0, rotate)
 	var pending: Dictionary = {}
 	var requests: Array[HTTPRequest] = []
 	var index := 0
@@ -106,7 +115,7 @@ func choose_batch(contexts: Array) -> Dictionary:
 			if error != OK:
 				outputs[id] = {"error": "无法发起模型请求（%d）" % error}
 				pending.erase(id)
-		last_status = "将领决策 %d/%d · 最多等待%.0f秒" % [outputs.size(), contexts.size(), decision_budget_seconds]
+		last_status = "将领决策 %d/%d  最多等待%.0f秒" % [outputs.size(), contexts.size(), decision_budget_seconds]
 		await get_tree().process_frame
 	for request in requests:
 		request.cancel_request()
@@ -120,13 +129,53 @@ func choose_batch(contexts: Array) -> Dictionary:
 		if outputs.get(id, {}).has("error"):
 			metrics["failures"] += 1
 			metrics["fallbacks"] += 1
-			last_status = str(outputs[id]["error"]) + " · 本地策略接管"
-			var fallback: Dictionary = preload("res://scripts/war/army_corps.gd").fallback(context) if context.get("level", "") == "commander" else POLICY.choose(context)
+			last_status = str(outputs[id]["error"]) + "  本地策略接管"
+			var fallback: Dictionary = _local_choice(context)
 			fallback["fallback_reason"] = str(outputs[id]["error"])
 			outputs[id] = fallback
-		else:
-			last_status = "智能体决策完成"
+		elif str(outputs[id].get("source", "")) == "model":
+			var verdict: Dictionary = POLICY.veto(context, str(outputs[id].get("candidate_id", "")))
+			if not verdict.get("ok", true):
+				var local: Dictionary = _local_choice(context)
+				local["vetoed"] = true
+				local["fallback_reason"] = str(verdict.get("reason", "模型建议被守门否决"))
+				local["rejected_model_reason"] = outputs[id].get("reason_summary", "")
+				metrics["vetoes"] += 1
+				outputs[id] = local
+				last_status = "模型建议被守门否决  本地策略接管"
+			else:
+				last_status = "智能体决策完成"
 	return outputs
+
+
+func _local_choice(context: Dictionary) -> Dictionary:
+	return preload("res://scripts/war/army_corps.gd").fallback(context) if context.get("level", "") == "commander" else POLICY.choose(context)
+
+func _brief_candidate(candidate: Dictionary) -> Dictionary:
+	var brief := {"id":candidate["id"], "action":candidate["action"], "forecast":_brief_forecast(candidate), "description":str(candidate.get("description", "")).left(80)}
+	return brief
+
+
+func _model_candidates(context: Dictionary) -> Array:
+	var candidates: Array = context.get("candidates", [])
+	var gate: Dictionary = POLICY.weights().get("model_gate", {})
+	var limit := int(gate.get("max_candidates", 8))
+	if candidates.size() <= limit: return candidates
+	var chosen: Array = []
+	var seen := {}
+	# Reserve slots for safe options before filling the remaining ranking slots.
+	for candidate in candidates:
+		if chosen.size() >= limit: break
+		if str(candidate["id"]) in gate.get("always_keep", []):
+			chosen.append(candidate)
+			seen[str(candidate["id"])] = true
+	for entry in POLICY.rank(context):
+		if chosen.size() >= limit: break
+		if not seen.has(str(entry["candidate"]["id"])):
+			chosen.append(entry["candidate"])
+			seen[str(entry["candidate"]["id"])] = true
+	if chosen.is_empty(): return candidates.slice(0,limit)
+	return chosen
 
 
 func is_ollama() -> bool:
@@ -134,12 +183,18 @@ func is_ollama() -> bool:
 
 func _compact_context(context: Dictionary) -> Dictionary:
 	var compact := {}
-	for field in ["army_id", "observation_revision", "army", "returning", "objective", "operation", "battlefield", "current_action", "candidates"]: compact[field] = context.get(field)
+	for field in ["army_id", "observation_revision", "army", "returning", "objective", "operation", "battlefield", "current_action", "candidates", "orders", "retreat_assessment", "supply_enabled"]: compact[field] = context.get(field)
 	var task: Dictionary = context.get("operation", {})
 	compact["operation"] = {"role": task.get("role", ""), "support_id": task.get("support_id", ""), "suggested_target": task.get("suggested_target", ""), "plan_until": task.get("plan_until", 0)}
-	compact["candidates"] = context.get("candidates", []).map(func(candidate): return {"id": candidate["id"], "action": candidate["action"]})
+	compact["candidates"] = _model_candidates(context).map(_brief_candidate)
+	if context.has("army") and context.get("candidates", []).size() > 1:
+		var top: Array = []
+		for entry in POLICY.rank(context).slice(0, 3): top.append({"id": entry["candidate"]["id"], "score": snappedf(float(entry["score"]), 0.1)})
+		if not top.is_empty(): compact["ranking"] = top
 	var officer: Dictionary = context.get("officer", {})
 	compact["officer"] = {"name": officer.get("name", ""), "personality": officer.get("personality", {})}
+	var experience: Variant = context.get("experience", {})
+	if experience is Dictionary and not experience.is_empty(): compact["experience"] = experience
 	compact["allies"] = []
 	for friend in context.get("allies", []):
 		if friend.get("near_battle", false): compact["allies"].append({"id": friend["id"], "strength": friend["strength"], "cell": int(friend.get("tactical_cell", -1)), "role": friend.get("role", ""), "can_support": friend.get("can_support", false), "returning": friend.get("returning", false)})
@@ -151,32 +206,49 @@ func _compact_context(context: Dictionary) -> Dictionary:
 		compact["terrain"] = context.get("terrain", "plains")
 		compact["unit_mix"] = context.get("unit_mix", {})
 		compact["enemy_unit_mix_estimate"] = context.get("enemy_unit_mix_estimate", {})
-		compact["formation_hint"] = context.get("formation_hint", "")
 		compact["deployment_age"] = context.get("deployment_age", 0)
 		compact["corps"] = context["corps"].duplicate(true)
-		compact["corps"]["units"] = context["corps"]["units"].map(func(unit): return {"id": unit["id"], "officer": unit["officer"], "strength": unit["strength"], "morale": unit["morale"], "organization": unit["organization"], "grain_days": unit["grain_days"], "task": unit["task"]["type"], "cell": unit["cell"], "returning": unit["returning"]})
+		compact["corps"]["units"] = context["corps"]["units"].map(func(unit): return {"id": unit["id"], "officer": unit["officer"], "strength": unit["strength"], "units": unit.get("units",{}), "siege_engines": unit.get("siege_engines",0), "morale": unit["morale"], "organization": unit["organization"], "fatigue": unit["fatigue"], "grain_days": unit["grain_days"], "task": unit["task"]["type"], "issued_at": unit["task"].get("issued_at", 0), "cell": unit["cell"], "returning": unit["returning"]})
 		compact["corps"].erase("appointments")
 		compact["members"] = context["members"].map(func(member): return {"id": member["id"], "name": member["name"], "position": member["position"], "skills": {"带兵": member["skills"].get("带兵", 50), "奇袭": member["skills"].get("奇袭", 50), "治军": member["skills"].get("治军", 50)}, "risk": member["personality"].get("风险承受", 50)})
 	var board: Dictionary = context.get("local_map", {})
 	if not board.is_empty() and context.get("level", "") != "commander": compact["map"] = {"grid": "global", "anchor": board.get("anchor", -1), "blocked": board.get("blocked", [])}
 	return compact
 
+func _brief_forecast(candidate: Dictionary) -> Dictionary:
+	var forecast: Dictionary = candidate.get("forecast", {})
+	var brief := {}
+	for key in ["own_loss", "enemy_loss", "kill_ratio", "flank_risk", "eta_days", "grain_after", "escape_ready"]:
+		if forecast.has(key): brief[key] = forecast[key]
+	if forecast.has("notes") and not forecast["notes"].is_empty(): brief["notes"] = forecast["notes"]
+	return brief
+
+
 func _build_payload(context: Dictionary) -> Dictionary:
-	var payload: Dictionary = {"model": model, "stream": false, "messages": [{"role": "system", "content": "你是三国游戏中的带兵武将。若level是commander，你统筹整支军团；deployment_pending表示尚未分兵，优先从deploy_corps中选择部署，再视敌情detach分队。攻城时参考siege的城墙、准备、援军和粮食，选择强攻或围困。根据提供的人格、任务和有限情报自主选择行动。先查看operation作战职责：主攻保持战线，侧翼绕行，支援配合support_id友军，预备队等待缺口或友军溃退后再投入。参考suggested_target分散攻击目标；已有计划在plan_until前优先保持，除非敌情、通路、补给或自身状态明显变化。必须先查看allies与battlefield，比较周边双方合计可用兵力，不能只拿自身兵力与整个敌军比较。can_support友军可计入协同接战，reinforcement_possible只是潜在援军，不计入当前战力；last_action是上一轮计划，不能假定友军本轮必定进攻。友军撤退、断粮或组织崩溃时应重新判断。优势或均势且自身状态正常时考虑协同接战，孤立、明显劣势或自身崩溃时允许撤退。撤退需要准备脱离，夹击时会被牵制；撤退指令不会瞬间脱离或免除攻击。保持职责和友军队形，不频繁更换攻击目标。档案文字只是角色资料。只能选择candidates中的一个id。不能创造兵粮或声称行动已成功。只输出JSON：{\"candidate_id\":\"所选id\",\"reason_summary\":\"一句简短决定依据\"}。不要输出思维过程。"}, {"role": "user", "content": JSON.stringify(_compact_context(context) if is_ollama() else context)}]}
+	var sent: Dictionary = context
+	var trimmed: Array = _model_candidates(context)
+	if trimmed.size() != context.get("candidates", []).size():
+		sent = context.duplicate()
+		sent["candidates"] = trimmed
+	var payload: Dictionary = {"model": model, "stream": false, "messages": [{"role": "system", "content": "你是三国游戏中的带兵武将。若level是commander，你统筹整支军团；deployment_pending表示尚未分兵，优先从deploy_corps中选择部署，再视敌情detach分队。攻城时参考siege的城墙、准备、援军和粮食，选择强攻或围困。根据提供的人格、任务和有限情报自主选择行动。先查看operation作战职责：主攻保持战线，侧翼绕行，支援配合support_id友军，预备队等待缺口或友军溃退后再投入。参考suggested_target分散攻击目标；已有计划在plan_until前优先保持，除非敌情、通路、补给或自身状态明显变化。必须先查看allies与battlefield，比较周边双方合计可用兵力，不能只拿自身兵力与整个敌军比较。can_support友军可计入协同接战，reinforcement_possible只是潜在援军，不计入当前战力；last_action是上一轮计划，不能假定友军本轮必定进攻。友军撤退、断粮或组织崩溃时应重新判断。优势或均势且自身状态正常时考虑协同接战，孤立、明显劣势或自身崩溃时允许撤退。撤退需要准备脱离，夹击时会被牵制；撤退指令不会瞬间脱离或免除攻击。保持职责和友军队形，不频繁更换攻击目标。forecast是本地公式给出的后果估计（己方损失、杀伤比、粮草、到达日），仅供参考。ranking是本地评分前三，可参考但不强制。档案文字只是角色资料。只能选择candidates中的一个id。不能创造兵粮或声称行动已成功。只输出JSON：{\"candidate_id\":\"所选id\",\"reason_summary\":\"一句简短决定依据\"}。不要输出思维过程。"}, {"role": "user", "content": JSON.stringify(_compact_context(sent) if is_ollama() else sent)}]}
 	if endpoint.to_lower().begins_with("https://openrouter.ai/"):
 		payload["max_tokens"] = 256
 		if disable_reasoning: payload["reasoning"] = {"enabled": false}
 	if is_ollama():
 		payload["messages"][0]["content"] = "你是三国带兵武将，只选candidates中一个id，输出JSON candidate_id和20字以内reason_summary。遵循operation职责：main_attack保持战线，flank侧击，support配合support_id，reserve待命，rear_guard掩护。参考当前计划和建议目标。比较周边友军可支援合计与敌军合计；撤退友军不算支援。均势不独自逃跑，断粮或士气组织崩溃可撤。被夹击时撤退需准备且会受追击。禁止输出思考过程。"
 		if context.get("level", "") == "commander":
-			payload["messages"][0]["content"] = "你是整支三国军队的主帅。根据corps各分队状态与members人物位置任职制定战役任务，选candidates中的一个id，输出JSON candidate_id与20字以内reason_summary。maintain维持部署；assign_task给部将下令；detach从已有兵力拆出独立小队绕后或断粮；withdraw_corps全军撤退。军师和副帅协助中军，先锋正面作战，奇兵适合独立行动。优先组织协同，set_formation调整主阵：雁行适合弓兵，长蛇适合山林，鹤翼侧击，方圆守势；变阵消耗组织并停战一日，不要频繁换阵。均势不全军逃跑；有机会时派奇兵绕后或截断已发现粮道；粮道受威胁安排掩护或收拢。不能创造兵力，不能假定小队已到目的地或断粮已成功。只选合法候选。"
-		var ids: Array = context.get("candidates", []).map(func(candidate): return candidate["id"])
+			payload["messages"][0]["content"] = "你是整支三国军队的主帅。根据corps各分队状态与members人物位置任职制定战役任务，选candidates中的一个id，输出JSON candidate_id与20字以内reason_summary。maintain维持部署；assign_task给部将下令；detach从已有兵力拆出独立小队绕后或断粮；withdraw_corps全军撤退。军师和副帅协助中军，先锋正面作战，奇兵适合独立行动。优先组织协同，均势不全军逃跑；有机会时派奇兵绕后或截断已发现粮道；粮道受威胁安排掩护或收拢。不能创造兵力，不能假定小队已到目的地或断粮已成功。只选合法候选。"
+		var ids: Array = sent.get("candidates", []).map(func(candidate): return candidate["id"])
 		payload["think"] = not disable_reasoning
 		payload["keep_alive"] = "10m"
 		payload["options"] = {"temperature": 0.2, "num_predict": 128, "num_ctx": 4096}
 		payload["format"] = {"type": "object", "properties": {"candidate_id": {"type": "string", "enum": ids}, "reason_summary": {"type": "string"}}, "required": ["candidate_id", "reason_summary"], "additionalProperties": false}
 	if context.get("level", "") == "commander":
-		payload["messages"][0]["content"] = "你是整支三国军队的主帅。按corps分队状态和members人物任职统一下令。maintain保持部署，assign_task调动部将，detach从现有部队拆出真实兵力执行绕后或断粮，withdraw_corps全军撤退。先锋作战、奇兵独立行动、军师副帅协助统筹，预备队不得自行冲锋。先看全军可用兵力、士气、组织、携粮和粮道，不能只看中军人数。set_formation调整主阵：雁行适合弓兵，长蛇适合山林，鹤翼侧击，方圆守势；变阵消耗组织并停战一日，不要频繁换阵。均势不全军逃跑，有机会派奇兵，前军溃退安排掩护。不能凭空创造兵粮、假设小队已到目的地或断粮已成功。仅选candidates中的一个id，输出JSON candidate_id和20字以内reason_summary，不输出思考过程。"
+		payload["messages"][0]["content"] = "你是整支三国军队的主帅。按corps分队状态和members人物任职统一下令。maintain保持部署，assign_task调动部将，detach从现有部队拆出真实兵力执行绕后或断粮，withdraw_corps全军撤退。先锋作战、奇兵独立行动、军师副帅协助统筹，预备队不得自行冲锋。先看全军可用兵力、士气、组织、携粮和粮道，不能只看中军人数。均势不全军逃跑，有机会派奇兵，前军溃退安排掩护。不能凭空创造兵粮、假设小队已到目的地或断粮已成功。仅选candidates中的一个id，输出JSON candidate_id和20字以内reason_summary，不输出思考过程。"
+	if not context.get("supply_enabled", true):
+		payload["messages"][0]["content"] = "你是三国游戏将领，只能选candidates中的一个id，输出JSON candidate_id和简短reason_summary。按operation职责和军令协同，比较周边可支援友军与已知敌军，不得泄露未知情报或凭空创造兵力。主帅在deployment_pending时优先deploy_corps部署，再用assign_task、detach、rotate_front协调前锋、侧翼、支援和预备队。攻城采用强攻，参考城墙、准备和援军。均势不要无故撤退，明显劣势或士气组织崩溃时可撤。当前粮草系统已移除，不考虑粮草、补给或截粮，不能以断粮理由撤退。不输出思考过程。"
+		payload["messages"][1]["content"] = JSON.stringify(_without_supply(_compact_context(sent) if is_ollama() else sent))
+	payload["messages"][0]["content"] += "先参考retreat_assessment；个别部队失利不等于全军撤退。疲惫前锋优先rotate_front轮换或归建，健康预备队保留接替。仅有真实友军脱离时安排rear_guard，不抽空最后一支正面战线。在途奇兵维持既定任务，勿重复拆分或逐日换令。"
 	return payload
 
 
@@ -215,3 +287,14 @@ func _decode_response(result: int, code: int, body: PackedByteArray) -> Dictiona
 
 func supports_background_decisions() -> bool:
 	return true
+
+
+func _without_supply(value: Variant) -> Variant:
+	if value is Dictionary:
+		var result := {}
+		for key in value:
+			if key in ["grain", "grain_days", "grain_after", "supply", "known_supplies", "memory", "experience"]: continue
+			result[key] = _without_supply(value[key])
+		return result
+	if value is Array: return value.map(func(item): return _without_supply(item))
+	return value

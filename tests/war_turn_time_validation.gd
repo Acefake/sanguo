@@ -39,7 +39,7 @@ func _run() -> void:
 	store.day = 23
 	store.inject_urgent = true
 	await store.advance_turn()
-	check(store.day == 3 and store.turn_days_done == 10 and store.saves == 4, "军情或月末截断了十日执行")
+	check(store.day == 24 and store.turn_days_done == 1 and store.saves == 4, "重要军情没有中断执行并仅保存一次")
 	store.queue_free()
-	if failures.is_empty(): print("WAR_TURN_TIME_OK: fixed ten days, mid-month start, month rollover, urgent reports do not truncate, report phase and one save")
+	if failures.is_empty(): print("WAR_TURN_TIME_OK: ten-day turns, month rollover, urgent interruption, report phase and one save")
 	quit(0 if failures.is_empty() else 1)

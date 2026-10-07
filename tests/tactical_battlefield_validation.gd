@@ -13,7 +13,7 @@ func check(value: bool, message: String) -> void:
 func _run() -> void:
 	var store: Node = root.get_node("GameState")
 	store.persist_enabled = false
-	store.prepare_battle_test(true)
+	store.prepare_battle_test(true, "plains_clash")
 	var board: Dictionary = store.war.state["battlefield"]
 	var anchor: int = int(board["anchor"])
 	check(Tactical.column_of(anchor) == int(board["min_column"]) + 7 and Tactical.row_of(anchor) == int(board["min_row"]) + 9, "全局格战场原点错误")
@@ -48,8 +48,8 @@ func _run() -> void:
 	context["army"]["organization"] = 10
 	check(store.war._decision_key(context) != original_key, "组织崩溃未触发重判")
 	var front: Array = store.war.active_armies("liu_bei").filter(func(army): return army["tactical"]["role"] == "main_attack")
-	front[0]["returning"] = true
-	front[1]["returning"] = true
+	check(not front.is_empty(), "没有可撤退的前锋")
+	for unit in front: unit["returning"] = true
 	store.war._update_operations()
 	var reserves: Array = store.war.active_armies("liu_bei").filter(func(army): return army["tactical"]["role"] == "reserve")
 	check(reserves[0]["operation"]["role"] == "reserve", "预备队自行改变主帅任务")
@@ -57,7 +57,7 @@ func _run() -> void:
 	check(store.war.Corps.issue(store.war, corps, {"type": "assign_task", "unit": reserves[0]["id"], "task": "main_attack"}, "主帅令预备队补线")["ok"], "主帅无法调动预备队")
 	store.war._update_operations()
 	check(reserves[0]["operation"]["role"] == "main_attack", "部将未执行主帅命令")
-	store.prepare_battle_test(true)
+	store.prepare_battle_test(true, "plains_clash")
 	for tick in range(8):
 		await store.war.step()
 		var occupied := {}
@@ -65,25 +65,25 @@ func _run() -> void:
 			var position: int = int(army["tactical"]["cell"])
 			check(not occupied.has(position) and not store.war.state["battlefield"]["blocked"].has(position), "战线推进出现重叠或穿障")
 			occupied[position] = true
-	store.prepare_battle_test(true)
+	store.prepare_battle_test(true, "plains_clash")
 	var board2: Dictionary = store.war.state["battlefield"]
-	var own: Dictionary = store.war.active_armies("liu_bei")[0]
+	var own: Dictionary = store.war.active_armies("liu_bei").filter(func(army): return int(army["units"].get("archers",0)) > 0)[0]
 	var enemy: Dictionary = store.war.active_armies("yuan_shao")[0]
 	for army in store.war.active_armies():
 		if army["id"] not in [own["id"], enemy["id"]]: army["status"] = "ended"
 	own["tactical"]["cell"] = Tactical.offset_cell(board2, 0, -2)
 	own["tactical"]["role"] = "support"
 	own["action"] = {"type": "support", "ally": own["id"]}
-	enemy["tactical"]["cell"] = Tactical.offset_cell(board2, 0, 1)
+	enemy["tactical"]["cell"] = Tactical.offset_cell(board2, 0, 0)
 	enemy["action"] = {"type": "hold"}
 	store.war._observe_all()
 	var before: int = store.war.Combat.strength(enemy)
 	store.war._resolve_contacts({})
-	check(store.war.Combat.strength(enemy) < before, "三格内远程支援未造成伤害")
-	enemy["tactical"]["cell"] = Tactical.offset_cell(board2, 0, 3)
+	check(store.war.Combat.strength(enemy) < before, "两格内远程支援未造成伤害")
+	enemy["tactical"]["cell"] = Tactical.offset_cell(board2, 0, 1)
 	before = store.war.Combat.strength(enemy)
 	store.war._resolve_contacts({})
-	check(store.war.Combat.strength(enemy) == before, "超出射程仍能攻击")
+	check(store.war.Combat.strength(enemy) == before, "三格距离仍能攻击")
 	enemy["status"] = "ended"
 	own["returning"] = true
 	var home_before: int = store.city_state("xiaopei")["garrison"]

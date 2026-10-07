@@ -1,0 +1,441 @@
+{
+  "version": 4,
+  "note": "效用评分的全部可调参数。base_score 为行动基线，factors 为通用因素权重，personality_modifiers 为 14 轴对各因素权重的偏移系数，形式：权重 = base + (轴值 - 50) × 系数。",
+  "base_score": {
+    "continue": 35,
+    "march": 30,
+    "scout": 18,
+    "hold": 15,
+    "resupply": 8,
+    "engage": 42,
+    "besiege": 48,
+    "withdraw": 5,
+    "pursue": 30,
+    "request_support": 25,
+    "support": 20,
+    "flank": 18
+  },
+  "march": {
+    "progress": 12
+  },
+  "scout": {
+    "unknown": 22
+  },
+  "hold": {
+    "defend": 28,
+    "reserve": 55,
+    "reserve_danger": 1.5
+  },
+  "resupply": {
+    "urgent": 80,
+    "urgent_days": 12,
+    "base": 8
+  },
+  "engage": {
+    "risk": 14,
+    "danger": 40,
+    "decisive": 6,
+    "suggested": 8
+  },
+  "flank": {
+    "role": 58,
+    "other": 18,
+    "decisive": 6
+  },
+  "besiege": {
+    "risk": 10,
+    "defender": 38,
+    "defender_risk": 16,
+    "defender_floor": 0.6
+  },
+  "pursue": {
+    "risk": 28,
+    "decisive": 6
+  },
+  "support": {
+    "role": 60,
+    "other": 20
+  },
+  "request_support": {
+    "danger": 15,
+    "danger_floor": 0.8
+  },
+  "withdraw": {
+    "crisis": 95,
+    "base": 5,
+    "returning": 120,
+    "grain_days": 4,
+    "morale": 30,
+    "organization": 25,
+    "threshold": 0.8,
+    "risk_scale": 0.8,
+    "ordered_threshold": 1.35,
+    "ordered_risk_scale": 0.65,
+    "danger_weight": 65
+  },
+  "factors": {
+    "kill_ratio": {
+      "weight": 16,
+      "cap": 3.0
+    },
+    "own_loss": {
+      "weight": -45,
+      "cap": 0.5
+    },
+    "flank_risk": {
+      "weight": -25,
+      "cap": 1.0
+    },
+    "target_value": {
+      "weight": 12,
+      "cap": 8.0
+    },
+    "danger": {
+      "weight": -30,
+      "cap": 2.0
+    },
+    "inertia": {
+      "weight": 10
+    },
+    "role_fit": {
+      "weight": 10
+    },
+    "patience": {
+      "weight": 0
+    },
+    "ambition": {
+      "weight": 0
+    },
+    "empathy": {
+      "weight": 14
+    },
+    "loyalty": {
+      "weight": 10
+    },
+    "greed": {
+      "weight": 0
+    },
+    "suspicion": {
+      "weight": 0
+    },
+    "discipline": {
+      "weight": 0
+    },
+    "pride": {
+      "weight": 0
+    },
+    "tolerance": {
+      "weight": 8
+    },
+    "order": {
+      "weight": 0
+    }
+  },
+  "personality_modifiers": {
+    "野心": {
+      "ambition": 0.15,
+      "greed": 0.15
+    },
+    "风险承受": {
+      "own_loss": 0.2,
+      "danger": 0.15,
+      "flank_risk": 0.1,
+      "pride": -0.1
+    },
+    "耐心": {
+      "patience": 0.12,
+      "ambition": -0.1,
+      "discipline": 0.1
+    },
+    "决断": {
+      "inertia": -0.2,
+      "discipline": -0.15,
+      "danger": 0.1
+    },
+    "自制": {
+      "discipline": 0.2,
+      "greed": -0.1
+    },
+    "猜疑": {
+      "suspicion": 0.1
+    },
+    "自尊": {
+      "pride": -0.2,
+      "danger": -0.1
+    },
+    "同理心": {
+      "empathy": 0.2,
+      "loyalty": 0.15
+    },
+    "秩序偏好": {
+      "order": 0.2,
+      "inertia": 0.2,
+      "role_fit": 0.15
+    },
+    "务实": {
+      "kill_ratio": 0.15,
+      "own_loss": -0.1
+    },
+    "记仇": {
+      "target_value": 0.15
+    },
+    "容人": {
+      "tolerance": 0.2,
+      "ambition": -0.1
+    },
+    "贪欲": {
+      "greed": 0.2,
+      "target_value": 0.1
+    },
+    "忠义": {
+      "loyalty": 0.2,
+      "empathy": 0.15
+    }
+  },
+  "hysteresis": {
+    "stay_bonus": 10
+  },
+  "intents": {
+    "速胜": {
+      "engage": 6,
+      "flank": 6,
+      "pursue": 6,
+      "withdraw": -10,
+      "maintain": -2,
+      "detach": 4,
+      "assign_main_attack": 4,
+      "assign_raid_rear": 4,
+      "deploy_corps": 4,
+      "set_siege_mode": 4,
+      "withdraw_corps": -20
+    },
+    "稳扎": {},
+    "牵制": {
+      "hold": 8,
+      "support": 8,
+      "engage": -4,
+      "flank": -4,
+      "maintain": 2,
+      "assign_flank": 4,
+      "assign_rear_guard": 6,
+      "withdraw_corps": 8
+    },
+    "斩首": {
+      "pursue": 8,
+      "engage": 4,
+      "flank": 4,
+      "withdraw": -6,
+      "detach": 6,
+      "assign_raid_rear": 8,
+      "assign_cut_supply": 6,
+      "withdraw_corps": -10
+    },
+    "保存实力": {
+      "withdraw": 18,
+      "engage": -8,
+      "flank": -8,
+      "pursue": -8,
+      "hold": 4,
+      "detach": -6,
+      "assign_raid_rear": -10,
+      "assign_cut_supply": -10,
+      "withdraw_corps": 30
+    }
+  },
+  "risk_allowance": {
+    "conservative": {
+      "engage": -4,
+      "flank": -12,
+      "pursue": -14,
+      "besiege": -4
+    },
+    "reckless": {
+      "engage": 4,
+      "flank": 10,
+      "pursue": 12,
+      "besiege": 4
+    }
+  },
+  "target_value": {
+    "kill": 1.0,
+    "isolated": 1.0,
+    "broken": 1.2,
+    "broken_weak": 0.4,
+    "counter": 2.0,
+    "threat": 0.6,
+    "grudge": 2.0,
+    "suggested": 1.5,
+    "isolated_radius": 2,
+    "weak_ratio": 0.75
+  },
+  "model_gate": {
+    "margin": 12,
+    "veto": 30,
+    "max_candidates": 8,
+    "high_risk": [
+      "withdraw",
+      "withdraw_corps",
+      "besiege",
+      "deploy_corps"
+    ],
+    "always_keep": [
+      "withdraw",
+      "maintain",
+      "hold",
+      "regroup",
+      "withdraw_corps"
+    ]
+  },
+  "experience": {
+    "enemy_notes": 6,
+    "battle_log": 10,
+    "drift_per_battle": 3,
+    "drift_cap": 12,
+    "grudge_days": 20,
+    "drift_enabled": false,
+    "decay_per_day": 0.15
+  },
+  "commander": {
+    "base_score": {
+      "maintain": 20,
+      "deploy": 45,
+      "withdraw_corps": 10,
+      "siege_mode": 12,
+      "assign_main_attack": 15,
+      "assign_flank": 12,
+      "assign_reserve": 10,
+      "assign_rear_guard": 15,
+      "assign_regroup": 8,
+      "assign_raid_rear": 18,
+      "assign_cut_supply": 18,
+      "detach": 12,
+      "rotate_front": 60
+    },
+    "withdraw": {
+      "base": 10,
+      "ratio": 2.5,
+      "ready_ratio": 0.55,
+      "grain_days": 2,
+      "majority_returning": 0.5,
+      "bonus": 100,
+      "hysteresis_bonus": 40
+    },
+    "rotate": {
+      "fatigue": 60,
+      "morale": 50,
+      "organization": 50,
+      "reserve_morale": 55,
+      "reserve_organization": 50
+    },
+    "siege": {
+      "blockade_grain": 12,
+      "assault_loss": 0.08,
+      "blockade_bonus": 20,
+      "assault_bonus": 16,
+      "assault_preparation": 70
+    },
+    "deploy": {
+      "assault_aggression": 0.6,
+      "flanking_aggression": 0.5,
+      "defensive_ratio": 1.4
+    },
+    "front": {
+      "empty_bonus": 30,
+      "guard_bonus": 25,
+      "reserve_bonus": 25,
+      "flank_bonus": 22,
+      "regroup_bonus": 22
+    },
+    "raid": {
+      "bonus": 15,
+      "supply_bonus": 15,
+      "aggression": 60
+    },
+    "factors": {
+      "enemy_ratio": {
+        "weight": -50,
+        "cap": 3.0
+      },
+      "ready_ratio": {
+        "weight": 40,
+        "cap": 1.0
+      },
+      "grain": {
+        "weight": -8,
+        "cap": 24.0
+      },
+      "fatigue": {
+        "weight": 20,
+        "cap": 100.0
+      },
+      "returning": {
+        "weight": 15,
+        "cap": 1.0
+      },
+      "raid": {
+        "weight": 12,
+        "cap": 1.0
+      },
+      "siege_supply": {
+        "weight": 10,
+        "cap": 20.0
+      }
+    },
+    "personality_modifiers": {
+      "野心": {
+        "raid": 0.4,
+        "enemy_ratio": 0.3,
+        "grain": -0.2
+      },
+      "风险承受": {
+        "enemy_ratio": 0.4,
+        "fatigue": -0.2
+      },
+      "耐心": {
+        "siege_supply": 0.5,
+        "raid": -0.3
+      },
+      "决断": {
+        "fatigue": -0.3,
+        "grain": -0.2
+      },
+      "自制": {
+        "raid": -0.3,
+        "enemy_ratio": -0.2
+      },
+      "猜疑": {
+        "raid": -0.2,
+        "ready_ratio": 0.2
+      },
+      "自尊": {
+        "enemy_ratio": -0.3
+      },
+      "同理心": {
+        "returning": 0.4
+      },
+      "秩序偏好": {
+        "fatigue": 0.2
+      },
+      "务实": {
+        "enemy_ratio": 0.3,
+        "grain": -0.3
+      },
+      "记仇": {
+        "raid": 0.2
+      },
+      "容人": {
+        "raid": -0.2
+      },
+      "贪欲": {
+        "raid": 0.4
+      },
+      "忠义": {
+        "returning": 0.3,
+        "ready_ratio": 0.2
+      }
+    },
+    "hysteresis": {
+      "stay_bonus": 8
+    }
+  }
+}

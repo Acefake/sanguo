@@ -7,6 +7,7 @@ const WORLD_SIZE := 2048.0
 const HEIGHT_SCALE := 0.01
 const TERRAIN_STEP := 1
 const CHUNK_CELLS := 256
+const STATIC_PLACEMENT_CHUNK_SIZE := 256.0
 const WATER_LEVEL := 0.3
 const SOURCE_SCENE := "KIDSSystemResource_6dbf662e.kidsobjdb"
 const CITY_BADGE_SCALE := 0.44
@@ -29,6 +30,7 @@ var labels: Array[Label3D] = []
 var city_badges: Dictionary = {}
 var badge_layer: CanvasLayer
 var city_interior: CanvasLayer
+var city_hidden_layers: Array[CanvasLayer] = []
 var terrain_root: Node3D
 var landscape_root: Node3D
 var cities_root: Node3D
@@ -108,6 +110,7 @@ func _ready() -> void:
 	_build_water()
 	_build_landscape()
 	_build_cities()
+	_build_campaign_city_markers()
 	_build_world_districts()
 	await _build_vegetation()
 	_build_selection_ring()
@@ -444,7 +447,7 @@ func _collect_meshes(node: Node, transform: Transform3D, found: Array) -> void:
 
 func _build_landscape() -> void:
 	landscape_root = Node3D.new()
-	landscape_root.name = "VerifiedStaticPlacements"
+	landscape_root.name = "NativeStaticLandscapeObjects"
 	add_child(landscape_root)
 	var groups: Dictionary = {}
 	var placements: Array = _read_json(ASSET_DIR + "placements.json", [])
@@ -455,9 +458,10 @@ func _build_landscape() -> void:
 	landscape_root.set_meta("source_visibility", source_visibility)
 	for record in placements:
 		static_source_count += 1
-		# The active stage renders its source visibility list. Other source meshes
-		# remain available as assets; drawing them over the baked relief duplicates it.
-		if not listed_instances.is_empty() and not listed_instances.has(str(record["instance"])):
+		# Negative PreviewVisibilitySet inherits the default-visible stage state.
+		# Only objects assigned to a positive set need a stage visibility override.
+		if int(record.get("preview_visibility_set", -1)) >= 0 \
+			and not listed_instances.has(str(record["instance"])):
 			continue
 		var model_id := str(record["model"])
 		if str(record["name"]).contains("ocean"):
@@ -470,34 +474,11 @@ func _build_landscape() -> void:
 		var rotation := Quaternion(float(q[0]), float(q[1]), float(q[2]), float(q[3])).normalized()
 		var basis := Basis(rotation).scaled_local(Vector3(float(s[0]), float(s[1]), float(s[2])))
 		var pose := Transform3D(basis, Vector3(float(p[0]), float(p[1]), float(p[2])) * HEIGHT_SCALE)
-		# The original relief is restored. Keep every source transform, including Y.
-
-		if _rock_overlaps_city(str(record["name"]), model_id, pose):
-			static_filtered_count += 1
-			continue
+		# Preserve every source transform, including Y and original overlaps.
 		groups[model_id].append(pose)
 		static_instance_count += 1
 	for model_id in groups:
 		_add_multimeshes(landscape_root, str(model_id), groups[model_id])
-
-func _rock_overlaps_city(object_name: String, model_id: String, pose: Transform3D) -> bool:
-	if not (object_name.contains("cliff") or object_name.contains("mt01")):
-		return false
-	var bounds := AABB()
-	var first := true
-	for part in _model_meshes(model_id):
-		var box: AABB = pose * part["transform"] * part["mesh"].get_aabb()
-		bounds = box if first else bounds.merge(box)
-		first = false
-	for city in city_data:
-		var x := float(city["x"])
-		var z := float(city["z"])
-		var radius := maxf(15.0, float(city_foundations[str(city["id"])]["selection_radius"]) * 0.9)
-		var closest := Vector2(clampf(x, bounds.position.x, bounds.end.x), clampf(z, bounds.position.z, bounds.end.z))
-		if Vector2(x, z).distance_squared_to(closest) < radius * radius:
-			return true
-	return false
-
 
 func _source_height_at(x: float, z: float) -> float:
 	var px := clampf(x, 0.0, WORLD_SIZE)
@@ -525,6 +506,17 @@ func _add_multimeshes(parent: Node3D, model_id: String, transforms: Array, parti
 		for tile in tiles:
 			_add_multimeshes(parent, model_id, tiles[tile], false)
 		return
+	if parent == landscape_root and partition:
+		var tiles: Dictionary = {}
+		for transform: Transform3D in transforms:
+			var tile := Vector2i(floori(transform.origin.x / STATIC_PLACEMENT_CHUNK_SIZE),
+				floori(transform.origin.z / STATIC_PLACEMENT_CHUNK_SIZE))
+			if not tiles.has(tile):
+				tiles[tile] = []
+			tiles[tile].append(transform)
+		for tile in tiles:
+			_add_multimeshes(parent, model_id, tiles[tile], false)
+		return
 	for part in _model_meshes(model_id):
 		var multimesh := MultiMesh.new()
 		multimesh.transform_format = MultiMesh.TRANSFORM_3D
@@ -537,6 +529,7 @@ func _add_multimeshes(parent: Node3D, model_id: String, transforms: Array, parti
 		var instance := MultiMeshInstance3D.new()
 		instance.multimesh = multimesh
 		instance.name = model_id
+		instance.set_meta("source_model_id", model_id)
 		parent.add_child(instance)
 		if parent == landscape_root:
 			instance.set_meta("source_poses", transforms)
@@ -606,6 +599,53 @@ func _build_cities() -> void:
 		badge_layer.add_child(badge)
 		badge_layer.move_child(city_popup, -1)
 		city_badges[str(city["id"])] = badge
+
+func _build_campaign_city_markers() -> void:
+	var sites: Dictionary = preload("res://scripts/war/city_fortifications.gd").sites(GameState)
+	for site in sites.values():
+		if site["native"]: continue
+		var id := str(site["id"])
+		var point: Vector2 = site["point"]
+		var y := height_at(point.x, point.y)
+		var root := Node3D.new()
+		root.name = id
+		root.position = Vector3(point.x, y, point.y)
+		root.set_meta("visual_source", "campaign_fallback_fort")
+		cities_root.add_child(root)
+		var stone := StandardMaterial3D.new()
+		stone.albedo_color = Color("948473")
+		for index in range(4):
+			var wall := MeshInstance3D.new()
+			var box := BoxMesh.new()
+			box.size = Vector3(6, 3.8, 0.55)
+			box.material = stone
+			wall.mesh = box
+			wall.rotation.y = index * PI / 2
+			wall.position = Vector3(sin(index * PI / 2) * 2.8, 1.9, cos(index * PI / 2) * 2.8)
+			root.add_child(wall)
+		for x in [-2.8, 2.8]:
+			for z in [-2.8, 2.8]:
+				var tower := MeshInstance3D.new()
+				var cylinder := CylinderMesh.new()
+				cylinder.top_radius = 0.7
+				cylinder.bottom_radius = 0.7
+				cylinder.height = 4.5
+				cylinder.material = stone
+				tower.mesh = cylinder
+				tower.position = Vector3(x, 2.25, z)
+				root.add_child(tower)
+		city_nodes[id] = root
+		city_foundations[id] = {"height": y, "bottom": 0.0, "selection_radius": 7.0}
+		city_pick_positions[id] = root.position + Vector3.UP * 12
+		var name: String = GameState.war.graph.name_of(id)
+		city_data.append({"id": id, "name": name, "x": point.x, "z": point.y, "cells": site["cells"], "model": "campaign_fallback"})
+		var badge := preload("res://scripts/world_city_badge.gd").new()
+		badge.city_name = name
+		badge.scale = Vector2.ONE * CITY_BADGE_SCALE
+		badge.chosen.connect(_select_city.bind(id))
+		badge_layer.add_child(badge)
+		badge_layer.move_child(city_popup, -1)
+		city_badges[id] = badge
 
 func _build_gates() -> void:
 	var root := Node3D.new()
@@ -681,7 +721,7 @@ func _prepare_city_sites() -> void:
 		var x := float(city["x"])
 		var z := float(city["z"])
 		var level := maxf(height_at(x, z), WATER_LEVEL + 0.6)
-		city_foundations[str(city["id"])] = {"height": level, "bottom": bounds.position.y, "selection_radius": maxf(bounds.size.x, bounds.size.z) * 0.62}
+		city_foundations[str(city["id"])] = {"height": level, "bottom": bounds.position.y, "bounds": bounds, "selection_radius": maxf(bounds.size.x, bounds.size.z) * 0.62}
 		var min_x := x + bounds.position.x - 1.0
 		var max_x := x + bounds.end.x + 1.0
 		var min_z := z + bounds.position.z - 1.0
@@ -906,11 +946,14 @@ func _process(delta: float) -> void:
 			var badge_position := screen + Vector2(-20, -78) * CITY_BADGE_SCALE
 			if not badge.position.is_equal_approx(badge_position):
 				badge.position = badge_position
-			var state: Dictionary = GameState.scenario.get("places", {}).get(city_id, {})
+			var state: Dictionary = GameState.city_state(city_id)
 			var faction: Dictionary = GameState.scenario.get("factions", {}).get(str(state.get("faction", "")), {})
 			var letter := str(faction.get("short", ""))
 			var color := Color(str(faction.get("color", "#c5c0aa")))
 			var troops := int(state.get("garrison", 0))
+			if not GameState.battle_test and not GameState.war.player_has_city_access(city_id):
+				var intel: Dictionary = GameState.war.player_city_intel(GameState.canonical_city_id(city_id))
+				troops = int(intel.get("strength_estimate", -1))
 			var selected: bool = selected_city == city_id
 			if badge.faction_letter != letter or badge.faction_color != color or badge.troops != troops or badge.selected != selected:
 				badge.faction_letter = letter
@@ -1074,7 +1117,7 @@ func _select_city(city_id: String) -> void:
 	selected_ring.position = Vector3(node.position.x, float(foundation["height"]) + 0.08, node.position.z)
 	selected_ring.visible = true
 	if city_popup != null:
-		city_popup.visible = true
+		city_popup.visible = GameState.canonical_city_id(selected_city) != ""
 
 
 func _clear_selection() -> void:
@@ -1183,20 +1226,27 @@ func _deploy_selected_city() -> void:
 		army_world.deploy_city(selected_city)
 
 func _enter_selected_city() -> void:
-	if selected_city.is_empty() or city_interior != null:
-		return
-	var name := selected_city
-	for city in city_data:
-		if str(city.id) == selected_city:
-			name = str(city.name)
-			break
+	if selected_city.is_empty() or city_interior != null: return
+	var logical_id := GameState.canonical_city_id(selected_city)
+	if logical_id == "": return
+	var name: String = GameState.war.graph.name_of(logical_id)
+	city_hidden_layers.clear()
+	for overlay in find_children("*", "CanvasLayer", true, false):
+		if overlay.visible:
+			city_hidden_layers.append(overlay)
+			overlay.hide()
 	city_interior = load("res://scenes/city_interior.tscn").instantiate()
 	add_child(city_interior)
-	city_interior.open_city(selected_city, name, "")
+	city_interior.open_city(logical_id, name, "")
 	city_interior.closed.connect(func() -> void:
 		city_interior.queue_free()
-		city_interior = null)
+		city_interior = null
+		for overlay in city_hidden_layers:
+			if is_instance_valid(overlay): overlay.show()
+		city_hidden_layers.clear()
+	)
 	city_popup.hide()
+
 
 func _label(text: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
@@ -1251,7 +1301,7 @@ func _toggle_cities() -> void:
 		_clear_selection()
 
 func _refresh_status() -> void:
-	status.text = "城池 %d 座 · 树木 %d 株 · 地被 %d 处 · 原始全图地形与植被分布" % [city_nodes.size(), vegetation_count, ground_cover_count]
+	status.text = "城池 %d 座  树木 %d 株  地被 %d 处  原始全图地形与植被分布" % [city_nodes.size(), vegetation_count, ground_cover_count]
 
 func _capture_preview() -> void:
 	await get_tree().create_timer(2.0).timeout

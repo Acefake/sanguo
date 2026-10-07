@@ -132,6 +132,10 @@ func step_toward(start: int, goal: int, occupied: Dictionary, bounds: Dictionary
 	var previous := {start: start}
 	var cursor := 0
 	var found := -1
+	# board["blocked"] is an Array, so .has() was a linear scan inside the BFS inner
+	# loop: up to 1710 scans per call against a mountain-heavy board. Build the set once.
+	var blocked := {}
+	for cell in bounds.get("blocked", []): blocked[cell] = true
 	while cursor < queue.size():
 		var cell: int = queue[cursor]
 		cursor += 1
@@ -140,7 +144,7 @@ func step_toward(start: int, goal: int, occupied: Dictionary, bounds: Dictionary
 			var column: int = next % WIDTH
 			var row: int = next / WIDTH
 			if column < int(bounds.get("min_column", 0)) or column > int(bounds.get("max_column", WIDTH - 1)) or row < int(bounds.get("min_row", 0)) or row > int(bounds.get("max_row", DEPTH - 1)): continue
-			if not walkable(next) or bounds.get("blocked", []).has(next) or occupied.has(next) or previous.has(next): continue
+			if not walkable(next) or blocked.has(next) or occupied.has(next) or previous.has(next): continue
 			previous[next] = cell
 			queue.append(next)
 	if found < 0 or found == start: return start
@@ -148,9 +152,10 @@ func step_toward(start: int, goal: int, occupied: Dictionary, bounds: Dictionary
 	return found
 
 
-func find_path(start: int, goal: int) -> PackedInt32Array:
+func find_path(start: int, goal: int, blocked: Array = []) -> PackedInt32Array:
 	if not walkable(start) or not walkable(goal):
 		return PackedInt32Array()
+	if blocked.has(start) or blocked.has(goal): return PackedInt32Array()
 	if path_graph == null:
 		path_graph = AStar2D.new()
 		path_graph.reserve_space(COUNT)
@@ -164,6 +169,12 @@ func find_path(start: int, goal: int) -> PackedInt32Array:
 				if other > cell and path_graph.has_point(other):
 					path_graph.connect_points(cell, other)
 	var result := PackedInt32Array()
+	for value in blocked:
+		var cell := int(value)
+		if path_graph.has_point(cell): path_graph.set_point_disabled(cell, true)
 	for cell in path_graph.get_id_path(start, goal):
 		result.append(int(cell))
+	for value in blocked:
+		var cell := int(value)
+		if path_graph.has_point(cell): path_graph.set_point_disabled(cell, false)
 	return result

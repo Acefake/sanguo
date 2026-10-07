@@ -16,7 +16,8 @@ var notice: Label
 func _ready() -> void:
 	store = get_node("/root/GameState")
 	window = Window.new()
-	window.title = "游戏主设置 · 武将智能体"
+	CitySkin.theme_window(window)
+	window.title = "游戏主设置  武将智能体"
 	window.size = Vector2i(640, 600)
 	window.transient = true
 	window.exclusive = true
@@ -54,7 +55,7 @@ func _ready() -> void:
 	rows.add_child(reasoning)
 	_label(rows, "Ollama使用原生接口、结构化行动JSON和短上下文；各军团主帅共享模型权重，部将执行军令，无需API Key。")
 	var local := Button.new()
-	local.text = "使用本机小模型 · Ollama Qwen3 1.7B"
+	local.text = "使用本机小模型  Ollama Qwen3 1.7B"
 	CitySkin.style_button(local)
 	local.pressed.connect(func():
 		enabled.button_pressed = true
@@ -95,11 +96,11 @@ func _ready() -> void:
 	close.pressed.connect(window.hide)
 	rows.add_child(close)
 	var battle := Button.new()
-	battle.text = "小沛中型对战 · 全武将出阵／重置"
+	battle.text = "选择验证战场  攻城 / 平原 / 山地 / 林地"
 	CitySkin.style_button(battle)
 	battle.pressed.connect(func():
 		if store.busy: notice.text = "请先完成本轮推进。"
-		else: store.start_battle_test()
+		else: window.hide(); store.open_battle_scenarios()
 	)
 	rows.add_child(battle)
 	var back := Button.new()

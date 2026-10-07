@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal closed
 const OfficerSkin = preload("res://scripts/city_ui_skin.gd")
+const Layout = preload("res://scripts/ui_layout.gd")
 const Radar = preload("res://scripts/officer_radar.gd")
 const TraitButton = preload("res://scripts/officer_trait_button.gd")
 const DIMENSIONS := ["军事", "谋略", "勇武", "政治", "魅力"]
@@ -25,7 +26,7 @@ var footer: Label
 func _ready() -> void:
 	officers = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
 	frame = Control.new()
-	frame.size = Vector2(1260, 710)
+	frame.size = Layout.DESIGN
 	frame.theme = Theme.new()
 	frame.theme.default_font = OfficerSkin.font()
 	OfficerSkin.apply_theme(frame.theme)
@@ -89,10 +90,7 @@ func _ready() -> void:
 	_render()
 
 func _resize() -> void:
-	var viewport_size := get_viewport().get_visible_rect().size
-	var factor := minf(viewport_size.x / 1260.0, viewport_size.y / 710.0)
-	frame.scale = Vector2.ONE * factor
-	frame.position = (viewport_size - frame.size * factor) / 2
+	Layout.fit_center(frame)
 
 func open_page(as_overview := false) -> void:
 	overview = as_overview
@@ -309,9 +307,8 @@ func _personality_page(parent: Control, person: Dictionary) -> void:
 func _basic(parent: Control, person: Dictionary) -> void:
 	_skills(parent, person)
 	var radar := Radar.new()
-	# 修复：雷达控件加高并下移，顶部留边距、底部标签不再压分隔线。
 	radar.position = Vector2(173, 2)
-	radar.size = Vector2(230, 144)
+	radar.size = Vector2(230, 174)
 	radar.theme = frame.theme
 	radar.values = person["stats"]
 	parent.add_child(radar)
@@ -328,13 +325,12 @@ func _meter(parent: Control, rect: Rect2, value: float) -> void:
 func _skills(parent: Control, person: Dictionary) -> void:
 	# 右侧纸面背景已按需求移除，内容直接落在窗口纸底上。
 	_section_title(parent, "能力", 10)
-	_section_title(parent, "子能力", 158)
-	_section_title(parent, "特性", 341)
-	for y in [146, 330, 446]:
+	_section_title(parent, "子能力", 178)
+	_section_title(parent, "特性", 326)
+	for y in [174, 316, 422]:
 		_panel(parent, Rect2(8, y, 494, 1), _flat(Color("a99b7e")))
 	for i in range(5):
-		# P0：子能力行高 33→28，省出的纵向空间还给雷达与特性。
-		var y := 161 + i * 28
+		var y := 179 + i * 26
 		var category := _text(parent, DIMENSIONS[i], Rect2(96, y, 40, 20), 15, Color("8c5c3d"))
 		category.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		category.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -348,7 +344,7 @@ func _skills(parent: Control, person: Dictionary) -> void:
 			value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			_meter(parent, Rect2(x, y + 21, 64, 4), float(person["substats"][i][j]))
-	_trait_chips(parent, person, Rect2(96, 341, 398, 106))
+	_trait_chips(parent, person, Rect2(96, 326, 398, 88))
 
 func _section_title(parent: Control, title: String, y: float) -> void:
 	_panel(parent, Rect2(8, y, 76, 26), _asset_style("user-title-atlas", Rect2(130, 66, 517, 52), 0))
@@ -385,10 +381,10 @@ func _trait_chips(parent: Control, person: Dictionary, rect: Rect2) -> void:
 	strip.size = Vector2(rect.size.x, rect.size.y)
 	strip.clip_contents = true
 	parent.add_child(strip)
-	var per_row := maxi(1, int((rect.size.x + 6) / 88.0))
+	var per_row := mini(5, maxi(1, int((rect.size.x + 6) / 78.0)))
 	var rows := maxi(1, int(ceil(traits.size() / float(per_row))))
-	var row_height := minf(30.0, rect.size.y / float(maxi(rows, 2)))
-	var chip_width := minf(82.0, (rect.size.x - (per_row - 1) * 6) / per_row)
+	var row_height := minf(25.0, rect.size.y / float(maxi(rows, 1)))
+	var chip_width := minf(72.0, (rect.size.x - (per_row - 1) * 6) / per_row)
 	for i in traits.size():
 		var entry: Dictionary = traits[i]
 		var chip := TraitButton.new()
@@ -400,14 +396,10 @@ func _trait_chips(parent: Control, person: Dictionary, rect: Rect2) -> void:
 		var row := i / per_row
 		var col := i % per_row
 		chip.position = Vector2(col * (chip_width + 6), row * row_height + 2)
-		chip.size = Vector2(chip_width / 0.75, 22)
-		chip.scale = Vector2(0.75, 0.75)
-		chip.add_theme_font_size_override("font_size", 13 if chip_width < 72 else 14)
+		chip.size = Vector2(chip_width, 21)
+		chip.add_theme_font_size_override("font_size", 12)
 		for state in ["normal", "hover", "pressed", "disabled", "hover_pressed"]:
 			var style := _trait_style(rank, state != "normal")
-			if rank == "legend" and chip_width < 72:
-				style.set_texture_margin(SIDE_LEFT, 10)
-				style.set_texture_margin(SIDE_RIGHT, 10)
 			chip.add_theme_stylebox_override(state, style)
 		chip.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 		chip.add_theme_color_override("font_color", OfficerSkin.PALE)
@@ -425,12 +417,8 @@ func _trait_rank(entry: Dictionary) -> String:
 	return "unranked"
 
 func _trait_style(kind: String, hovered: bool) -> StyleBoxTexture:
-	var style := _extracted_style("trait-common" if kind == "unranked" else "personality-" + kind, 5)
-	if kind == "legend":
-		style.set_texture_margin(SIDE_LEFT, 24)
-		style.set_texture_margin(SIDE_RIGHT, 24)
-		style.set_texture_margin(SIDE_TOP, 10)
-		style.set_texture_margin(SIDE_BOTTOM, 10)
+	var asset := "trait-common" if kind == "unranked" else "personality-gold" if kind == "legend" else "personality-" + kind
+	var style := _extracted_style(asset, 5)
 	if hovered: style.modulate_color = Color(1.15, 1.15, 1.15)
 	return style
 
@@ -448,13 +436,13 @@ func _prose(parent: Control, person: Dictionary, keys: Array, title: String, fal
 	label.custom_minimum_size.x = 464
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if keys.is_empty():
-		label.text = fallback
+		label.text = preload("res://scripts/ui_text.gd").clean(fallback)
 	else:
 		# 列传去掉「定位」「核心定义」这类说明标题，只拼正文。
 		var parts: Array[String] = []
 		for key in keys:
 			parts.append(str(person["sections"].get(key, "尚未录入")))
-		label.text = "\n\n".join(parts)
+		label.text = preload("res://scripts/ui_text.gd").clean("\n\n".join(parts))
 	scroll.add_child(label)
 
 func _render_table() -> void:
@@ -521,7 +509,7 @@ func _render_table() -> void:
 		if tab == "个人": values = [person["style_name"]]
 		if tab == "名声": values = [person["substats"][4][3]]
 		if tab == "关系": values = ["尚未录入关系档案"]
-		if tab == "属性": values = ["25项子属性 · 点击查看"]
+		if tab == "属性": values = ["25项子属性  点击查看"]
 		if tab == "特性":
 			values = []
 			_trait_chips(row, person, Rect2(282, 2, 650, 30))

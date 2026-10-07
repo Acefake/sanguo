@@ -1,39 +1,30 @@
 shader_type spatial;
 render_mode unshaded, blend_add, cull_disabled, depth_draw_never;
 
-uniform vec4 tint : source_color = vec4(0.72, 0.88, 1.0, 0.8);
+uniform vec4 tint : source_color = vec4(0.95, 0.98, 1.0, 0.8);
 uniform float phase = 0.0;
+uniform sampler2D image : source_color, filter_linear_mipmap, repeat_disable;
 // Four terrain corners, relative to the formation's origin.
 uniform vec4 ground_heights = vec4(0.0);
-varying vec2 formation_point;
+varying vec2 fan_uv;
 
 void vertex() {
- formation_point = VERTEX.xz * 1.45;
  vec2 corner = VERTEX.xz * 0.5 + 0.5;
+ float along = corner.y;
+	fan_uv = vec2(corner.x, along);
+ float swell = sin(clamp(phase / 0.68, 0.0, 1.0) * 3.14159265);
+ VERTEX.x *= 0.9 + swell * 0.1;
+ VERTEX.z = mix(-0.20, 1.15, along) + swell * 0.15;
  VERTEX.y = mix(mix(ground_heights.x, ground_heights.y, corner.x),
-                mix(ground_heights.z, ground_heights.w, corner.x), corner.y) + 1.6;
+                mix(ground_heights.z, ground_heights.w, corner.x), corner.y)
+                + 1.0 + sin(along * 3.14159265) * 0.4;
 }
 
 void fragment() {
- float radius = length(formation_point);
- float angle = atan(formation_point.x, formation_point.y);
- float progress = clamp(phase / 0.68, 0.0, 1.0);
- float front = mix(0.48, 1.28, progress);
- float sector = 1.0 - smoothstep(0.85, 1.03, abs(angle));
- float arc_distance = abs(radius - front);
- float arc = (1.0 - smoothstep(0.024, 0.072, arc_distance)) * sector;
- float glow = exp(-arc_distance * 20.0) * sector * 0.3;
- float trails = 0.0;
- // Curved strokes originate inside the army and spread to its fighting edge.
- for (int branch = -1; branch <= 1; branch++) {
-  float bend = float(branch) * (0.24 + radius * 0.46);
-  float distance = abs(angle - bend) * max(radius, 0.2);
-  float line = 1.0 - smoothstep(0.014, 0.046, distance);
-  float length_mask = smoothstep(0.25, 0.45, radius) * (1.0 - smoothstep(front - 0.04, front + 0.02, radius));
-  trails += line * length_mask * 0.65;
- }
+ // Original white fan texture, opened in world space toward the contacted army.
+ vec4 stroke = texture(image, fan_uv);
  float fade = 1.0 - smoothstep(0.72, 1.0, phase);
- ALBEDO = tint.rgb;
- EMISSION = tint.rgb * 0.7;
- ALPHA = clamp(arc + glow + trails, 0.0, 1.0) * tint.a * fade;
+ ALBEDO = stroke.rgb * tint.rgb;
+ EMISSION = stroke.rgb * tint.rgb * 1.3;
+ ALPHA = stroke.a * tint.a * fade;
 }

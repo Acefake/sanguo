@@ -12,6 +12,8 @@ func _run() -> void:
 	var sandbox = load("res://scripts/game_state.gd").new()
 	sandbox.persist_enabled = false
 	sandbox._load_demo()
+	sandbox.war.state["player_faction"] = "dong_zhuo"
+	sandbox.war.rules["strategy"] = {}
 	var before: Dictionary = sandbox.city_state("luoyang").duplicate(true)
 	var result: Dictionary = sandbox.apply_action("luoyang", "govern")
 	var after: Dictionary = sandbox.city_state("luoyang")
@@ -32,7 +34,7 @@ func _run() -> void:
 		_fail("行动力耗尽后仍可执行命令")
 		return
 	var old_money := int(sandbox.city_state("luoyang")["treasury"])
-	sandbox.advance_month()
+	await sandbox.advance_month()
 	if sandbox.month != 10 or sandbox.action_points != 3 or int(sandbox.city_state("luoyang")["treasury"]) <= old_money:
 		_fail("月度结算未推进时间、恢复行动力或产生税收")
 		return
@@ -78,7 +80,7 @@ func _run() -> void:
 	if interior.show_building_names or interior.building_labels[0].visible:
 		_fail("建筑名称显示开关未生效")
 		return
-	sandbox.advance_month()
+	await sandbox.advance_month()
 	var trade_before: Dictionary = sandbox.city_state("luoyang").duplicate(true)
 	interior.building_buttons["market"].pressed.emit()
 	interior.action_list.get_child(2).get_child(0).pressed.emit()
@@ -94,7 +96,7 @@ func _run() -> void:
 	if int(sandbox.city_state("luoyang")["equipment"]) != 56:
 		_fail("锻造未提升军备")
 		return
-	sandbox.advance_month()
+	await sandbox.advance_month()
 	interior.building_buttons["tavern"].pressed.emit()
 	var order_before_visit := int(sandbox.city_state("luoyang")["order"])
 	_click_action(interior, "访察民情")
@@ -117,6 +119,7 @@ func _run() -> void:
 	var saved = load("res://scripts/game_state.gd").new()
 	saved.save_path = "user://city_validation_temp.json"
 	saved._load_demo()
+	saved.war.state["player_faction"] = "dong_zhuo"
 	saved.apply_action("luoyang", "govern")
 	saved.apply_action("luoyang", "forge")
 	var restored = load("res://scripts/game_state.gd").new()

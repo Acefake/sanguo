@@ -10,7 +10,7 @@ func check(ok: bool, message: String) -> void:
 func run() -> void:
 	var store: Node = root.get_node("GameState")
 	store.persist_enabled = false
-	store.prepare_battle_test(true)
+	store.prepare_battle_test(true, "plains_clash")
 	var war = store.war
 	var own: Dictionary = war.active_armies("liu_bei").filter(func(a): return a["corps_task"]["type"] == "flank")[0]
 	var enemy: Dictionary = war.active_armies("yuan_shao")[1]
@@ -29,7 +29,7 @@ func run() -> void:
 		war._observe_all()
 		T.move(war)
 		check(own["tactical"]["cell"] == first and enemy["tactical"]["cell"] == second, "近战侧翼仍绕圈")
-	store.prepare_battle_test(true)
+	store.prepare_battle_test(true, "plains_clash")
 	war = store.war
 	board = war.state["battlefield"]
 	board["blocked"] = []
@@ -54,7 +54,7 @@ func run() -> void:
 	check(issue["ok"] and own["tactical"]["lane"] == T.column_of(own["tactical"]["cell"]), "调任仍沿用旧侧翼阵线")
 	check(not war.Corps.issue(war, corps, {"type": "assign_task", "unit": own["id"], "task": "flank"}, "反复换令")["ok"], "同日允许反复改变任务")
 	check(war.Corps.issue(war, corps, {"type": "assign_task", "unit": own["id"], "task": "rear_guard"}, "紧急掩护")["ok"], "换令限制阻断紧急掩护")
-	store.prepare_battle_test(true)
+	store.prepare_battle_test(true, "plains_clash")
 	war = store.war
 	board = war.state["battlefield"]
 	board["blocked"] = []
@@ -86,7 +86,7 @@ func run() -> void:
 		war._observe_all()
 		T.move(war)
 		check(T.cell_distance(chase_origin, int(own["tactical"]["cell"])) <= 3, "侧翼无限追赶溃退部队")
-	store.prepare_battle_test(true)
+	store.prepare_battle_test(true, "plains_clash")
 	var occupied_checks := 0
 	for day in range(30):
 		await store.war.step(null)

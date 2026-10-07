@@ -25,10 +25,6 @@ func run() -> void:
 	var fighter: Dictionary = store.war.active_armies("yuan_shao").filter(func(a): return a.get("combat_tick", -1) == store.war.state["tick"])[0]
 	var visual: Dictionary = world._combat_visual(fighter["id"])
 	check(not visual.is_empty() and not visual["siege"], "接战目标没有接到可见军队")
-	store.war.state["sieges"][fighter["target"]] = {"phase": "强攻", "active_tick": store.war.state["tick"], "participants": [fighter["id"]]}
-	visual = world._combat_visual(fighter["id"])
-	check(visual["siege"] and visual["target"] == world._battle_point(store.war.state["battlefield"]["objectives"]["xiaopei"]), "攻城光效没有接到城市格")
-	store.war.state["sieges"].clear()
 	fighter["tactical"]["phase"] = "远射"
 	check(world._combat_visual(fighter["id"])["ranged"], "远射没有区分投射轨迹")
 	store.battle_test = false
@@ -96,6 +92,7 @@ func run() -> void:
 	check(effects.contacts.size() == effects.MAX_CONTACTS, "特效数量没有上限")
 	check(is_equal_approx(effects.contacts["0"]["spark"].position.y, 8.2), "特效未贴合实际地形高度")
 	check(effects.contacts["0"]["slash"].mesh is PlaneMesh, "近战效果仍是朝向摄像机的箭头")
+	check(effects.contacts["0"]["slash"].mesh.material.get_shader_parameter("image") == effects.TEXTURES["slash"], "近战弧光没有使用原生扇形纹理")
 	check(effects.contacts["0"]["slash"].position == Vector3.ZERO, "打击线没有锚定本队阵型")
 	var before_heading: Basis = effects.contacts["0"]["slash"].basis
 	camera.position = Vector3(-20,30,20)
@@ -105,11 +102,51 @@ func run() -> void:
 	var same = effects.contacts["0"]["slash"]
 	effects.show_contact("0", Vector3.ZERO, Vector3(10, 0, 0), 0.3)
 	check(effects.contacts["0"]["slash"] == same, "每帧重建交战效果")
+	# Field contacts cannot starve simultaneous city fire; both waves reuse
+	# the settled event and pause deterministically at the same flight position.
+	for target_index in range(3):
+		effects.show_city_volley("wall:" + str(target_index), Vector3(0, 8, 0), Vector3(10, 7, target_index * 5), 0.65)
+	check(effects.contacts.size() == effects.MAX_CONTACTS + 3, "繁忙野战挤掉了城防多目标箭束")
+	var city_id := "city:wall:0"
+	for time in [0.65, 2.10]:
+		effects.show_city_volley("wall:0", Vector3(0, 8, 0), Vector3(10, 7, 0), time)
+		check(effects.contacts[city_id]["arrows"].all(func(arrow): return arrow.visible), "齐射波次缺失")
+		var arrow: Node3D = effects.contacts[city_id]["arrows"][0]
+		var before: Transform3D = arrow.global_transform
+		effects.show_city_volley("wall:0", Vector3(0, 8, 0), Vector3(10, 7, 0), time)
+		check(arrow.global_transform == before, "暂停时箭矢仍在移动")
+		check(arrow.get_node_or_null("ArrowTrail") == null, "箭矢仍附着粗白色光束")
+	effects.show_city_volley("wall:0", Vector3(0, 8, 0), Vector3(10, 7, 0), 3.40)
+	check(effects.contacts[city_id]["arrows"].all(func(arrow): return not arrow.visible), "结算事件结束后仍在无限射箭")
+	for index in range(30): effects.show_city_volley("bounded:" + str(index), Vector3(0,8,0), Vector3(10,7,0), 0.25)
+	check(effects.contacts.size() == effects.MAX_CONTACTS + effects.MAX_CITY_CONTACTS, "城防特效缺少数量上限")
 	effects.begin_frame()
 	effects.end_frame()
 	await process_frame
 	check(effects.contacts.is_empty() and effects.get_child_count() == 0, "停止交战后特效节点泄漏")
 	for group in world.formations.values(): group.queue_free()
+	world.formations.clear()
+	# A plains board has no city footprint. Exercise wall targeting on the
+	# actual siege board, where range is measured from its blocking wall cells.
+	store.prepare_battle_test(false,"siege_assault",42)
+	fighter = store.war.active_armies("yuan_shao")[0]
+	var group := Node3D.new()
+	root.add_child(group)
+	world.formations[fighter["id"]] = group
+	group.position = world._battle_point(fighter["tactical"]["cell"])
+	fighter["combat_tick"] = store.war.state["tick"]
+	store.war.state["sieges"][fighter["target"]] = {"phase":"强攻","active_tick":store.war.state["tick"],"participants":[fighter["id"]]}
+	check(world._combat_visual(fighter["id"]).is_empty(),"远离城墙仍显示攻城攻击")
+	var Fort = preload("res://scripts/war/city_fortifications.gd")
+	var board: Dictionary = store.war.state["battlefield"]
+	var approaches: Array = Fort.approach(store.war,board,fighter["faction"],fighter["target"],fighter["tactical"]["cell"])
+	check(not approaches.is_empty(),"城市没有合法城下攻击格")
+	if not approaches.is_empty():
+		fighter["tactical"]["cell"] = approaches[0]
+		group.position = world._battle_point(approaches[0])
+		visual = world._combat_visual(fighter["id"])
+		check(visual.get("siege",false) and visual.get("target",Vector3.ZERO).distance_to(world._battle_point(board["objectives"]["xiaopei"])) > 0.5,"攻城光效没有瞄准面前城墙")
+	group.queue_free()
 	world.free()
 	map.free()
 	effects.queue_free()

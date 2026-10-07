@@ -8,9 +8,11 @@ func _initialize() -> void:
 func _run() -> void:
 	var campaign := root.get_node("GameState")
 	campaign.persist_enabled = false
+	campaign.agent.enabled = false
 	campaign._load_demo()
-	var scene: PackedScene = load("res://scenes/map_slice.tscn")
-	var map = scene.instantiate()
+	# This suite validates the supplied legacy atlas polygons and route graph.
+	# The RTK14 scene has its own coordinate registration checks.
+	var map = load("res://scripts/map_slice.gd").new()
 	root.add_child(map)
 	map.map_mode = "faction"
 	var ids: Dictionary = map.places
@@ -52,14 +54,14 @@ func _run() -> void:
 	map.selected_id = "xiapi"
 	map._update_route()
 	map._refresh_ui()
-	if map.detail_faction.text.find("吕布") < 0 or map.detail_stats.get_child_count() != 5:
-		_fail("城池情报面板未显示势力或完整指标")
+	if map.detail_faction.text.find("吕布") < 0 or map.detail_stats.get_child_count() != 1:
+		_fail("未侦察敌城应只显示公开归属与未知情报")
 		return
 	map.selected_id = "east_pass"
 	map._update_route()
 	map._refresh_ui()
-	if map.detail_stats.get_child_count() != 2:
-		_fail("关隘情报面板应只显示军事指标")
+	if map.detail_stats.get_child_count() != 1:
+		_fail("未侦察关隘不应泄漏驻军")
 		return
 	var reachable: Dictionary = map._find_route("hongnong", "beihai")
 	if not bool(reachable["found"]) or float(reachable["cost"]) <= 0:
@@ -104,7 +106,7 @@ func _run() -> void:
 			_fail("地形模式仍显示势力标签")
 			return
 	var unchanged_label_id: int = map.faction_labels[0].get_instance_id()
-	campaign.advance_month()
+	await campaign.advance_month()
 	if map.faction_labels[0].get_instance_id() != unchanged_label_id:
 		_fail("月度资源结算不应反复重建势力名称")
 		return

@@ -1,14 +1,25 @@
 extends RefCounted
 const Combat = preload("res://scripts/war/combat_system.gd")
 const Terrain = preload("res://scripts/war/battle_terrain.gd")
-const Formation = preload("res://scripts/war/battle_formation.gd")
 
 static func advantage(armies: Array, faction: String) -> float:
 	var total := 0.0
 	for army in armies:
 		if army.get("faction", "") != faction or army.get("status","active") == "ended": continue
-		total += Combat.strength(army) * (0.5+float(army.get("morale",100))/200) * (0.5+float(army.get("organization",100))/200) * Formation.attack(army.merged({"formation_locked":false},true))
+		total += Combat.strength(army) * (0.5+float(army.get("morale",100))/200) * (0.5+float(army.get("organization",100))/200)
 	return total
+# Enemy morale and organization are not exposed by the scouting contract, so an
+# observed enemy is scored at the 50/50 default instead of our own 100 default.
+# This pessimism is deliberate and feeds enemy_to_friendly_ratio, so it is named.
+const ESTIMATE_MORALE := 50.0
+const ESTIMATE_ORGANIZATION := 50.0
+
+static func _condition_weight(morale: float, organization: float) -> float:
+	return (0.5 + morale / 200.0) * (0.5 + organization / 200.0)
+
+static func _estimate_weight() -> float:
+	return _condition_weight(ESTIMATE_MORALE, ESTIMATE_ORGANIZATION)
+
 static func visible_advantage(war) -> Dictionary:
 	var own: String = war.state["player_faction"]
 	var ours := advantage(war.active_armies(own),own)
@@ -22,22 +33,46 @@ static func visible_advantage(war) -> Dictionary:
 			for enemy in army["intel"]["enemies"].values():
 				if seen.has(enemy["id"]) or int(enemy["observed_at"]) != int(war.state["tick"]): continue
 				seen[enemy["id"]] = true
-				# Enemy morale and organization are not exposed by the scouting contract.
-				theirs += float(enemy["strength_estimate"])*0.75*0.75
+				theirs += float(enemy["strength_estimate"]) * _estimate_weight()
+	# A city garrison remains a fighting force even without a field-army marker.
+	# Both sides go through the same weighting so the two branches stay comparable.
+	for node in war.state.get("battlefield", {}).get("objectives", {}):
+		var city: Dictionary = war.store.city_state(node)
+		if city.get("faction", "") == own:
+			ours += float(int(city.get("garrison", 0))) * _condition_weight(100.0, 100.0)
+		elif war.store.battle_test:
+			var siege: Dictionary = war.state["sieges"].get(node, {})
+			theirs += float(int(city.get("garrison", 0))) * _condition_weight(float(siege.get("morale", 100)), float(siege.get("organization", 100)))
+		else:
+			var estimate := -1
+			for army in war.active_armies(own):
+				var intel: Dictionary = army["intel"]["cities"].get(node, {})
+				if int(intel.get("observed_at", -1)) == int(war.state["tick"]): estimate = maxi(estimate, int(intel.get("strength_estimate", 0)))
+			if estimate >= 0: theirs += float(estimate) * _estimate_weight()
 	return {"ours":ours,"theirs":theirs,"percent":100*ours/maxf(ours+theirs,1),"estimated":not war.store.battle_test}
 static func factors(attacker: Dictionary, defender: Dictionary, rules: Dictionary, terrain: String) -> Array:
 	var breakdown := Combat.power_breakdown(attacker,rules,terrain,defender)
 	var entries := []
 	var threshold := float(rules.get("feedback",{}).get("factor_threshold",0.05))
-	if terrain != "plains": entries.append({"weight":1.3,"text":"交战地形：%s，防护×%.2f" % [Terrain.name_of(terrain),float(Terrain.settings(terrain,rules).get("defense",1))]})
-	var labels := {"morale":"士气","training":"训练","equipment":"军备","organization":"组织","fatigue":"疲劳","command":"指挥","unit_skill":"兵种发挥","terrain":"地形限制","formation":"阵型","delay":"进入地形迟滞","wounded":"主将带伤"}
+	var defense_terrain := float(Terrain.settings(terrain,rules).get("defense",1))
+	if terrain != "plains": entries.append({"weight":absf(defense_terrain-1.0),"text":"交战地形：%s，防护×%.2f" % [Terrain.name_of(terrain),defense_terrain]})
+	var labels := {"morale":"士气","training":"训练","equipment":"军备","organization":"组织","fatigue":"疲劳","delay":"进入地形迟滞","wounded":"主将带伤"}
 	for key in labels:
 		var value := float(breakdown.get(key,1))
 		if absf(value-1) <= threshold: continue
 		entries.append({"weight":absf(value-1)+(1.0 if key == "morale" and float(attacker.get("morale",100)) < 50 else 0),"text":"%s%s：输出×%.2f" % [attacker.get("name","攻方"),labels[key],value]})
+	# unit_skill and command are two halves of one clamped composite, so reporting
+	# them separately would credit the clamp as a command bonus. Report the product.
+	var officer_attack := float(breakdown.get("officer_attack",1.0))
+	if absf(officer_attack-1) > threshold: entries.append({"weight":absf(officer_attack-1),"text":"%s将领统率：输出×%.2f" % [attacker.get("name","攻方"),officer_attack]})
 	var counters: float = breakdown["counters"]
-	if counters-1 > threshold: entries.append({"weight":counters-1,"text":"兵种克性：伤害×%.2f" % counters})
-	entries.sort_custom(func(a,b): return a["weight"] > b["weight"])
+	if counters-1 > threshold: entries.append({"weight":counters-1,"text":"兵种克制：伤害×%.2f" % counters})
+	var edge_attack := float(attacker.get("edge_attack", 1.0))
+	if absf(edge_attack - 1.0) > threshold: entries.append({"weight":absf(edge_attack - 1.0),"text":"专长：攻击×%.2f" % edge_attack})
+	var edge_defense := float(defender.get("edge_defense", 1.0))
+	if absf(edge_defense - 1.0) > threshold: entries.append({"weight":absf(edge_defense - 1.0),"text":"专长：守御×%.2f" % edge_defense})
+	# Stable order so equal-weight factors do not shuffle between runs on one seed.
+	entries.sort_custom(func(a,b): return float(a["weight"]) > float(b["weight"]) if not is_equal_approx(float(a["weight"]),float(b["weight"])) else str(a["text"]) < str(b["text"]))
 	var output := []
 	for entry in entries.slice(0,int(rules.get("feedback",{}).get("max_factors",2))): output.append(entry["text"])
 	return output
@@ -105,4 +140,4 @@ static func summary(war) -> Dictionary:
 		var root: Dictionary = war.state["armies"].get(corps["root_id"],{})
 		if data.has("battle_id") and root.get("battlefield_id","") != data["battle_id"]: continue
 		loot[corps["faction"]] = float(loot.get(corps["faction"],0))+float(corps.get("looted_grain",0))
-	return {"days":int(data.get("ended_at",war.state["tick"]))-int(data.get("started_at",0)),"winner":data.get("winner","交战中"),"sides":snapshot(war),"log":log,"duels":duels.filter(func(d):return d["result"] != "refused").size(),"challenges":duels.size(),"overwhelming":duels.filter(func(d):return d["result"] == "overwhelming").size(),"events":events,"loot":loot,"sieges":war.state.get("sieges",{}).values().filter(func(s):return int(s.get("started",0)) >= int(data.get("started_at",0)))}
+	return {"days":int(data.get("ended_at",war.state["tick"]))-int(data.get("started_at",0)),"winner":data.get("winner","交战中"),"field_winner":data.get("field_winner",""),"field_winner_at":int(data.get("field_winner_at",0)),"sides":snapshot(war),"log":log,"duels":duels.filter(func(d):return d["result"] != "refused").size(),"challenges":duels.size(),"overwhelming":duels.filter(func(d):return d["result"] == "overwhelming").size(),"events":events,"loot":loot,"sieges":war.state.get("sieges",{}).values().filter(func(s):return int(s.get("started",0)) >= int(data.get("started_at",0)))}

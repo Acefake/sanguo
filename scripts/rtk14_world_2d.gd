@@ -6,6 +6,7 @@ const SOURCE_CITIES := "res://assets/rtk14/cities_map.json"
 const MAP_BOUNDS := Rect2(372, 128, 1548, 1792)
 const HexGrid = preload("res://scripts/rtk14_hex_grid.gd")
 const HexOverlay = preload("res://scripts/rtk14_hex_overlay.gd")
+const Fortifications = preload("res://scripts/war/city_fortifications.gd")
 var hex_grid = HexGrid.shared()
 var hex_overlay: Node2D
 var hovered_cell := -1
@@ -54,14 +55,14 @@ func _load_map_data() -> void:
 	if not source is Array:
 		push_error("无法读取三国志14城市坐标")
 		return
-	places.clear()
 	var city_places: Array = []
-	for city in source:
-		var city_id := str(city["id"])
-		var place: Dictionary = legacy_places.get(city_id, {}).duplicate(true)
-		place.merge({"id": city_id, "name": str(city["name"]), "type": "city",
-			"x": float(city["x"]), "y": float(city["z"]),
-			"region_id": str(place.get("region_id", ""))}, true)
+	var positions: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/war/world_3d_positions.json")).get("positions", {})
+	for city_id in legacy_places:
+		var place: Dictionary = legacy_places[city_id].duplicate(true)
+		var site := Fortifications.for_city(GameState, city_id)
+		var point: Vector2 = site["point"] if not site.is_empty() else Vector2(float(positions.get(city_id, {}).get("x", place["x"])), float(positions.get(city_id, {}).get("z", place["y"])))
+		place["x"] = point.x
+		place["y"] = point.y
 		places[city_id] = place
 		city_places.append(place)
 	map_size = Vector2.ONE * WORLD_EXTENT
@@ -73,9 +74,7 @@ func _load_map_data() -> void:
 	map_data["regions"] = []
 	map_data["zoom_min"] = 0.15
 	map_data["zoom_max"] = 12.0
-	# Legacy atlas routes/polygons are not registered to the RTK14 texture.
-	routes = []
-	map_data["routes"] = []
+	# Route endpoints now use the same registered campaign positions as the 3D map.
 
 
 func _city_marker_visible(_city_id: String) -> bool:
@@ -239,7 +238,9 @@ func _preview_cell_path(goal: int) -> void:
 		selected_cell = goal
 		path_message = "已设起点；Shift 点击目标格"
 	else:
-		cell_path = hex_grid.find_path(selected_cell, goal)
+		var bounds := {"min_column": 0, "max_column": 219, "min_row": 0, "max_row": 219, "blocked": []}
+		Fortifications.attach(GameState.war, bounds)
+		cell_path = hex_grid.find_path(selected_cell, goal, Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state["player_faction"])))
 		path_message = "路径预览：%d 格" % cell_path.size() if not cell_path.is_empty() else "此地形不可通行，或两格之间无通路"
 	_refresh_cell_panel()
 	queue_redraw()
@@ -267,13 +268,13 @@ func _refresh_cell_panel() -> void:
 	if cell_label == null:
 		return
 	var cell := hovered_cell if hovered_cell >= 0 else selected_cell
-	var hint := "滚轮缩放 · 拖动平移 · 点击选格\nG 格线 · B 势力格 · Shift 点击预览路径"
+	var hint := "滚轮缩放  拖动平移  点击选格\nG 格线  B 势力格  Shift 点击预览路径"
 	if not hex_grid.valid(cell):
-		cell_label.text = "六角地图 · 48,400 格\n" + hint
+		cell_label.text = "六角地图  48,400 格\n" + hint
 		return
 	var data: Dictionary = hex_grid.info(cell)
 	var city_id := str(data["controller"])
 	var city_name := str(places.get(city_id, {}).get("name", "未归属城市"))
 	var faction_id := _faction_id(city_id)
 	var faction_name := str(scenario.get("factions", {}).get(faction_id, {}).get("name", "无主"))
-	cell_label.text = "格 %d · 列 %d / 行 %d\n地形 %d · 区域 %d · %s\n%s · %s\n%s" % [cell, data["column"], data["row"], data["terrain"], data["region"], "可通行" if data["walkable"] else "不可通行", city_name, faction_name, path_message + "\n" + hint if not path_message.is_empty() else hint]
+	cell_label.text = "格 %d  列 %d / 行 %d\n地形 %d  区域 %d  %s\n%s  %s\n%s" % [cell, data["column"], data["row"], data["terrain"], data["region"], "可通行" if data["walkable"] else "不可通行", city_name, faction_name, path_message + "\n" + hint if not path_message.is_empty() else hint]

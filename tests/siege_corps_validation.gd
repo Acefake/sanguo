@@ -83,6 +83,11 @@ func run() -> void:
 	check(siege["phase"] == "援军阻断" and siege["preparation"] == progress and siege["wall"] == walls, "敌援军未阻断攻城")
 	check(war.Feedback.book(war).get("pending_events",[]).any(func(e):return e["kind"] == "援军阻断"),"真实援军阻断没有写入会战事件")
 	relief["returning"] = true
+	relief["status"] = "ended"
+	# 其余撤退守军也离场：避免他们在新城规则下走回小沛补入守军（fixture 清场）。
+	for defender in war.active_armies("liu_bei"):
+		defender["returning"] = true
+		defender["status"] = "ended"
 	check(not war.Corps.issue(war, corps, {"type": "set_siege_mode", "mode": "blockade"}, "围困待粮")["ok"], "移除系统后仍能选择断粮围困")
 	war.state["tick"] += 1
 	war._resolve_sieges()
@@ -100,6 +105,8 @@ func run() -> void:
 	var capture_day := -1
 	for day in range(50):
 		war.state["tick"] += 1
+		# 新规则：驻军只吃“真正入城”的巷战伤害，因此破口开放后按真实移动进城。
+		if bool(siege.get("breach_open", false)): T.move(war)
 		war._resolve_sieges()
 		if city["faction"] == "yuan_shao": capture_day = day + 1; break
 	check(capture_day > 0 and siege["phase"] == "occupied", "无法完成破城占领")
@@ -119,13 +126,25 @@ func run() -> void:
 		# Evacuate to another friendly city; returning to Xiaopei reinforces its guard.
 		defender["home"] = "xiapi"
 		war._execute(defender, {"type": "withdraw"})
+	# 新规则要求真实破门入城、驻军不再被远程强攻磨死；本段物理攻城需要有
+	# 器械与足够步兵的围城军团，fixture 按围城编制补足（不改城市守军）。
+	var siege_units := 0
+	for id in corps["units"]:
+		var troop: Dictionary = war.state["armies"][id]
+		if troop["status"] == "ended" or troop["returning"]: continue
+		var strength: int = maxi(4000, war.Combat.strength(troop))
+		troop["units"] = {"infantry": strength, "archers": 0, "cavalry": 0}
+		troop["siege_engines"] = 0
+		siege_units += 1
+	if siege_units > 0: war.state["armies"][corps["root_id"]]["siege_engines"] = 4
 	var reached := false
 	for day in range(35):
 		await war.step(null)
 		if war.state["sieges"].has("xiaopei"): reached = true; break
 	check(reached, "野战结束后军团不能沿全局格推进到城下")
 	var physically_captured := false
-	for day in range(50):
+	# 新规则下城墙必须真正被打破、部队入城才能占领，给足真实破墙时间。
+	for day in range(110):
 		await war.step(null)
 		if store.city_state("xiaopei")["faction"] == "yuan_shao": physically_captured = true; break
 	if not physically_captured:

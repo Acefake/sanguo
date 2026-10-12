@@ -13,10 +13,19 @@ func validate() -> void:
 	assert(source_visibility["stage_object"] == "6eff205a")
 	assert(source_visibility["visibility_object"] == "63f9f0ba")
 	assert(source_visibility["visible_instances"].size() == 105)
-	assert(world.static_instance_count == 105)
-	# All 1120 source records remain intact; the current stage lists 105 houses.
+	assert(source_visibility["placement_visibility_semantics"]["default_visible_without_visibility_set"] == 1015)
+	assert(source_visibility["placement_visibility_semantics"]["explicitly_listed_preview_visibility_set"] == 105)
+	assert(world.static_instance_count == 1120)
+	assert(not world.hex_world.enabled)
+	# The 105 positive visibility-set placements are villages; the other 1015
+	# source placements inherit the default-visible state.
 	assert(world.static_filtered_count == 0)
-	assert(world.city_nodes.size() == 46)
+	var source_city_count := 0
+	for city in world.city_data:
+		if str(city.get("model", "")) != "campaign_fallback":
+			source_city_count += 1
+	assert(source_city_count == 46)
+	assert(world.city_nodes.size() >= source_city_count)
 	assert(world.has_node("FullMapRiversAndLakes"))
 	var village_count := 0
 	var source_covered: Dictionary = {}
@@ -94,7 +103,7 @@ func validate() -> void:
 	assert(world.map_environment.ssao_enabled and not world.map_environment.ssil_enabled)
 	for batch in world.landscape_root.get_children():
 		var render_mesh: Mesh = batch.multimesh.mesh
-		var source_mesh: Mesh = world._model_meshes(batch.name)[0]["mesh"]
+		var source_mesh: Mesh = world._model_meshes(str(batch.get_meta("source_model_id", batch.name)))[0]["mesh"]
 		if render_mesh.surface_get_material(0) is ShaderMaterial:
 			assert(render_mesh.get_surface_count() == source_mesh.get_surface_count())
 			for surface in range(render_mesh.get_surface_count()):
@@ -130,6 +139,8 @@ func validate() -> void:
 	assert(world.map_environment.ssil_enabled and world.get_viewport().scaling_3d_scale == 1.0)
 	world._set_map_quality(0)
 	for city in world.city_data:
+		if str(city.get("model", "")) == "campaign_fallback":
+			continue
 		var expected := Vector2.ZERO
 		for cell_id in city["cells"]:
 			var column := int(cell_id) % 220
@@ -155,8 +166,6 @@ func validate() -> void:
 		overview_count += batch.multimesh.instance_count
 	assert(overview_count == world.vegetation_count + world.ground_cover_count)
 	assert(original_mesh.surface_get_material(0).normal_texture != null)
-	var city_selector := world.find_child("CitySelector", true, false) as OptionButton
-	assert(city_selector != null and city_selector.item_count == 47)
 	world.focus_city("luoyang", true)
 	assert(world.selected_city == "luoyang")
 	assert(world.selected_ring.visible)
@@ -212,5 +221,5 @@ func validate() -> void:
 	world._update_vegetation_lod()
 	assert(not world.vegetation_overview_root.visible)
 	assert(world.distance_goal == 65.0)
-	print("WORLD3D_VALIDATION_OK chunks=", world.chunk_count, " source_placements=", world.static_source_count, " visible_placements=", world.static_instance_count, " city_rocks_filtered=", world.static_filtered_count, " cities=", world.city_nodes.size(), " trees=", world.vegetation_count, " ground_cover=", world.ground_cover_count)
+	print("WORLD3D_VALIDATION_OK chunks=", world.chunk_count, " source_placements=", world.static_source_count, " visible_placements=", world.static_instance_count, " city_rocks_filtered=", world.static_filtered_count, " source_cities=", source_city_count, " campaign_sites=", world.city_nodes.size() - source_city_count, " trees=", world.vegetation_count, " ground_cover=", world.ground_cover_count)
 	quit()

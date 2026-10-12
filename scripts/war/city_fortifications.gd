@@ -180,12 +180,44 @@ static func blocked_for(war, board: Dictionary, faction: String) -> Array:
 	for site in board.get("fortifications", {}).values():
 		var node := str(site["id"])
 		var friendly: bool = node != "" and war.store.city_state(node).get("faction", "") == faction
-		var breach: int = int(war.state.get("sieges", {}).get(node, {}).get("breach_cell", -1))
+		var siege: Dictionary = war.state.get("sieges", {}).get(node, {})
+		var breach: int = int(siege.get("breach_cell", -1))
+		# 破口状态：新档读 breach_open；旧档用 breach_cell / wall<=0 兜底。
+		var open: bool = bool(siege.get("breach_open", false)) or breach >= 0 or (not siege.is_empty() and float(siege.get("wall", 1.0)) <= 0.0)
+		var passage := {}
+		if open and breach >= 0:
+			# 仅开放缺口到城心的内侧通道，不能把缺口周围尚完整的墙一起解锁。
+			passage = breach_passage(site, breach)
 		for value in site["cells"]:
 			var cell := int(value)
 			if cell == breach or (friendly and cell == int(site["gate"])): continue
+			if passage.has(cell): continue
 			if not blocked.has(cell): blocked.append(cell)
 	return blocked
+
+static func breach_passage(site: Dictionary, breach: int) -> Dictionary:
+	var passage := {breach: true}
+	var cells := {}
+	for value in site["cells"]: cells[int(value)] = true
+	var center := int(site["center"])
+	if not cells.has(center): return passage
+	var queue: Array = [breach]
+	var parents := {breach: -1}
+	var index := 0
+	var grid = Grid.shared()
+	while index < queue.size() and not parents.has(center):
+		var current: int = queue[index]
+		index += 1
+		for neighbor in grid.neighbors(current):
+			if not cells.has(int(neighbor)) or parents.has(int(neighbor)) or not grid.walkable(int(neighbor)): continue
+			parents[int(neighbor)] = current
+			queue.append(int(neighbor))
+	if parents.has(center):
+		var cursor := center
+		while cursor >= 0:
+			passage[cursor] = true
+			cursor = int(parents[cursor])
+	return passage
 
 static func movement_board(war, board: Dictionary, faction: String) -> Dictionary:
 	var result := board.duplicate()
@@ -260,16 +292,38 @@ static func line_of_sight(board: Dictionary, start: int, target: int, source_cit
 		if not grid.walkable(cell) or buildings.has(cell): return false
 	return true
 
+static func inside_city(board: Dictionary, cell: int) -> String:
+	# 城防内部判定：部队所在格属于某城 footprint 时返回该城节点，否则返回空。
+	# 城内侧与城外侧互不通行攻击，只有破口开放且真正入城才能与驻军交战。
+	for site in board.get("fortifications", {}).values():
+		for value in site["cells"]:
+			if int(value) == cell: return str(site["id"])
+	return ""
+
+
 static func breach(war, node: String, attackers: Array) -> void:
 	var site := for_city(war.store, node)
 	if site.is_empty(): return
+	# 通道格必须可通行：优先从既有 site.cells 里选 walkable 的墙格；
+	# 全部不可通行时才退回原规则（不虚构几何）。
+	var grid = Grid.shared()
+	var candidates: Array = []
+	for value in site["cells"]:
+		if grid.walkable(int(value)): candidates.append(int(value))
+	if candidates.is_empty():
+		for value in site["cells"]: candidates.append(int(value))
 	var gate := int(site["gate"])
 	if not attackers.is_empty() and attackers[0].has("tactical"):
 		var source: int = attackers[0]["tactical"]["cell"]
-		var cells: Array = site["cells"].duplicate()
-		cells.sort_custom(func(a, b): return Grid.shared().distance(source, int(a)) < Grid.shared().distance(source, int(b)))
-		gate = int(cells[0])
+		candidates.sort_custom(func(a, b):
+			var left: int = grid.distance(source, int(a))
+			var right: int = grid.distance(source, int(b))
+			return left < right if left != right else int(a) < int(b))
+		gate = int(candidates[0])
+	elif not candidates.has(gate):
+		gate = int(candidates[0])
 	war.state["sieges"][node]["breach_cell"] = gate
+	war.state["sieges"][node]["breach_open"] = true
 	for army in war.active_armies():
 		if army.has("tactical"):
 			army["tactical"].erase("previous_goal")

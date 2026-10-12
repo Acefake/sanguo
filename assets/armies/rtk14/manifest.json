@@ -1,6 +1,6 @@
 {
   "d3c18f06": {
-    "label": "持长兵器步兵 A · 525 面",
+    "label": "持长兵器步兵 A",
     "role": "infantry_low",
     "path": "res://assets/armies/rtk14/models/d3c18f06.glb",
     "source_package": "CharacterEditor",
@@ -13,9 +13,21 @@
         "normal": "5c01f0c2"
       }
     ],
-    "animation_status": "unbound",
+    "animation_status": "native G2A splines decoded and baked for field playback",
     "unresolved_textures": [],
-    "verification": "original geometry preview and native material references"
+    "verification": "original geometry preview and native material references",
+    "field_pose_asset": "res://assets/armies/rtk14/models/infantry-poses.glb",
+    "field_details": {
+      "model": "d3c18f06",
+      "clips": [
+        "0439a8ca",
+        "be09ed4e",
+        "13af95d7"
+      ],
+      "triangles_per_model": 525,
+      "fixed_models": 64,
+      "palette": "authored khaki cloth and red belt; source material uses 32x32 texture"
+    }
   },
   "5b38b582": {
     "label": "持长兵器步兵 B · 2625 面",
@@ -36,7 +48,7 @@
     "verification": "original geometry preview and native material references"
   },
   "cdf4bc12": {
-    "label": "马匹 · 高面数待简化",
+    "label": "战马 原生动作与野战简化版已接入",
     "role": "horse_high",
     "path": "res://assets/armies/rtk14/models/cdf4bc12.glb",
     "source_package": "CharacterEditor",
@@ -53,9 +65,33 @@
         "normal": "1dcd0c62"
       }
     ],
-    "animation_status": "unbound",
+    "animation_status": "native G2A splines decoded and baked for field playback",
     "unresolved_textures": [],
-    "verification": "original geometry preview and native material references"
+    "verification": "original geometry preview and native material references",
+    "field_pose_asset": "res://assets/armies/rtk14/models/cavalry-poses.glb",
+    "field_details": {
+      "horse": "cdf4bc12",
+      "clips": [
+        "80b8fc61",
+        "d94c175d",
+        "13af95d7"
+      ],
+      "rider": "d3c18f06",
+      "seating": "project authored",
+      "triangles_per_mounted_model": 9713,
+      "fixed_models": 36,
+      "atlas_sources": [
+        "90e56d46",
+        "e67ffb54",
+        "24b4dfb4"
+      ],
+      "mounted_attack": "native forward gait and infantry strike with authored seating; excluded horse-only rear/kick",
+      "rider_fit": {
+        "scale": 1.05,
+        "vertical_offset_m": 0.85,
+        "method": "pelvis above saddle; visible torso and helmet verified at battle camera"
+      }
+    }
   },
   "a9a19ea3": {
     "label": "象兵 · 姿态待校正",
@@ -129,7 +165,7 @@
     "verification": "original geometry preview and native material references"
   },
   "682039a2": {
-    "label": "攻城器械 A",
+    "label": "投石车 原生摆臂动作",
     "role": "siege_frame",
     "path": "res://assets/armies/rtk14/models/682039a2.glb",
     "source_package": "CharacterEditor",
@@ -146,12 +182,13 @@
         "normal": "39ca044d"
       }
     ],
-    "animation_status": "unbound",
+    "animation_status": "native G2A mechanism action decoded and visually checked",
     "unresolved_textures": [],
-    "verification": "original geometry preview and native material references"
+    "verification": "original geometry preview and native material references",
+    "field_pose_asset": "res://assets/armies/rtk14/models/siege-catapult-poses.glb"
   },
   "e5dc4fba": {
-    "label": "攻城器械 · 楼车",
+    "label": "箭楼 静态建筑及原生倒塌动作候选",
     "role": "siege_tower",
     "path": "res://assets/armies/rtk14/models/e5dc4fba.glb",
     "source_package": "CharacterEditor",
@@ -177,7 +214,7 @@
     "verification": "original geometry preview and native material references"
   },
   "c0d5fa9c": {
-    "label": "攻城器械 · 箱式车辆",
+    "label": "冲车 原生撞击动作",
     "role": "siege_vehicle",
     "path": "res://assets/armies/rtk14/models/c0d5fa9c.glb",
     "source_package": "CharacterEditor",
@@ -194,9 +231,10 @@
         "normal": "0ef07f54"
       }
     ],
-    "animation_status": "unbound",
+    "animation_status": "native G2A mechanism action decoded and visually checked",
     "unresolved_textures": [],
-    "verification": "original geometry preview and native material references"
+    "verification": "original geometry preview and native material references",
+    "field_pose_asset": "res://assets/armies/rtk14/models/siege-ram-poses.glb"
   },
   "bd1ef9be": {
     "label": "船只 · 桨船",
@@ -275,5 +313,24 @@
     "animation_status": "unbound",
     "unresolved_textures": [],
     "verification": "original geometry preview and native material references"
+  },
+  "f893127a": {
+    "label": "箭矢",
+    "role": "arrow",
+    "path": "res://assets/armies/rtk14/models/arrow.glb",
+    "source_model": "f893127a",
+    "source_package": "CharacterEditor",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "6759cb41",
+    "materials": [
+      {
+        "texture": "00b434fc",
+        "normal": "3801460a"
+      }
+    ],
+    "animation_status": "native geometry; authored ballistic playback",
+    "unresolved_textures": [],
+    "verification": "native material references and rendered UVs",
+    "triangles": 630
   }
 }

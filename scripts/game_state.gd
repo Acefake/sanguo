@@ -48,7 +48,7 @@ var battle_snapshot: Dictionary = {}
 var battle_picker: CanvasLayer
 var city_aliases: Dictionary = {}
 
-func start_battle_test(scenario_id: String = "plains_clash", seed: int = 1910901) -> void:
+func start_battle_test(scenario_id: String = "guandu_clash", seed: int = 1910901) -> void:
 	if busy: return
 	if preload("res://scripts/war/battle_scenarios.gd").definition(scenario_id).is_empty(): return
 	prepare_battle_test(true, scenario_id, seed)
@@ -56,7 +56,7 @@ func start_battle_test(scenario_id: String = "plains_clash", seed: int = 1910901
 	if is_instance_valid(settings_menu): settings_menu.window.hide()
 	get_tree().change_scene_to_file("res://scenes/rtk14_world_3d.tscn")
 
-func prepare_battle_test(preformed: bool = false, scenario_id: String = "plains_clash", seed: int = 1910901) -> void:
+func prepare_battle_test(preformed: bool = false, scenario_id: String = "guandu_clash", seed: int = 1910901) -> void:
 	if preload("res://scripts/war/battle_scenarios.gd").definition(scenario_id).is_empty(): return
 	if not battle_test:
 		_save()
@@ -301,10 +301,7 @@ func apply_faction_action(city_id: String, action_id: String, faction: String) -
 	if error != "": return {"ok": false, "message": error}
 	_apply_effects(city_state(city_id), action_id)
 	if action_id == "fortify":
-		var siege: Dictionary = war.state["sieges"].get(canonical_city_id(city_id), {})
-		if not siege.is_empty():
-			siege["wall"] = minf(float(siege["wall_max"]), float(siege["wall"]) + 20.0)
-			if int(city_state(city_id)["defense"]) >= 30: siege.erase("breach_cell")
+		preload("res://scripts/war/city_defense.gd").repair(war, canonical_city_id(city_id), 20.0)
 	if faction == str(war.state["player_faction"]): action_points -= 1
 	else: war.state["faction_action_points"][faction] = faction_action_points(faction) - 1
 	_record(canonical_city_id(city_id), str(ACTIONS[action_id]["title"]))
@@ -458,7 +455,7 @@ func _advance_one_day() -> String:
 	await war.step(agent)
 	if is_instance_valid(war_presentation):
 		war_presentation.begin_day(before)
-		# Finish each queued duel and its result before resuming the battle.
+		# Finish accepted duel playback and confirmation; refusals do not pause progression.
 		while is_instance_valid(war_presentation) and (war_presentation.presenting or war_presentation.duel_active()):
 			await get_tree().process_frame
 	return date_text() + ("：收到重要军情。" if war.urgent_event else "：将领继续自主行动。")

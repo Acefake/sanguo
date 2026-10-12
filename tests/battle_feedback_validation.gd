@@ -27,7 +27,7 @@ func run():
 	for enemy in war.active_armies("yuan_shao"):
 		enemy["morale"] = 10
 		enemy["organization"] = 10
-	check(F.visible_advantage(war) == balance,"优势条读取了未侦察的敌方真实士气与组织")
+	check(F.visible_advantage(war)["theirs"] < balance["theirs"] and not F.visible_advantage(war)["estimated"],"优势条未使用敌方实时士气与组织")
 	for enemy in war.active_armies("yuan_shao"):
 		enemy["morale"] = 100
 		enemy["organization"] = 100

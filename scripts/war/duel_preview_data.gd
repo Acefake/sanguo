@@ -4,6 +4,7 @@ const Duel = preload("res://scripts/war/duel_system.gd")
 
 class PreviewContext extends RefCounted:
 	var rules: Dictionary
+	var state: Dictionary = {"tick":0}
 	var rng := RandomNumberGenerator.new()
 
 static func build(war) -> Dictionary:
@@ -11,7 +12,7 @@ static func build(war) -> Dictionary:
 	for name in ["关羽", "颜良"]:
 		for card in war.roster.officers.values():
 			if card.get("name", "") == name:
-				fighters.append({"name":name, "skills":card["skills"].duplicate(true), "units":{"cavalry":1}})
+				fighters.append({"officer_id":card["id"], "stats":card.get("stats", []), "name":name, "skills":card["skills"].duplicate(true), "units":{"cavalry":1}})
 				break
 	assert(fighters.size() == 2, "Preview officers must exist in the roster")
 	var context := PreviewContext.new()

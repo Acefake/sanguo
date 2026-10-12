@@ -83,18 +83,35 @@ static func settle(war, army: Dictionary, enemy: Dictionary, status: String, cau
 		war._report(army, "主将接替", "%s接掌余部，继续执行军令。" % war.roster.officers[successor]["name"], true)
 	else:
 		army["commander_unavailable"] = true
-		army["returning"] = true
-		army["outcome"] = "主将失位撤退"
-		war._start_return(army)
+		disperse(war, army)
 	army.erase("pending_request")
 	army.erase("approved_action")
 	war.planner.clear()
 	return record
 
+static func disperse(war, army: Dictionary) -> void:
+	if army.get("status", "") == "ended": return
+	var count := Combat.strength(army) + int(army.get("wounded", 0))
+	army["dispersed"] = int(army.get("dispersed", 0)) + count
+	army["units"] = {"infantry": 0, "archers": 0, "cavalry": 0}
+	army["wounded"] = 0
+	army["wounded_units"] = {"infantry": 0, "archers": 0, "cavalry": 0}
+	army["siege_engines"] = 0
+	army["morale"] = 0.0
+	army["organization"] = 0.0
+	army["returning"] = true
+	army["victory_chain"] = false
+	war.state["battle_victories"].erase(str(army["officer_id"]))
+	army["action"] = {"type": "hold"}
+	army["last_reason"] = "随军武将尽失，无人接掌，士兵溃散"
+	war._report(army, "溃败", "%s无人接掌，剩余%d人溃散，退出战斗。" % [army["name"], count], true)
+	war._finish(army, "失去指挥溃散")
+
 static func encounter(war, army: Dictionary, enemy: Dictionary, cause: String, severity: float) -> Dictionary:
 	if army.get("commander_unavailable", false) or unavailable(war, str(army["officer_id"])) or enemy.is_empty(): return {}
 	var rules: Dictionary = war.rules.get("officer_fate", {})
 	var death := float(rules.get(cause + "_death", 0.02)) * clampf(severity, 0, 1)
+	if cause == "duel" and not war.rules.get("duel", {}).get("allow_death", true): death = 0.0
 	var capture := float(rules.get(cause + "_capture", 0.1)) * clampf(severity, 0, 1)
 	if cause != "duel" and (Combat.strength(enemy) <= 0 or enemy.get("commander_unavailable", false)): capture = 0.0
 	var roll: float = war.rng.randf()

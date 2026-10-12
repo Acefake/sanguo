@@ -79,6 +79,9 @@ static func decay(war) -> void:
 	var limits := settings()
 	var rate := float(limits.get("decay_per_day", 0.15))
 	for army in war.state.get("armies", {}).values():
+		if army.has("battle_ai"):
+			var notes: Array = army["battle_ai"].get("memory",[])
+			while not notes.is_empty() and int(war.state["battle_round"])-int(notes[0]["round"]) > 20: notes.pop_front()
 		if not army.get("experience", null) is Dictionary: continue
 		var drift: Dictionary = army["experience"].get("drift", {})
 		for axis in drift.keys():
@@ -91,3 +94,17 @@ static func summary(army: Dictionary) -> Dictionary:
 	var experience := ensure(army)
 	var recent: Array = experience["battle_log"].slice(maxi(0, experience["battle_log"].size() - 3))
 	return {"drift": experience["drift"].duplicate(), "enemy_notes": experience["enemy_notes"].duplicate(true), "streak": experience["streak"].duplicate(), "recent": recent}
+
+static func tactical_result(war, army: Dictionary) -> void:
+	if not army.has("battle_ai") or not army.has("tactical"): return
+	var ai: Dictionary = army["battle_ai"]
+	var entries: Array = ai.get("memory",[])
+	var event := "blocked" if army["tactical"].get("blocked",false) else "under_pressure" if int(army.get("last_enemy_tick",-100)) == int(war.state["tick"]) else ""
+	if not event.is_empty():
+		var note := {"round":war.state["battle_round"],"event":event,"target":army.get("last_enemy_id",""),"template":ai.get("plan",{}).get("template",""),"source":"personal_experience","army_id":army["id"]}
+		entries.append(note)
+		var agent := preload("res://scripts/agents/officer_brain.gd").ensure(war,str(army["officer_id"]))
+		agent["memory"].append(note.duplicate(true))
+		while agent["memory"].size() > 6: agent["memory"].pop_front()
+	while entries.size() > 10: entries.pop_front()
+	ai["memory"] = entries

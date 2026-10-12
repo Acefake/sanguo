@@ -84,6 +84,9 @@ func _ready() -> void:
 	back.add_theme_stylebox_override("normal", _asset_style("controls", Rect2(14, 13, 132, 132), 0))
 	back.add_theme_stylebox_override("hover", _asset_style("controls", Rect2(176, 14, 132, 132), 0))
 	back.add_theme_font_size_override("font_size", 19)
+	# The octagon plate is dark red; keep the label light like the footer plates.
+	for state in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+		back.add_theme_color_override(state, OfficerSkin.PALE)
 	footer = _text(frame, "", Rect2(915, 88, 215, 25), 15, Color("715d43"))
 	get_viewport().size_changed.connect(_resize)
 	_resize()
@@ -573,8 +576,10 @@ func _style_footer_button(button: Button) -> void:
 		button.add_theme_stylebox_override(state, style)
 	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	button.add_theme_font_size_override("font_size", 14)
-	button.add_theme_color_override("font_hover_color", OfficerSkin.PALE)
-	button.add_theme_color_override("font_pressed_color", OfficerSkin.PALE)
+	# The command plate is a dark red, so the shared theme's dark INK was
+	# unreadable in the normal state. Every state now uses the light paper tone.
+	for state in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+		button.add_theme_color_override(state, OfficerSkin.PALE)
 
 func _row_style(active: bool) -> StyleBox:
 	# P3：选中行改用加深底色，不再依赖难以分辨的浅黄高亮图。

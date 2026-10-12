@@ -16,7 +16,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0005.png",
     "thumbnail": "res://assets/officers/portraits/0005-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/袁紹"
+    "verification": "https://wikiwiki.jp/sangokushi8r/袁紹",
+    "unit_portrait": "res://assets/officers/portraits/0005-unit.png",
+    "unit_crop": [
+      162,
+      172,
+      778,
+      746
+    ]
   },
   "袁尚": {
     "image_number": 34,
@@ -35,7 +42,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0034.png",
     "thumbnail": "res://assets/officers/portraits/0034-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/袁尚"
+    "verification": "https://wikiwiki.jp/sangokushi8r/袁尚",
+    "unit_portrait": "res://assets/officers/portraits/0034-unit.png",
+    "unit_crop": [
+      76,
+      22,
+      583,
+      493
+    ]
   },
   "孙策": {
     "image_number": 63,
@@ -54,7 +68,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0063.png",
     "thumbnail": "res://assets/officers/portraits/0063-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/孫策"
+    "verification": "https://wikiwiki.jp/sangokushi8r/孫策",
+    "unit_portrait": "res://assets/officers/portraits/0063-unit.png",
+    "unit_crop": [
+      222,
+      142,
+      838,
+      716
+    ]
   },
   "田丰": {
     "image_number": 107,
@@ -73,7 +94,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0107.png",
     "thumbnail": "res://assets/officers/portraits/0107-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/田豊"
+    "verification": "https://wikiwiki.jp/sangokushi8r/田豊",
+    "unit_portrait": "res://assets/officers/portraits/0107-unit.png",
+    "unit_crop": [
+      209,
+      89,
+      781,
+      622
+    ]
   },
   "颜良": {
     "image_number": 10,
@@ -92,7 +120,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0010.png",
     "thumbnail": "res://assets/officers/portraits/0010-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/顔良"
+    "verification": "https://wikiwiki.jp/sangokushi8r/顔良",
+    "unit_portrait": "res://assets/officers/portraits/0010-unit.png",
+    "unit_crop": [
+      54,
+      164,
+      626,
+      697
+    ]
   },
   "文丑": {
     "image_number": 11,
@@ -111,7 +146,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0011.png",
     "thumbnail": "res://assets/officers/portraits/0011-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/文醜"
+    "verification": "https://wikiwiki.jp/sangokushi8r/文醜",
+    "unit_portrait": "res://assets/officers/portraits/0011-unit.png",
+    "unit_crop": [
+      0,
+      124,
+      546,
+      657
+    ]
   },
   "袁谭": {
     "image_number": 35,
@@ -130,7 +172,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0035.png",
     "thumbnail": "res://assets/officers/portraits/0035-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/袁譚"
+    "verification": "https://wikiwiki.jp/sangokushi8r/袁譚",
+    "unit_portrait": "res://assets/officers/portraits/0035-unit.png",
+    "unit_crop": [
+      0,
+      64,
+      561,
+      597
+    ]
   },
   "袁熙": {
     "image_number": 33,
@@ -149,7 +198,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0033.png",
     "thumbnail": "res://assets/officers/portraits/0033-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/袁煕"
+    "verification": "https://wikiwiki.jp/sangokushi8r/袁煕",
+    "unit_portrait": "res://assets/officers/portraits/0033-unit.png",
+    "unit_crop": [
+      39,
+      44,
+      611,
+      577
+    ]
   },
   "廖化": {
     "image_number": 121,
@@ -168,7 +224,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0121.png",
     "thumbnail": "res://assets/officers/portraits/0121-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/廖化"
+    "verification": "https://wikiwiki.jp/sangokushi8r/廖化",
+    "unit_portrait": "res://assets/officers/portraits/0121-unit.png",
+    "unit_crop": [
+      217,
+      82,
+      833,
+      656
+    ]
   },
   "关兴": {
     "image_number": 81,
@@ -187,7 +250,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0081.png",
     "thumbnail": "res://assets/officers/portraits/0081-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/関興"
+    "verification": "https://wikiwiki.jp/sangokushi8r/関興",
+    "unit_portrait": "res://assets/officers/portraits/0081-unit.png",
+    "unit_crop": [
+      55,
+      65,
+      605,
+      577
+    ]
   },
   "张苞": {
     "image_number": 103,
@@ -206,7 +276,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0103.png",
     "thumbnail": "res://assets/officers/portraits/0103-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/張苞"
+    "verification": "https://wikiwiki.jp/sangokushi8r/張苞",
+    "unit_portrait": "res://assets/officers/portraits/0103-unit.png",
+    "unit_crop": [
+      63,
+      63,
+      636,
+      616
+    ]
   },
   "张遵": {
     "image_number": 631,
@@ -225,7 +302,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0631.png",
     "thumbnail": "res://assets/officers/portraits/0631-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/張遵"
+    "verification": "https://wikiwiki.jp/sangokushi8r/張遵",
+    "unit_portrait": "res://assets/officers/portraits/0631-unit.png",
+    "unit_crop": [
+      55,
+      155,
+      605,
+      667
+    ]
   },
   "诸葛亮": {
     "image_number": 45,
@@ -244,7 +328,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0045.png",
     "thumbnail": "res://assets/officers/portraits/0045-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/諸葛亮"
+    "verification": "https://wikiwiki.jp/sangokushi8r/諸葛亮",
+    "unit_portrait": "res://assets/officers/portraits/0045-unit.png",
+    "unit_crop": [
+      238,
+      173,
+      832,
+      726
+    ]
   },
   "关凤": {
     "image_number": 571,
@@ -263,7 +354,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0571.png",
     "thumbnail": "res://assets/officers/portraits/0571-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/関銀屏"
+    "verification": "https://wikiwiki.jp/sangokushi8r/関銀屏",
+    "unit_portrait": "res://assets/officers/portraits/0571-unit.png",
+    "unit_crop": [
+      16,
+      57,
+      523,
+      528
+    ]
   },
   "周仓": {
     "image_number": 20,
@@ -282,7 +380,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0020.png",
     "thumbnail": "res://assets/officers/portraits/0020-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/周倉"
+    "verification": "https://wikiwiki.jp/sangokushi8r/周倉",
+    "unit_portrait": "res://assets/officers/portraits/0020-unit.png",
+    "unit_crop": [
+      25,
+      125,
+      575,
+      637
+    ]
   },
   "关羽": {
     "image_number": 2,
@@ -301,7 +406,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0002.png",
     "thumbnail": "res://assets/officers/portraits/0002-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/関羽"
+    "verification": "https://wikiwiki.jp/sangokushi8r/関羽",
+    "unit_portrait": "res://assets/officers/portraits/0002-unit.png",
+    "unit_crop": [
+      140,
+      70,
+      800,
+      685
+    ]
   },
   "黄忠": {
     "image_number": 23,
@@ -320,7 +432,14 @@
     ],
     "portrait": "res://assets/officers/portraits/0023.png",
     "thumbnail": "res://assets/officers/portraits/0023-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/黄忠"
+    "verification": "https://wikiwiki.jp/sangokushi8r/黄忠",
+    "unit_portrait": "res://assets/officers/portraits/0023-unit.png",
+    "unit_crop": [
+      223,
+      268,
+      927,
+      924
+    ]
   },
   "魏延": {
     "image_number": 15,
@@ -339,6 +458,13 @@
     ],
     "portrait": "res://assets/officers/portraits/0015.png",
     "thumbnail": "res://assets/officers/portraits/0015-head.png",
-    "verification": "https://wikiwiki.jp/sangokushi8r/魏延"
+    "verification": "https://wikiwiki.jp/sangokushi8r/魏延",
+    "unit_portrait": "res://assets/officers/portraits/0015-unit.png",
+    "unit_crop": [
+      262,
+      72,
+      878,
+      646
+    ]
   }
 }

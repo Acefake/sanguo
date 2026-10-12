@@ -34,7 +34,7 @@ for index, (name, (number, page, head)) in enumerate(matches.items()):
     portrait = image.crop(bounds)
     portrait.save(output/f'{number:04d}.png')
     image.crop(head).save(output/f'{number:04d}-head.png')
-    manifest[name] = {'image_number': number, 'source': str(files[0]), 'alpha_bounds': list(bounds), 'head_crop': list(head), 'portrait': f'res://assets/officers/portraits/{number:04d}.png', 'thumbnail': f'res://assets/officers/portraits/{number:04d}-head.png', 'verification': f'https://wikiwiki.jp/sangokushi8r/{page}'}
+    manifest[name] = {**manifest.get(name, {}), 'image_number': number, 'source': str(files[0]), 'alpha_bounds': list(bounds), 'head_crop': list(head), 'portrait': f'res://assets/officers/portraits/{number:04d}.png', 'thumbnail': f'res://assets/officers/portraits/{number:04d}-head.png', 'verification': f'https://wikiwiki.jp/sangokushi8r/{page}'}
     portrait.thumbnail((220, 258))
     x = (index % 4)*240; y = (index // 4)*300
     gallery.paste(portrait, (x+(240-portrait.width)//2, y), portrait)

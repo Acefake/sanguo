@@ -1,5 +1,6 @@
 {
-  "version": 6,
+  "version": 8,
+  "battle_ai": {"version": 1, "mode": "active"},
   "days_per_month": 30,
   "grain_per_soldier_day": 0.004,
   "reserve_ratio": 0.35,
@@ -10,6 +11,7 @@
   "mission_days": 90,
   "route_days_per_cost": 3.0,
   "report_delay_days": 1,
+  "report_policy": {"major_strength": 10000},
   "intel_expiry_days": 4,
   "units": {
     "infantry": {
@@ -92,6 +94,15 @@
       "adjacent_range": 1,
       "flank_attack": 1.15
     },
+    "chase": {
+      "enabled": true,
+      "max_steps": 2
+    },
+    "breakthrough": {
+      "enabled": true,
+      "min_remaining_points": 1.0,
+      "max_threat": 1
+    },
     "attack_range": 3
   },
   "officer": {
@@ -126,7 +137,6 @@
     ],
     "default_intent": "稳扎",
     "default_risk": "常规",
-    "default_report": "重大事件",
     "dissent": {
       "gap": 12,
       "base": 0.15,
@@ -232,15 +242,31 @@
   },
   "duel": {
     "enabled": true,
+    "role_gate": {
+      "enabled": true,
+      "allowed_roles": [
+        "frontline",
+        "duelist",
+        "guard"
+      ],
+      "min_martial": 60.0,
+      "role_weights": {
+        "frontline": 1.0,
+        "duelist": 1.2,
+        "guard": 0.7,
+        "commander": 0.3,
+        "strategist": 0.0,
+        "civil": 0.0,
+        "default": 1.0
+      },
+      "accept_min_martial": 20
+    },
     "initiation": 0.12,
     "acceptance": 0.55,
     "officer_battle_limit": 2,
-    "round_noise": 15,
-    "draw_margin": 1,
     "recover_days": 10,
     "max_records": 240,
-    "wounded_attack": 0.75,
-    "allow_death": false,
+    "allow_death": true,
     "personality_threshold": 70,
     "disadvantage_ratio": 0.8,
     "initiative_disadvantage": 1.5,
@@ -255,14 +281,6 @@
     "accept_pride": 1.25,
     "accept_control": 0.85,
     "accept_disadvantage": 0.8,
-    "aura_percent": 0.05,
-    "aura_scale": 100,
-    "weights": {
-      "武艺": 0.5,
-      "膂力": 0.3,
-      "体魄": 0.2,
-      "骑术": 0.1
-    },
     "effects": {
       "overwhelming": {
         "loser_morale": 40,
@@ -280,6 +298,153 @@
       "refused": {
         "challenger_morale": 6,
         "defender_morale": 3
+      }
+    },
+    "mode": "mounted_melee",
+    "presentation": {
+      "entry_seconds": 1.2,
+      "attack_seconds": 0.55,
+      "impact_seconds": 0.15,
+      "hp_blend_seconds": 0.1,
+      "result_seconds": 6.0
+    },
+    "numeric": {
+      "trait_factor_bounds": [1.03, 1.10],
+      "attribute_max": 120,
+      "main_weight": 0.6,
+      "sub_weight": 0.4,
+      "weights": {
+        "mounted_melee": {
+          "武艺": 0.4,
+          "膂力": 0.25,
+          "体魄": 0.15,
+          "骑术": 0.15,
+          "箭术": 0.05
+        },
+        "foot_melee": {
+          "武艺": 0.45,
+          "膂力": 0.3,
+          "体魄": 0.2,
+          "骑术": 0,
+          "箭术": 0.05
+        }
+      },
+      "fatigue_penalty": 0.15,
+      "injury_penalty": 0.2,
+      "state_min": 0.6,
+      "injury_labels": {
+        "轻伤": 0.25,
+        "负伤": 0.5,
+        "重伤": 1.0
+      },
+      "attack": [
+        0.7,
+        0.2,
+        0.1
+      ],
+      "defense": [
+        0.65,
+        0.2,
+        0.15
+      ],
+      "initiative_weights": [
+        0.5,
+        0.2,
+        0.15,
+        0.15
+      ],
+      "initiative_hp_base": 0.85,
+      "initiative_hp_weight": 0.15,
+      "initiative_base": 0.5,
+      "initiative_difference": 0.01,
+      "initiative_bounds": [
+        0.05,
+        0.95
+      ],
+      "hit_base": 0.72,
+      "hit_attack": 0.006,
+      "hit_skill": 0.002,
+      "hit_calm": 0.001,
+      "hit_bounds": [
+        0.08,
+        0.99
+      ],
+      "block_base": 0.1,
+      "block_skill": 0.004,
+      "block_calm": 0.002,
+      "block_strength": 0.0015,
+      "block_bounds": [
+        0.02,
+        0.35
+      ],
+      "block_damage": 0.25,
+      "critical_base": 0.05,
+      "critical_strength": 0.002,
+      "critical_skill": 0.001,
+      "critical_bounds": [
+        0.03,
+        0.45
+      ],
+      "critical_damage": 1.7,
+      "damage_base": 8,
+      "damage_exponent": 3,
+      "suppression_scale": 40,
+      "defense_floor": 20,
+      "damage_min": 1,
+      "damage_noise": [
+        0.95,
+        1.05
+      ],
+      "resistance_base": 60,
+      "resistance_physique": 0.002,
+      "resistance_bounds": [
+        0.82,
+        1.12
+      ],
+      "hp_base": 80,
+      "hp_physique": 0.5,
+      "hp_min": 80,
+      "hp_max": 140,
+      "counter_enabled": true,
+      "counter_base": 0.05,
+      "counter_skill": 0.003,
+      "counter_adapt": 0.002,
+      "counter_bounds": [
+        0.02,
+        0.25
+      ],
+      "counter_damage": 0.6,
+      "fatigue_base": 1.6,
+      "fatigue_physique": 0.005,
+      "fatigue_bounds": [
+        0.8,
+        1.6
+      ],
+      "critical_fatigue": 0.5,
+      "recovery_hp": 0.05,
+      "recovery_fatigue": 8,
+      "max_rounds": 40,
+      "decision_ratio": 0.15,
+      "traits": {
+        "武圣": {
+          "effect": "hit",
+          "factor": 1.05
+        },
+        "骑战": {
+          "effect": "attack",
+          "factor": 1.03,
+          "mode": "mounted_melee"
+        },
+        "刀术": {
+          "effect": "attack",
+          "factor": 1.03,
+          "weapon": "blade"
+        },
+        "枪术": {
+          "effect": "attack",
+          "factor": 1.03,
+          "weapon": "spear"
+        }
       }
     }
   },

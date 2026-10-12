@@ -3,25 +3,45 @@ extends RefCounted
 const AXES := ["野心", "风险承受", "耐心", "决断", "自制", "猜疑", "自尊", "同理心", "秩序偏好", "务实", "记仇", "容人", "贪欲", "忠义"]
 const SKILLS := [["带兵", "布阵", "水练", "奇袭", "治军"], ["智计", "沉着", "料敌", "应变", "辩才"], ["膂力", "体魄", "武艺", "骑术", "箭术"], ["农桑", "商贾", "吏治", "律法", "辞令"], ["威仪", "仁德", "忠义", "名望", "雅量"]]
 var officers: Dictionary = {}
+var parsing_audit: Array = []
 const Battle = preload("res://scripts/war/officer_battle.gd")
+
+static func numeric(value: Variant, maximum: int) -> Dictionary:
+	if typeof(value) not in [TYPE_INT,TYPE_FLOAT] and not (value is String and value.is_valid_float()): return {"value":50,"source":"invalid_default"}
+	var number := float(value)
+	if is_nan(number) or is_inf(number): return {"value":50,"source":"invalid_default"}
+	return {"value":int(clampf(number,0,maximum)),"source":"clamped_card" if number < 0 or number > maximum else "card"}
 
 
 func setup(cards: Array, mapping: Dictionary) -> void:
 	officers.clear()
+	parsing_audit.clear()
 	for card in cards:
 		var skills: Dictionary = {}
-		var rows: Array = card.get("substats", [])
+		var sources := {"skills":{},"personality":{}}
+		var rows: Array = card.get("substats", []) if card.get("substats",[]) is Array else []
 		for row in range(mini(rows.size(), SKILLS.size())):
+			if not rows[row] is Array: continue
 			for col in range(mini(rows[row].size(), SKILLS[row].size())):
-				skills[SKILLS[row][col]] = clampi(int(rows[row][col]), 0, 120)
+				var parsed := numeric(rows[row][col],120)
+				skills[SKILLS[row][col]] = parsed["value"]
+				sources["skills"][SKILLS[row][col]] = parsed["source"]
+		for group in SKILLS:
+			for skill in group:
+				if not skills.has(skill): skills[skill] = 50; sources["skills"][skill] = "missing_default"
 		var personality: Dictionary = {}
 		var text: String = str(card.get("sections", {}).get("人格数值", "")).replace("记仄", "记仇")
 		for axis in AXES:
 			var regex := RegEx.new()
-			regex.compile(axis + "\\s*(\\d{1,3})")
+			regex.compile(axis + "[\\s:：=]*([+-]?[0-9]+(?:\\.[0-9]+)?)")
 			var match_value := regex.search(text)
-			personality[axis] = clampi(int(match_value.get_string(1)), 0, 100) if match_value != null else 50
-		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": str(mapping.get(str(card.get("faction", "")), "")), "skills": skills, "personality": personality, "battle_traits": Battle.traits(card), "portrait": card.get("thumbnail", ""), "positions": str(card.get("sections", {}).get("位置", "")), "profile_note": str(card.get("sections", {}).get("核心定义", "")).left(350)}
+			var parsed := numeric(match_value.get_string(1),100) if match_value != null else {"value":50,"source":"invalid_default" if text.contains(axis) else "missing_default"}
+			personality[axis] = parsed["value"]
+			sources["personality"][axis] = parsed["source"]
+		parsing_audit.append({"id":card["id"],"sources":sources.duplicate(true)})
+		# Keep parsing provenance separate from the card's original values.
+		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": str(mapping.get(str(card.get("faction", "")), "")), "stats": card.get("stats", []).duplicate(), "skills": skills, "personality": personality, "battle_traits": Battle.traits(card), "portrait": card.get("thumbnail", ""), "positions": str(card.get("sections", {}).get("位置", "")), "profile_note": str(card.get("sections", {}).get("核心定义", "")).left(350)}
+		officers[str(card["id"])]["data_sources"] = sources
 
 
 func militia(faction: String, city: String) -> String:
@@ -34,7 +54,7 @@ func militia(faction: String, city: String) -> String:
 		var personality: Dictionary = {}
 		for axis in AXES:
 			personality[axis] = 50
-		officers[id] = {"id": id, "name": "守备将", "faction": faction, "skills": skills, "personality": personality, "portrait": "", "profile_note": "地方守备，遵守守城与保全部队的任务。"}
+		officers[id] = {"id": id, "name": "守备将", "battlefield_role":"guard", "positions":"核心位置：守备", "faction": faction, "skills": skills, "personality": personality, "portrait": "", "profile_note": "地方守备，遵守守城与保全部队的任务。"}
 	return id
 
 # Deterministic local officers keep incomplete historical data playable. Their

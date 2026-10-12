@@ -7,6 +7,7 @@ var endpoint: LineEdit
 var model: LineEdit
 var key: LineEdit
 var enabled: CheckButton
+var model_scope: OptionButton
 var timeout: SpinBox
 var parallel: SpinBox
 var budget: SpinBox
@@ -35,11 +36,17 @@ func _ready() -> void:
 	rows.add_theme_constant_override("separation", 10)
 	scroll.add_child(rows)
 	_label(rows, "武将智能体")
-	_label(rows, "编军后由主帅智能体统筹任务、拆分小队；部将按军令执行。各军团共用模型服务，失败时由本地指挥策略接管。")
+	_label(rows, "主帅分配职责，每支小部队依据自己的武将、敌情与授权自主判断目标、站位和配合；模型未配置时本地策略完整作战。")
 	enabled = CheckButton.new()
 	enabled.text = "启用模型自主决策"
 	enabled.add_theme_color_override("font_color", CitySkin.INK)
 	rows.add_child(enabled)
+	_label(rows,"模型参与范围")
+	model_scope = OptionButton.new()
+	for item in [["本地决策","local"],["仅主帅使用模型","commanders"],["所有武将使用模型","all"]]:
+		model_scope.add_item(item[0])
+		model_scope.set_item_metadata(model_scope.item_count-1,item[1])
+	rows.add_child(model_scope)
 	endpoint = _field(rows, "接口地址（/chat/completions 或 Ollama /api/chat）")
 	model = _field(rows, "模型名")
 	key = _field(rows, "API Key（保存到本机配置，重启自动读取）")
@@ -53,7 +60,7 @@ func _ready() -> void:
 	reasoning.text = "关闭模型思考（Ollama／OpenRouter）"
 	reasoning.add_theme_color_override("font_color", CitySkin.INK)
 	rows.add_child(reasoning)
-	_label(rows, "Ollama使用原生接口、结构化行动JSON和短上下文；各军团主帅共享模型权重，部将执行军令，无需API Key。")
+	_label(rows, "武将保留独立性格、观察和记忆，共享模型权重。主帅签发军令，主将临机执行，参军独立建议。Ollama无需API Key。")
 	var local := Button.new()
 	local.text = "使用本机小模型  Ollama Qwen3 1.7B"
 	CitySkin.style_button(local)
@@ -74,12 +81,12 @@ func _ready() -> void:
 	CitySkin.style_button(probe)
 	probe.pressed.connect(_probe_local)
 	rows.add_child(probe)
-	_label(rows, "同时请求主帅数（1–12）")
+	_label(rows, "同时请求将领数（1–6）")
 	parallel = SpinBox.new()
 	parallel.min_value = 1
-	parallel.max_value = 12
+	parallel.max_value = 6
 	rows.add_child(parallel)
-	_label(rows, "每个游戏日模型总等待上限（秒，超时由本地策略接管）")
+	_label(rows, "后台请求时间预算（秒；战斗持续使用本地判断）")
 	budget = SpinBox.new()
 	budget.min_value = 2
 	budget.max_value = 30
@@ -114,6 +121,8 @@ func _ready() -> void:
 
 func open() -> void:
 	enabled.button_pressed = store.agent.enabled
+	for i in range(model_scope.item_count):
+		if model_scope.get_item_metadata(i) == store.agent.model_mode: model_scope.select(i)
 	endpoint.text = store.agent.endpoint
 	model.text = store.agent.model
 	key.text = store.agent.api_key
@@ -129,7 +138,7 @@ func _save() -> void:
 	if store.busy:
 		notice.text = "请先完成本轮十日推进，再保存模型设置。"
 		return
-	notice.text = store.agent.configure({"enabled": enabled.button_pressed, "endpoint": endpoint.text, "model": model.text, "api_key": key.text, "timeout": timeout.value, "concurrency": parallel.value, "decision_budget": budget.value, "disable_reasoning": reasoning.button_pressed})
+	notice.text = store.agent.configure({"enabled": enabled.button_pressed, "model_mode": model_scope.get_item_metadata(model_scope.selected), "endpoint": endpoint.text, "model": model.text, "api_key": key.text, "timeout": timeout.value, "concurrency": parallel.value, "decision_budget": budget.value, "disable_reasoning": reasoning.button_pressed})
 
 func _label(parent: Node, text: String) -> Label:
 	var label := Label.new()

@@ -8,7 +8,7 @@
 
 地形网格由两米抽样改为来源一米采样，保留窄山脊。64 个地形块仍生成网格 LOD，并缓存到 `terrain/mesh-cache/`；缓存键包含最终高度数组的 SHA-256、网格版本与采样步长，城池或关口地基发生变化时不会沿用旧网格。后续启动直接加载压缩缓存，避免每次重建网格与 LOD。
 
-原场景 `6dbf662e` 的 1120 条静态位置、四元数和缩放全部保留。当前场景配置 `6eff205a` 位于 `KIDSSystemResource_b041e18a.kidsobjdb`，它同时引用已恢复的地表、植被和静态场景数据库；其可见清单 `63f9f0ba` 只列出 105 处原始村落，与来源村落实例集合完全一致。当前按这份清单绘制；其余 1015 条制作摆放保留为资产与来源记录，不再叠加绘制到已烘焙高度图之上。游戏代码可能对清单另作修改，尚未确认。清单和来源 SHA 见 `stage_visibility.json`。静态物件直接使用来源 Y，不再跟随派生地面补偿高度。
+原场景 `6dbf662e` 的 1120 条静态位置、四元数和缩放全部保留。当前场景配置 `6eff205a` 位于 `KIDSSystemResource_b041e18a.kidsobjdb`；可见清单 `63f9f0ba` 只列出 105 个被分配正值 `PreviewVisibilitySet` 的村落实例。通过实例模板确认，其余 1015 个山体、峭壁和地被对象继承负值（无显式可见组），按默认状态绘制；因此它们不应被可见清单过滤。修正后场景按来源变换绘制全部 1120 个摆放，山体分模型分成 256 米空间块以供视锥裁剪；不再因与城池相交而擅自过滤。静态物件直接使用来源 Y，不跟随派生地面补偿高度。游戏代码可能另有运行时覆盖，尚未确认。来源列表、可见性字段和 SHA 见 `stage_visibility.json` 及 `placements.json`。
 
 ## 地表材质
 
@@ -53,6 +53,14 @@ Displayset、纹理状态、KTID 绑定、来源纹理的追踪记录为 `model-
 
 `tools/rtk14_terrain_color_probe.gd` 在独立进程对照两种采样方式；`--linear` 使用专用诊断着色器，不修改主场景。线性对照图 `validation/terrain-color-linear.png` 显著泛白，因此当前正式地形设置保留。完整原作色调仍需恢复运行时材质和光照，而非继续手工染色。
 
+## 原版地形细节位移（尚未接入）
+
+除了基础 2049² 高度图，来源 `dc52fd1c` 还包含 hull/domain 细分阶段（反汇编变体 140/141）。domain 阶段从法线/高度纹理 alpha 取值，按 `alpha × TessScale + TessBias` 计算位移，再沿地表法线移动顶点；材质层参数已保存在 `terrain/native_materials.json`。这能补充基础高度图没有的小尺度起伏，值得纳入山体差异调查。
+
+运行时细分系数、相机衰减和活动地图场景绑定尚未确定，因此不改正式地形。诊断脚本 `tools/build_rtk14_terrain_displacement_probe.py` 以 0.01 的假设增益单独生成 `validation/native-tessellation-probe-delta.r32`，Godot 预览脚本另建高度缓存并输出 `validation/native-tessellation-probe.png`。此次候选范围约 −1.00 至 +0.93 米，汉中截图与基线视觉差异很小；这说明该低增益诊断不足以还原参考图中明显的山脊，不能据此判断原版位移强度。
+
+全局相机候选对象记录了 `TerrainTessellationMaxDistance=5000`、`TerrainTessellationDivisionFactor=64` 和两个屏幕位移衰减参数为 0，但目前还没证实这些对象就是活动大地图使用的相机。必须先恢复该对象与实际地图渲染状态的绑定及单位，再决定正式网格位移量。
+
 ## 验证和性能
 
 `tools/validate_rtk14_native_maps.py` 独立核对原始高度 4198401 个样本、地表控制字节及 1048576 单元植被分布/密度，全部与来源二进制一致。生成植被均处于来源绘制生境。纹理周期与原版烘焙图独立对应，五类材质正确周期相关系数约 0.766～0.925，错误的十分之一或十倍周期接近无相关。
@@ -73,7 +81,7 @@ Displayset、纹理状态、KTID 绑定、来源纹理的追踪记录为 `model-
 
 `tools/validate_rtk14_water.py` 独立读取 G1T BGRA8 像素，确认导出两张法线全部 524288 个像素相同；检查全部水面顶点与缓存高度、索引范围、一米三角形面积及文件哈希。结果见 `validation/native-water-check.json`。这不验证重建水位的原作准确性。最终场景检查 `validation/native-water-validation.log` 通过；新水面汉中/洛阳截图为 `validation/native-water-{hanzhong,luoyang}.png`。
 
-一米采样和来源可见清单接入后的实测：
+以下是一米地形阶段的历史测量。该版本把 105 条显式可见清单误当作全部静态摆放，因此漏画了 1015 个继承默认可见状态的原版山体/峭壁对象；这些帧率不代表当前完整静态摆件场景：
 
 | 视角/画质 | 中位帧时 ms | FPS | P95 ms | 可见绘制次数 |
 | --- | ---: | ---: | ---: | ---: |
@@ -84,6 +92,23 @@ Displayset、纹理状态、KTID 绑定、来源纹理的追踪记录为 `model-
 | 返回洛阳流畅 | 3.059 | 327 | 3.486 | 258 |
 
 首轮流畅采样有约 13 毫秒的 P95 波动，返回视角的 P95 为 3.486 毫秒；这些短样本不应当解释为长期稳定帧率保证。网格缓存复用检查为 64 块全部复用，无重建；压缩缓存约 106.5 MiB。最终截图使用 1600×1000，汉中、洛阳和关口为精细模式，全国为流畅模式。
+
+恢复默认可见摆件并按 256 米区域分块后的当前实测，使用 RTX 3060 Laptop、Vulkan Forward+、1260×710、开启正常地图更新、每种模式预热 12 帧并采样 45 帧：
+
+| 视角/画质 | 中位帧时 ms | FPS | P95 ms | 可见绘制次数 |
+| --- | ---: | ---: | ---: | ---: |
+| 洛阳流畅，1120 个静态摆件开启 | 3.592 | 278 | 13.829 | 426 |
+| 洛阳流畅，静态摆件关闭对照 | 3.293 | 304 | 3.852 | 335 |
+| 洛阳精细 | 4.916 | 203 | 5.374 | 426 |
+| 全国总览 | 7.625 | 131 | 8.168 | 1388 |
+| 近远切换 | 4.905 | 204 | 5.466 | 711 |
+| 洛阳流畅重复采样 | 3.488 | 287 | 4.054 | 426 |
+
+静态摆件在洛阳流畅对照中增加 91 次可见绘制，重复测量中位帧时增加约 0.3 ms；首轮 P95 有一次 13.8 ms 波动，重复轮 P95 为 4.1 ms。当前帧率足以排除这次恢复导致的持续性卡顿，但并不保证其他显卡表现相同。实拍截图见 `validation/native-source-static-hanzhong-no-grid.png`、`validation/native-source-gate-131-verified.png` 和 `validation/native-source-static-overview-no-grid.png`。
+
+![汉中：恢复原始山体摆件并关闭地格线](validation/native-source-static-hanzhong-no-grid.png)
+![洛阳关口 131：关墙横跨山谷通道](validation/native-source-gate-131-verified.png)
+![全图总览：关闭地格线](validation/native-source-static-overview-no-grid.png)
 
 汉中改用来源 B 类圆角浅色石墙城池，与用户提供的汉中参考图作视觉对应；中型阶段仍为重建选择。完整原始 A/B/C 三类各阶段及 D/E 类型实拍见 `validation/native-city-archetypes.png`。
 

@@ -25,11 +25,11 @@ func run():
 		var outcome := {"result":"overwhelming", "winner":0}
 		Duel.apply_result(war, a, b, outcome)
 		check(outcome["fate"]["status"] == status, "Forced duel fate not applied")
-		check(war.Combat.strength(b) == manpower, "Officer loss erased soldiers")
+		check(war.Combat.strength(b) + int(b.get("dispersed", 0)) == manpower, "Officer loss did not account for surviving soldiers")
 		check(war.state["officer_states"][loser_id]["status"] == status, "Officer status missing")
 		if b["officer_id"] != loser_id:
 			check(not Fate.unavailable(war, b["officer_id"]) and not b.get("commander_unavailable", false), "Invalid successor")
-		else: check(b["returning"] and b.get("commander_unavailable", false), "Leaderless unit still fighting")
+		else: check(b["status"] == "ended" and b.get("commander_unavailable", false) and b.get("dispersed", 0) == manpower, "Leaderless unit did not disperse")
 		check(not war.available_officers("yuan_shao").any(func(officer): return officer["id"] == loser_id), "Terminal officer available")
 		var fate_before: Dictionary = war.state["officer_fates"][loser_id].duplicate(true)
 		Fate.settle(war, b, a, status, "重复结算") if b["officer_id"] == loser_id else null
@@ -99,7 +99,7 @@ func run():
 		for day in range(45):
 			await war.step(adapter)
 			for unit in war.state["armies"].values():
-				check(int(unit["initial_strength"]) == war.Combat.strength(unit) + int(unit["dead"]) + int(unit["wounded"]) + int(unit["captured"]) + int(unit["deposited"]), "Manpower not conserved after fate")
+				check(war.ledger(unit)["missing"] == 0, "Manpower not conserved after fate")
 		var killed := 0
 		var deaths := 0
 		for unit in war.state["armies"].values():

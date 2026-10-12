@@ -14,7 +14,9 @@ TESTS = [
     "encirclement_validation", "corps_validation", "siege_corps_validation",
     "battle_discipline_validation", "decision_scheduler_validation",
     "global_battle_grid_validation", "officer_battle_validation",
+    "officer_command_validation", "officer_edges_validation",
     "xiaopei_battle_validation", "war_validation", "war_orders_validation",
+    "orders_dissent_validation", "strategic_ai_validation",
     "battle_balance_validation", "combat_effects_validation",
     "dispatch_view_validation", "war_turn_time_validation",
 ]

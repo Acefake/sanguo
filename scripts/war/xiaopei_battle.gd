@@ -2,6 +2,7 @@ extends RefCounted
 
 static func setup(store: Node, preformed: bool = false, options: Dictionary = {}) -> void:
 	store._load_demo()
+	store.war.setup(store, {})
 	store.year = 191
 	store.month = 9
 	store.day = 1

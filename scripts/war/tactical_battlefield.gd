@@ -10,6 +10,8 @@ const Feedback = preload("res://scripts/war/battle_feedback.gd")
 const Edges = preload("res://scripts/war/officer_edges.gd")
 const GRID_WIDTH := 220
 const Fort = preload("res://scripts/war/city_fortifications.gd")
+const Roles = preload("res://scripts/war/troop_roles.gd")
+const Defense = preload("res://scripts/war/city_defense.gd")
 
 static func board_for(war, army: Dictionary) -> Dictionary:
 	var id := str(army.get("battlefield_id", ""))
@@ -34,6 +36,55 @@ static func _flank_tuning(war) -> Dictionary:
 
 static func _flank_num(war, key: String, fallback: float) -> float:
 	return float(_flank_tuning(war).get(key, fallback))
+
+# Chase and breakthrough share the combat rules file. Both are bounded follow-ups
+# on the same per-round movement budget; defaults keep older saves playable.
+static func _chase_tuning(war) -> Dictionary:
+	return Combat.settings(war.rules).get("chase", {})
+
+static func _breakthrough_tuning(war) -> Dictionary:
+	return Combat.settings(war.rules).get("breakthrough", {})
+
+# A visible, non-routing enemy cavalry's contact reach next round: whole steps
+# it could legally walk on its own ground, plus the best-case fraction carry,
+# plus contact range 1. The known view only: hidden squadrons must not steer a
+# bow's plan, and rough ground must not be reported as a plains-speed threat.
+static func authority_duty_cell(war, army: Dictionary, orders: Dictionary) -> int:
+	var task: Dictionary = army.get("corps_task",{})
+	var tactical: Dictionary = army.get("tactical",{})
+	var anchor := int(task.get("cell",-1))
+	var hold: bool = bool(orders.get("must_hold_objective",false)) or bool(task.get("must_hold_objective",false))
+	if hold and anchor < 0:
+		anchor = int(tactical.get("siege_slot",-1))
+		var role := str(army.get("operation",{}).get("role",tactical.get("role","main_attack")))
+		if anchor < 0 and role not in ["reserve","command"]:
+			anchor = int(war.state.get("battlefield",{}).get("control_point",{}).get("cell",-1))
+	if anchor < 0: anchor = int(army.get("battle_ai",{}).get("duty_cell",tactical.get("cell",-1)))
+	return anchor
+
+static func duty_step_allowed(start: int, next: int, duty: int, radius: int) -> bool:
+	if cell_distance(next,duty) <= radius: return true
+	# A new order can put an existing formation outside its new region. It may
+	# return toward the duty position, but may not make that deviation larger.
+	return cell_distance(start,duty) > radius and cell_distance(next,duty) < cell_distance(start,duty)
+
+static func cavalry_reach(enemy: Dictionary) -> int:
+	var mix: Dictionary = enemy.get("unit_mix_estimate",{})
+	var enemy_cell := int(enemy.get("cell",-1))
+	if enemy_cell < 0: return 1
+	var mobility := Roles.mobility({"units":mix},terrain_class(enemy_cell))
+	return floori(minf(2.0,0.99 + mobility)) + 1
+
+static func cavalry_threat(enemies: Array, cell: int) -> float:
+	var nearest := 99.0
+	for enemy in enemies:
+		var enemy_cell := int(enemy.get("cell",-1))
+		if enemy_cell < 0 or bool(enemy.get("routing",false)): continue
+		if Roles.kind_from_mix(enemy.get("unit_mix_estimate",{})) != "cavalry": continue
+		var gap := cell_distance(cell,enemy_cell)
+		if gap > cavalry_reach(enemy): continue
+		nearest = minf(nearest,float(gap))
+	return nearest
 
 # Main-map renderer, selection and tactical rules share one grid service.
 static func grid() -> RefCounted:
@@ -86,7 +137,19 @@ static func terrain_class(cell: int) -> String:
 	return Terrain.from_code(grid().terrain(cell))
 
 static func can_attack(war, army: Dictionary) -> bool:
-	return Terrain.entry_factor(army, war.rules) > 0
+	return not army.get("tactical",{}).get("placement_invalid",false) and Terrain.entry_factor(army, war.rules) > 0
+
+# 城防内外互不相通：同处城内或同处城外的部队才能互相攻击。
+# 破口只是开放的通道；攻方必须真正从破口入城，才能与城内部队交战，
+# 城内部队也必须出城（或入城）才会成为目标。城内目标不会被外部弓箭射穿。
+static func shield_between(war, army: Dictionary, enemy: Dictionary) -> bool:
+	if not army.has("tactical") or not enemy.has("tactical"): return false
+	var board: Dictionary = board_for(war, army)
+	return Fort.inside_city(board, int(army["tactical"]["cell"])) != Fort.inside_city(board, int(enemy["tactical"]["cell"]))
+
+# Shared by melee damage and duel eligibility, including contact during repositioning.
+static func can_engage(war, army: Dictionary) -> bool:
+	return army.has("tactical") and not bool(army.get("returning", false)) and army.get("action", {}).get("type", "") in ["engage", "pursue", "support", "flank", "continue", "hold", "reposition"] and bool(war.orders_for(army)["engage"]) and can_attack(war, army)
 
 static func cell_text(cell: int) -> String:
 	return "列%d行%d" % [column_of(cell), row_of(cell)]
@@ -107,13 +170,19 @@ static func migrate_positions(war) -> void:
 			var cell := cell_at(q,r)
 			if not grid().walkable(cell) and not board["blocked"].has(cell): board["blocked"].append(cell)
 	var occupied := {}
+	var displaced: Array = []
 	for army in participants(war, board):
-		if can_enter(war, army, int(army["tactical"]["cell"])): occupied[int(army["tactical"]["cell"])] = true
-	for army in participants(war, board):
-		if can_enter(war, army, int(army["tactical"]["cell"])): continue
+		var cell := int(army["tactical"]["cell"])
+		if can_enter(war, army, cell) and not occupied.has(cell):
+			occupied[cell] = army["id"]
+			army["tactical"].erase("placement_invalid")
+		else: displaced.append(army)
+	for army in displaced:
 		var start: int = army["tactical"]["cell"]
-		var queue: Array = [start]
-		var seen := {start:true}
+		# Seed inside the board even for corrupt save indices.
+		var seed := cell_at(clampi(column_of(maxi(start,0)),int(board["min_column"]),int(board["max_column"])),clampi(row_of(maxi(start,0)),int(board["min_row"]),int(board["max_row"])))
+		var queue: Array = [seed]
+		var seen := {seed:true}
 		var cursor := 0
 		var destination := -1
 		while cursor < queue.size():
@@ -124,13 +193,20 @@ static func migrate_positions(war) -> void:
 				if column_of(other) < int(board["min_column"]) or column_of(other) > int(board["max_column"]) or row_of(other) < int(board["min_row"]) or row_of(other) > int(board["max_row"]) or seen.has(other): continue
 				seen[other] = true
 				queue.append(other)
-		if destination < 0: continue
+		if destination < 0:
+			army["tactical"]["placement_invalid"] = true
+			army["tactical"]["blocked"] = true
+			continue
+		occupied[destination] = army["id"]
+		army["tactical"].erase("placement_invalid")
 		army["tactical"]["cell"] = destination
 		army["tactical"]["lane"] = column_of(destination)
+		army["tactical"]["move_path"] = [destination]
+		army["tactical"]["blocked"] = false
+		army["combat_targets"] = []
 		for field in ["previous_cell","previous_goal","terrain_delay","flank_goal","attack_target"]: army["tactical"].erase(field)
 		army["tactical"]["terrain_migrated_at"] = war.state["tick"]
 		army["last_reason"] = "通行规则更新，部队就近归岸"
-		occupied[destination] = true
 
 
 static func setup(war, anchor_cell: int = -1) -> void:
@@ -238,10 +314,10 @@ static var _target_cache: Dictionary = {}
 static func targets(war, army: Dictionary) -> Array:
 	var key := "%d:%d:%s" % [war.get_instance_id(), int(war.state["tick"]), str(army["id"])]
 	if _target_cache.has(key):
-		return _target_cache[key].filter(func(enemy): return enemy.get("status", "") != "ended" and distance(army, enemy) < 10000 and _seen_now(war,army,enemy))
+		return _target_cache[key].filter(func(enemy): return enemy.get("status", "") != "ended" and not enemy.get("tactical",{}).get("placement_invalid",false) and distance(army, enemy) < 10000 and _seen_now(war,army,enemy) and not shield_between(war,army,enemy))
 	var result: Array = []
 	for enemy in war.active_armies():
-		if war.hostile(str(enemy["faction"]), str(army["faction"])) and _seen_now(war,army,enemy) and enemy.has("tactical") and distance(army, enemy) < 10000:
+		if war.hostile(str(enemy["faction"]), str(army["faction"])) and _seen_now(war,army,enemy) and enemy.has("tactical") and not enemy.get("tactical",{}).get("placement_invalid",false) and distance(army, enemy) < 10000 and not shield_between(war,army,enemy):
 			result.append(enemy)
 	result.sort_custom(func(a, b):
 		var left := _target_priority(war,army,a)
@@ -296,6 +372,17 @@ static func _path_step(start: int, goal: int, occupied: Dictionary, board: Dicti
 	return grid().step_toward(start, goal, occupied, board, stop_distance)
 
 
+# 破口入城专用步进：用共享网格的实际寻路绕开墙面，取路径第一步；每次只走一格。
+# 攻城入城是突击动作，不按日常行军预算折算（器械部队 hold 时 mobility<1 也能进门）。
+static func _entry_step(war, army: Dictionary, board: Dictionary, start: int, goal: int, occupied: Dictionary, legal: Dictionary) -> int:
+	if goal == start: return start
+	var route: PackedInt32Array = grid().find_path(start, goal, legal["blocked"])
+	if route.size() < 2: return start
+	var next := int(route[1])
+	if occupied.has(next) or not in_battlefield(legal, next): return start
+	return next
+
+
 static func contact_state(war, army: Dictionary) -> Dictionary:
 	# Positions, assignments and returns can change within the same campaign day.
 	# Contact is a current rule query, not a day-level observation cache.
@@ -303,6 +390,7 @@ static func contact_state(war, army: Dictionary) -> Dictionary:
 	var cover := 0
 	for other in participants(war):
 		if other["id"] == army["id"] or not other.has("tactical") or distance(army, other) > 1: continue
+		if shield_between(war, army, other): continue
 		if war.hostile(str(other["faction"]), str(army["faction"])) and not bool(other["returning"]) and bool(war.orders_for(other)["engage"]): attackers.append(other["id"])
 		elif other["faction"] == army["faction"] and not bool(other["returning"]) and other.get("operation", {}).get("role", "") == "rear_guard": cover += 1
 	var flanked := false
@@ -328,6 +416,7 @@ static func _cached_enemy_control(war, army: Dictionary) -> Dictionary:
 	var controlled := {}
 	for enemy in participants(war):
 		if not war.hostile(str(enemy["faction"]), str(army["faction"])) or bool(enemy["returning"]) or not enemy.has("tactical") or not bool(war.orders_for(enemy)["engage"]): continue
+		if shield_between(war, army, enemy): continue
 		for cell in neighbors(int(enemy["tactical"]["cell"])): controlled[cell] = true
 	return controlled
 
@@ -339,7 +428,36 @@ static func _enemy_control_cache_clear() -> void:
 static var _enemy_control_cache: Dictionary = {}
 
 
+# 破口开放后，非弓兵部队从缺口入城：先走缺口外侧落点，再进缺口格；
+# 已入城则向城心推进。城内其余格仍由 blocked_for 控制，通道只在破口走廊。
+# 返回 -1 表示保持原有城下位置（尚未破城或该兵种应留在城下）。
+static func siege_entry_goal(war, army: Dictionary, board: Dictionary) -> int:
+	if attack_range(army) > 1: return -1
+	var node := str(army["target"])
+	var breach: int = Defense.breach_cell(war, node)
+	if breach < 0: return -1
+	var legal: Dictionary = Fort.movement_board(war, board, str(army["faction"]))
+	var start := int(army["tactical"]["cell"])
+	if Fort.inside_city(board, start) == node:
+		var center := int(board.get("objectives", {}).get(node, breach))
+		return center if in_battlefield(legal, center) else start
+	if not in_battlefield(legal, breach): return -1
+	if cell_distance(start, breach) <= 1: return breach
+	# 城外远处：先到缺口外侧的落点，避免直线穿墙导致寻路卡死。
+	var outside := -1
+	var best := 10000
+	for neighbor in neighbors(breach):
+		var cell := int(neighbor)
+		if not in_battlefield(legal, cell) or Fort.inside_city(board, cell) != "": continue
+		var gap := cell_distance(start, cell)
+		if gap < best:
+			best = gap
+			outside = cell
+	return outside if outside >= 0 else breach
+
+
 static func move(war) -> Dictionary:
+	migrate_positions(war)
 	_enemy_control_cache_clear()
 	clear_target_cache()
 	var board: Dictionary = war.state["battlefield"]
@@ -359,11 +477,16 @@ static func move(war) -> Dictionary:
 			for cell in front: q += column_of(cell); r += row_of(cell)
 			lines[corps["id"]] = cell_at(int(round(q / front.size())), int(round(r / front.size())))
 	for army in armies:
-		if army.has("tactical"): occupied[int(army["tactical"]["cell"])] = army["id"]
+		if army.has("tactical") and not army["tactical"].get("placement_invalid",false): occupied[int(army["tactical"]["cell"])] = army["id"]
 	# Alternate movement priority so one faction does not always claim free cells first.
 	if int(war.state["tick"]) % 2 == 0: armies.reverse()
 	for army in armies:
 		if not army.has("tactical"): continue
+		if army["tactical"].get("placement_invalid",false): continue
+		if not war.ready(army): continue
+		if army.get("action",{}).get("tactical_contract",false) and not army["returning"]:
+			_move_committed(war,army,board,occupied,motions)
+			continue
 		var tactical: Dictionary = army["tactical"]
 		tactical.erase("terrain_delay")
 		var contact := contact_state(war, army)
@@ -392,6 +515,7 @@ static func move(war) -> Dictionary:
 		var city_approach: bool = enemy.is_empty() and army["mission_type"] == "capture" and board.get("objectives", {}).has(army["target"]) and war.hostile(str(war.store.city_state(army["target"]).get("faction", "")), str(army["faction"]))
 		var goal: int = start
 		var stop_distance := 0
+		var entry_assault := false
 		tactical["attack_target"] = enemy.get("id", "")
 		if bool(army["returning"]) or army.get("corps_task", {}).get("type", "") == "regroup":
 			var exit_row: int = int(board["min_row"]) if side_for(board, str(army["faction"])) < 0 else int(board["max_row"])
@@ -406,12 +530,14 @@ static func move(war) -> Dictionary:
 					stop_distance = 1
 				else:
 					regrouping = false
-			if not regrouping and (occupied.has(goal) or board["blocked"].has(goal)):
-				for offset in range(1, 15):
-					var exit_cell := cell_at(clampi(column_of(start) + (offset / 2 + 1) * (-1 if offset % 2 else 1), int(board["min_column"]), int(board["max_column"])), exit_row)
-					if not occupied.has(exit_cell) and not board["blocked"].has(exit_cell):
-						goal = exit_cell
-						break
+			if not regrouping:
+				var exit_board := Fort.movement_board(war,board,str(army["faction"]))
+				var exits: Array = []
+				for column in range(int(board["min_column"]),int(board["max_column"])+1):
+					var exit_cell := cell_at(column,exit_row)
+					if grid().walkable(exit_cell) and not occupied.has(exit_cell) and not exit_board["blocked"].has(exit_cell): exits.append(exit_cell)
+				exits.sort_custom(func(a,b): return cell_distance(start,a) < cell_distance(start,b) if cell_distance(start,a) != cell_distance(start,b) else a < b)
+				goal = int(exits[0]) if not exits.is_empty() else start
 			tactical["phase"] = "脱离"
 			if int(contact["adjacent_enemies"]) > 0:
 				var preparation := int(tactical.get("withdraw_preparation", 0)) + 1
@@ -436,9 +562,16 @@ static func move(war) -> Dictionary:
 					goal = option
 					best_gap = gap
 			tactical["phase"] = "中军避射  呼叫压制" if goal != start else "避射通路受阻"
-		elif siege_march:
+		elif siege_march and (str(army.get("autonomy", {}).get("stance", "obey")) == "obey" or action in ["continue", "besiege", "engage"]):
 			goal = int(tactical["siege_slot"])
-			tactical["phase"] = "军团向城下集结" if start != goal else "城下待命"
+			var entry := siege_entry_goal(war, army, board)
+			if entry >= 0:
+				# 破口已开：步兵/骑兵走缺口入城，弓兵保持城下射位。
+				goal = entry
+				entry_assault = true
+				tactical["phase"] = "突入破口" if Fort.inside_city(board, start) != str(army["target"]) else "入城巷战"
+			else:
+				tactical["phase"] = "军团向城下集结" if start != goal else "城下待命"
 			if start == goal: army["action"] = {"type": "hold"}
 		elif action == "support" and army.get("operation", {}).get("role", "") == "rear_guard" and war.state["armies"].has(army["action"].get("ally", "")):
 			var friend: Dictionary = war.state["armies"][army["action"]["ally"]]
@@ -450,6 +583,10 @@ static func move(war) -> Dictionary:
 			goal = int(army["corps_task"]["cell"])
 			stop_distance = 1 if army["corps_task"]["type"] == "cut_supply" else 0
 			tactical["phase"] = "绕后行军" if army["corps_task"]["type"] == "raid_rear" else "奔袭粮道"
+		elif board.has("control_point") and army.get("corps_task", {}).get("type", "") in ["main_attack", "flank", "support"] and war.orders_for(army)["engage"] and (enemy.is_empty() or distance(army, enemy) > 3):
+			goal = int(board["control_point"]["cell"])
+			stop_distance = 1
+			tactical["phase"] = "争夺" + str(board["control_point"]["name"])
 		elif action in ["engage", "pursue", "continue", "flank", "support"] and not enemy.is_empty():
 			goal = int(army["intel"]["enemies"].get(enemy["id"], {}).get("tactical_cell", enemy["tactical"]["cell"]))
 			stop_distance = attack_range(army)
@@ -482,10 +619,16 @@ static func move(war) -> Dictionary:
 					if gap == 1: tactical["phase"] = "接应撤退友军"
 					stop_distance = 0
 		elif action in ["continue", "engage", "besiege"] and army["mission_type"] == "capture" and board.get("objectives", {}).has(army["target"]) and war.store.city_state(army["target"]).get("faction", "") != army["faction"]:
-			var approaches := Fort.approach(war, board, str(army["faction"]), str(army["target"]), start)
-			goal = int(approaches[0]) if not approaches.is_empty() else start
+			var entry := siege_entry_goal(war, army, board)
+			if entry >= 0:
+				goal = entry
+				entry_assault = true
+				tactical["phase"] = "突入破口" if Fort.inside_city(board, start) != str(army["target"]) else "入城巷战"
+			else:
+				var approaches := Fort.approach(war, board, str(army["faction"]), str(army["target"]), start)
+				goal = int(approaches[0]) if not approaches.is_empty() else start
+				tactical["phase"] = "向城下推进" if start != goal else "城下围攻"
 			stop_distance = 0
-			tactical["phase"] = "向城下推进" if start != goal else "城下围攻"
 		else:
 			tactical["phase"] = "预备待命" if tactical["role"] == "reserve" else "驻守"
 			if tactical["role"] in ["command", "reserve"] and not bool(army["returning"]) and lines.has(army.get("corps_id", "")):
@@ -515,13 +658,24 @@ static func move(war) -> Dictionary:
 				goal = start
 				tactical["phase"] = "停止追击  保持战线"
 		elif enemy.is_empty() or not bool(enemy["returning"]): tactical.erase("pursuit_origin")
+		# 破口开放后，被 hold/驻守钉在城下的部队也改走缺口入城；
+		# 契约行动（tactical_contract）在 _move_committed 中有同类规则。
+		if goal == start and not bool(army["returning"]) and action in ["continue", "engage", "besiege"] and army.get("corps_task", {}).get("type", "") != "regroup" and bool(war.orders_for(army)["engage"]) and str(army["mission_type"]) == "capture":
+			var entry_node := str(army["target"])
+			if Fort.distance_to_wall(board, entry_node, start) <= 2 or Fort.inside_city(board, start) == entry_node:
+				var entry_goal := siege_entry_goal(war, army, board)
+				if entry_goal >= 0 and entry_goal != start:
+					goal = entry_goal
+					entry_assault = true
+					stop_distance = 0
+					tactical["phase"] = "突入破口"
 		occupied.erase(start)
 		var known_occupied := {}
 		for key in occupied:
 			var occupant: Dictionary = war.state["armies"][occupied[key]]
 			if occupant["faction"] == army["faction"] or int(army["intel"]["enemies"].get(occupant["id"], {}).get("observed_at", -1)) == int(war.state["tick"]): known_occupied[key] = occupant["id"]
 		var legal_board := Fort.movement_board(war, board, str(army["faction"]))
-		var next := _path_step(start, goal, known_occupied, legal_board, stop_distance)
+		var next := _entry_step(war, army, board, start, goal, known_occupied, legal_board) if entry_assault else _path_step(start, goal, known_occupied, legal_board, stop_distance)
 		if occupied.has(next): next = start
 		if not bool(army["returning"]) and army.get("corps_task", {}).get("type", "") != "regroup" and next != start and next == int(tactical.get("previous_cell", -1)) and goal == int(tactical.get("previous_goal", -1)) and int(tactical.get("blocked_days", 0)) < 2:
 			next = start
@@ -576,7 +730,12 @@ static func move(war) -> Dictionary:
 					next = extra
 					path.append(extra)
 					points -= 1.0
+		points = maxf(points, 0.0)
 		tactical["movement_credit"] = minf(points,0.99) if goal != start else 0.0
+		# The true remaining budget must survive the 0.99 cap above: the unified
+		# chase phase spends whole steps and must see a real 1.0, not 0.99.
+		tactical["round_points"] = minf(points,2.0)
+		tactical["round_marker"] = int(war.state["tick"])
 		tactical["move_path"] = path
 		if next != start:
 			tactical["previous_cell"] = start
@@ -598,7 +757,304 @@ static func move(war) -> Dictionary:
 				army.erase("tactical")
 				army.erase("battlefield_id")
 				war._start_return(army)
+	# One unified follow-up after every normal move, so both movement orders can
+	# catch a target that walked away during this same round. Refresh positions
+	# before following so the pursuit uses the current occupied cells.
+	var direct := _fresh_sightings(war)
+	_chase_phase(war, board, occupied, direct)
 	return motions
+
+
+# Refresh every hostile participant after movement; distance does not hide units.
+static func _fresh_sightings(war) -> Dictionary:
+	var result := {}
+	for army in participants(war):
+		if not army.has("tactical") or army["tactical"].get("placement_invalid", false): continue
+		var seen := {}
+		for enemy in participants(war):
+			if enemy["id"] == army["id"] or not enemy.has("tactical"): continue
+			if enemy["tactical"].get("placement_invalid", false): continue
+			if not war.hostile(str(enemy["faction"]), str(army["faction"])): continue
+			var enemy_id := str(enemy["id"])
+			seen[enemy_id] = true
+			army["intel"]["enemies"][enemy_id] = war.enemy_intel(enemy)
+		result[str(army["id"])] = seen
+	return result
+
+static func _move_committed(war, army: Dictionary, board: Dictionary, occupied: Dictionary, motions: Dictionary) -> void:
+	var tactical: Dictionary = army["tactical"]
+	var action: Dictionary = army["action"]
+	var start := int(tactical["cell"])
+	var current := start
+	var contact := contact_state(war,army)
+	var legal_board := Fort.movement_board(war,board,str(army["faction"]))
+	var path: Array = [start]
+	var points := minf(2.0,float(tactical.get("movement_credit",0)) + preload("res://scripts/war/troop_roles.gd").mobility(army,terrain_class(start),war.rules))
+	var kind := str(action["type"])
+	var task: Dictionary = army.get("corps_task",{})
+	var orders: Dictionary = war.orders_for(army)
+	var duty := authority_duty_cell(war,army,orders)
+	var radius := 1 if orders.get("must_hold_objective",false) or task.get("must_hold_objective",false) else int(task.get("region_radius",16))
+	tactical.erase("terrain_delay")
+	tactical["contact"] = contact
+	tactical["phase"] = str(action.get("intent","临机行动"))
+	var ready_to_leave := int(contact["adjacent_enemies"]) == 0
+	if kind == "local_disengage":
+		if not war.orders_for(army).get("local_disengage",war.orders_for(army)["retreat"]): ready_to_leave = false
+		elif not ready_to_leave:
+			tactical["withdraw_preparation"] = int(tactical.get("withdraw_preparation",0)) + 1
+			army["organization"] = maxf(0,float(army["organization"])-3*int(contact["adjacent_enemies"]))
+			ready_to_leave = int(tactical["withdraw_preparation"]) >= int(contact["required_preparation"])
+			tactical["phase"] = "准备局部脱离" if not ready_to_leave else "局部后撤"
+	else:
+		tactical["withdraw_preparation"] = 0
+	for value in action.get("path",[]).slice(1):
+		var next := int(value)
+		if points < 1 or occupied.has(next) or cell_distance(current,next) != 1 or not in_battlefield(legal_board,next): break
+		if not ready_to_leave: break
+		if not duty_step_allowed(current,next,duty,radius): break
+		# 已入城的部队不再被机动契约拉回城外：巷战部队要撤离必须走
+		# withdraw / local_disengage / regroup 契约，普通机动不能自行退出。
+		if kind not in ["local_disengage", "withdraw", "evade", "regroup"] and not army["returning"] and Fort.inside_city(board, current) != "" and Fort.inside_city(board, next) == "":
+			break
+		if kind == "local_disengage" and _enemy_control(war,army).has(next) and int(tactical.get("withdraw_preparation",0)) < int(contact["required_preparation"])+1: break
+		occupied.erase(current)
+		current = next
+		occupied[current] = army["id"]
+		points -= 1
+		path.append(current)
+	# 破口开放后，围城契约不再把部队钉在城下：向缺口再推进一格（骑兵同样可以
+	# 经破口入城；弓兵由 siege_entry_goal 返回 -1 保留城下射位）。只在城下
+	# 短距内生效，且后撤/脱离类契约不抢路。
+	var entry_intent: bool = str(action.get("template", "")) == "approach_objective"
+	if points >= 1.0 and entry_intent and not army["returning"] and bool(war.orders_for(army)["engage"]) and kind in ["reposition", "continue", "besiege", "engage"] and str(army.get("mission_type", "")) == "capture":
+		var siege_node := str(army["target"])
+		if Fort.distance_to_wall(board, siege_node, current) <= 2 or Fort.inside_city(board, current) == siege_node:
+			var entry := siege_entry_goal(war, army, board)
+			if entry >= 0 and entry != current:
+				var step := _entry_step(war, army, board, current, entry, occupied, legal_board)
+				if step != current and duty_step_allowed(current,step,duty,radius):
+					occupied.erase(current)
+					current = step
+					occupied[current] = army["id"]
+					points = maxf(0.0, points - 1.0)
+					path.append(current)
+					tactical["previous_cell"] = start
+					tactical["moved_tick"] = int(war.state["tick"])
+					tactical["phase"] = "入城巷战" if Fort.inside_city(board, current) == siege_node else "突入破口"
+					if terrain_class(current) in ["mountains","ford"]: tactical["terrain_delay"] = terrain_class(current)
+	var selected := str(action.get("enemy",""))
+	var target: Dictionary = war.state["armies"].get(selected,{})
+	tactical["attack_target"] = selected if not target.is_empty() and target["status"] != "ended" and _seen_now(war,army,target) else ""
+	tactical["move_path"] = path
+	tactical["flank_ready"] = bool(action.get("flank_ready",false))
+	tactical["cell"] = current
+	tactical["previous_goal"] = int(action.get("goal_cell",start))
+	tactical["movement_credit"] = minf(points,0.99) if int(action.get("goal_cell",start)) != start else 0
+	# Exact remainder for this round, surviving the 0.99 fraction cap. The chase
+	# phase and the breakthrough step both spend from this one pool.
+	tactical["round_points"] = minf(points,2.0)
+	tactical["round_marker"] = int(war.state["tick"])
+	if current != start:
+		tactical["previous_cell"] = start
+		tactical["moved_tick"] = int(war.state["tick"])
+		army["fatigue"] = minf(100,float(army["fatigue"]) + Battle.fatigue_cost(army,3*(path.size()-1)))
+		if terrain_class(current) in ["mountains","ford"]: tactical["terrain_delay"] = terrain_class(current)
+	tactical["blocked"] = current == start and action.get("path",[]).size() > 1 and points >= 1
+	tactical["blocked_days"] = int(tactical.get("blocked_days",0))+1 if tactical["blocked"] else 0
+	if tactical["blocked"]: tactical["phase"] = "通路或接触受阻，下轮重新判断"
+	motions[army["id"]] = {"before":army["location"].duplicate(true),"after":army["location"].duplicate(true)}
+	if army.has("battle_ai") and not army["battle_ai"]["history"].is_empty():
+		army["battle_ai"]["history"][-1]["executed_cell"] = current
+		army["battle_ai"]["history"][-1]["blocked"] = tactical["blocked"]
+
+
+# A bounded follow-up across every formation: at most one extra follow per unit
+# per round, spending only the real points left in this round's pool. The target
+# must be in this round's fresh direct-sight set; the live cell is read only for
+# units in that set, never from hidden positions.
+static func _chase_phase(war, board: Dictionary, occupied: Dictionary, direct: Dictionary) -> void:
+	var tuning := _chase_tuning(war)
+	if not bool(tuning.get("enabled", true)): return
+	var max_steps := maxi(1,int(tuning.get("max_steps", 2)))
+	var tick := int(war.state["tick"])
+	var armies := participants(war)
+	if tick % 2 == 1: armies.reverse()
+	for army in armies:
+		if not army.has("tactical"): continue
+		if army["tactical"].get("placement_invalid",false): continue
+		if army.get("status","") == "ended" or bool(army.get("returning",false)): continue
+		if not war.ready(army): continue
+		if attack_range(army) != 1: continue
+		var tactical: Dictionary = army["tactical"]
+		if int(tactical.get("round_marker",-1)) != tick: continue
+		if int(tactical.get("chase_marker",-1)) == tick: continue
+		if float(army["morale"]) < 35 or float(army["organization"]) < 30: continue
+		var orders: Dictionary = war.orders_for(army)
+		if not bool(orders.get("engage", true)): continue
+		var ai: Dictionary = army.get("battle_ai", {})
+		if str(ai.get("plan",{}).get("template","")) == "rally": continue
+		if str(ai.get("local_state","active")) in ["disengaging_local","repositioning","recovering"]: continue
+		var target_id := str(army.get("action",{}).get("enemy", tactical.get("attack_target","")))
+		if target_id == "": continue
+		var visible_now: Dictionary = direct.get(str(army["id"]), {})
+		if not visible_now.has(target_id): continue
+		var target: Dictionary = war.state["armies"].get(target_id, {})
+		if target.is_empty() or target.get("status","") == "ended" or int(Combat.strength(target)) <= 0: continue
+		if distance(army,target) >= 10000: continue
+		if shield_between(war, army, target): continue
+		# The record was refreshed by _fresh_sightings on the compliant hit above.
+		var goal := int(target["tactical"]["cell"])
+		if goal < 0: continue
+		if bool(target.get("returning",false)) and not bool(orders.get("pursue", true)): continue
+		var contact := contact_state(war, army)
+		if int(contact["adjacent_enemies"]) > 0: continue
+		var start := int(tactical["cell"])
+		if cell_distance(start, goal) <= attack_range(army): continue
+		var remaining := float(tactical.get("round_points", 0.0))
+		var steps := mini(int(floor(remaining)), max_steps)
+		if steps < 1: continue
+		# Other directly visible enemies keep their adjacency wall; only the chased
+		# unit may be closed on this round.
+		var other_enemy_cells := {}
+		for enemy_id in visible_now:
+			if enemy_id == target_id: continue
+			var other: Dictionary = war.state["armies"].get(str(enemy_id), {})
+			if other.is_empty() or not other.has("tactical") or bool(other.get("returning",false)): continue
+			other_enemy_cells[int(other["tactical"]["cell"])] = true
+		var task: Dictionary = army.get("corps_task", {})
+		var duty := int(task.get("cell", -1))
+		if duty < 0: duty = int(tactical.get("duty_cell", start))
+		var hold: bool = bool(orders.get("must_hold_objective", false)) or bool(task.get("must_hold_objective", false))
+		var radius := int(task.get("region_radius", 16))
+		# A hold order never follows; the unit keeps its post even against a lure.
+		if hold: continue
+		var legal_board := Fort.movement_board(war,board,str(army["faction"]))
+		var path: Array = []
+		var current := start
+		for step in range(steps):
+			if cell_distance(current, goal) <= attack_range(army): break
+			var next := _path_step(current, goal, occupied, legal_board, attack_range(army))
+			if next == current or occupied.has(next) or not in_battlefield(legal_board,next): break
+			if cell_distance(next, duty) > radius: break
+			var screened := false
+			for cell in other_enemy_cells:
+				if cell_distance(next, int(cell)) <= 1: screened = true; break
+			if screened: break
+			occupied.erase(current)
+			current = next
+			occupied[current] = army["id"]
+			path.append(current)
+		if path.is_empty(): continue
+		tactical["chase_marker"] = tick
+		var routes: Array = tactical.get("move_path", [start])
+		if routes.is_empty() or int(routes[-1]) != start: routes = [start]
+		for cell in path: routes.append(int(cell))
+		tactical["move_path"] = routes
+		tactical["cell"] = current
+		tactical["previous_cell"] = start
+		tactical["moved_tick"] = tick
+		tactical["phase"] = "追击跟进"
+		if terrain_class(current) in ["mountains","ford"]: tactical["terrain_delay"] = terrain_class(current)
+		army["fatigue"] = minf(100, float(army["fatigue"]) + Battle.fatigue_cost(army, 3*path.size()))
+		tactical["round_points"] = maxf(0.0, remaining - float(path.size()))
+		tactical["movement_credit"] = minf(float(tactical["round_points"]),0.99)
+		tactical["blocked"] = false
+		tactical["blocked_days"] = 0
+		if army.has("battle_ai") and not army["battle_ai"]["history"].is_empty():
+			var record: Dictionary = army["battle_ai"]["history"][-1]
+			record["executed_cell"] = current
+			record["chase_cells"] = path.size()
+
+
+# After simultaneous melee resolution, a truly destroyed defender leaves an empty
+# tile. One surviving melee striker may step in, spending one real point of the
+# same round budget and extending move_path so the map animation walks in.
+static func _resolve_breakthrough(war, melee_strikers: Dictionary, dealt: Dictionary) -> void:
+	var tuning := _breakthrough_tuning(war)
+	if not bool(tuning.get("enabled", true)): return
+	var board: Dictionary = war.state["battlefield"]
+	var tick := int(war.state["tick"])
+	var occupied := {}
+	for army in participants(war):
+		if army.has("tactical") and not army["tactical"].get("placement_invalid",false): occupied[int(army["tactical"]["cell"])] = army["id"]
+	var minimum := float(tuning.get("min_remaining_points", 1.0))
+	var max_threat := int(tuning.get("max_threat", 1))
+	var victims: Array = melee_strikers.keys()
+	victims.sort()
+	for defender_id in victims:
+		var defender: Dictionary = war.state["armies"].get(str(defender_id), {})
+		if defender.is_empty() or str(defender.get("status","")) != "ended": continue
+		if int(Combat.strength(defender)) > 0: continue
+		var cell := int(defender.get("tactical",{}).get("cell",-1))
+		if cell < 0 or occupied.has(cell): continue
+		var options: Array = []
+		for striker_id in melee_strikers[defender_id]:
+			var striker: Dictionary = war.state["armies"].get(str(striker_id), {})
+			if striker.is_empty() or str(striker.get("status","")) == "ended": continue
+			if bool(striker.get("returning",false)) or int(Combat.strength(striker)) <= 0: continue
+			if not striker.has("tactical") or attack_range(striker) != 1: continue
+			var tactical: Dictionary = striker["tactical"]
+			if tactical.get("placement_invalid",false): continue
+			if int(tactical.get("round_marker",-1)) != tick: continue
+			if int(tactical.get("breakthrough_marker",-1)) == tick: continue
+			if float(tactical.get("round_points", 0.0)) < minimum: continue
+			var start := int(tactical["cell"])
+			if cell_distance(start, cell) != 1: continue
+			var orders: Dictionary = war.orders_for(striker)
+			if not bool(orders.get("engage", true)) or not bool(orders.get("pursue", true)): continue
+			# A hold order keeps the formation on its duty cell; it never follows in.
+			var task: Dictionary = striker.get("corps_task", {})
+			if bool(orders.get("must_hold_objective", false)) or bool(task.get("must_hold_objective", false)): continue
+			var duty := int(task.get("cell", -1))
+			if duty < 0: duty = int(tactical.get("duty_cell", start))
+			if cell_distance(cell, duty) > int(task.get("region_radius", 16)): continue
+			if not in_battlefield(Fort.movement_board(war, board, str(striker["faction"])), cell): continue
+			if _breakthrough_threat(war, striker, cell, str(defender_id)) > max_threat: continue
+			options.append({"army":striker,"id":str(striker_id),"contribution":float(dealt.get(str(striker_id),{}).get(str(defender_id),0))})
+		if options.is_empty(): continue
+		options.sort_custom(func(a,b):
+			if not is_equal_approx(float(a["contribution"]),float(b["contribution"])): return float(a["contribution"]) > float(b["contribution"])
+			return str(a["id"]) < str(b["id"]))
+		var mover: Dictionary = options[0]["army"]
+		var move: Dictionary = mover["tactical"]
+		var start := int(move["cell"])
+		var routes: Array = move.get("move_path", [start])
+		if routes.is_empty() or int(routes[-1]) != start: routes = [start]
+		routes.append(cell)
+		move["move_path"] = routes
+		move["cell"] = cell
+		move["previous_cell"] = start
+		move["moved_tick"] = tick
+		move["breakthrough_marker"] = tick
+		move["round_points"] = maxf(0.0, float(move.get("round_points", minimum)) - 1.0)
+		move["movement_credit"] = minf(float(move["round_points"]),0.99)
+		move["phase"] = "击破跟进"
+		move["flank_ready"] = false
+		if terrain_class(cell) in ["mountains","ford"]: move["terrain_delay"] = terrain_class(cell)
+		occupied.erase(start)
+		occupied[cell] = str(mover["id"])
+		if mover.has("battle_ai") and not mover["battle_ai"]["history"].is_empty():
+			var record: Dictionary = mover["battle_ai"]["history"][-1]
+			record["executed_cell"] = cell
+			record["breakthrough_cell"] = cell
+
+
+# The empty tile is a viable foothold only if the visible enemy records this
+# unit holds say so; hidden squadrons must not veto a breakthrough through the
+# engine's private positions.
+static func _breakthrough_threat(war, mover: Dictionary, cell: int, defender_id: String) -> int:
+	var tick := int(war.state["tick"])
+	var threat := 0
+	for enemy_id in mover.get("intel",{}).get("enemies",{}):
+		if str(enemy_id) == defender_id: continue
+		var sight: Dictionary = mover["intel"]["enemies"][enemy_id]
+		if int(sight.get("observed_at",-1)) != tick: continue
+		if bool(sight.get("routing",false)): continue
+		var enemy_cell := int(sight.get("tactical_cell",-1))
+		if enemy_cell < 0: continue
+		if cell_distance(cell, enemy_cell) <= 1: threat += 1
+	return threat
 
 
 static func _compute_auras(war) -> void:
@@ -627,10 +1083,15 @@ static func resolve(war) -> void:
 	var dealt := {}
 	var personal_dealt := {}
 	var before := {}
-	for unit in participants(war): before[unit["id"]] = Combat.strength(unit)
+	for unit in participants(war):
+		before[unit["id"]] = Combat.strength(unit)
+		unit["combat_targets"] = []
 	_compute_auras(war)
 	var aura_scale := float(war.rules.get("officer", {}).get("aura_org_scale", 0.5))
 	var attackers := {}
+	# Melee strikers that actually hit each defender this tick. Only these may
+	# occupy a broken tile; ranged-only fire never follows into the cell.
+	var melee_strikers := {}
 	# Apply one-time contact effects before the simultaneous damage snapshot.
 	for army in participants(war):
 		if not army.has("tactical") or army["returning"] or not war.orders_for(army)["engage"] or not can_attack(war, army): continue
@@ -645,21 +1106,28 @@ static func resolve(war) -> void:
 	for army in participants(war):
 		if not army.has("tactical") or not can_attack(war, army): continue
 		for enemy in targets(war, army):
-			if distance(army, enemy) == 1 and can_attack(war, enemy):
+			if Duel.eligible(war, army, enemy):
 				Duel.challenge(war, army, enemy)
 				break
 	# Damage requires current adjacent contact; no remote hit after withdrawal.
 	for army in participants(war):
-		if not army.has("tactical") or bool(army["returning"]) or army["action"]["type"] not in ["engage", "pursue", "support", "flank", "continue", "hold"] or not bool(war.orders_for(army)["engage"]) or not can_attack(war, army): continue
+		if not can_engage(war, army): continue
 		var enemies := targets(war, army)
 		var selected: String = str(army["tactical"].get("attack_target", ""))
 		if war.state["armies"].has(selected):
 			var preferred: Dictionary = war.state["armies"][selected]
 			# Build a new ordering rather than mutating targets(), whose result is shared.
 			if enemies.has(preferred): enemies = [preferred] + enemies.filter(func(e): return e["id"] != preferred["id"])
+		# Share one army's attack budget across its adjacent contact sectors.
+		var adjacent := enemies.filter(func(e): return distance(army,e) == 1)
+		if not adjacent.is_empty():
+			enemies = adjacent
+		else:
+			enemies = enemies.filter(func(e): return distance(army,e) <= attack_range(army) and Fort.line_of_sight(war.state["battlefield"],int(army["tactical"]["cell"]),int(e["tactical"]["cell"]))).slice(0,1)
 		for enemy in enemies:
 			var separation := distance(army, enemy)
 			if separation < 1 or separation > attack_range(army): continue
+			if shield_between(war, army, enemy): continue
 			if separation > 1 and not Fort.line_of_sight(war.state["battlefield"], int(army["tactical"]["cell"]), int(enemy["tactical"]["cell"])): continue
 			# Shallow copy: losses_detail/power_breakdown only read these fields, and a
 			# deep copy also cloned intel, experience and decision_history every attack.
@@ -678,7 +1146,7 @@ static func resolve(war) -> void:
 			# Each side fights from its own tile: the attacker's attack modifiers and the
 			# defender's cover come from different ground.
 			var origin := terrain_class(army["tactical"]["cell"])
-			var hit := Combat.losses_detail(attacker, enemy, war.rules, terrain, war.rng.randf_range(0.9, 1.1) * multiplier, 1.0, origin)
+			var hit := Combat.losses_detail(attacker, enemy, war.rules, terrain, war.rng.randf_range(0.9, 1.1) * multiplier / maxf(enemies.size(),1), 1.0, origin)
 			var loss: int = int(hit["loss"])
 			enemy["battle_factors"] = Feedback.factors(attacker, enemy, war.rules, terrain)
 			if flank: Feedback.event(war, "侧击", army["name"] + "侧击" + enemy["name"], army["faction"])
@@ -689,17 +1157,21 @@ static func resolve(war) -> void:
 			personal_dealt[army["id"]][enemy["id"]] = float(personal_dealt[army["id"]].get(enemy["id"], 0)) + loss * float(hit.get("personal_fraction", 0))
 			if not attackers.has(enemy["id"]): attackers[enemy["id"]] = []
 			attackers[enemy["id"]].append(army)
+			if separation <= 1:
+				if not melee_strikers.has(enemy["id"]): melee_strikers[enemy["id"]] = {}
+				melee_strikers[enemy["id"]][army["id"]] = true
 			army["combat_tick"] = war.state["tick"]
-			army["tactical"]["attack_target"] = enemy["id"]
+			army["combat_targets"].append(enemy["id"])
+			army["tactical"]["attack_target"] = army["combat_targets"][0]
 			army["tactical"]["phase"] = "近战" if separation <= 1 else "远射"
 			if flank: army["tactical"]["phase"] = "侧击"
-			break
 	# A unit being hit in melee counters unless it is withdrawing or ordered to ignore.
 	# Contact may have moved into range after its order was chosen this morning.
 	for id in damages.keys():
 		var defender: Dictionary = war.state["armies"][id]
 		if dealt.has(id) or defender["returning"] or not war.orders_for(defender)["engage"] or not can_attack(war, defender): continue
-		for attacker in attackers.get(id, []):
+		var melee_attackers: Array = attackers.get(id, []).filter(func(a): return distance(defender,a) == 1)
+		for attacker in melee_attackers:
 			if distance(defender, attacker) > 1: continue
 			# The counter-attack uses the same richness as the opening strike: its own
 			# formation flank bonus, hitting a routing enemy, and exploiting a flanked one.
@@ -711,18 +1183,21 @@ static func resolve(war) -> void:
 			counter["melee_attack"] = true
 			counter["ranged_attack"] = false
 			counter["flanking_hit"] = counter_flank or bool(counter_pressure["flanked"])
-			var hit := Combat.losses_detail(counter, attacker, war.rules, terrain_class(attacker["tactical"]["cell"]), war.rng.randf_range(0.9, 1.1) * counter_multiplier, 1.0, terrain_class(defender["tactical"]["cell"]))
+			var hit := Combat.losses_detail(counter, attacker, war.rules, terrain_class(attacker["tactical"]["cell"]), war.rng.randf_range(0.9, 1.1) * counter_multiplier / maxf(melee_attackers.size(),1), 1.0, terrain_class(defender["tactical"]["cell"]))
 			var loss: int = int(hit["loss"])
 			damages[attacker["id"]] = int(damages.get(attacker["id"], 0)) + loss
 			attacker["battle_factors"] = Feedback.factors(defender,attacker,war.rules,terrain_class(attacker["tactical"]["cell"]))
-			dealt[id] = {attacker["id"]: float(loss)}
-			personal_dealt[id] = {attacker["id"]: loss * float(hit.get("personal_fraction", 0))}
+			if not dealt.has(id): dealt[id] = {}; personal_dealt[id] = {}
+			dealt[id][attacker["id"]] = float(loss)
+			personal_dealt[id][attacker["id"]] = loss * float(hit.get("personal_fraction", 0))
 			if not attackers.has(attacker["id"]): attackers[attacker["id"]] = []
 			attackers[attacker["id"]].append(defender)
+			if not melee_strikers.has(attacker["id"]): melee_strikers[attacker["id"]] = {}
+			melee_strikers[attacker["id"]][defender["id"]] = true
 			defender["combat_tick"] = war.state["tick"]
-			defender["tactical"]["attack_target"] = attacker["id"]
+			defender["combat_targets"].append(attacker["id"])
+			defender["tactical"]["attack_target"] = defender["combat_targets"][0]
 			defender["tactical"]["phase"] = "近战反击"
-			break
 	# Commit losses after every attack has been calculated from the same state.
 	for id in damages:
 		var army: Dictionary = war.state["armies"][id]
@@ -766,6 +1241,10 @@ static func resolve(war) -> void:
 		unit["combat_tick"] = war.state["tick"]
 		Combat.battle_morale(unit, mini(int(damages.get(id, 0)), int(before[id])), inflicted, int(before[id]), opponent_before, friendly, hostile, contact_state(war, unit)["flanked"], float(unit.get("aura", 0.0)), aura_scale)
 	for id in participants: war._check_rout(war.state["armies"][id])
+	# A melee break opens the defender's tile; one surviving striker may follow in
+	# on the map path. This happens after losses and routs are final, so the books
+	# and the casualty ledger cannot change here.
+	_resolve_breakthrough(war, melee_strikers, dealt)
 	for id in dealt:
 		var inflicted_day := 0.0
 		for enemy_id in dealt[id]: inflicted_day += float(dealt[id][enemy_id])

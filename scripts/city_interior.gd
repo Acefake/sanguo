@@ -473,10 +473,6 @@ func _report_paper(parent: Control, rect: Rect2, style: StyleBox) -> PanelContai
 
 
 func _fill_city_stats(state: Dictionary) -> void:
-	if not store.war.player_has_city_access(city_id):
-		var intel: Dictionary = store.war.player_city_intel(city_id)
-		report_stats.add_child(CitySkin.label("尚未获得本城军事情报" if intel.is_empty() else "驻军约%d  城防%d  观测于第%d日" % [intel["strength_estimate"], intel["defense"], intel["observed_at"]], 20))
-		return
 	var pairs := [["人口", "population", "经济", "economy"], ["金钱", "treasury", "粮草", "grain"], ["兵力", "garrison", "训练", "training"], ["城防", "defense", "军备", "equipment"], ["民心", "order", "行动力", "ap"]]
 	for pair in pairs:
 		var row := HBoxContainer.new()
@@ -637,7 +633,7 @@ func _refresh_summary() -> void:
 	if selected_building == "":
 		return
 	if not store.war.player_has_city_access(city_id):
-		action_summary.text = "本城情报 · 只能查看公开信息与侦察结果"
+		action_summary.text = "本城信息 · 可查看实时数据，政令由所属势力下达"
 		command_summary_label.text = action_summary.text
 		return
 	var state: Dictionary = store.city_state(city_id)

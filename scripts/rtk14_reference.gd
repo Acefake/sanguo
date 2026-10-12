@@ -289,7 +289,7 @@ func _build_reference_ui() -> void:
 	bar.add_theme_constant_override("separation", 16)
 	panel.add_child(bar)
 	bar.add_child(_label("秋日城郊", 18, Color("f7eed4")))
-	bar.add_child(_label("拖动平移 · 右键环绕 · 滚轮缩放 · Tab 隐藏界面", 13, Color("d7dbca")))
+	bar.add_child(_label("拖动平移  右键环绕  滚轮缩放  Tab 隐藏界面", 13, Color("d7dbca")))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(spacer)

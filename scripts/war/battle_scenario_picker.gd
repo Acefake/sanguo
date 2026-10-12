@@ -1,10 +1,10 @@
-﻿extends CanvasLayer
+extends CanvasLayer
 
 const UISkin = preload("res://scripts/war/war_ui_skin.gd")
 const Scenarios = preload("res://scripts/war/battle_scenarios.gd")
 var store: Node
 var surface: Control
-var selected := "plains_clash"
+var selected := "guandu_clash"
 var buttons: Dictionary = {}
 var description: Label
 var seed: SpinBox
@@ -28,39 +28,46 @@ func _ready() -> void:
 	surface.add_child(shade)
 	var panel := UISkin.framed_panel(24)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.offset_left = -390
-	panel.offset_right = 390
-	panel.offset_top = -275
-	panel.offset_bottom = 275
+	panel.offset_left = -440
+	panel.offset_right = 440
+	panel.offset_top = -300
+	panel.offset_bottom = 300
 	surface.add_child(panel)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 16)
 	panel.add_child(column)
 	var header := HBoxContainer.new()
 	column.add_child(header)
-	title = UISkin.label("战场验证", 25)
+	title = UISkin.label("选择战场", 25)
 	title.add_theme_font_override("font", UISkin.CitySkin.font())
 	header.add_child(title)
 	close_button = UISkin.button("关闭", func():
 		if startup_mode: get_tree().quit()
 		else: surface.hide())
 	header.add_child(close_button)
-	subtitle = UISkin.label("选择独立测试战场。结束测试可返回原战役。", 12, UISkin.MUTED)
+	subtitle = UISkin.label("八大经典战场  自由军团编制  地形克制、兵种调度与战略目标各不相同", 12, UISkin.MUTED)
 	column.add_child(subtitle)
 	UISkin.rule(column)
 	var content := HBoxContainer.new()
 	content.add_theme_constant_override("separation", 24)
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(content)
+	var scroll := ScrollContainer.new()
+	scroll.name = "ScenarioListScroll"
+	scroll.custom_minimum_size = Vector2(240, 280)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	content.add_child(scroll)
 	var list := VBoxContainer.new()
-	list.custom_minimum_size.x = 195
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 8)
-	content.add_child(list)
+	scroll.add_child(list)
 	for spec in Scenarios.definitions():
 		var id: String = spec["id"]
 		var button := UISkin.button(spec["name"], func(): choose(id))
 		button.name = "Scenario_" + id
 		button.custom_minimum_size.y = 35
+		button.tooltip_text = str(spec.get("category", "")) + "\n" + str(spec.get("objective_text", ""))
 		list.add_child(button)
 		buttons[id] = button
 	var detail := VBoxContainer.new()
@@ -112,17 +119,21 @@ func choose(id: String) -> void:
 	if spec.is_empty(): return
 	selected = id
 	for key in buttons: UISkin.style_button(buttons[key], key == id)
-	description.text = str(spec["name"]) + "\n\n" + str(spec["description"]) + "\n\n均势维持部署；疲惫部队轮换；溃败部队仍可撤离。"
+	var strengths: Dictionary = spec.get("strengths", {"liu_bei": 20000, "yuan_shao": 20000})
+	description.text = str(spec["name"]) + "  " + str(spec.get("category", "")) + "\n\n" + str(spec["description"]) + "\n\n作战目标\n" + str(spec.get("objective_text", "击溃敌军")) + "\n\n双方野战兵力  %d / %d\n自由编制  岗位、兵力与指挥层级由玩家设定\n各将领依据性格与立场决定服从、异议或自行行动。" % [strengths["liu_bei"], strengths["yuan_shao"]]
+	if spec["kind"] == "siege": description.text += "\n守军另有%d人，己方野战部队归城防守。" % int(spec.get("garrison", 3000))
+	elif spec["kind"] == "combined": description.text += "\n城内另有%d守军，援军与城防共同作战。" % int(spec.get("garrison", 3000))
+	if int(spec.get("engines", 0)) > 0: description.text += "\n攻城前锋携带%d辆攻城兵器。" % int(spec["engines"])
 
 func open(from_startup: bool = false) -> void:
 	startup_mode = from_startup
-	title.text = "选择战场" if startup_mode else "战场验证"
-	subtitle.text = "先选择战场，再点击开始战斗。" if startup_mode else "选择独立测试战场。结束测试可返回原战役。"
+	title.text = "选择战场"
+	subtitle.text = "先选择战场，再点击开始战斗。" if startup_mode else "独立战场  结束后可返回原战役"
 	close_button.text = "退出" if startup_mode else "关闭"
 	return_button.visible = not startup_mode
 	launch.text = "开始战斗" if startup_mode else "开始 / 重置此场景"
 	var board: Dictionary = store.war.state.get("battlefield", {})
-	choose(str(board.get("scenario_id", "plains_clash")))
+	choose(str(board.get("scenario_id", "guandu_clash")))
 	seed.value = int(board.get("seed", 1910901))
 	notice.text = "请先完成当前推进，再切换场景。" if store.busy else ""
 	launch.disabled = store.busy

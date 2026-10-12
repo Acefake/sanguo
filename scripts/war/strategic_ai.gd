@@ -1,7 +1,7 @@
 extends RefCounted
 
 # 势力战略 AI：非玩家势力每旬评估一次出兵与增援，复用 preview_dispatch/_mobilize，
-# 不另建战争通道。评分只使用本方情报口径的守军估计，不用真实兵力。
+# 不另建战争通道。评分使用实时城池与军队信息。
 
 const Battle = preload("res://scripts/war/officer_battle.gd")
 
@@ -19,7 +19,6 @@ static func plan(war, store) -> Array:
 	var faction_ids: Array = factions.keys()
 	faction_ids.sort()
 	for faction in faction_ids:
-		_scout_border(war, store, str(faction))
 		_govern(war, store, str(faction))
 		decisions.append_array(_plan_faction(war, store, str(faction), section))
 	_govern(war, store, str(war.state["player_faction"]))
@@ -47,28 +46,11 @@ static func lord_of(roster, faction: String, officer_states: Dictionary = {}) ->
 	return best
 
 
-static func estimate(officer: Dictionary, strength: int) -> int:
-	# 与侦察同一口径：按料敌换算观测误差后取整。
-	var accuracy := maxi(50, 1000 - int(Battle.skill({"skills": officer.get("skills", {})}, "料敌")) * 8)
-	return int(round(float(strength) / accuracy)) * accuracy
+static func estimate(_officer: Dictionary, strength: int) -> int:
+	return strength
 
-
-# 战略评分只读本方情报口径：守军走 estimate()，城防与人口必须先被本方侦察到。
-# 未侦察的城市只按先验计分，不能读真实人口、粮草与城防。
-static func _known_city(war, faction: String, node: String) -> Dictionary:
-	var freshest: Dictionary = war.state.get("faction_intel", {}).get(faction, {}).get("cities", {}).get(node, {})
-	var freshest_tick: int = int(freshest.get("observed_at", -1))
-	for army in war.active_armies(faction):
-		var record: Dictionary = army.get("intel", {}).get("cities", {}).get(node, {})
-		if record.is_empty(): continue
-		var tick := int(record.get("observed_at", -1))
-		if tick > freshest_tick:
-			freshest_tick = tick
-			freshest = record
-	if freshest.is_empty() or freshest_tick < int(war.state["tick"]) - int(war.rules.get("intel_expiry_days", 4)): return {}
-	var result := freshest.duplicate(true)
-	result["garrison"] = int(freshest.get("strength_estimate", freshest.get("garrison", 0)))
-	return result
+static func _known_city(war, _faction: String, node: String) -> Dictionary:
+	return war.city_intel(node)
 
 static func _govern(war, store, faction: String) -> void:
 	var cities := _faction_cities(store, faction)
@@ -94,11 +76,6 @@ static func _govern(war, store, faction: String) -> void:
 		choices.sort_custom(func(a, b): return a["priority"] > b["priority"] if not is_equal_approx(a["priority"], b["priority"]) else a["node"] < b["node"])
 		store.apply_faction_action(choices[0]["node"], choices[0]["action"], faction)
 
-static func _scout_border(war, store, faction: String) -> void:
-	for home in _faction_cities(store, faction):
-		if war.Operations.scout_for_faction(war, home, faction).get("ok", false): break
-
-
 static func _city_value(war, faction: String, node: String, section: Dictionary) -> float:
 	var known := _known_city(war, faction, node)
 	if known.is_empty(): return float(section.get("unscouted_value", 1.0))
@@ -106,14 +83,8 @@ static func _city_value(war, faction: String, node: String, section: Dictionary)
 
 
 # 该敌军是否已被本方任何部队看见；未见到的部队不能用来推断威胁。
-static func _visible_from_faction(war, faction: String, enemy: Dictionary) -> bool:
-	for army in war.active_armies(faction):
-		var record: Dictionary = army.get("intel", {}).get("enemies", {}).get(str(enemy["id"]), {})
-		if record.is_empty(): continue
-		if int(record.get("observed_at", -1)) < int(war.state["tick"]) - int(war.rules.get("intel_expiry_days", 4)): continue
-		return true
-	return false
-
+static func _visible_from_faction(_war, _faction: String, enemy: Dictionary) -> bool:
+	return str(enemy.get("status", "active")) != "ended"
 
 static func lord_orders(lord: Dictionary, posture: String) -> Dictionary:
 	var personality: Dictionary = lord.get("personality", {})
@@ -213,7 +184,7 @@ static func _attack(war, store, faction: String, cities: Array, officers: Array,
 	for target in targets:
 		var known := _known_city(war, faction, str(target["node"]))
 		if known.is_empty(): continue
-		for officer in officers.slice(0, 3):
+		for officer in officers:
 			var preview: Dictionary = war.preview_dispatch(target["home"], target["node"], str(officer["id"]))
 			if not bool(preview["ok"]): continue
 			var estimate := int(known.get("garrison", 0))
@@ -222,7 +193,10 @@ static func _attack(war, store, faction: String, cities: Array, officers: Array,
 			if ratio > float(section.get("max_ratio", 1.8)): continue
 			if float(preview["grain_days"]) < float(section.get("min_grain_days", 20)): continue
 			var value := _city_value(war, faction, str(target["node"]), section)
-			var score: float = 25.0 + value - ratio * 25.0 - float(target["cost"]) * 0.6 - fronts * 8.0 + aggression * 15.0
+			var command_score: float = war.Corps.suitability(officer, "主帅") * 0.10
+			var assembly: int = war.Operations.assembly_days(war, str(target["home"]), [officer["id"]])
+			if assembly < 0: continue
+			var score: float = command_score - assembly * 0.5 + 25.0 + value - ratio * 25.0 - float(target["cost"]) * 0.6 - fronts * 8.0 + aggression * 15.0
 			if score <= float(section.get("threshold", 0.0)): continue
 			if best.is_empty() or score > float(best["score"]):
 				best = {"score": score, "home": target["home"], "target": target["node"], "officer": officer, "preview": preview, "estimate": estimate, "ratio": ratio}
@@ -231,7 +205,7 @@ static func _attack(war, store, faction: String, cities: Array, officers: Array,
 	var army: Dictionary = war._mobilize(preview)
 	army["orders"] = lord_orders(lord, "attack")
 	_form_corps(war, army)
-	army["last_reason"] = "势力战略：攻取%s（守军估计%d，评分%.1f）" % [war.graph.name_of(str(best["target"])), int(best["estimate"]), float(best["score"])]
+	army["last_reason"] = "势力战略：攻取%s（守军%d，评分%.1f）" % [war.graph.name_of(str(best["target"])), int(best["estimate"]), float(best["score"])]
 	war._report(army, "势力出兵", "%s率兵%d出征%s。" % [army["name"], int(preview["strength"]), war.graph.name_of(str(best["target"]))], false)
 	return {"kind": "attack", "tick": int(war.state["tick"]), "faction": faction, "home": str(best["home"]), "target": str(best["target"]), "officer": str(best["officer"]["id"]), "estimate": int(best["estimate"]), "score": float(best["score"]), "army_id": str(army["id"])}
 
@@ -249,12 +223,8 @@ static func _defend(war, store, faction: String, cities: Array, officers: Array,
 		for enemy in war.active_armies():
 			if not war.hostile(str(enemy["faction"]), faction) or bool(enemy["returning"]): continue
 			if not _visible_from_faction(war, faction, enemy): continue
-			# A sighting near a city is a threat; an enemy's secret destination is not.
-			var near := false
-			for observer in war.active_armies(faction):
-				var sight: Dictionary = observer.get("intel", {}).get("enemies", {}).get(enemy["id"], {})
-				var location: Dictionary = sight.get("location", {})
-				if str(location.get("node", "")) == str(node) or str(location.get("to", "")) == str(node): near = true
+			var location: Dictionary = enemy["location"]
+			var near := str(location.get("node", "")) == str(node) or str(location.get("to", "")) == str(node)
 			if not near: continue
 			threatened = true
 			break
@@ -263,7 +233,7 @@ static func _defend(war, store, faction: String, cities: Array, officers: Array,
 			if str(home) == str(node): continue
 			var home_city: Dictionary = store.city_state(str(home))
 			if int(home_city.get("garrison", 0)) <= int(war.rules.get("minimum_reserve", 1000)): continue
-			for officer in officers.slice(0, 3):
+			for officer in officers:
 				var preview: Dictionary = war.preview_dispatch(str(home), str(node), str(officer["id"]), true)
 				if not bool(preview["ok"]): continue
 				var army: Dictionary = war._mobilize(preview)
@@ -275,8 +245,6 @@ static func _defend(war, store, faction: String, cities: Array, officers: Array,
 	return {}
 
 static func _form_corps(war, army: Dictionary) -> void:
-	var companions: Array = []
-	for officer in war.available_officers(str(army["faction"])):
-		if companions.size() >= 2: break
-		companions.append(officer["id"])
+	var candidates: Array = war.available_officers(str(army["faction"])).filter(func(o): return not str(o["id"]).begins_with("militia:")).map(func(o): return o["id"])
+	var companions: Array = war.Corps.select_members(war, str(army["officer_id"]), candidates, str(army["home"]))
 	war.Corps.form(war, army, companions, true)

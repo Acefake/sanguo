@@ -18,5 +18,36 @@
     "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\06_特效与辅助\\光效与闪电\\0x02dd8dbc_3c21f048_55f180_000.png",
     "file": "res://assets/armies/rtk14/effects/duel-flare.png",
     "usage": "Visually inspected white spindle flare, reused for crossed weapon impacts; original game emitter not reconstructed."
+  },
+  "arrow_trail": {
+    "source": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_动画与战斗资源\\纹理预览\\RRPreview\\42a8ae5a_000.png",
+    "file": "res://assets/armies/rtk14/effects/arrow-trail.png",
+    "usage": "Visually inspected native white streak texture, used as short camera-facing trails on one in four field and city arrows; original emitter binding remains unverified."
+  },
+  "arrow_model": {
+    "source_model": "f893127a",
+    "texture_binding": "6759cb41",
+    "materials": [
+      {
+        "texture": "00b434fc",
+        "normal": "3801460a"
+      }
+    ],
+    "orientation": "original +X to field +Z",
+    "file": "res://assets/armies/rtk14/models/arrow.glb",
+    "source_package": "CharacterEditor",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "usage": "Original geometry, UVs and material references; trajectory and volley timing authored locally."
+  },
+  "duel_kill_slash": {
+    "source": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_UI素材\\布局还原\\05_底板背景分隔线与遮罩\\000_base_gekiha_08__ec3d8755_00.png",
+    "file": "res://assets/armies/rtk14/effects/duel-kill-slash.png",
+    "texinfo_name": "000_base_gekiha_08",
+    "size": [
+      128,
+      1024
+    ],
+    "pixel_sha256": "3a96f823c7d6eceb86e1765397695d471620a78f638758883454275f4f06d991",
+    "usage": "User selected this exact white alpha slash for confirmed duel death presentation; original emitter binding remains unverified."
   }
 }

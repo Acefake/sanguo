@@ -3,7 +3,7 @@ extends CanvasLayer
 signal army_dispatched(id: String)
 
 const CitySkin = preload("res://scripts/city_ui_skin.gd")
-const ACTION_NAMES := {"march": "行军", "continue": "继续行军", "hold": "驻守整顿", "scout": "侦察", "resupply": "补給", "engage": "接战", "besiege": "围城", "pursue": "追击", "withdraw": "撤退", "request_support": "求援", "flank": "侧翼绕行", "support": "协同支援"}
+const ACTION_NAMES := {"march": "行军", "continue": "继续行军", "hold": "驻守整顿", "scout": "侦察", "resupply": "补給", "engage": "接战", "besiege": "围城", "pursue": "追击", "withdraw": "撤退", "request_support": "求援", "flank": "侧翼绕行", "support": "协同支援", "reposition":"战术换位", "local_disengage":"准备局部脱离"}
 var store: Node
 var drawer: PanelContainer
 var body: VBoxContainer
@@ -21,6 +21,7 @@ var preview_label: Label
 var confirm_button: Button
 var notice_label: Label
 var selected_army := ""
+var scenario_picker: Button
 var toolbar_offset := Vector2(14, 14)
 var dispatch_home := ""
 var flow_button: Button
@@ -46,7 +47,8 @@ func _ready() -> void:
 	toolbar.add_theme_constant_override("separation", 8)
 	canvas.add_child(toolbar)
 	if store.battle_test:
-		var scenario_button := _button("战场：" + str(store.war.state.get("battlefield", {}).get("scenario_name", "平原会战")) + "  ▾", store.open_battle_scenarios)
+		var scenario_button := _button("战场：" + str(store.war.state.get("battlefield", {}).get("scenario_name", "官渡列阵决战")) + "  ▾", store.open_battle_scenarios)
+		scenario_picker = scenario_button
 		scenario_button.name = "BattleScenarioPicker"
 		scenario_button.position = Vector2(470, 112)
 		scenario_button.add_theme_font_size_override("font_size", 13)
@@ -190,6 +192,7 @@ func refresh() -> void:
 
 
 func _refresh_status() -> void:
+	if is_instance_valid(scenario_picker): scenario_picker.text = "战场：" + str(store.war.state.get("battlefield",{}).get("scenario_name","平原会战")) + "  ▾"
 	if not store.war.state.get("campaign_result", {}).is_empty():
 		status_label.text = str(store.war.state["campaign_result"]["message"])
 		next_button.disabled = true
@@ -239,7 +242,7 @@ func _show_dispatch_legacy(target: String) -> void:
 	heading.text = "派将  " + store.war.graph.name_of(target)
 	drawer.show()
 	_clear()
-	body.add_child(_label("选择主帅与随军人员，按人物位置编为一支军团；主帅统一下令、调兵与拆队。", 15))
+	body.add_child(_label("军团人数、岗位、兵力和指挥层级由玩家自由设置；各角色按自身性格与立场决定服从、异议或自行行动。", 15))
 	body.add_child(_label("出征目标", 14))
 	var target_choice := OptionButton.new()
 	_style_field(target_choice)
@@ -294,12 +297,12 @@ func _show_dispatch_legacy(target: String) -> void:
 		officer_choice.set_item_metadata(officer_choice.item_count - 1, officer["id"])
 	officer_choice.item_selected.connect(func(_index): _update_preview())
 	body.add_child(officer_choice)
-	body.add_child(_label("随军人员  按核心／次选位置任职", 16))
+	body.add_child(_label("随军人员  最多选五人，按职位能力任命", 16))
 	companion_checks.clear()
 	for officer in store.war.available_officers(str(store.war.state["player_faction"])):
 		var check := CheckButton.new()
 		check.text = officer["name"] + "  " + str(officer.get("positions", "")).split("\n")[0]
-		check.button_pressed = true
+		check.button_pressed = store.war.Corps.select_members(store.war, str(officer_choice.get_item_metadata(officer_choice.selected)), store.war.available_officers(str(store.war.state["player_faction"])).map(func(o): return o["id"])).has(officer["id"])
 		check.tooltip_text = officer.get("positions", "")
 		check.add_theme_font_override("font", CitySkin.font())
 		check.add_theme_color_override("font_color", CitySkin.INK)
@@ -324,8 +327,12 @@ func _update_preview() -> void:
 		return
 	var home: String = str(source_choice.get_item_metadata(source_choice.selected))
 	var id: String = str(officer_choice.get_item_metadata(officer_choice.selected))
+	if companion_checks.has(id): companion_checks[id].set_pressed_no_signal(false)
+	var selected_count := 0
 	for officer in companion_checks:
-		companion_checks[officer].disabled = officer == id
+		if companion_checks[officer].button_pressed: selected_count += 1
+	for officer in companion_checks:
+		companion_checks[officer].disabled = officer == id or (selected_count >= 5 and not companion_checks[officer].button_pressed)
 	var preview: Dictionary = store.war.preview_dispatch(home, target_id, id)
 	confirm_button.disabled = store.busy or not bool(preview["ok"])
 	if not bool(preview["ok"]):
@@ -459,6 +466,13 @@ func show_army_orders(id: String) -> void:
 		request_row.add_child(approve_button)
 		request_row.add_child(reject_button)
 	var orders: Dictionary = store.war.orders_for(army)
+	for setting in [["局部脱离整顿","local_disengage",bool(orders.get("local_disengage",orders["retreat"]))],["必须保持职责据点","must_hold_objective",bool(orders.get("must_hold_objective",false))]]:
+		var permission := CheckButton.new()
+		permission.text = setting[0]
+		permission.button_pressed = setting[2]
+		permission.disabled = ended or store.busy or bool(army["returning"])
+		permission.toggled.connect(func(value): store.war.command_army(id,{setting[1]:value}))
+		body.add_child(permission)
 	for spec in [["敌军接近时", "engage", "攻击", "无视"], ["自主撤退", "retreat", "许可", "不许"], ["追击败军", "pursue", "许可", "不许"], ["攻取后命令", "after_battle", "撤退", "待命"]]:
 		var row := HBoxContainer.new()
 		body.add_child(row)
@@ -477,7 +491,7 @@ func show_army_orders(id: String) -> void:
 		row.add_child(choice)
 	body.add_child(_label("主动撤退优先执行；溃败时仍会保命撤离。忽视敌军不能免于遭受攻击。", 13))
 	# 军令书扩展项：意图进入AI评分偏置，冒险许可在候选生成阶段过滤，撤退线强制提醒撤军。
-	for spec in [["作战意图", "intent", store.war.rules.get("orders", {}).get("intents", ["速胜", "稳扎", "牵制", "斩首", "保存实力"])], ["冒险许可", "risk_allowance", store.war.rules.get("orders", {}).get("risk_levels", ["保守", "常规", "放手"])], ["汇报频率", "report_level", ["重大事件", "每日"]]]:
+	for spec in [["作战意图", "intent", store.war.rules.get("orders", {}).get("intents", ["速胜", "稳扎", "牵制", "斩首", "保存实力"])], ["冒险许可", "risk_allowance", store.war.rules.get("orders", {}).get("risk_levels", ["保守", "常规", "放手"])]]:
 		var order_row := HBoxContainer.new()
 		body.add_child(order_row)
 		order_row.add_child(_label(spec[0], 13))
@@ -509,7 +523,7 @@ func show_army_orders(id: String) -> void:
 		)
 		line_row.add_child(line_choice)
 	body.add_child(_label("意图是总体偏置：速胜更进取、牵制重守位、保存实力更早撤退；保守许可不生成侧击与追击候选。", 13))
-	if ended: body.add_child(_button("查看战役复盘", func(): show_review(id)))
+	body.add_child(_button("查看战役复盘" if ended else "查看当前复盘", func(): show_review(id)))
 
 
 
@@ -557,7 +571,6 @@ func show_city_policy(selected: String = "") -> void:
 		var result: Dictionary = store.war.Operations.configure(store.war, selected, {"defense": defense.get_item_metadata(defense.selected), "rebuild": rebuild.get_item_metadata(rebuild.selected), "delegated": delegated.button_pressed})
 		notice_label.text = result["message"]
 	))
-	body.add_child(_button("侦察邻城 · 50金 / 1行动力", func(): notice_label.text = store.war.Operations.scout(store.war, selected)["message"]))
 	var governor: Dictionary = store.war.roster.officers.get(store.city_state(selected).get("governor_id", ""), {})
 	var guard: Dictionary = store.war.state["garrison_commanders"].get(selected, {})
 	body.add_child(_label("太守：%s\n守将：%s" % [governor.get("name", "地方吏员代管"), guard.get("name", "临战任命")], 15))

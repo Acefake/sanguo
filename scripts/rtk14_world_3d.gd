@@ -951,9 +951,6 @@ func _process(delta: float) -> void:
 			var letter := str(faction.get("short", ""))
 			var color := Color(str(faction.get("color", "#c5c0aa")))
 			var troops := int(state.get("garrison", 0))
-			if not GameState.battle_test and not GameState.war.player_has_city_access(city_id):
-				var intel: Dictionary = GameState.war.player_city_intel(GameState.canonical_city_id(city_id))
-				troops = int(intel.get("strength_estimate", -1))
 			var selected: bool = selected_city == city_id
 			if badge.faction_letter != letter or badge.faction_color != color or badge.troops != troops or badge.selected != selected:
 				badge.faction_letter = letter

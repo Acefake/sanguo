@@ -1,11 +1,14 @@
 [
   {
-    "id": "plains_clash",
-    "name": "平原会战",
+    "id": "guandu_clash",
+    "name": "官渡列阵决战",
     "kind": "field",
-    "anchor": 21238,
+    "category": "列阵决战",
+    "anchor": 22129,
     "terrain": "plains",
-    "description": "双方各两万人平原列阵。步兵守正、骑兵侧击、弓兵两格远射，验证兵种分工、侧翼包抄、预备轮换与单挑。开局即可见步、弓、骑独立分队。",
+    "camera_distance": 180,
+    "description": "官渡之战两军于旷野列阵。前锋正面推进搏杀，骑兵迂回侧翼穿插，弓兵据阵后发箭掩护，中军统领后备兵力，决胜于平原主力对决。",
+    "objective_text": "击溃或迫退敌军，牢固控制战场中心。",
     "troops": [
       "infantry",
       "cavalry",
@@ -13,30 +16,93 @@
       "archers",
       "infantry"
     ],
-    "engines": 0
+    "engines": 0,
+    "deployment": [
+      [
+        0,
+        6
+      ],
+      [
+        -2,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        -1,
+        4
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "strengths": {
+      "liu_bei": 20000,
+      "yuan_shao": 20000
+    }
   },
   {
-    "id": "mountain_pass",
-    "name": "山地隘口战",
+    "id": "hulao_pass",
+    "name": "虎牢关要道争夺",
     "kind": "field",
-    "anchor": 16110,
+    "category": "要道争夺",
+    "anchor": 14553,
     "terrain": "mountains",
-    "description": "双方各两万人山地对进。保留原地图不可通行山峰，验证窄路寻路、地形迟滞、弓兵掩护与骑兵受限。开局即可见步、弓、骑独立分队。",
+    "camera_distance": 210,
+    "description": "崇山险隘，绝壁夹峙，两军于虎牢关通道正面接战。前锋扼守隘口咽喉，弓箭手于山道后方压制，山峦断绝骑兵大范围机动，全赖勇将坚守要道。",
+    "objective_text": "控制关隘要道连续4日，或迫退敌军。",
+    "control": {
+      "name": "关隘要道",
+      "hold_days": 4,
+      "radius": 1
+    },
     "troops": [
       "infantry",
       "cavalry",
-      "archers",
+      "infantry",
       "archers",
       "infantry"
     ],
-    "engines": 0
+    "engines": 0,
+    "deployment": [
+      [
+        0,
+        6
+      ],
+      [
+        -1,
+        3
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        5
+      ]
+    ],
+    "strengths": {
+      "liu_bei": 20000,
+      "yuan_shao": 20000
+    }
   },
   {
-    "id": "siege_assault",
-    "name": "攻城强袭",
+    "id": "xiapi_siege",
+    "name": "下邳城池强攻",
     "kind": "siege",
+    "category": "城池攻防",
     "anchor": 16442,
-    "description": "袁军两万人攻城，前锋配两辆投石车、两辆冲车；刘军六千人归城加原守军三千。验证集结、破墙、守军伤亡与占领，不以野战胜利直接结算。开局即可见步、弓、骑独立分队。",
+    "camera_distance": 190,
+    "description": "大军兵临下邳坚城，攻守血战一触即发。攻城前锋配赋重型冲车与发石车直逼城墙城门，护军弓兵压制城垛守军，主帅掌控全军云梯登城与强攻时机。",
+    "objective_text": "突破城防攻克坚城；仅野战击溃外围部队不能替代占领。",
     "troops": [
       "infantry",
       "cavalry",
@@ -44,6 +110,326 @@
       "archers",
       "infantry"
     ],
-    "engines": 4
+    "engines": 4,
+    "deployment": [
+      [
+        0,
+        6
+      ],
+      [
+        -2,
+        3
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        -1,
+        4
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "strengths": {
+      "liu_bei": 6000,
+      "yuan_shao": 20000
+    },
+    "garrison": 3000,
+    "defense": 65
+  },
+  {
+    "id": "yiling_forest",
+    "name": "夷陵密林伏击",
+    "kind": "field",
+    "category": "侧翼遭遇",
+    "anchor": 13609,
+    "terrain": "forest",
+    "camera_distance": 200,
+    "description": "密林丛生，枝叶蔽日。伏击军自两翼林间突施合围，行军纵队被迫仓促应战。茂密密林极大压制骑兵冲阵，主帅急需收拢阵线以步弓稳住阵脚。",
+    "objective_text": "击溃或迫退敌军，化解林地两翼合围险境。",
+    "troops": [
+      "infantry",
+      "infantry",
+      "cavalry",
+      "archers",
+      "infantry"
+    ],
+    "engines": 0,
+    "deployment": [
+      [
+        0,
+        6
+      ],
+      [
+        -2,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        -1,
+        4
+      ],
+      [
+        1,
+        5
+      ]
+    ],
+    "side_deployment": {
+      "liu_bei": [
+        [
+          -3,
+          5
+        ],
+        [
+          -4,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          -3,
+          3
+        ],
+        [
+          1,
+          4
+        ]
+      ],
+      "yuan_shao": [
+        [
+          0,
+          6
+        ],
+        [
+          -1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          5
+        ]
+      ]
+    },
+    "strengths": {
+      "liu_bei": 20000,
+      "yuan_shao": 20000
+    },
+    "side_condition": {
+      "liu_bei": {
+        "organization": 85,
+        "fatigue": 5
+      },
+      "yuan_shao": {
+        "organization": 65,
+        "fatigue": 20
+      }
+    }
+  },
+  {
+    "id": "dingjun_hill",
+    "name": "定军山高地争夺",
+    "kind": "field",
+    "category": "据点控制",
+    "anchor": 37140,
+    "terrain": "hills",
+    "camera_distance": 200,
+    "description": "两军决战汉中，抢夺定军山丘陵制高点。精锐前锋率先扑向山巅，弓弩居高临下倾泻箭雨，护军固守山脊侧翼，占据制高点者将主导战局胜负。",
+    "objective_text": "夺取并控制山巅制高点连续5日，或迫退敌军。",
+    "control": {
+      "name": "山巅制高点",
+      "hold_days": 5,
+      "radius": 1
+    },
+    "troops": [
+      "infantry",
+      "infantry",
+      "cavalry",
+      "archers",
+      "infantry"
+    ],
+    "engines": 0,
+    "deployment": [
+      [
+        0,
+        6
+      ],
+      [
+        -2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        -1,
+        4
+      ],
+      [
+        1,
+        5
+      ]
+    ],
+    "strengths": {
+      "liu_bei": 20000,
+      "yuan_shao": 20000
+    }
+  },
+  {
+    "id": "chibi_ford",
+    "name": "赤壁滩头争渡",
+    "kind": "field",
+    "category": "要道争夺",
+    "anchor": 23684,
+    "terrain": "ford",
+    "camera_distance": 200,
+    "description": "大江浩荡，两军云集滩头抢夺关键渡口。滔滔深水阻绝万马，唯有浅滩可行。步骑涉水滞缓极易遭受弓弩倾覆，两军必须死守渡口确保通途。",
+    "objective_text": "控制江津渡口连续4日，或迫退敌军。",
+    "control": {
+      "name": "江津渡口",
+      "hold_days": 4,
+      "radius": 1
+    },
+    "troops": [
+      "infantry",
+      "infantry",
+      "cavalry",
+      "archers",
+      "infantry"
+    ],
+    "engines": 0,
+    "deployment": [
+      [
+        0,
+        6
+      ],
+      [
+        -1,
+        2
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        -1,
+        4
+      ],
+      [
+        1,
+        5
+      ]
+    ],
+    "strengths": {
+      "liu_bei": 20000,
+      "yuan_shao": 20000
+    }
+  },
+  {
+    "id": "wancheng_marsh",
+    "name": "宛城泽地鏖战",
+    "kind": "field",
+    "category": "地形消耗",
+    "anchor": 23267,
+    "terrain": "marsh",
+    "camera_distance": 200,
+    "description": "连绵大雨后两军于泥泞泽地交锋。积水深泥严重拖慢行军，骑兵冲锋大受削弱，步卒弓弩步步艰难，极度依赖统帅调度与预备轮换的持久作战韧性。",
+    "objective_text": "击溃或迫退敌军，在泽地泥泞中保持中军与前锋紧密协同。",
+    "troops": [
+      "infantry",
+      "infantry",
+      "infantry",
+      "archers",
+      "cavalry"
+    ],
+    "engines": 0,
+    "deployment": [
+      [
+        0,
+        6
+      ],
+      [
+        -2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "strengths": {
+      "liu_bei": 20000,
+      "yuan_shao": 20000
+    }
+  },
+  {
+    "id": "xiangyang_relief",
+    "name": "襄阳城下解围",
+    "kind": "combined",
+    "category": "城野协同",
+    "anchor": 16442,
+    "camera_distance": 210,
+    "description": "大军压境围攻坚城，外围援军急行军赶至。城内守军凭城据守牵制攻城方，援军自侧后猛击敌军包围圈，攻守双方在城下展开城野立体决战。",
+    "objective_text": "解围方迫退攻城大军保全城池；攻城方击破外围援军并攻克坚城。",
+    "troops": [
+      "infantry",
+      "cavalry",
+      "infantry",
+      "archers",
+      "infantry"
+    ],
+    "engines": 2,
+    "deployment": [
+      [
+        0,
+        6
+      ],
+      [
+        -2,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        -1,
+        4
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "strengths": {
+      "liu_bei": 20000,
+      "yuan_shao": 20000
+    },
+    "garrison": 3000,
+    "defense": 60
   }
 ]

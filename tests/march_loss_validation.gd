@@ -95,6 +95,27 @@ func run() -> void:
 		var count := world.loss_floaters.size()
 		world._spawn_loss_floaters()
 		assert(world.loss_floaters.size() == count,"Duplicate damage labels")
+		var label := world.loss_floaters[0]
+		var id: String = label.get_meta("army")
+		var delay := 0.70 if world._loss_contact_mode(id) == "ranged" else 0.20
+		var hit_at: float = world.loss_contact_since[id]+delay
+		var badge := preload("res://scripts/war/army_badge.gd").new()
+		world.add_child(badge)
+		world.badges[id] = badge
+		world.presentation_stats[id] = {"strength":3123,"morale":100.0}
+		var previous_loss := -1
+		for step in range(11):
+			world.presentation_elapsed = hit_at+world.LOSS_COUNT_SECONDS*float(step)/10
+			world._update_display_stats()
+			world._update_loss_floaters(0)
+			var loss := int(label.text.trim_prefix("−"))
+			assert(loss >= previous_loss and loss <= 123,"Dynamic loss counter overshoots or reverses")
+			assert(badge.strength+loss == 3123,"Remaining strength and dynamic loss disagree")
+			if step == 5: assert(loss > 0 and loss < 123,"Loss counter jumps directly to final total")
+			previous_loss = loss
+		assert(label.text == "−123" and badge.strength == 3000,"Dynamic counter misses settled total")
+		world.badges.erase(id)
+		badge.queue_free()
 		store.time_paused = true
 		world._update_loss_floaters(1)
 		assert(world.loss_floaters[0].get_meta("age") == 0.0,"Paused damage label advances")

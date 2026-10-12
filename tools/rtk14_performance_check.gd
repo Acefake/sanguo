@@ -14,7 +14,7 @@ func measure() -> void:
 	var result: Dictionary = {}
 	RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
-	for mode in ["flow", "fine", "overview", "far_transition", "flow_repeat"]:
+	for mode in ["flow", "no_static_rocks", "fine", "overview", "far_transition", "flow_repeat"]:
 		if mode == "overview":
 			world._show_overview(true)
 		else:

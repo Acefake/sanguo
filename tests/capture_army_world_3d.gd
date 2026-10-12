@@ -50,6 +50,7 @@ func _run() -> void:
 	check(world.formations.has(id) and world.badges.has(id), "军队模型或头像标记未创建")
 	check(world.march_meshes.size() == 8, "步兵行军帧没有加载")
 	check(world.combat_meshes.size() == 12, "步兵战斗帧没有加载")
+	check(world.idle_meshes.size() == 8, "步兵待机呼吸帧没有加载")
 	world.deploy_city("chengdu")
 	check(is_instance_valid(world.ui.dispatch_view) and world.ui.dispatch_view.target != "chengdu" and world.ui.dispatch_view.selection(world.ui.dispatch_view.sources) == "chengdu", "3D出阵没有保留出发城")
 	world.badges[id].selected.emit()
@@ -119,6 +120,7 @@ func _run() -> void:
 	store.busy = true
 	check(not store.war.command_army(id, {}, true)["ok"], "推进日期时仍能撤退")
 	store.busy = false
+	world.ui.show_army_orders(id)
 	var button: Button = world.ui.body.find_child("WithdrawArmy", true, false)
 	check(button != null, "没有主动撤退入口")
 	button.pressed.emit()

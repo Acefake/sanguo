@@ -829,15 +829,7 @@ func _refresh_ui() -> void:
 	for child in detail_stats.get_children():
 		detail_stats.remove_child(child)
 		child.queue_free()
-	if not GameState.war.player_has_city_access(selected_id):
-		var intel: Dictionary = GameState.war.player_city_intel(selected_id)
-		if intel.is_empty():
-			_add_stat("敌军情报", "尚未侦察")
-		else:
-			_add_stat("估计驻军", "约" + _format_count(int(intel["strength_estimate"])))
-			_add_stat("已知城防", "%d / 100" % int(intel["defense"]))
-			_add_stat("情报时效", "第%d日观测" % int(intel["observed_at"]))
-	elif str(place["type"]) == "pass":
+	if str(place["type"]) == "pass":
 		_add_stat("驻守兵力", _format_count(int(state.get("garrison", 0))))
 		_add_stat("关防", "%d / 100" % int(state.get("defense", 0)))
 	else:
@@ -887,7 +879,7 @@ func _update_tooltip(screen_pos: Vector2) -> void:
 	var faction: Dictionary = scenario.get("factions", {}).get(str(state.get("faction", "")), {})
 	if not GameState.war.player_has_city_access(hovered_id):
 		var intel: Dictionary = GameState.war.player_city_intel(hovered_id)
-		tooltip_label.text = "%s  %s\n%s" % [place["name"], faction.get("name", "无主"), "尚无侦察军报" if intel.is_empty() else "估计驻军约" + _format_count(int(intel["strength_estimate"]))]
+		tooltip_label.text = "%s  %s\n%s" % [place["name"], faction.get("name", "无主"), "驻军 " + _format_count(int(intel["strength_estimate"]))]
 	elif str(place["type"]) == "pass":
 		tooltip_label.text = "%s  %s\n守军 %s  关防 %d" % [str(place["name"]), str(faction.get("name", "无主")), _format_count(int(state.get("garrison", 0))), int(state.get("defense", 0))]
 	else:

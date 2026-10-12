@@ -110,9 +110,9 @@ func _build_ui() -> void:
 	_place(left_name, Rect2(275, 103, 260, 37))
 	right_name = _label("敌方武将", 29)
 	_place(right_name, Rect2(735, 103, 260, 37))
-	left_score = _label("武艺  0", 18, Color("715d43"))
+	left_score = _label("勇武  0    武艺  0", 18, Color("715d43"))
 	_place(left_score, Rect2(275, 143, 260, 26))
-	right_score = _label("武艺  0", 18, Color("715d43"))
+	right_score = _label("勇武  0    武艺  0", 18, Color("715d43"))
 	_place(right_score, Rect2(735, 143, 260, 26))
 	left_bar = _health_bar(Color("80794b"))
 	_place(left_bar, Rect2(275, 180, 260, 16))
@@ -306,8 +306,12 @@ func present_record(record: Dictionary, left: Dictionary, right: Dictionary, lef
 			head.atlas = preload("res://assets/officers/portraits/0010.png")
 			head.region = Rect2(70, 245, 285, 270)
 			face.texture = head
-	left_score.text = "武艺  %d" % int(left.get("skills", {}).get("武艺", 0))
-	right_score.text = "武艺  %d" % int(right.get("skills", {}).get("武艺", 0))
+	var left_courage := _courage_of(left, record, 0)
+	var right_courage := _courage_of(right, record, 1)
+	var left_martial := int(left.get("skills", {}).get("武艺", 0))
+	var right_martial := int(right.get("skills", {}).get("武艺", 0))
+	left_score.text = _format_stats(left_courage, left_martial)
+	right_score.text = _format_stats(right_courage, right_martial)
 	left_bar.value = 100
 	right_bar.value = 100
 	replay_button.hide()
@@ -387,3 +391,19 @@ func _input(event: InputEvent) -> void:
 	if visible and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		close()
 		get_viewport().set_input_as_handled()
+
+func _courage_of(officer: Dictionary, rec: Dictionary, index: int) -> int:
+	var stats: Array = officer.get("stats", [])
+	if stats.size() >= 3:
+		return roundi(float(stats[2]))
+	var profiles: Array = rec.get("profiles", [])
+	if profiles.size() > index and profiles[index].has("courage"):
+		return roundi(float(profiles[index].get("courage", 0)))
+	return 0
+
+func _format_stats(courage_val: int, martial_val: int) -> String:
+	if courage_val > 0 and martial_val > 0:
+		return "勇武  %d    武艺  %d" % [courage_val, martial_val]
+	if courage_val > 0:
+		return "勇武  %d" % courage_val
+	return "武艺  %d" % martial_val

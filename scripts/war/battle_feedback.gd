@@ -22,34 +22,19 @@ static func _estimate_weight() -> float:
 
 static func visible_advantage(war) -> Dictionary:
 	var own: String = war.state["player_faction"]
-	var ours := advantage(war.active_armies(own),own)
+	var ours := advantage(war.active_armies(own), own)
 	var theirs := 0.0
-	var seen := {}
-	if war.store.battle_test:
-		for army in war.active_armies():
-			if army["faction"] != own: theirs += advantage([army],army["faction"])
-	else:
-		for army in war.active_armies(own):
-			for enemy in army["intel"]["enemies"].values():
-				if seen.has(enemy["id"]) or int(enemy["observed_at"]) != int(war.state["tick"]): continue
-				seen[enemy["id"]] = true
-				theirs += float(enemy["strength_estimate"]) * _estimate_weight()
-	# A city garrison remains a fighting force even without a field-army marker.
-	# Both sides go through the same weighting so the two branches stay comparable.
+	for army in war.active_armies():
+		if army["faction"] != own: theirs += advantage([army], army["faction"])
 	for node in war.state.get("battlefield", {}).get("objectives", {}):
 		var city: Dictionary = war.store.city_state(node)
 		if city.get("faction", "") == own:
 			ours += float(int(city.get("garrison", 0))) * _condition_weight(100.0, 100.0)
-		elif war.store.battle_test:
+		else:
 			var siege: Dictionary = war.state["sieges"].get(node, {})
 			theirs += float(int(city.get("garrison", 0))) * _condition_weight(float(siege.get("morale", 100)), float(siege.get("organization", 100)))
-		else:
-			var estimate := -1
-			for army in war.active_armies(own):
-				var intel: Dictionary = army["intel"]["cities"].get(node, {})
-				if int(intel.get("observed_at", -1)) == int(war.state["tick"]): estimate = maxi(estimate, int(intel.get("strength_estimate", 0)))
-			if estimate >= 0: theirs += float(estimate) * _estimate_weight()
-	return {"ours":ours,"theirs":theirs,"percent":100*ours/maxf(ours+theirs,1),"estimated":not war.store.battle_test}
+	return {"ours": ours, "theirs": theirs, "percent": 100 * ours / maxf(ours + theirs, 1), "estimated": false}
+
 static func factors(attacker: Dictionary, defender: Dictionary, rules: Dictionary, terrain: String) -> Array:
 	var breakdown := Combat.power_breakdown(attacker,rules,terrain,defender)
 	var entries := []
@@ -95,10 +80,10 @@ static func snapshot(war) -> Array:
 		var board: Dictionary = war.state.get("battlefield",{})
 		if not board.is_empty() and army.get("battlefield_id","") != board.get("battle_id",""): continue
 		var faction: String = army["faction"]
-		if not sides.has(faction): sides[faction] = {"faction":faction,"initial":0,"strength":0,"dead":0,"wounded":0,"captured":0,"deposited":0,"morale":0.0,"org":0.0}
+		if not sides.has(faction): sides[faction] = {"faction":faction,"initial":0,"strength":0,"dead":0,"wounded":0,"captured":0,"deposited":0,"dispersed":0,"morale":0.0,"org":0.0}
 		var row: Dictionary = sides[faction]
 		var strength := Combat.strength(army)
-		for ledger in ["dead","wounded","captured","deposited"]: row[ledger] += int(army.get(ledger,0))
+		for ledger in ["dead","wounded","captured","deposited","dispersed"]: row[ledger] += int(army.get(ledger,0))
 		row["initial"] += int(army.get("initial_strength",0))
 		row["strength"] += strength
 		row["morale"] += float(army.get("morale",100))*strength
@@ -106,7 +91,7 @@ static func snapshot(war) -> Array:
 	for row in sides.values():
 		row["morale"] /= maxf(row["strength"],1)
 		row["org"] /= maxf(row["strength"],1)
-		row["accounted"] = row["strength"]+row["dead"]+row["wounded"]+row["captured"]+row["deposited"]
+		row["accounted"] = row["strength"]+row["dead"]+row["wounded"]+row["captured"]+row["deposited"]+row["dispersed"]
 	return sides.values()
 static func record_day(war, before: Array) -> void:
 	var data := book(war)
@@ -135,6 +120,9 @@ static func summary(war) -> Dictionary:
 	var duels: Array = war.state.get("duels",{}).get("records",[]).filter(func(d): return int(d["tick"]) >= int(data.get("started_at",0)))
 	var events := []
 	for row in log: events.append_array(row["events"])
+	# The final milestone may occur after record_day; explicit review includes it immediately.
+	for pending in data.get("pending_events", []):
+		if not pending in events: events.append(pending)
 	var loot := {}
 	for corps in war.state["corps"].values():
 		var root: Dictionary = war.state["armies"].get(corps["root_id"],{})

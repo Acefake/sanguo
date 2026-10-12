@@ -4,132 +4,160 @@
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nTERRAIN_BATTLE_OK: audit, defense, cavalry, ranged, ford lock, mountain delay and next day\n",
-    "elapsed_ms": 1062
+    "elapsed_ms": 1922
   },
   {
     "test": "formation_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nFORMATION_OK: attack, weakness, proficiency, cost, lock, cooldown, emergency orders, candidates and saves\n",
-    "elapsed_ms": 1156
+    "elapsed_ms": 2016
   },
   {
     "test": "duel_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nDUEL_OK: eligibility, personality, replay RNG, effects, manpower, one pair, wounds and save\n",
-    "elapsed_ms": 1062
+    "elapsed_ms": 1922
   },
   {
     "test": "battle_feedback_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nBATTLE_FEEDBACK_OK: advantage, deterministic factors, conservation, events, 240 day bound and saves\n",
-    "elapsed_ms": 1156
+    "elapsed_ms": 2016
   },
   {
     "test": "tactical_battlefield_validation",
-    "passed": true,
-    "exit_code": 0,
-    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nTACTICAL_BATTLEFIELD_OK: obstacle detour, four roles, eight-day collision checks, ranged limits, retreat and conservation\n",
-    "elapsed_ms": 1328
+    "passed": false,
+    "exit_code": 1,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nERROR: 三格内远程支援未造成伤害\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/tactical_battlefield_validation.gd:11)\n       [1] _run (res://tests/tactical_battlefield_validation.gd:82)\n",
+    "elapsed_ms": 2203
   },
   {
     "test": "encirclement_validation",
-    "passed": true,
-    "exit_code": 0,
-    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nENCIRCLEMENT_OK: pinned retreat, occupied ring, attrition, breakout through opening\n",
-    "elapsed_ms": 1031
+    "passed": false,
+    "exit_code": 1,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nENCIRCLEMENT_FAILED\nERROR: 主攻孤立时仍脱离阵线追敌\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/encirclement_validation.gd:11)\n       [1] _run (res://tests/encirclement_validation.gd:69)\n",
+    "elapsed_ms": 1828
   },
   {
     "test": "corps_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nCORPS_OK: hierarchy, appointments, authority, real split and regroup, contact pinning, discovered supply interception, conservation, succession, release, save and canceled model response\n",
-    "elapsed_ms": 1438
+    "elapsed_ms": 2484
   },
   {
     "test": "siege_corps_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nSIEGE_CORPS_OK: commander deployment, grain/troop conservation, preparation, relief pause, blockade/starvation, capture days=1, garrison, orders, save, physical city approach\n",
-    "elapsed_ms": 1329
+    "elapsed_ms": 2406
   },
   {
     "test": "battle_discipline_validation",
-    "passed": true,
-    "exit_code": 0,
-    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nBATTLE_DISCIPLINE_OK: stationary melee, fixed flank waypoint, rebased line, order commitment, 30-day cells=302\n",
-    "elapsed_ms": 1703
+    "passed": false,
+    "exit_code": 1,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nBATTLE_DISCIPLINE_FAILED\nERROR: 目标承诺忽略贴身威胁\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/battle_discipline_validation.gd:8)\n       [1] run (res://tests/battle_discipline_validation.gd:76)\n",
+    "elapsed_ms": 2766
   },
   {
     "test": "decision_scheduler_validation",
     "passed": true,
     "exit_code": 0,
-    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nDECISION_SCHEDULER_OK: non-blocking day_ms=73, only commanders, boundary application, cooldown, reset cancellation\n",
-    "elapsed_ms": 2062
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nDECISION_SCHEDULER_OK: non-blocking day_ms=133, only commanders, boundary application, cooldown, reset cancellation, queued batch\n",
+    "elapsed_ms": 3969
   },
   {
     "test": "global_battle_grid_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nGLOBAL_BATTLE_GRID_OK: shared IDs, six neighbors, world registration, terrain and eight-day movement\n",
-    "elapsed_ms": 1140
+    "elapsed_ms": 2016
   },
   {
     "test": "officer_battle_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nOFFICER_BATTLE_VALIDATION: PASS\n",
-    "elapsed_ms": 860
+    "elapsed_ms": 1656
+  },
+  {
+    "test": "officer_command_validation",
+    "passed": true,
+    "exit_code": 0,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nOFFICER_COMMAND_VALIDATION: PASS\n",
+    "elapsed_ms": 1734
+  },
+  {
+    "test": "officer_edges_validation",
+    "passed": true,
+    "exit_code": 0,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nOFFICER_EDGES_VALIDATION: PASS\n",
+    "elapsed_ms": 1828
   },
   {
     "test": "xiaopei_battle_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nXIAOPEI_BATTLE_OK: 18 officers in 2 corps, whole corps at start, commander-controlled split, 20000 per side, 2 commander decisions, frontline combat and collision checks, isolated save and restoration\n",
-    "elapsed_ms": 1047
+    "elapsed_ms": 1750
   },
   {
     "test": "war_validation",
     "passed": true,
     "exit_code": 0,
-    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nWAR_RESULT 攻取成功 days=19 decisions=14\nWAR_VALIDATION_OK: dispatch, conservation, authority, fog, personality, model actions, road contact, supply, siege, return, migration, RNG and adapter failures\n",
-    "elapsed_ms": 2344
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nWAR_RESULT 攻取成功 days=38 decisions=24\nWAR_VALIDATION_OK: dispatch, conservation, authority, fog, personality, model actions, road contact, supply, siege, return, migration, RNG and adapter failures\n",
+    "elapsed_ms": 2500
   },
   {
     "test": "war_orders_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nWAR_ORDERS_OK: authority, typed commands, candidate restrictions, persistence, emergency retreat and capture/hold/return\n",
-    "elapsed_ms": 969
+    "elapsed_ms": 1641
+  },
+  {
+    "test": "orders_dissent_validation",
+    "passed": true,
+    "exit_code": 0,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nORDERS_DISSENT_VALIDATION: PASS\n",
+    "elapsed_ms": 1828
+  },
+  {
+    "test": "strategic_ai_validation",
+    "passed": true,
+    "exit_code": 0,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nSTRATEGIC_AI_VALIDATION: PASS\n",
+    "elapsed_ms": 1625
   },
   {
     "test": "battle_balance_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nBATTLE_BALANCE_OK: mutual melee, both animations, winning morale/cohesion, severe losses and justified rout\n",
-    "elapsed_ms": 1141
+    "elapsed_ms": 2016
   },
   {
     "test": "combat_effects_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nCOMBAT_EFFECTS_OK: contact target, siege city, ranged, stale fog, idle, bounded reuse, terrain and cleanup\n",
-    "elapsed_ms": 1250
+    "elapsed_ms": 2687
   },
   {
     "test": "dispatch_view_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nDISPATCH_VIEW_OK: pure preview, troop selection, radar, actual corps deployment\n",
-    "elapsed_ms": 1047
+    "elapsed_ms": 1922
   },
   {
     "test": "war_turn_time_validation",
     "passed": true,
     "exit_code": 0,
     "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nWAR_TURN_TIME_OK: fixed ten days, mid-month start, month rollover, urgent reports do not truncate, report phase and one save\n",
-    "elapsed_ms": 875
+    "elapsed_ms": 1844
   }
 ]

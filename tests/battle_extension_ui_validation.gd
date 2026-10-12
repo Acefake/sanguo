@@ -2,14 +2,17 @@ extends SceneTree
 
 const Terrain = preload("res://scripts/war/battle_terrain.gd")
 var failures: Array[String] = []
+var output_dir := "res://docs/validation/battle-ui-2026-10-11/"
 func _initialize(): call_deferred("run")
 func check(ok: bool, message: String):
 	if not ok: failures.append(message); push_error(message)
 func capture(name: String):
 	await process_frame
 	await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://docs/validation/"+name+".png"))
+	var path := ProjectSettings.globalize_path(output_dir+name+".png")
+	check(root.get_texture().get_image().save_png(path) == OK,"截图保存失败："+path)
 func run():
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output_dir))
 	var store = root.get_node("GameState")
 	store.persist_enabled = false
 	store.prepare_battle_test()
@@ -58,7 +61,7 @@ func run():
 	world.advantage_panel.hide()
 	# Capture real 3D ground at the same native cells used by the labeled 2D audit.
 	var audit: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://docs/validation/terrain-code-audit.json"))
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://docs/validation/terrain-3d"))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output_dir+"terrain-3d"))
 	var note := Label.new()
 	note.position = Vector2(470,95)
 	note.add_theme_color_override("font_color",Color.WHITE)

@@ -14,7 +14,7 @@ func _run() -> void:
 	second.settings_path = first.settings_path
 	second.load_settings()
 	var valid: bool = second.api_key == "fake-test-key" and second.model == "test" and second.enabled
-	valid = valid and second.concurrency == 7 and second.decision_budget_seconds == 5 and not second.disable_reasoning
+	valid = valid and second.concurrency == 6 and second.decision_budget_seconds == 5 and not second.disable_reasoning
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(first.settings_path))
 	first.free()
 	second.free()

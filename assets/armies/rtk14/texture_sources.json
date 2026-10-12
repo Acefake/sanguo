@@ -243,5 +243,15 @@
     "source_package": "MaterialEditor",
     "resource": "40c8b51e",
     "slot": 0
+  },
+  "00b434fc": {
+    "source_package": "MaterialEditor",
+    "resource": "54e19a7e",
+    "slot": 0
+  },
+  "3801460a": {
+    "source_package": "MaterialEditor",
+    "resource": "d8e14f0c",
+    "slot": 0
   }
 }

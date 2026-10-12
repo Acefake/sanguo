@@ -165,5 +165,11 @@
     "obj-c01-plane-house-008"
   ],
   "unlisted_count": 1015,
-  "status": "Source stage visibility list; additional game-code visibility overrides are unconfirmed."
+  "status": "Source stage visibility list; additional game-code visibility overrides are unconfirmed.",
+  "placement_visibility_semantics": {
+    "default_visible_without_visibility_set": 1015,
+    "explicitly_listed_preview_visibility_set": 105,
+    "source": "WorldPQ PreviewVisibilitySet inherited from template; stage MotorStageVisibilitySet",
+    "interpretation": "Negative PreviewVisibilitySet inherits default draw; positive values require a stage visibility override."
+  }
 }

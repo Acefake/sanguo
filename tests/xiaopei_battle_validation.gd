@@ -45,11 +45,13 @@ func _run() -> void:
 	for army in store.war.active_armies():
 		strengths[army["faction"]] += store.war.Combat.strength(army)
 		check(army["location"]["edge"] == "b094", "小沛接战位置无效")
-	check(ids.size() == 18 and strengths["liu_bei"] == 20000 and strengths["yuan_shao"] == 20000, "未编入全部18位人物或兵力不平衡")
-	var own: Dictionary = store.war.active_armies("liu_bei").filter(func(army): return army["corps_task"]["type"] == "main_attack")[0]
+	var selected_count: int = 0
+	for formation in store.war.state["corps"].values(): selected_count += formation["members"].size()
+	check(ids.size() == selected_count and strengths["liu_bei"] == 20000 and strengths["yuan_shao"] == 20000, "军团成员缺失或兵力不平衡")
+	var own: Dictionary = store.war.active_armies("liu_bei")[0]
 	var corps: Dictionary = store.war.state["corps"][own["corps_id"]]
 	var context: Dictionary = store.war.Corps.commander_context(store.war, corps)
-	check(context["level"] == "commander" and context["corps"]["strength"] == 20000 and context["members"].size() == 10, "缺少军团总兵力和人物任职")
+	check(context["level"] == "commander" and context["corps"]["strength"] == 20000 and context["members"].size() == corps["members"].size(), "缺少军团总兵力或自由编制成员任职")
 	check(store.war.Corps.fallback(context)["candidate_id"] != "withdraw_corps", "均势军团只按中军兵力逃跑")
 	var fixture := BattleAgent.new()
 	root.add_child(fixture)
@@ -140,5 +142,5 @@ func _run() -> void:
 	store.restore_battle_test()
 	check(store.day == old_day and store.war.state["tick"] == old_tick and not store.battle_test and store.agent == original_agent, "测试退出没有恢复原战役")
 	fixture.queue_free()
-	if failures.is_empty(): print("XIAOPEI_BATTLE_OK: 18 officers in 2 corps, whole corps at start, commander-controlled split, 20000 per side, 2 commander decisions, frontline combat and collision checks, isolated save and restoration")
+	if failures.is_empty(): print("XIAOPEI_BATTLE_OK: 12 officers in 2 six-person corps, whole corps at start, commander-controlled split, 20000 per side, 2 commander decisions, frontline combat and collision checks, isolated save and restoration")
 	quit(0 if failures.is_empty() else 1)

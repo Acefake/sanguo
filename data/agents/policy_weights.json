@@ -1,5 +1,6 @@
 {
-  "version": 4,
+  "version": 5,
+  "tactical": {"version": 2, "max_candidates": 16, "max_positions": 16, "enemy_candidates": 3, "prediction_candidates": 3, "prediction_depth": 2, "switch_gain": 10, "stay_bonus": 8, "record_limit": 40, "cavalry_archer_bonus": 16, "cavalry_escort_radius": 1, "cavalry_escort_penalty": 0.5, "archer_cavalry_retreat_bonus": 10, "archer_cavalry_cover_bonus": 6, "archer_cavalry_hold_penalty": 8},
   "note": "效用评分的全部可调参数。base_score 为行动基线，factors 为通用因素权重，personality_modifiers 为 14 轴对各因素权重的偏移系数，形式：权重 = base + (轴值 - 50) × 系数。",
   "base_score": {
     "continue": 35,

@@ -28,7 +28,7 @@ func run() -> void:
 				kinds[Roles.kind(army)] = true
 				total += war.Combat.strength(army)
 			check(kinds.size() == 3, spec.id+": missing initial arm")
-			check(total == 20000,spec.id+": wrong initial strength")
+			check(total == int(spec.get("strengths",{}).get(faction,20000)),spec.id+": wrong initial strength")
 		if spec.kind == "siege": check(store.city_state("xiaopei").garrison == 9000,spec.id+": guard accounting")
 		var corps: Dictionary = war.state.corps.values()[0]
 		var context: Dictionary = Corps.commander_context(war,corps)
@@ -64,10 +64,12 @@ func run() -> void:
 	check(Roles.breach_multiplier([{"units":{"infantry":1000},"siege_engines":4,"returning":true}]) == 1,"routing engines remain effective")
 	var replay := ""
 	for i in range(2):
-		store.prepare_battle_test(true,"plains_clash",7654)
+		store.prepare_battle_test(true,"guandu_clash",7654)
 		store.war.rules["duel"]["enabled"] = false
 		for day in range(20): await store.war.step(offline)
-		var result := JSON.stringify(store.war.state)
+		var clean_state: Dictionary = store.war.state.duplicate(true)
+		clean_state.erase("battle_ai_metrics")
+		var result := JSON.stringify(clean_state)
 		if i == 0: replay = result
 		else: check(replay == result,"mixed arms same-seed replay")
 	var file := FileAccess.open("res://docs/validation/mixed-troop-scenarios-2026-10-06.json",FileAccess.WRITE)

@@ -81,6 +81,8 @@ static func default_weights() -> Dictionary:
 
 
 static func choose(context: Dictionary, orders_aware: bool = true) -> Dictionary:
+	if context.get("level","") == "adviser": return preload("res://scripts/agents/officer_brain.gd").choose(context)
+	if context.get("level","") == "unit": return preload("res://scripts/agents/tactical_evaluator.gd").choose(context)
 	var ranked := score(context, orders_aware)
 	if ranked.is_empty(): return {}
 	var best: Dictionary = ranked[0]
@@ -88,6 +90,7 @@ static func choose(context: Dictionary, orders_aware: bool = true) -> Dictionary
 
 
 static func score(context: Dictionary, orders_aware: bool = true) -> Array:
+	if context.get("level","") == "unit": return preload("res://scripts/agents/tactical_evaluator.gd").rank(context)
 	var w := weights()
 	var personality := effective_personality(context)
 	var ranked: Array = []
@@ -453,6 +456,7 @@ static func commander_choose(context: Dictionary) -> Dictionary:
 
 
 static func rank(context: Dictionary, orders_aware: bool = true) -> Array:
+	if context.get("level","") == "adviser": return preload("res://scripts/agents/officer_brain.gd").rank(context)
 	if str(context.get("level", "")) == "commander": return commander_rank(context)
 	return score(context, orders_aware)
 
@@ -470,6 +474,10 @@ static func commander_rank(context: Dictionary) -> Array:
 
 
 static func should_ask_model(context: Dictionary) -> bool:
+	if context.get("level","") == "adviser": return context.get("crisis",false) or margin(preload("res://scripts/agents/officer_brain.gd").rank(context)) < 10
+	if context.get("level","") == "unit":
+		var ranked := score(context)
+		return ranked.size() > 1 and (margin(ranked) < 10 or context.get("crisis",false) or context.get("current_plan",{}).get("template","") == "flank_then_engage")
 	if not context.has("army"): return true
 	var ranked := rank(context)
 	if ranked.is_empty(): return true
@@ -482,6 +490,8 @@ static func should_ask_model(context: Dictionary) -> bool:
 
 
 static func veto(context: Dictionary, candidate_id: String) -> Dictionary:
+	if context.get("level","") == "unit":
+		return {"ok":context.get("candidates",[]).any(func(c): return c["id"] == candidate_id),"reason":"模型只能选择当前请求内的规范战术"}
 	var ranked := rank(context)
 	if ranked.is_empty(): return {"ok": true}
 	var top := float(ranked[0]["score"])
@@ -532,6 +542,12 @@ static func commander_candidate(context: Dictionary, candidate: Dictionary, w: D
 	for key in order_terms:
 		score += float(order_terms[key])
 		breakdown[key] = float(order_terms[key])
+	var advice_value := 0.0
+	for advice in context.get("officer_advice",[]):
+		var favored: bool = (advice["kind"] == "support" and (kind == "rotate_front" or task in ["support","rear_guard"])) or (advice["kind"] == "flank" and (task in ["flank","raid_rear"] or action.get("posture","") == "flanking")) or (advice["kind"] == "rally" and (kind == "rotate_front" or task == "regroup")) or (advice["kind"] == "observe" and kind == "maintain") or (advice["kind"] == "assault" and (task == "main_attack" or action.get("posture","") == "assault"))
+		if favored: advice_value += clampf(float(advice.get("planning",50))/25.0,0,4)
+	breakdown["参谋建议"] = minf(4,advice_value)
+	score += float(breakdown["参谋建议"])
 	return {"score": score, "breakdown": breakdown}
 
 
@@ -546,6 +562,7 @@ static func commander_explicit(context: Dictionary, candidate: Dictionary, kind:
 			out["姿态"] = deploy_score(context, candidate, w, personality)
 		"withdraw_corps":
 			if context.get("retreat_assessment",{}).get("reason","") == "攻城步兵不足": out["攻城无力"] = 100.0
+			if context.get("retreat_assessment",{}).get("reason","") == "前军覆没，失去作战分队": out["前军覆没"] = 100.0
 			if context.get("retreat_assessment", {}).get("reason", "") == "达到玩家撤退线": out["军令撤退线"] = 100.0
 			var ratio := float(context.get("battlefield", {}).get("enemy_to_friendly_ratio", 0))
 			var ready := float(context.get("battlefield", {}).get("friendly_ready_strength", 0))

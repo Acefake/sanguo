@@ -10,6 +10,35 @@ const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
 const MELEE := ["engage", "flank", "pursue", "besiege"]
 const ESTIMATE := {"training": 50, "equipment": 50, "morale": 70.0, "organization": 70.0, "fatigue": 0.0, "skills": {}, "ranged_attack": false}
 
+# Frozen snapshots only; never reads enemy truth or consumes the battle RNG.
+static func tactical_exchange(own: Dictionary, sight: Dictionary, rules: Dictionary, terrain: String) -> Dictionary:
+	var opponent := _estimate_from(sight)
+	if opponent.is_empty(): return {}
+	var attacker: Dictionary = own.duplicate()
+	attacker["action"] = {"type":"hold"}
+	attacker["name"] = "己军估计"
+	attacker["melee_attack"] = true
+	opponent["melee_attack"] = true
+	var enemy_terrain := Tactical.terrain_class(int(sight.get("cell",sight.get("tactical_cell",own["cell"]))))
+	var defense := Combat.losses_detail(opponent,attacker,rules,terrain,1.0,1.0,enemy_terrain)
+	var offense := Combat.losses_detail(attacker,opponent,rules,enemy_terrain,1.0,1.0,terrain)
+	var own_ranged := 0
+	var enemy_ranged := 0
+	var enemy_range := Tactical.attack_range(opponent)
+	if int(own.get("attack_range",1)) > 1:
+		var bow: Dictionary = attacker.duplicate()
+		bow["units"] = {"infantry":0,"archers":attacker["units"].get("archers",0),"cavalry":0}
+		bow["ranged_attack"] = true
+		bow["melee_attack"] = false
+		own_ranged = Combat.losses_detail(bow,opponent,rules,enemy_terrain,1.0,1.0,terrain)["loss"]
+	if enemy_range > 1:
+		var bow: Dictionary = opponent.duplicate()
+		bow["units"] = {"infantry":0,"archers":opponent["units"].get("archers",0),"cavalry":0}
+		bow["ranged_attack"] = true
+		bow["melee_attack"] = false
+		enemy_ranged = Combat.losses_detail(bow,attacker,rules,terrain,1.0,1.0,enemy_terrain)["loss"]
+	return {"own_loss":defense["loss"],"enemy_loss":offense["loss"],"own_loss_ranged":enemy_ranged,"enemy_loss_ranged":own_ranged,"range":enemy_range}
+
 
 static func annotate(war, army: Dictionary, candidates: Array, options: Dictionary = {}) -> void:
 	var terrain: String = str(options.get("terrain", _terrain(war, army)))

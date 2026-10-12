@@ -27,11 +27,17 @@ func run() -> void:
 	assert(preview["ok"] and preview["strength"] == wanted)
 	assert(store.city_state(home)["garrison"] == before)
 	assert(view.radar.values.size() == 5)
+	# Reducing total troops must reject an overcommitted player allocation.
+	var assigned: int = 0
+	for id in view.members(): assigned += int(view.composition[id].get("strength", 0))
+	if assigned > wanted - 500: assert(view.confirm.disabled)
+	view.auto_compose()
+	assert(not view.confirm.disabled)
 	if not DisplayServer.get_name() == "headless":
 		await process_frame
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("res://docs/validation/army-assets/dispatch-view.png")
-	var layout: Dictionary = store.war.Corps.preview_appointments(store.war, view.selection(view.chiefs), view.members(), wanted)
+	var layout: Dictionary = store.war.Corps.preview_appointments(store.war, view.selection(view.chiefs), view.members(), wanted, view.current_plan())
 	view.deploy()
 	var corps: Dictionary = store.war.state["corps"].values()[-1]
 	assert(corps["appointments"] == layout["appointments"])

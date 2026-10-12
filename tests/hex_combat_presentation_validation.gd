@@ -10,8 +10,19 @@ class MapStub extends Node3D:
 	func height_at(_x: float,_z: float) -> float: return 0.0
 
 func _initialize() -> void: call_deferred("run")
-func inside(point: Vector3, cell: int, reason: String) -> void:
+func inside(point: Vector3, cell: int, reason: String, overflow: float = 0.0) -> void:
 	if Hex.cell_at(point) == cell: return
+	if overflow > 0:
+		var grid = Hex.Grid.shared()
+		var center: Vector2 = grid.center(cell)
+		var polygon: PackedVector2Array = grid.polygon(cell)
+		var accepted := true
+		for i in range(polygon.size()):
+			var edge := polygon[(i+1)%polygon.size()]-polygon[i]
+			var outward := Vector2(edge.y,-edge.x).normalized()
+			if outward.dot(polygon[i]-center) < 0: outward = -outward
+			if outward.dot(Vector2(point.x,point.z)-polygon[i]) > overflow+0.001: accepted = false
+		if accepted: return
 	if not failed: push_error(reason+" point="+str(point))
 	failed = true
 func run() -> void:
@@ -35,11 +46,11 @@ func run() -> void:
 	var group := Node3D.new()
 	world.add_child(group)
 	world._create_formation(group)
-	world._layout_formation(group,64)
+	world._layout_formation(group,world.MAX_SOLDIERS)
 	var checked := 0
-	for kind in ["infantry","archers","cavalry","engines"]:
-		group.get_node("Soldiers").multimesh.visible_instance_count = 64 if kind in ["infantry","engines"] else 0
-		world._update_special_troops(group,64 if kind == "archers" else 0,36 if kind == "cavalry" else 0)
+	for kind in ["infantry","archers","cavalry","cavalry_partial","engines"]:
+		group.get_node("Soldiers").multimesh.visible_instance_count = world.MAX_SOLDIERS if kind in ["infantry","engines"] else 0
+		world._update_special_troops(group,world.MAX_SOLDIERS if kind == "archers" else 0,world.CAVALRY_MODELS if kind == "cavalry" else 36 if kind == "cavalry_partial" else 0)
 		world._update_siege_engines(group,{"siege_engines":4 if kind == "engines" else 0,"units":{"infantry":3000}})
 		for side in range(12):
 			group.position = Vector3(center.x+2.8 if side%2 else center.x,0,center.y)
@@ -48,10 +59,19 @@ func run() -> void:
 			for spec in [["Soldiers","infantry"],["Archers","archers"],["Mounted/Cavalry","cavalry"]]:
 				var batch: MultiMeshInstance3D = group.get_node(spec[0])
 				var bounds: AABB = world.troop_pose_bounds[spec[1]]
+				var standing_center := Vector3.ZERO
 				for i in range(batch.multimesh.visible_instance_count):
+					standing_center += batch.global_transform*(batch.multimesh.get_instance_transform(i)*world.troop_ground_centers[spec[1]])
 					for corner in range(8):
-						inside(batch.global_transform*(batch.multimesh.get_instance_transform(i)*bounds.get_endpoint(corner)),cell,"Soldier attack envelope crosses hex: "+kind)
+						inside(batch.global_transform*(batch.multimesh.get_instance_transform(i)*bounds.get_endpoint(corner)),cell,"Soldier attack envelope crosses assigned hex: "+kind)
 						checked += 1
+				if batch.multimesh.visible_instance_count > 0:
+					standing_center /= batch.multimesh.visible_instance_count
+					# Thinned formations deliberately keep the front ranks filled.
+					# Their visible centroid shifts, but every foot remains in the hex.
+					inside(standing_center,cell,"Visible formation centroid crosses hex: "+kind)
+					if batch.multimesh.visible_instance_count == batch.multimesh.instance_count:
+						assert(Vector2(standing_center.x,standing_center.z).distance_to(center) < 0.001,"Full formation is not centered in the hex: "+kind)
 			var target := group.global_position+Vector3(cos(side),0,sin(side))*15
 			var equipment: Node3D = group.get_node("SiegeEngines")
 			Siege.aim(equipment,target)

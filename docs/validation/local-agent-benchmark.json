@@ -1,6 +1,6 @@
 {
-	"boundary_applied_orders": 0,
-	"boundary_model_orders": 0,
+	"boundary_applied_orders": 2,
+	"boundary_model_orders": 2,
 	"budget_seconds": 15,
 	"choices": {
 		"deploy_corps": 2
@@ -12,58 +12,62 @@
 		{
 			"action": "deploy_corps",
 			"officer": "诸葛亮",
-			"reason": "部署前锋部队，利用地形优势实施侧翼包抄",
+			"reason": "主帅展开全军：加强双前锋，保留预备队，适合当前敌情，可有效牵制敌军并保持正面攻势，符合部署优先级与战术需求",
 			"role": "commander",
 			"source": "model"
 		},
 		{
 			"action": "deploy_corps",
 			"officer": "孙策",
-			"reason": "部署精锐骑兵，保持侧翼防御，准备奇袭敌军后方",
+			"reason": "主帅展开全军：加强双前锋，保留预备队",
 			"role": "commander",
 			"source": "model"
 		}
 	],
 	"deployed_corps": 2,
-	"discarded_stale_proposals": 2,
-	"elapsed_ms": 13726,
+	"discarded_stale_proposals": 0,
+	"elapsed_ms": 1811,
 	"final_formation_count": 10,
 	"formation_count": 2,
 	"metrics": {
 		"calls": 2,
 		"failures": 0,
 		"fallbacks": 0,
-		"input_tokens": 2858,
-		"output_tokens": 55
+		"input_tokens": 4014,
+		"local_decisions": 0,
+		"output_tokens": 81,
+		"vetoes": 0
 	},
 	"model": "qwen3:1.7b",
 	"simulation_metrics": {
-		"calls": 5,
+		"calls": 4,
 		"failures": 0,
 		"fallbacks": 0,
-		"input_tokens": 5716,
-		"output_tokens": 99
+		"input_tokens": 8028,
+		"local_decisions": 0,
+		"output_tokens": 193,
+		"vetoes": 0
 	},
 	"thinking": false,
 	"three_day_simulation": [
 		{
 			"active": 2,
-			"elapsed_ms": 10,
+			"elapsed_ms": 14,
 			"fighting": 0,
 			"returning": 0,
 			"tick": 1
 		},
 		{
-			"active": 10,
-			"elapsed_ms": 114,
+			"active": 2,
+			"elapsed_ms": 4,
 			"fighting": 0,
 			"returning": 0,
 			"tick": 2
 		},
 		{
 			"active": 10,
-			"elapsed_ms": 111,
-			"fighting": 4,
+			"elapsed_ms": 69,
+			"fighting": 0,
 			"returning": 0,
 			"tick": 3
 		}

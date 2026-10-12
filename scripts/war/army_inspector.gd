@@ -4,6 +4,7 @@ signal close_requested
 signal orders_requested(id: String)
 signal reports_requested(id: String)
 const UISkin = preload("res://scripts/war/war_ui_skin.gd")
+const CommandRoles = preload("res://scripts/war/army_command_roles.gd")
 var store: Node
 var army_id := ""
 var portrait: TextureRect
@@ -16,6 +17,7 @@ var wounded: Label
 var target: Label
 var task: Label
 var personnel: Label
+var command_personnel: Label
 var bars: Dictionary = {}
 var numbers: Dictionary = {}
 var judgment: Label
@@ -149,6 +151,9 @@ func _ready() -> void:
 	personnel = UISkin.label("", 12)
 	personnel.name = "CorpsPersonnel"
 	info.add_child(personnel)
+	command_personnel = UISkin.label("", 11)
+	command_personnel.name = "CommandRoles"
+	info.add_child(command_personnel)
 	UISkin.rule(body)
 	var thought := UISkin.section(body, "临机判断")
 	source = UISkin.label("", 11, UISkin.MUTED)
@@ -179,27 +184,36 @@ func _ready() -> void:
 	update_info()
 
 static func personnel_text(war, corps: Dictionary) -> String:
-	var entries: Array[String] = []
-	var appointments: Dictionary = corps.get("appointments", {})
-	var members: Array = corps.get("members", []).duplicate()
-	for id in appointments:
-		if not members.has(id): members.append(id)
-	var order := ["主帅", "副帅", "军师", "参军", "前锋", "奇兵", "护军", "殿后"]
-	members.sort_custom(func(a, b):
-		var a_rank := order.find(str(appointments.get(a, "随军待命")))
-		var b_rank := order.find(str(appointments.get(b, "随军待命")))
-		return (a_rank if a_rank >= 0 else order.size()) < (b_rank if b_rank >= 0 else order.size())
-	)
-	for id in members:
+	var structure := preload("res://scripts/war/corps_structure.gd")
+	structure.ensure(corps)
+	var rows: Array = structure.tree_rows(corps)
+	var lines: Array[String] = []
+	for row in rows:
+		var id := str(row["id"])
 		var officer: Dictionary = war.roster.officers.get(id, {})
 		if officer.is_empty(): continue
-		entries.append("%s %s" % [appointments.get(id, "随军待命"), officer.get("name", id)])
-	var lines: Array[String] = []
-	for index in range(0, entries.size(), 2):
-		lines.append(entries[index] + ("  " + entries[index + 1] if index + 1 < entries.size() else ""))
+		var role := str(corps.get("appointments", {}).get(id, "随军"))
+		var strength := int(corps.get("node_strength", {}).get(id, 0))
+		var depth := int(row["depth"])
+		var prefix := ""
+		for index in range(depth): prefix += "└ "
+		var suffix := "  %d人" % strength if strength > 0 else ""
+		lines.append("%s%s %s%s" % [prefix, role, officer.get("name", id), suffix])
+	var autonomy := preload("res://scripts/agents/officer_autonomy.gd")
+	var stances: Array[String] = []
+	for row in autonomy.summary_rows(war, corps):
+		if str(row["stance"]) == "obey": continue
+		stances.append("%s：%s（%s）" % [row["name"], autonomy.label(str(row["stance"])), row["reason"]])
+	if not stances.is_empty(): lines.append("独立立场：" + "；".join(stances))
 	return "\n".join(lines)
 
 static func decision(war, army: Dictionary) -> Dictionary:
+	if army.has("battle_ai") and not army["battle_ai"].get("plan",{}).is_empty():
+		var ai: Dictionary = army["battle_ai"]
+		var plan: Dictionary = ai["plan"]
+		var phase := str({"approach":"接近","execute":"执行","wait_support":"等待正面配合","disengage":"准备脱离","reposition":"前往接应位置","recover":"整顿恢复","rejoin":"准备重新投入"}.get(plan.get("stage",""),"执行"))
+		var text := "%s · %s\n%s\n下一步：%s\n改判：%s" % [plan["label"],phase,army.get("last_reason",""),plan.get("next",""),plan.get("stop_condition","")]
+		return {"text":text,"source":ai.get("last_source","baseline"),"tick":int(ai.get("submitted_round",-1)),"pending":false,"applied":true,"thinking":war.planner.has_pending("unit:"+str(army["id"]))}
 	var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
 	var key := "army:" + str(army["id"]) if corps.is_empty() else "corps:" + str(corps["id"])
 	if war.planner.ready.has(key):
@@ -267,15 +281,27 @@ func update_info() -> void:
 	var terrain: String = store.war.Terrain.name_of(store.war.Tactical.terrain_class(army["tactical"]["cell"])) if army.has("tactical") else "行军途中"
 	task.text = "%s  %s" % [terrain, army.get("tactical", {}).get("phase", "待命")]
 	task.text += "\n主将 %s  主帅 %s" % [card.get("name", "无"), store.war.roster.officers.get(corps.get("commander_id", ""), {}).get("name", "无")]
+	if army.has("autonomy") and str(army["autonomy"].get("stance", "obey")) != "obey":
+		task.text += "\n独立立场 %s：%s" % [preload("res://scripts/agents/officer_autonomy.gd").label(str(army["autonomy"]["stance"])), str(army["autonomy"].get("reason", ""))]
+	var command_roles := CommandRoles.resolve(store.war, army)
+	command_personnel.visible = command_roles["enabled"]
+	command_personnel.text = CommandRoles.role_text(command_roles["commander"], "主将") + "\n" + CommandRoles.role_text(command_roles["deputy"], "副将")
+	command_personnel.tooltip_text = "主将沿用现有指挥权限；副将随军展示，不新增岗位或指挥增益。"
 	personnel.visible = not corps.is_empty()
-	personnel.text = "军团编制\n" + personnel_text(store.war, corps) if not corps.is_empty() else ""
+	personnel.text = "军团编制（自由编组）\n" + personnel_text(store.war, corps) if not corps.is_empty() else ""
+	if not corps.is_empty():
+		for advice in preload("res://scripts/agents/officer_brain.gd").advice(store.war,corps):
+			var stance := str(advice.get("stance", ""))
+			var suffix := "（独立立场：%s）" % preload("res://scripts/agents/officer_autonomy.gd").label(stance) if stance not in ["", "obey"] else ""
+			personnel.text += "\n%s%s：%s" % [advice["name"], suffix, advice["reason"]]
 	if army.has("commander_fate"):
 		task.text += "\n%s%s" % [army["commander_fate"]["name"], "战死" if army["commander_fate"]["status"] == "dead" else "被俘"]
 	var result := decision(store.war, army)
 	judgment.text = preload("res://scripts/ui_text.gd").clean(str(result["text"])) if not str(result["text"]).is_empty() else "尚未返回新的判断。"
 	judgment.tooltip_text = judgment.text
 	var origin := "智能体返回" if result["source"] == "model" else "当前军令" if result["source"] == "orders" else "本地策略"
-	if not corps.is_empty(): origin = "主帅" + origin
+	if army.has("battle_ai") and not army["battle_ai"].get("plan",{}).is_empty(): origin = {"model":"部将模型建议","safety":"部将安全反应","coordination":"军团配合调整"}.get(result["source"],"部将本地判断")
+	elif not corps.is_empty(): origin = "主帅" + origin
 	var state := "待执行" if result["pending"] else "已下达" if result.get("applied", true) else "未执行"
 	source.text = "%s%s  %s" % [origin, "  第%d日" % int(result["tick"]) if int(result["tick"]) >= 0 else "", state]
 	if result.get("thinking", false): source.text += "  正在推演"

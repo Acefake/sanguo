@@ -27,9 +27,21 @@ var troop_kind := "infantry"
 var speech := ""
 var speech_until := 0.0
 var speech_visible := true
+var corps_aggregated := false
+var base_strength := 0
+var base_morale := 100.0
 
-static func camera_scale(camera_distance: float) -> float:
+static func camera_scale(camera_distance: float, aggregated: bool = false) -> float:
+	# 远景军团聚合时提高缩放保底，确保主帅面部与徽标信息清晰可读
+	if aggregated: return clampf(82.0 / maxf(camera_distance, 1.0), 0.38, 0.88)
 	return clampf(64.0 / maxf(camera_distance, 1.0), 0.20, 0.88)
+
+func set_corps_aggregated(aggregated: bool, total_strength: int = 0, avg_morale: float = 100.0) -> void:
+	if corps_aggregated == aggregated and (not aggregated or (strength == total_strength and is_equal_approx(morale, avg_morale))): return
+	corps_aggregated = aggregated
+	strength = total_strength if aggregated else base_strength
+	morale = avg_morale if aggregated else base_morale
+	queue_redraw()
 
 func set_speech(line: String, until: float) -> void:
 	speech = line
@@ -61,14 +73,14 @@ func _draw() -> void:
 		draw_string_outline(font, Vector2(29, 44), title.left(1), HORIZONTAL_ALIGNMENT_LEFT, -1, 22, 3, outline)
 		draw_string(font, Vector2(29, 44), title.left(1), HORIZONTAL_ALIGNMENT_LEFT, -1, 22, ink)
 	var pennant := PackedVector2Array([Vector2(3,30),Vector2(18,26),Vector2(23,31),Vector2(23,49),Vector2(14,55),Vector2(3,49)])
-	draw_colored_polygon(pennant, outline)
-	var serial := str(squad_number)
-	draw_string(font, Vector2(7,46), serial, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color("ffe69c") if highlighted else ink)
+	draw_colored_polygon(pennant, Color("7a1c1d") if corps_aggregated else outline)
+	var serial := "帅" if corps_aggregated else str(squad_number)
+	draw_string(font, Vector2(5 if corps_aggregated else 7,46), serial, HORIZONTAL_ALIGNMENT_LEFT, -1, 15 if corps_aggregated else 17, Color("ffe69c") if (highlighted or corps_aggregated) else ink)
 	# Native spear, crossed-arrow and horse icons replace the placeholder chevron.
 	draw_texture_rect(UNIT_ICONS.get(troop_kind, UNIT_ICONS["infantry"]), Rect2(0,49,21,21), false, Color("fa9d8e") if hostile else Color("9adaee"))
 	var number := ("≈" if estimated else "") + str(strength)
 	draw_string_outline(font, Vector2(52,59), number, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, 3, outline)
-	draw_string(font, Vector2(52,59), number, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color("ff9a89") if hostile else Color("a4e7fc"))
+	draw_string(font, Vector2(52,59), number, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color("ff9a89") if hostile else (Color("ffe2a3") if corps_aggregated else Color("a4e7fc")))
 	if not estimated:
 		draw_texture_rect(MORALE_TRACK, Rect2(16,61,99,8), false)
 		for segment in range(5):

@@ -2,8 +2,11 @@
 *.tmp
 *.log
 .commandcode/
+.omo/
 tools/army-source-cache/
 tools/city-source-cache/
+tools/duel-source-cache/
+docs/validation/mounted-duel/[0-9][0-9][0-9].png*
 __pycache__/
 /atlas-candidate-*.png.import
 /atlas-search.jpg.import

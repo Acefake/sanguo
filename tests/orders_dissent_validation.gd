@@ -43,7 +43,7 @@ func _run() -> void:
 	check(commander_filtered.size() == 2 and not commander_filtered.any(func(candidate): return candidate["action"].get("task", "") in ["raid_rear", "cut_supply"]), "保守主帅不派绕后与截粮")
 	# 默认军令书：字段齐全且新旧行为等价（稳扎无偏置时自由评分与军令评分一致）。
 	var defaults: Dictionary = war.orders_for({})
-	check(str(defaults["intent"]) == "稳扎" and str(defaults["risk_allowance"]) == "常规" and str(defaults["report_level"]) == "重大事件", "缺省军令书字段")
+	check(str(defaults["intent"]) == "稳扎" and str(defaults["risk_allowance"]) == "常规" and not defaults.has("report_level"), "缺省军令书字段")
 	var firm: Dictionary = war.orders_for({"orders": {"intent": "保存实力"}})
 	check(str(firm["intent"]) == "保存实力" and str(firm["risk_allowance"]) == "常规", "存档军令合并缺省")
 	var base_context := context(defaults, persona())
@@ -110,8 +110,10 @@ func _run() -> void:
 	check(bool(rejected.get("ok", false)) and not army.has("pending_request"), "驳回清空请示")
 	# 超时默认驳回。
 	army["pending_request"] = {"tick": int(war.state["tick"]) - 1, "action": {"type": "hold"}, "reason": "测试建议", "probability": 0.5}
+	var report_count: int = war.state["reports"].size()
 	war._expire_requests()
-	check(not army.has("pending_request") and not war.state["reports"].is_empty() and str(war.state["reports"][-1]["kind"]) == "请示超时", "超时默认驳回并留军报")
+	check(not army.has("pending_request") and army["memory"].any(func(item): return item["kind"] == "请示超时"), "超时默认驳回并保留本地记录")
+	check(war.state["reports"].size() == report_count, "日常请示超时不主动发报")
 	# 非玩家势力不能由玩家批复。
 	var enemy_army: Dictionary = war.active_armies().filter(func(a): return a["faction"] != war.state["player_faction"])[0]
 	enemy_army["pending_request"] = {"tick": war.state["tick"], "action": {"type": "hold"}, "reason": "测试建议", "probability": 0.5}

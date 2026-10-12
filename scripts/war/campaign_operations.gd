@@ -20,33 +20,11 @@ static func configure(war, city_id: String, changes: Dictionary) -> Dictionary:
 	war.store._save()
 	return {"ok": true, "message": "城池方针已更新"}
 
-static func scout(war, city: String) -> Dictionary:
-	if war.campaign_finished(): return {"ok": false, "message": "战役已经结束"}
-	if war.store.busy or not war.player_has_city_access(city): return {"ok": false, "message": "只能从本方城池下达侦察"}
-	var result := scout_for_faction(war, city, str(war.state["player_faction"]))
-	war.store._save()
-	return result
+static func scout(_war, _city: String) -> Dictionary:
+	return {"ok": false, "message": "全地图信息实时可见，无需侦察"}
 
-static func scout_for_faction(war, home: String, faction: String) -> Dictionary:
-	var city: Dictionary = war.store.city_state(home)
-	if city.get("faction", "") != faction or war.store.faction_action_points(faction) <= 0 or int(city.get("treasury", 0)) < 50: return {"ok": false, "message": "侦察需要50金与1点行动力"}
-	var intel: Dictionary = war.state["faction_intel"].get(faction, {"cities": {}, "enemies": {}})
-	var lord: Dictionary = war.Strategic.lord_of(war.roster, faction, war.state["officer_states"])
-	var observations := 0
-	for link in war.graph.neighbors(home):
-		var node := str(link["node"])
-		var target: Dictionary = war.store.city_state(node)
-		if not target.has("garrison") or target.get("faction", "") == faction: continue
-		var estimate: int = war.Strategic.estimate(lord, int(target.get("garrison", 0)))
-		intel["cities"][node] = {"node": node, "garrison": estimate, "strength_estimate": estimate, "uncertainty": maxi(250, int(estimate * 0.1)), "defense": target.get("defense", 0), "faction": target.get("faction", ""), "observed_at": int(war.state["tick"]), "source": "border_scout"}
-		observations += 1
-	if observations == 0: return {"ok": false, "message": "邻接地区没有需要侦察的城池"}
-	city["treasury"] -= 50
-	if faction == war.state["player_faction"]: war.store.action_points -= 1
-	else: war.state["faction_action_points"][faction] = war.store.faction_action_points(faction) - 1
-	war.state["faction_intel"][faction] = intel
-	war.store.city_changed.emit(home)
-	return {"ok": true, "message": "已侦察%d座邻城，消耗50金与1点行动力" % observations}
+static func scout_for_faction(_war, _home: String, _faction: String) -> Dictionary:
+	return {"ok": false, "message": "全地图信息实时可见，无需侦察"}
 
 static func cities(war, faction: String) -> Array:
 	var result: Array = []

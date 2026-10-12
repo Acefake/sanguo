@@ -3,8 +3,8 @@ extends CanvasLayer
 # Active presentation. The mounted implementation remains in duel_presentation.gd.
 signal finished
 const Layout = preload("res://scripts/ui_layout.gd")
-const EFFECT_SECONDS := 12.0
-const RESULT_SECONDS := 6.0
+const EFFECT_SECONDS := 1.2
+const REFUSAL_SECONDS := 2.5
 var elapsed := 0.0
 var demo := false
 var active_record: Dictionary = {}
@@ -19,10 +19,13 @@ var card: Control
 var mask: Control
 var continue_button: Button
 var started_ms := 0
+var combat_seconds := EFFECT_SECONDS
+var result_ready_at := 0.0
+var combat_end_at := 0.0
 
 func _ready() -> void:
 	layer = 20
-	# Other battle presentation waits until this result finishes.
+	# The result overlay does not stop battle progression.
 	mask = Control.new()
 	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -50,6 +53,14 @@ func _ready() -> void:
 	continue_button.text = "继续战斗"
 	continue_button.position = Vector2(220, 450)
 	continue_button.size = Vector2(180, 40)
+	continue_button.add_theme_font_override("font", preload("res://scripts/city_ui_skin.gd").font())
+	continue_button.add_theme_font_size_override("font_size", 22)
+	continue_button.add_theme_color_override("font_disabled_color", Color("ffe7ad"))
+	var button_style := StyleBoxFlat.new()
+	button_style.bg_color = Color(0.12, 0.15, 0.12, 0.95)
+	button_style.set_corner_radius_all(6)
+	continue_button.add_theme_stylebox_override("disabled", button_style)
+	continue_button.add_theme_stylebox_override("normal", button_style)
 	continue_button.pressed.connect(close)
 	card.add_child(continue_button)
 	status.hide()
@@ -81,6 +92,23 @@ func present_record(record: Dictionary, left: Dictionary, right: Dictionary, lef
 	if visible: return
 	active_record = record.duplicate(true)
 	names.assign([str(left.get("name", "我方武将")), str(right.get("name", "敌方武将"))])
+	effect_key = ""
+	elapsed = 0.0
+	started_ms = Time.get_ticks_msec()
+	continue_button.hide()
+	status.hide()
+	card.show()
+	if record.get("result", "") == "refused":
+		# Refusal is a lightweight notice: no portrait decoding or GPU readback.
+		card.refused = true
+		card.record = active_record
+		card.names = names
+		card.elapsed = 0.0
+		for cut in card.cuts: cut.hide()
+		mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		show()
+		_update_stage()
+		return
 	portraits = [left_face, right_face]
 	for index in range(portraits.size()):
 		var face: Texture2D = portraits[index]
@@ -92,8 +120,12 @@ func present_record(record: Dictionary, left: Dictionary, right: Dictionary, lef
 	effect_key = "gold:%s:%s:%s:%s" % [record.get("tick", -1), record.get("a", names[0]), record.get("b", names[1]), get_instance_id()]
 	card.show()
 	status.hide()
-	card.result_at = EFFECT_SECONDS
-	card.record = active_record
+	card.configure(active_record)
+	card.courage = _extract_courage(active_record, left, right)
+	# Preserve every combat round; the result is dismissible as soon as playback ends.
+	combat_seconds = card.result_at
+	combat_end_at = combat_seconds
+	result_ready_at = combat_end_at
 	card.names = names
 	card.faces = portraits.duplicate()
 	var mapping: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/officer_portraits.json"))
@@ -130,31 +162,29 @@ func _process(_delta: float) -> void:
 func _update_stage() -> void:
 	if active_record.is_empty(): return
 	if active_record.get("result", "") == "refused":
-		card.hide()
-		status.show()
-		status.text = "%s 拒绝应战" % names[1]
-		if elapsed >= 2.5: close()
+		card.elapsed = elapsed
+		card.queue_redraw()
+		if elapsed >= REFUSAL_SECONDS: close()
 		return
-	var duration := EFFECT_SECONDS + RESULT_SECONDS
-	continue_button.visible = elapsed >= EFFECT_SECONDS
+	var duration := result_ready_at
+	continue_button.visible = elapsed >= combat_seconds
 	continue_button.disabled = elapsed < duration
-	continue_button.text = "继续战斗" if elapsed >= duration else "结算展示 %d 秒" % ceili(duration - elapsed)
+	continue_button.text = "继续战斗"
 	_resize()
 	card.elapsed = elapsed
 	card.queue_redraw()
-	if elapsed < EFFECT_SECONDS:
-		var rounds: Array = active_record.get("rounds", [])
-		var round_index := mini(int(elapsed / EFFECT_SECONDS * rounds.size()) + 1, maxi(rounds.size(), 1))
+	if elapsed < combat_seconds:
+		var round_index := int(card.playback().get("round", 1))
 		status.text = "单挑中  第 %d 回合" % round_index
 	else:
 		var winner := int(active_record.get("winner", -1))
 		status.text = "平手  %s 与 %s 未分胜负" % names if winner < 0 else "胜方：%s    负方：%s" % [names[winner], names[1 - winner]]
 		if winner >= 0:
-			status.text = "胜方：%s    负方：%s  %s" % [names[winner], names[1 - winner], {"dead":"被斩杀", "captured":"被俘"}.get(active_record.get("fate", {}).get("status", ""), "重伤")]
+			status.text = "胜方：%s    负方：%s  %s" % [names[winner], names[1 - winner], {"dead":"被斩杀", "captured":"被俘"}.get(active_record.get("fate", {}).get("status", ""), "重伤" if active_record.get("result", "") == "overwhelming" else "退让")]
 
 func close() -> void:
 	if not visible: return
-	if active_record.get("result", "") != "refused" and elapsed < EFFECT_SECONDS + RESULT_SECONDS: return
+	if active_record.get("result", "") != "refused" and elapsed < result_ready_at: return
 	if is_instance_valid(effects): effects.remove_duel(effect_key)
 	hide()
 	if is_instance_valid(mask): mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -162,3 +192,18 @@ func close() -> void:
 
 func _exit_tree() -> void:
 	if is_instance_valid(effects): effects.remove_duel(effect_key)
+
+func _extract_courage(record_dict: Dictionary, left_officer: Dictionary, right_officer: Dictionary) -> Array[int]:
+	var values: Array[int] = [0, 0]
+	var officers: Array = [left_officer, right_officer]
+	var profiles: Array = record_dict.get("profiles", [])
+	for index in range(2):
+		var officer: Dictionary = officers[index]
+		var stats: Array = officer.get("stats", [])
+		if stats.size() >= 3:
+			values[index] = roundi(float(stats[2]))
+		elif profiles.size() > index and profiles[index].has("courage"):
+			values[index] = roundi(float(profiles[index].get("courage", 0)))
+		elif officer.get("skills", {}).has("武艺"):
+			values[index] = roundi(float(officer["skills"]["武艺"]))
+	return values

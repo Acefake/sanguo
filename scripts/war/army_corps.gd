@@ -5,6 +5,9 @@ const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
 const Edges = preload("res://scripts/war/officer_edges.gd")
 const Forecast = preload("res://scripts/agents/forecast.gd")
 const Policy = preload("res://scripts/agents/baseline_policy.gd")
+const Structure = preload("res://scripts/war/corps_structure.gd")
+const Autonomy = preload("res://scripts/agents/officer_autonomy.gd")
+const STAFF_ROLE := "参军"
 const TASKS := {"command": "中军统筹", "support": "弓兵支援", "main_attack": "正面进攻", "flank": "侧翼包抄", "reserve": "预备待命", "rear_guard": "掩护撤退", "raid_rear": "绕后奇袭", "cut_supply": "截断粮道", "regroup": "归建"}
 
 static func suitability(officer: Dictionary, position: String) -> float:
@@ -21,42 +24,72 @@ static func suitability(officer: Dictionary, position: String) -> float:
 		var found := regex.search(line)
 		if found != null: value = float(found.get_string(1))
 	var skills: Dictionary = officer.get("skills", {})
-	return value + float(skills.get("奇袭" if position == "奇兵" else "智计" if position == "军师" else "带兵", 50)) * 0.5
+	return value + float(skills.get("奇袭" if position == "奇兵" else "智计" if position in ["军师", "参军"] else "带兵", 50)) * 0.5 + float(skills.get("料敌" if position == "参军" else "治军" if position == "护军" else "布阵", 50)) * 0.25
 
 static func best_member(war, members: Array, position: String) -> String:
 	var sorted: Array = members.duplicate()
-	sorted.sort_custom(func(a, b): return suitability(war.roster.officers[a], position) > suitability(war.roster.officers[b], position))
+	sorted.sort_custom(func(a, b): return suitability(war.roster.officers[a], position) > suitability(war.roster.officers[b], position) if not is_equal_approx(suitability(war.roster.officers[a], position), suitability(war.roster.officers[b], position)) else str(a) < str(b))
 	return str(sorted[0]) if not sorted.is_empty() else ""
 
-static func preview_appointments(war, commander: String, members: Array, strength: int) -> Dictionary:
+# Select by role rather than roster order. One person can occupy only one slot.
+static func select_members(war, commander: String, candidates: Array, home: String = "") -> Array:
 	var free: Array = []
-	for id in members:
-		if id != commander and not free.has(id) and war.roster.officers.has(id) and war.roster.officers[id]["faction"] == war.roster.officers[commander]["faction"] and war.state["officer_states"].get(id, {}).get("status", "available") == "available": free.append(id)
-	var positions := {commander: "主帅"}
-	var formations := []
-	var remaining := strength
-	for office in ["副帅", "军师"]:
-		var id := best_member(war, free, office)
-		if id != "" and suitability(war.roster.officers[id], office) >= 100:
-			positions[id] = office
-			free.erase(id)
-	for spec in [["奇兵", "flank", 0.15], ["前锋", "main_attack", 0.3], ["前锋", "main_attack", 0.3], ["护军", "reserve", 0.15]]:
-		var id := best_member(war, free, spec[0])
-		var count := int(strength * float(spec[2]))
-		if id == "" or count < 500 or remaining - count < 500: continue
-		positions[id] = spec[0]
-		formations.append({"officer": id, "task": spec[1], "strength": count})
-		remaining -= count
-		free.erase(id)
-	for id in free: positions[id] = "参军" if suitability(war.roster.officers[id], "参军") >= suitability(war.roster.officers[id], "护军") else "护军"
-	formations.push_front({"officer": commander, "task": "command" if formations.size() > 0 else "main_attack", "strength": remaining})
+	if not war.roster.officers.has(commander): return []
+	for value in candidates:
+		var id := str(value)
+		if id == commander or free.has(id) or not war.roster.officers.has(id): continue
+		if war.roster.officers[id]["faction"] != war.roster.officers[commander]["faction"]: continue
+		if war.state["officer_states"].get(id, {}).get("status", "available") != "available": continue
+		if home != "" and war.Operations.assembly_days(war, home, [id]) < 0: continue
+		free.append(id)
+	return free
+
+static func preview_appointments(war, commander: String, members: Array, strength: int, plan: Dictionary = {}) -> Dictionary:
+	var free: Array = select_members(war, commander, members)
+	if not plan.is_empty():
+		var normalized: Dictionary = Structure.normalize_plan(war, commander, [commander] + free, plan, strength)
+		var formations: Array = [{"officer": commander, "task": "command", "strength": normalized["strengths"][commander]}]
+		for officer in free:
+			var count: int = int(normalized["strengths"].get(officer, 0))
+			if count > 0: formations.append({"officer": officer, "task": task_for_role(str(normalized["roles"][officer])), "strength": count})
+		return {"appointments": normalized["roles"], "formations": formations, "command_tree": normalized["parents"], "node_strength": normalized["strengths"]}
+	var positions: Dictionary = {commander: "主帅"}
+	var formations: Array = []
+	var staff: String = best_member(war, free, "参军")
+	if staff != "": positions[staff] = "参军"; free.erase(staff)
+	var remaining: int = strength
+	var index: int = 0
+	for officer in free:
+		var role: String = "前锋" if index < 2 else "护军" if index < 4 else "随军"
+		positions[officer] = role
+		var count: int = int(strength * (0.27 if role == "前锋" else 0.13)) if index < 4 else 0
+		if count >= Structure.MIN_TROOP and remaining - count >= Structure.MIN_TROOP:
+			formations.append({"officer": officer, "task": "main_attack" if role == "前锋" else "flank" if index == 2 else "reserve", "strength": count})
+			remaining -= count
+		index += 1
+	formations.push_front({"officer": commander, "task": "command", "strength": remaining})
 	return {"appointments": positions, "formations": formations}
+
+static func task_for_role(role: String) -> String:
+	match Structure.behavior_of(role):
+		"command": return "command"
+		"staff": return "support"
+		"front": return "main_attack"
+		"guard": return "reserve"
+	return "main_attack"
+
+static func validate_plan(war, commander: String, members: Array, plan: Dictionary, strength: int) -> Dictionary:
+	return Structure.validate_plan(commander, [commander] + select_members(war, commander, members), plan, strength)
 
 static func form(war, root: Dictionary, members: Array, autonomous: bool = false) -> Dictionary:
 	var id: String = "corps-" + root["id"]
-	var joined: Array = [root["officer_id"]]
-	for officer in members:
-		if war.roster.officers.has(officer) and not joined.has(officer) and war.roster.officers[officer]["faction"] == root["faction"] and war.state["officer_states"].get(officer, {}).get("status", "available") == "available": joined.append(officer)
+	var joined: Array = [root["officer_id"]] + select_members(war, root["officer_id"], members, str(root["home"]))
+	var player_plan: Dictionary = war.state.get("pending_corps_plan", {})
+	if str(player_plan.get("commander", "")) != str(root["officer_id"]): player_plan = {}
+	var layout := preview_appointments(war, root["officer_id"], joined, Combat.strength(root), player_plan)
+	if not player_plan.is_empty():
+		autonomous = false
+		war.state.erase("pending_corps_plan")
 	var old_departure := int(root.get("departure_at", war.state["tick"]))
 	root["departure_at"] = maxi(old_departure, int(war.state["tick"]) + war.Operations.assembly_days(war, str(root["home"]), joined))
 	root["deadline"] += int(root["departure_at"]) - old_departure
@@ -70,31 +103,19 @@ static func form(war, root: Dictionary, members: Array, autonomous: bool = false
 	root["corps_task"] = {"type": "command", "reason": "主帅坐镇中军，统筹全军", "issued_by": root["officer_id"]}
 	root["name"] = war.roster.officers[root["officer_id"]]["name"] + "中军"
 	for officer in joined: war.state["officer_states"][officer] = {"status": "deployed", "army_id": root["id"], "corps_id": id}
-	var free: Array = joined.filter(func(officer): return officer != root["officer_id"])
-	for office in ["副帅", "军师"]:
-		var officer := best_member(war, free, office)
-		if officer != "" and suitability(war.roster.officers[officer], office) >= 100:
-			corps["appointments"][officer] = office
-			free.erase(officer)
-	var original := Combat.strength(root)
+	corps["appointments"] = layout["appointments"]
+	corps["composition_version"] = Structure.STRUCTURE_VERSION
+	corps["command_tree"] = layout.get("command_tree", {})
+	corps["node_strength"] = layout.get("node_strength", {})
+	corps["player_composition"] = not player_plan.is_empty()
+	Structure.ensure(corps)
 	corps["autonomous_deployment"] = autonomous
 	corps["formed_at"] = int(war.state["tick"])
-	if autonomous:
-		for officer in free: corps["appointments"][officer] = "随军待命"
-		root["corps_task"]["type"] = "main_attack"
-		root["name"] = corps["name"]
-		return corps
-	for spec in [["奇兵", "flank", 0.15], ["前锋", "main_attack", 0.3], ["前锋", "main_attack", 0.3], ["护军", "reserve", 0.15]]:
-		var officer := best_member(war, free, spec[0])
-		var count := int(original * float(spec[2]))
-		if officer == "" or count < 500 or Combat.strength(root) - count < 500: continue
-		var result := split(war, corps, root, officer, count, spec[1], -1)
-		if result.get("ok", false):
-			corps["appointments"][officer] = spec[0]
-			free.erase(officer)
-	for officer in free:
-		var office := "参军" if suitability(war.roster.officers[officer], "参军") >= suitability(war.roster.officers[officer], "护军") else "护军"
-		corps["appointments"][officer] = office
+	if autonomous: return corps
+	for formation in layout["formations"]:
+		if formation["officer"] == root["officer_id"]: continue
+		split(war, corps, root, formation["officer"], formation["strength"], formation["task"], -1)
+	corps["deployed"] = true
 	if corps["units"].size() == 1: root["corps_task"]["type"] = "main_attack"
 	return corps
 
@@ -105,24 +126,33 @@ static func deploy_by_commander(war, corps: Dictionary, posture: String, reason:
 	if root["status"] == "ended" or root["returning"]: return {"ok": false}
 	if root.has("tactical") and Tactical.contact_state(war, root)["adjacent_enemies"] > 0: return {"ok": false, "message": "接战中不能展开分兵"}
 	var active_officers: Array = corps["units"].filter(func(id): return war.state["armies"][id]["status"] != "ended").map(func(id): return war.state["armies"][id]["officer_id"])
-	var free: Array = corps["members"].filter(func(id): return not active_officers.has(id) and corps["appointments"].get(id, "") not in ["副帅", "军师"] and not war.state["officer_states"].get(id, {}).get("lost", false) and not war.state["officer_states"].get(id, {}).get("duel_wounded",false))
+	var free: Array = corps["members"].filter(func(id): return not active_officers.has(id) and not Structure.is_staff(str(corps["appointments"].get(id, ""))) and not war.state["officer_states"].get(id, {}).get("lost", false) and not war.state["officer_states"].get(id, {}).get("duel_wounded",false))
 	var before := Combat.strength(root)
-	var front_share := 0.35 if posture == "assault" else 0.25 if posture == "flanking" else 0.30
-	var flank_share := 0.25 if posture == "flanking" else 0.10 if posture == "assault" else 0.15
+	var front_share := 0.30 if posture == "assault" else 0.25 if posture == "flanking" else 0.27
+	var flank_share := 0.20 if posture == "flanking" else 0.10 if posture == "assault" else 0.13
 	var created := []
-	for spec in [["前锋", "main_attack", front_share], ["前锋", "main_attack", front_share], ["奇兵", "flank", flank_share], ["护军", "reserve", 0.15]]:
-		var officer := best_member(war, free, spec[0])
-		var count := int(before * float(spec[2]))
-		if officer == "" or count < 500 or Combat.strength(root) - count < 500: continue
-		var result := split(war, corps, root, officer, count, spec[1], -1)
+	for officer in free:
+		Autonomy.ensure_evaluated(war, corps, str(officer), {"action": {"type": "deploy_corps"}, "reason": reason})
+		if Autonomy.blocks_override(war, corps, str(officer)).get("blocked", false): continue
+		var role: String = str(corps["appointments"].get(officer, "随军"))
+		var behavior: String = Structure.behavior_of(role)
+		var share: float = front_share if behavior == "front" else flank_share if behavior == "guard" else 0.13
+		var count: int = mini(int(before * share), Combat.strength(root) - Structure.MIN_TROOP)
+		if count < Structure.MIN_TROOP: continue
+		var task: String = task_for_role(role)
+		if behavior == "guard": task = "flank" if not created.is_empty() and created.size() % 2 == 0 else "reserve"
+		var result: Dictionary = split(war, corps, root, str(officer), count, task, -1)
 		if result.get("ok", false):
-			free.erase(officer)
-			corps["appointments"][officer] = spec[0]
 			var child: Dictionary = war.state["armies"][result["army_id"]]
 			child["corps_task"]["reason"] = reason
 			child["corps_task"]["issued_at"] = int(war.state["tick"])
 			created.append(result["army_id"])
-	if created.is_empty(): return {"ok": false, "message": "没有可展开的将领、兵力或相邻格"}
+	if created.is_empty():
+		if free.is_empty() or before < Structure.MIN_TROOP * 2:
+			corps["deployed"] = true
+			root["corps_task"]["type"] = "main_attack"
+			return {"ok": true, "units": [], "message": "缺员或兵力不足，主帅率中军执行任务"}
+		return {"ok": false, "message": "没有可展开的将领、兵力或相邻格"}
 	root["corps_task"]["type"] = "command"
 	root["name"] = war.roster.officers[root["officer_id"]]["name"] + "中军"
 	corps["deployed"] = true
@@ -159,9 +189,14 @@ static func split(war, corps: Dictionary, source: Dictionary, officer: String, c
 		if cell < 0: return {"ok": false, "message": "没有可展开的相邻格"}
 	var before := Combat.strength(source)
 	var child: Dictionary = source.duplicate(true)
+	child.erase("battle_ai")
+	if source.has("battle_ai"):
+		source["battle_ai"]["actor_revision"] += 1
+		source["battle_ai"]["plan"] = {}
+		war.planner.invalidate("unit:"+str(source["id"]))
 	var id := "army-%04d" % int(war.state["next_id"])
 	war.state["next_id"] += 1
-	child.merge({"id": id, "officer_id": officer, "name": war.roster.officers[officer]["name"] + "分队", "skills": war.roster.officers[officer]["skills"].duplicate(true), "battle_traits": war.roster.officers[officer].get("battle_traits", []).duplicate(), "battle_contacts": [], "victory_chain": false, "opening_used": false, "units": {"infantry": 0, "archers": 0, "cavalry": 0}, "initial_strength": count, "enemy_killed": 0, "personal_soldier_kills": 0, "dead": 0, "wounded": 0, "captured": 0, "deposited": 0, "returning": false, "status": "active", "last_decision": -10, "last_report": {}, "last_reason": "奉主帅命令展开分队", "operation": {}, "decision_history": [], "memory": [], "action": {"type": "hold"}, "corps_task": {"type": task, "cell": target, "reason": TASKS.get(task, task), "issued_by": corps["commander_id"]}}, true)
+	child.merge({"id": id, "officer_id": officer, "name": war.roster.officers[officer]["name"] + "分队", "skills": war.roster.officers[officer]["skills"].duplicate(true), "battle_traits": war.roster.officers[officer].get("battle_traits", []).duplicate(), "battle_contacts": [], "victory_chain": false, "opening_used": false, "units": {"infantry": 0, "archers": 0, "cavalry": 0}, "initial_strength": count, "enemy_killed": 0, "personal_soldier_kills": 0, "dead": 0, "wounded": 0, "captured": 0, "deposited": 0, "returning": false, "status": "active", "last_decision": -10, "last_report": {}, "last_reason": "奉主帅命令展开分队", "operation": {}, "decision_history": [], "memory": [], "action": {"type": "hold"}, "corps_task": {"type": task, "cell": target, "reason": TASKS.get(task, task), "issued_by": Structure.tree_parent(corps, officer)}}, true)
 	var left := count
 	for type in Combat.TYPES:
 		var take: int = mini(int(source["units"][type]), int(count * float(source["units"][type]) / before))
@@ -189,6 +224,9 @@ static func split(war, corps: Dictionary, source: Dictionary, officer: String, c
 	war.state["armies"][id] = child
 	war.state["missions"][id] = {"army_id": id, "status": "active", "officer_id": officer, "home": child["home"], "target": child["target"], "type": "detachment", "result": ""}
 	corps["units"].append(id)
+	Structure.ensure(corps)
+	corps["node_strength"][officer] = count
+	corps["node_strength"][source["officer_id"]] = Combat.strength(source)
 	war.state["officer_states"][officer] = {"status": "deployed", "army_id": id, "corps_id": corps["id"]}
 	return {"ok": true, "army_id": id}
 
@@ -228,10 +266,11 @@ static func summary(war, corps: Dictionary) -> Dictionary:
 		if army["status"] == "ended": continue
 		total += Combat.strength(army)
 		units.append({"id": id, "officer": army["name"], "strength": Combat.strength(army), "morale": army["morale"], "organization": army["organization"], "fatigue": army["fatigue"], "grain_days": int(war.food_days(army)), "task": army["corps_task"], "cell": army.get("tactical", {}).get("cell", -1), "returning": army["returning"], "units": army["units"].duplicate(true), "siege_engines": army.get("siege_engines",0)})
-	return {"id": corps["id"], "name": corps["name"], "strength": total, "units": units, "appointments": corps["appointments"], "supply": corps["supply"].duplicate(true), "known_supplies": corps["known_supplies"].duplicate(true), "deployment_pending": corps.get("autonomous_deployment", false) and not corps.get("deployed", false)}
+	return {"id": corps["id"], "name": corps["name"], "strength": total, "units": units, "appointments": corps["appointments"], "composition": {"unlimited": true, "roles": corps["appointments"].values(), "command_tree": corps.get("command_tree", {}).duplicate(true), "node_strength": corps.get("node_strength", {}).duplicate(true)}, "supply": corps["supply"].duplicate(true), "known_supplies": corps["known_supplies"].duplicate(true), "deployment_pending": corps.get("autonomous_deployment", false) and not corps.get("deployed", false)}
 
 static func deploy(war) -> void:
 	var board: Dictionary = war.state["battlefield"]
+	var global_occupied := {}
 	for corps in war.state["corps"].values():
 		var side := Tactical.side_for(board, str(corps["faction"]))
 		var rank := 0
@@ -246,6 +285,10 @@ static func deploy(war) -> void:
 			elif task == "flank": dq = -4; dr = side * 3
 			elif task == "support": dq = 1; dr = side * 4
 			elif task == "reserve": dq = 2; dr = side * 5
+			var layout: Array = board.get("side_deployment", {}).get(corps["faction"], board.get("scenario_deployment", []))
+			var slot: int = unit.get("scenario_slot", 0)
+			if not layout.is_empty() and slot < layout.size(): dq = int(layout[slot][0]); dr = side * int(layout[slot][1])
+			if slot == 0 and corps.get("autonomous_deployment", false) and not corps.get("deployed", false): dr = side * 3
 			desired.append({"unit": unit, "cell": Tactical.offset_cell(board, dq, dr)})
 		var occupied := {}
 		for entry in desired:
@@ -254,11 +297,12 @@ static func deploy(war) -> void:
 				for r in range(-8, 9):
 					if r * side <= 0: continue
 					var cell := Tactical.offset_cell(board, q, r)
-					if Tactical.can_enter(war, entry["unit"], cell) and not occupied.has(cell): options.append(cell)
+					if Tactical.can_enter(war, entry["unit"], cell) and not occupied.has(cell) and not global_occupied.has(cell) and (not board.has("deployment_cells") or board["deployment_cells"].has(cell)): options.append(cell)
 			options.sort_custom(func(a, b): return Tactical.cell_distance(a, entry["cell"]) < Tactical.cell_distance(b, entry["cell"]))
 			if options.is_empty(): continue
 			var cell: int = options[0]
 			occupied[cell] = true
+			global_occupied[cell] = true
 			entry["unit"]["tactical"].merge({"cell": cell, "lane": Tactical.column_of(cell), "role": entry["unit"]["corps_task"]["type"]}, true)
 		var supply_options: Array = []
 		for q in range(-6, 7):
@@ -276,18 +320,26 @@ static func deploy(war) -> void:
 			corps["supply"]["stock"] += excess
 
 static func commander_context(war, corps: Dictionary) -> Dictionary:
+	Structure.ensure(corps)
+	Autonomy.evaluate_corps(war, corps)
 	var root: Dictionary = war.state["armies"][corps["root_id"]]
 	var context: Dictionary = war.context_for(root)
 	context["level"] = "commander"
+	context["battle_objective"] = Tactical.board_for(war, root).get("control_point", {}).duplicate(true)
+	context["objective_text"] = Tactical.board_for(war, root).get("objective_text", "")
+	context["staff_advice"] = staff_advice(war, corps)
+	context["officer_advice"] = preload("res://scripts/agents/officer_brain.gd").advice(war,corps)
 	context["siege"] = war.state.get("sieges", {}).get(root["target"], {}).duplicate(true)
 	context["corps"] = summary(war, corps)
 	if not war.supply_enabled() and not context["siege"].is_empty(): context["siege"]["grain_days"] = 999
 	context["withdraw_hysteresis"] = bool(corps.get("withdraw_hysteresis", false))
 	context["members"] = []
+	context["autonomy"] = Autonomy.summary_rows(war, corps)
 	var known_enemies := {}
 	for unit_id in corps["units"]:
 		var unit: Dictionary = war.state["armies"][unit_id]
 		if unit["status"] == "ended": continue
+		if war.rules.get("battle_ai",{}).get("mode","active") == "active" and unit_id != root["id"] and (not unit.has("tactical") or not root.has("tactical") or Tactical.distance(root,unit) > 3): continue
 		for enemy in unit["intel"]["enemies"].values():
 			if not known_enemies.has(enemy["id"]) or int(enemy["observed_at"]) > int(known_enemies[enemy["id"]]["observed_at"]): known_enemies[enemy["id"]] = enemy
 	var enemy_list: Array = known_enemies.values()
@@ -304,12 +356,12 @@ static func commander_context(war, corps: Dictionary) -> Dictionary:
 	context["battlefield"] = {"friendly_ready_strength": ready, "enemy_estimated_strength": enemy_strength, "enemy_to_friendly_ratio": float(enemy_strength) / maxf(ready, 1)}
 	for id in corps["members"]:
 		var member: Dictionary = war.roster.officers[id]
-		context["members"].append({"id": id, "name": member["name"], "position": corps["appointments"][id], "aptitude": member.get("positions", ""), "skills": member["skills"], "personality": member["personality"]})
+		context["members"].append({"id": id, "name": member["name"], "position": corps["appointments"][id], "aptitude": member.get("positions", ""), "skills": member["skills"], "personality": member["personality"], "parent": Structure.tree_parent(corps, str(id)), "stance": Autonomy.stance_of(corps, str(id)).get("stance", "obey"), "stance_reason": Autonomy.stance_of(corps, str(id)).get("reason", "")})
 	context["candidates"] = [{"id": "maintain", "action": {"type": "maintain"}, "description": "保持当前军团部署"}]
 	if context["corps"]["deployment_pending"]:
 		context["deployment_age"] = int(war.state["tick"]) - int(corps.get("formed_at", 0))
 		for posture in ["balanced", "assault", "flanking"]:
-			context["candidates"].append({"id": "deploy:" + posture, "action": {"type": "deploy_corps", "posture": posture}, "description": "主帅展开全军：" + {"balanced": "双前锋、侧翼、预备队", "assault": "加强双前锋，保留预备队", "flanking": "双前锋牵制、加强侧翼"}[posture]})
+			context["candidates"].append({"id": "deploy:" + posture, "action": {"type": "deploy_corps", "posture": posture}, "description": "主帅按现有编制展开军团：" + {"balanced": "双前锋、侧翼护军、预备护军", "assault": "加强双前锋，保留预备队", "flanking": "双前锋牵制、加强侧翼"}[posture]})
 	context["terrain"] = Tactical.terrain_class(root["tactical"]["cell"]) if root.has("tactical") else war._terrain(root["location"]["node"])
 	context["unit_mix"] = {"infantry":0,"archers":0,"cavalry":0}
 	context["enemy_unit_mix_estimate"] = {"infantry":0,"archers":0,"cavalry":0}
@@ -338,8 +390,11 @@ static func commander_context(war, corps: Dictionary) -> Dictionary:
 		if not unit["returning"] and unit["task"]["type"] != "command" and float(unit["morale"]) >= 25 and float(unit["organization"]) >= 20:
 			assault_ready += int(unit.get("units",{}).get("infantry",0))
 	var siege_stalled: bool = corps.get("siege_approach",false) and float(context["siege"].get("wall",0)) > 0 and assault_ready < 500
-	var retreat_needed: bool = outnumbered or broken or supply_crisis or line_reached or siege_stalled
-	context["retreat_assessment"] = {"allowed": retreat_needed, "reason": "达到玩家撤退线" if line_reached else "可战兵力明显劣势" if outnumbered else "全军战线崩溃" if broken else "补给危急" if supply_crisis else "攻城步兵不足" if siege_stalled else "全军仍可作战，优先轮换与整顿"}
+	# Headquarters can remain healthy after every field formation has been lost.
+	# Its own morale and expired enemy sightings cannot justify waiting forever.
+	var field_lost: bool = corps.get("deployed", false) and corps["units"].size() > 1 and float(context["corps"]["strength"]) < initial * 0.5 and not context["corps"]["units"].any(func(u): return u["id"] != corps["root_id"] and not u["returning"])
+	var retreat_needed: bool = outnumbered or broken or supply_crisis or line_reached or siege_stalled or field_lost
+	context["retreat_assessment"] = {"allowed": retreat_needed, "reason": "达到玩家撤退线" if line_reached else "可战兵力明显劣势" if outnumbered else "全军战线崩溃" if broken else "补给危急" if supply_crisis else "攻城步兵不足" if siege_stalled else "前军覆没，失去作战分队" if field_lost else "全军仍可作战，优先轮换与整顿"}
 	if war.orders_for(root)["retreat"] and retreat_needed: context["candidates"].append({"id": "withdraw_corps", "action": {"type": "withdraw_corps"}, "description": "全军有序撤退"})
 	if not context["siege"].is_empty() and context["siege"].get("attacker", "") == corps["faction"] and context["siege"].get("phase", "") not in ["occupied", "解围"]:
 		for mode in (["assault", "blockade"] if war.supply_enabled() else ["assault"]):
@@ -418,12 +473,17 @@ static func commander_context(war, corps: Dictionary) -> Dictionary:
 
 static func plan(war, adapter) -> void:
 	if adapter != null and adapter.has_method("supports_background_decisions"):
-		plan_background(war, adapter)
-		return
+		if not adapter.has_method("can_request_model") or adapter.can_request_model({"level":"commander"}):
+			plan_background(war, adapter)
+			return
+		# Disabled/unconfigured models use exactly the normal local commander loop.
+		adapter = null
 	var epoch: int = war.generation
 	var contexts: Array = []
 	for corps in war.state["corps"].values():
 		succeed(war, corps)
+		Structure.ensure(corps)
+		Autonomy.evaluate_corps(war, corps)
 		siege_slots(war, corps)
 		var root: Dictionary = war.state["armies"][corps["root_id"]]
 		if root["status"] == "ended" or root["returning"] or corps.get("withdrawing", false) or not war.ready(root): continue
@@ -465,9 +525,20 @@ static func plan(war, adapter) -> void:
 		war.state["armies"][corps["root_id"]]["last_reason"] = str(result.get("reason_summary", "主帅下达任务"))
 		corps["last_plan"] = war.state["tick"]
 		corps["orders"].append({"tick": war.state["tick"], "commander": corps["commander_id"], "action": candidate["action"], "reason": result.get("reason_summary", ""), "source": result.get("source", ""), "applied": applied, "policy_version": Policy.version(), "score_breakdown": result.get("score_breakdown", {})})
+		preload("res://scripts/agents/officer_brain.gd").record_command(war,corps,corps["orders"][-1])
 		while corps["orders"].size() > 40: corps["orders"].pop_front()
 
 static func issue(war, corps: Dictionary, action: Dictionary, reason: String) -> Dictionary:
+	Structure.ensure(corps)
+	var recipients: Array = []
+	if action.get("type", "") == "assign_task":
+		var assigned_unit: Dictionary = war.state["armies"].get(action.get("unit", ""), {})
+		recipients.append(str(assigned_unit.get("officer_id", "")))
+	elif action.get("type", "") == "detach": recipients.append(str(action.get("officer", "")))
+	for officer in recipients:
+		Autonomy.ensure_evaluated(war, corps, str(officer), {"tick": war.state["tick"], "action": action, "reason": reason})
+		var refusal: Dictionary = Autonomy.blocks_override(war, corps, str(officer))
+		if refusal.get("blocked", false): return {"ok": false, "refused": true, "officer": officer, "message": refusal.get("reason", "拒绝军令")}
 	if not war.supply_enabled() and (action.get("task", "") == "cut_supply" or action.get("mode", "") == "blockade"): return {"ok": false, "message": "粮草系统已停用"}
 	var kind: String = action.get("type", "maintain")
 	if kind not in ["maintain", "deploy_corps", "set_siege_mode", "detach", "assign_task", "rotate_front", "withdraw_corps"]: return {"ok": false, "message": "未知主帅命令"}
@@ -522,7 +593,7 @@ static func issue(war, corps: Dictionary, action: Dictionary, reason: String) ->
 			if action["task"] == "cut_supply":
 				var known: Dictionary = corps["known_supplies"].get(action.get("enemy_corps", ""), {})
 				if known.is_empty() or int(known.get("cell", -1)) != cell: return {"ok": false, "message": "尚未发现这条粮道"}
-		assigned["corps_task"] = {"type": action["task"], "reason": reason, "issued_by": corps["commander_id"], "issued_at": int(war.state["tick"]), "cell": int(action.get("cell", -1)), "enemy_corps": action.get("enemy_corps", ""), "independent": action["task"] in ["raid_rear", "cut_supply"]}
+		assigned["corps_task"] = {"type": action["task"], "reason": reason, "issued_by": Structure.tree_parent(corps, str(assigned["officer_id"])), "issued_at": int(war.state["tick"]), "cell": int(action.get("cell", -1)), "enemy_corps": action.get("enemy_corps", ""), "independent": action["task"] in ["raid_rear", "cut_supply"]}
 		if assigned.has("tactical"):
 			assigned["tactical"]["lane"] = Tactical.column_of(int(assigned["tactical"]["cell"]))
 			for field in ["flank_goal", "flank_target", "flank_ready", "pursuit_origin", "target_until", "previous_cell", "previous_goal"]: assigned["tactical"].erase(field)
@@ -543,6 +614,8 @@ static func issue(war, corps: Dictionary, action: Dictionary, reason: String) ->
 		for id in corps["units"]:
 			var unit: Dictionary = war.state["armies"][id]
 			if unit["status"] == "ended": continue
+			Autonomy.ensure_evaluated(war, corps, str(unit["officer_id"]), {"action": action})
+			if Autonomy.blocks_override(war, corps, str(unit["officer_id"])).get("blocked", false): continue
 			if id == guard: unit["corps_task"] = {"type": "rear_guard", "reason": "主帅命令掩护全军撤离，安全后归营", "issued_by": corps["commander_id"], "cover_withdrawal": true}
 			else:
 				unit["retreat_reason"] = "主帅军令：" + reason
@@ -564,7 +637,10 @@ static func siege_slots(war, corps: Dictionary) -> void:
 	for id in corps["units"]:
 		var unit: Dictionary = war.state["armies"][id]
 		if unit["status"] == "ended" or unit["returning"] or not unit.has("tactical") or unit["corps_task"].get("independent", false): continue
-		var assault: bool = unit["corps_task"]["type"] in ["main_attack", "flank", "raid_rear"]
+		# With the field screen cleared, the headquarters' own infantry can join
+		# the authorized city assault. Keeping it on the outer ring leaves a corps
+		# with cavalry/archers at the wall unable to use its remaining breach force.
+		var assault: bool = unit["corps_task"]["type"] in ["main_attack", "flank", "raid_rear"] or (war.uses_unit_brain(unit) and id == corps["root_id"] and int(unit["units"].get("infantry",0)) >= 500)
 		var ring := 1 if assault else 2
 		var saved: int = unit["tactical"].get("siege_slot", -1)
 		if saved >= 0 and Tactical.can_enter(war, unit, saved) and Tactical.Fort.distance_to_wall(board, str(root["target"]), saved) == ring and not claimed.has(saved): claimed[saved] = true; continue
@@ -574,21 +650,36 @@ static func siege_slots(war, corps: Dictionary) -> void:
 static func update(war) -> void:
 	for corps in war.state["corps"].values():
 		succeed(war, corps)
+		Structure.ensure(corps)
+		Autonomy.evaluate_corps(war, corps)
 		siege_slots(war, corps)
 		if corps.get("ended", false) or not war.ready(war.state["armies"][corps["root_id"]]): continue
+		corps["known_supplies"] = {}
 		for other in war.state["corps"].values():
-			if not war.supply_enabled(): continue
+			if not war.supply_enabled() or other.get("ended", false): continue
 			if other["faction"] == corps["faction"] or int(other["supply"]["cell"]) < 0: continue
 			for id in corps["units"]:
 				var army: Dictionary = war.state["armies"][id]
-				if army["status"] != "ended" and army.has("tactical") and Tactical.cell_distance(army["tactical"]["cell"], other["supply"]["cell"]) <= 5: corps["known_supplies"][other["id"]] = {"cell": int(other["supply"]["cell"]), "observed_at": war.state["tick"]}
+				if army["status"] != "ended" and army.has("tactical"): corps["known_supplies"][other["id"]] = {"cell": int(other["supply"]["cell"]), "observed_at": war.state["tick"]}
 		for id in corps["units"]:
 			var unit: Dictionary = war.state["armies"][id]
 			if unit["status"] == "ended": continue
+			var independent: Dictionary = Autonomy.stance_of(corps, str(unit["officer_id"]))
+			unit["autonomy"] = independent.duplicate(true)
+			unit["autonomy"]["until"] = Autonomy.refusal_until(corps, str(unit["officer_id"]))
+			if independent.get("stance", "obey") != "obey" and Autonomy.refused(war, corps, str(unit["officer_id"])) and not unit["returning"]:
+				unit["action"] = Autonomy.local_action(war, corps, unit) if independent.get("stance") == "act" else {"type": "hold"}
+				unit["last_reason"] = ("自行行动：" if independent.get("stance") == "act" else "异议：") + str(independent.get("reason", ""))
+				if unit.has("battle_ai"): unit["battle_ai"]["plan"] = {}
+				continue
 			var task: Dictionary = unit["corps_task"]
 			var role: String = task["type"]
-			if unit["id"] != corps["root_id"]: unit["last_reason"] = "奉主帅军令：" + str(task.get("reason", TASKS.get(role, role)))
-			unit["operation"] = {"role": role, "role_label": TASKS.get(role, role), "commander": corps["root_id"], "support_id": corps["root_id"], "suggested_target": _suggest_target(war, unit, int(corps["last_plan"])), "plan_until": int(corps["last_plan"]) + 3, "change_reason": task.get("reason", "主帅任务")}
+			if unit["id"] != corps["root_id"] and not war.uses_unit_brain(unit): unit["last_reason"] = "奉主帅军令：" + str(task.get("reason", TASKS.get(role, role)))
+			var suggested := _suggest_target(war, unit, int(corps["last_plan"])) if role in ["main_attack", "flank", "support", "raid_rear"] and not war.uses_unit_brain(unit) else ""
+			var supervisor: String = Structure.tree_parent(corps, str(unit["officer_id"]))
+			var superior_unit: Dictionary = Autonomy.unit_for(war, corps, supervisor)
+			var superior_id: String = str(superior_unit.get("id", corps["root_id"]))
+			unit["operation"] = {"role": role, "role_label": TASKS.get(role, role), "commander": superior_id, "support_id": superior_id, "suggested_target": suggested, "plan_until": int(corps["last_plan"]) + 3, "change_reason": task.get("reason", "主帅任务")}
 			if unit.has("tactical"): unit["tactical"]["role"] = role
 			if war.supply_enabled() and int(corps["supply"]["blocked_until"]) <= int(war.state["tick"]) and unit.has("tactical"):
 				var need := maxf(0, war.daily_food(unit) * 7 - float(unit["grain"]))
@@ -596,6 +687,13 @@ static func update(war) -> void:
 				unit["grain"] += amount
 				corps["supply"]["stock"] -= amount
 			if not unit["returning"]:
+				if war.uses_unit_brain(unit):
+					if role == "rear_guard":
+						var escaping: Array = corps["units"].filter(func(friend_id): return war.state["armies"][friend_id]["returning"] and war.state["armies"][friend_id]["status"] != "ended")
+						if not escaping.is_empty(): unit["operation"]["support_id"] = escaping[0]
+						elif task.get("cover_withdrawal",false) and int(war.state["tick"])-int(corps.get("withdraw_started",0)) >= 3: war._execute(unit,{"type":"withdraw"})
+					if float(unit["morale"]) < 25 or float(unit["organization"]) < 20: war._check_rout(unit)
+					continue
 				unit["action"] = {"type": "hold"} if role in ["command", "reserve"] else {"type": "continue"}
 				if corps.get("autonomous_deployment", false) and not corps.get("deployed", false): unit["action"] = {"type": "hold"}
 				var enemy_list := Tactical.targets(war, unit) if unit.has("tactical") else []
@@ -674,13 +772,19 @@ static func merge(war, corps: Dictionary, child: Dictionary, root: Dictionary) -
 	for type in Combat.TYPES: root["wounded_units"][type] = int(root["wounded_units"].get(type, 0)) + int(injuries.get(type, 0))
 	child["wounded_units"] = {"infantry": 0, "archers": 0, "cavalry": 0}
 	if child["id"] == root["id"]: return
+	war.planner.invalidate("unit:"+str(child["id"]))
+	if child.has("battle_ai"): child["battle_ai"]["plan"] = {}
+	if root.has("battle_ai"):
+		root["battle_ai"]["actor_revision"] += 1
+		root["battle_ai"]["plan"] = {}
+		war.planner.invalidate("unit:"+str(root["id"]))
 	for type in Combat.TYPES:
 		root["units"][type] += child["units"][type]
 		child["units"][type] = 0
 	root["siege_engines"] = int(root.get("siege_engines",0)) + int(child.get("siege_engines",0))
 	child["siege_engines"] = 0
-	for ledger in ["initial_strength", "dead", "wounded", "captured", "deposited"]:
-		root[ledger] += child[ledger]
+	for ledger in ["initial_strength", "dead", "wounded", "captured", "deposited", "dispersed"]:
+		root[ledger] = int(root.get(ledger, 0)) + int(child.get(ledger, 0))
 		child[ledger] = 0
 	root["enemy_killed"] = int(root.get("enemy_killed", 0)) + int(child.get("enemy_killed", 0))
 	child["enemy_killed"] = 0
@@ -709,9 +813,11 @@ static func succeed(war, corps: Dictionary) -> void:
 	corps["root_id"] = survivors[0]
 	var successor: Dictionary = war.state["armies"][survivors[0]]
 	corps["withdraw_hysteresis"] = false
+	corps["appointments"][corps["commander_id"]] = "原主帅"
 	corps["commander_id"] = successor["officer_id"]
 	corps["appointments"][successor["officer_id"]] = "代理主帅"
 	if not corps.get("withdrawing", false): successor["corps_task"] = {"type": "command", "reason": "原主帅撤离或中军结束任务，接掌军团指挥", "issued_by": successor["officer_id"]}
+	Structure.ensure(corps)
 	corps["last_plan"] = -10
 
 static func on_finish(war, army: Dictionary) -> void:
@@ -760,7 +866,7 @@ static func decision_signature(war, corps: Dictionary, adapter) -> String:
 	var units: Array = []
 	for id in corps["units"]:
 		var unit: Dictionary = war.state["armies"][id]
-		var contact: Dictionary = Tactical.contact_state(war, unit) if unit.has("tactical") and unit["status"] != "ended" else {}
+		var contact: Dictionary = war._observed_contact(unit) if unit.has("tactical") and unit["status"] != "ended" else {}
 		units.append([id, unit["status"], unit["returning"], unit["corps_task"]["type"], unit["corps_task"].get("stage", ""), float(unit["morale"]) < 30, float(unit["organization"]) < 25, war.supply_enabled() and float(unit["grain"]) < war.daily_food(unit) * 3, int(unit.get("tactical", {}).get("blocked_days", 0)) >= 2, contact.get("flanked", false), int(contact.get("adjacent_enemies", 0)) >= 3, preload("res://scripts/war/troop_roles.gd").kind(unit), preload("res://scripts/war/troop_roles.gd").engine_count(unit)])
 	var seen := {}
 	for id in corps["units"]:
@@ -834,6 +940,7 @@ static func record_background_order(war, corps: Dictionary, action: Dictionary, 
 	if applied.get("ok", false): war.state["armies"][corps["root_id"]]["last_reason"] = str(result.get("reason_summary", "主帅军令"))
 	if applied.get("ok", false): corps["last_plan"] = war.state["tick"]
 	corps["orders"].append({"tick": war.state["tick"], "based_on_tick": observed_tick, "commander": corps["commander_id"], "action": action.duplicate(true), "reason": result.get("reason_summary", ""), "source": result.get("source", "commander-policy"), "applied": applied, "policy_version": Policy.version(), "score_breakdown": result.get("score_breakdown", {})})
+	preload("res://scripts/agents/officer_brain.gd").record_command(war,corps,corps["orders"][-1])
 	while corps["orders"].size() > 40: corps["orders"].pop_front()
 
 
@@ -842,3 +949,25 @@ static func decision_authority_signature(signature: String) -> String:
 	# Newly scouted enemies prompt the next review, but do not invalidate an
 	# otherwise legal issued order. Routing, command authority and crises do.
 	return JSON.stringify([state[0], state[1], state[4], state[5], state[6], state[8] if state.size() > 8 else []])
+
+# The adviser only interprets reports already known to the corps, never hidden enemies.
+static func staff_advice(war, corps: Dictionary) -> Dictionary:
+	for id in corps["members"]:
+		if not Structure.is_staff(str(corps["appointments"].get(id, ""))): continue
+		var status: Dictionary = war.state["officer_states"].get(id, {})
+		if status.get("lost", false) or status.get("duel_wounded", false) or status.get("status", "") in ["dead", "captured"]: continue
+		var skills: Dictionary = war.roster.officers[id].get("skills", {})
+		return {"officer_id": id, "name": war.roster.officers[id]["name"], "analysis": skills.get("料敌", 50), "planning": skills.get("智计", 50), "duty": "依据个人立场提供建议", "stance": Autonomy.stance_of(corps, str(id)).get("stance", "obey"), "reason": Autonomy.stance_of(corps, str(id)).get("reason", "")}
+	return {}
+
+# Upgrade without merging units, removing officers or changing troop ledgers.
+static func migrate(war, corps: Dictionary) -> void:
+	for unit_id in corps.get("units", []):
+		var unit: Dictionary = war.state["armies"].get(unit_id, {})
+		var officer: String = str(unit.get("officer_id", ""))
+		if not officer.is_empty() and not corps["members"].has(officer): corps["members"].append(officer)
+	Structure.ensure(corps)
+	for unit_id in corps.get("units", []):
+		var unit: Dictionary = war.state["armies"].get(unit_id, {})
+		if unit.get("status", "ended") != "ended": corps["node_strength"][str(unit["officer_id"])] = Combat.strength(unit)
+	corps["composition_version"] = Structure.STRUCTURE_VERSION

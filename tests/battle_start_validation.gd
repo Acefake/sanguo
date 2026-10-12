@@ -1,4 +1,4 @@
-﻿extends SceneTree
+extends SceneTree
 func _initialize() -> void: call_deferred("run")
 func run() -> void:
 	var store = root.get_node("GameState")
@@ -16,10 +16,11 @@ func run() -> void:
 	assert(picker.surface.visible and not picker.startup_mode)
 	assert(picker.return_button.visible)
 	assert(picker.launch.text == "开始 / 重置此场景")
-	for id in ["plains_clash", "mountain_pass", "siege_assault"]:
+	for spec in preload("res://scripts/war/battle_scenarios.gd").definitions():
+		var id: String = spec["id"]
 		picker.buttons[id].pressed.emit()
 		assert(picker.selected == id)
-	picker.buttons["plains_clash"].pressed.emit()
+	picker.buttons["guandu_clash"].pressed.emit()
 	picker.seed.value = 42
 	await process_frame
 	if DisplayServer.get_name() != "headless":
@@ -29,7 +30,7 @@ func run() -> void:
 	await process_frame
 	await process_frame
 	assert(store.battle_test)
-	assert(store.war.state["battlefield"]["scenario_id"] == "plains_clash")
+	assert(store.war.state["battlefield"]["scenario_id"] == "guandu_clash")
 	assert(store.war.state["battlefield"]["seed"] == 42)
 	assert(not picker.surface.visible)
 	assert(current_scene.scene_file_path == "res://scenes/rtk14_world_3d.tscn")
@@ -71,5 +72,5 @@ func run() -> void:
 	current_scene.queue_free()
 	await process_frame
 	await process_frame
-	print("BATTLE_START_OK: 21 factions, new campaign resets, continue preserves, three isolated scenarios")
+	print("BATTLE_START_OK: 21 factions, new campaign resets, continue preserves, eight isolated scenarios")
 	quit()

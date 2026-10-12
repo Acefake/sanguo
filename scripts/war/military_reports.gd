@@ -63,7 +63,7 @@ func _ready() -> void:
 	column.add_child(nav)
 	report_tab = UISkin.button("送达军报", func(): mode = "reports"; rebuild())
 	report_tab.name = "ReportsTab"
-	summary_tab = UISkin.button("会战账本", show_summary)
+	summary_tab = UISkin.button("当前总结", show_summary)
 	summary_tab.name = "SummaryTab"
 	nav.add_child(report_tab)
 	nav.add_child(summary_tab)
@@ -180,7 +180,7 @@ func refresh() -> void:
 
 func _matches(report: Dictionary) -> bool:
 	var army: Dictionary = store.war.state["armies"].get(report.get("army_id", ""), {})
-	if army.get("faction", "") != store.war.state["player_faction"]: return false
+	if report.get("faction", army.get("faction", "")) != store.war.state["player_faction"]: return false
 	if filter_army != "" and report["army_id"] != filter_army: return false
 	var kind := str(report["kind"])
 	if kind_filter.selected == 1: return kind.contains("战") or kind.contains("城") or kind.contains("追击") or kind.contains("单挑")
@@ -205,7 +205,8 @@ func rebuild() -> void:
 		report_list.add_child(UISkin.label("暂无送达军报", 14, UISkin.MUTED))
 		UISkin.clear(detail)
 		detail.add_child(UISkin.label("军报尚未送达", 21))
-		detail.add_child(UISkin.label("部队收到军令后，军报会依传递时间送达。可在右侧部队卡查看当前状态和临时判断。", 14, UISkin.MUTED))
+		detail.add_child(UISkin.label("仅关键节点和重大战役结束送达军报。可随时点击当前总结，或在部队详情查看当前复盘。", 14, UISkin.MUTED))
+		if not filter_army.is_empty(): detail.add_child(UISkin.button("查看当前复盘", func(): show_review(filter_army)))
 		return
 	if not entries.any(func(item): return str(item["id"]) == selected_report): selected_report = str(entries[0]["id"])
 	for report in entries:
@@ -309,14 +310,14 @@ func _show_report(id: String) -> void:
 	detail.add_child(actions)
 	var army_id := str(report["army_id"])
 	actions.add_child(UISkin.button("查看部队", func(): close_view(); army_requested.emit(army_id)))
-	if snapshot.get("ended", false): actions.add_child(UISkin.button("战役复盘", func(): show_review(army_id)))
+	if not army.is_empty(): actions.add_child(UISkin.button("战役复盘" if snapshot.get("ended", false) else "当前复盘", func(): show_review(army_id)))
 
 func _visible_side(row: Dictionary, summary: Dictionary) -> bool:
 	return store.battle_test or summary["winner"] != "交战中" or row["faction"] == store.war.state["player_faction"]
 
 func _build_summary() -> void:
 	UISkin.clear(detail)
-	var summary := Feedback.summary(store.war)
+	var summary: Dictionary = store.war.request_battle_summary()
 	count_label.text = "持续%d日  单挑%d次" % [summary["days"], summary["duels"]]
 	detail.add_child(UISkin.label("会战兵员账本", 22))
 	var result := str(store.scenario["factions"].get(summary["winner"], {}).get("name", summary["winner"]))
@@ -326,7 +327,7 @@ func _build_summary() -> void:
 		if not _visible_side(side, summary): continue
 		var box := UISkin.section(detail, str(store.scenario["factions"].get(side["faction"], {}).get("name", side["faction"])))
 		_metric_row(box, [["初始兵力", side["initial"]], ["当前兵力", side["strength"]], ["阵亡", side["dead"]]])
-		box.add_child(UISkin.label("伤兵 %d    被俘 %d    归队 / 留驻 %d\n截获粮草 %d    兵员核对：%s" % [side["wounded"], side["captured"], side["deposited"], summary["loot"].get(side["faction"], 0), "守恒" if side["initial"] == side["accounted"] else "需核对"], 13))
+		box.add_child(UISkin.label("伤兵 %d    被俘 %d    溃散 %d    归队 / 留驻 %d\n截获粮草 %d    兵员核对：%s" % [side["wounded"], side["captured"], side.get("dispersed", 0), side["deposited"], summary["loot"].get(side["faction"], 0), "守恒" if side["initial"] == side["accounted"] else "需核对"], 13))
 	for siege in summary["sieges"]:
 		if not store.battle_test and summary["winner"] == "交战中" and siege["attacker"] != store.war.state["player_faction"]: continue
 		_section(store.war.graph.name_of(siege["city"]) + "  城池攻防", "%s  城墙%d/%d\n守军累计损失%d  攻城部队累计损失%d" % [siege["phase"], siege["wall"], siege["wall_max"], siege["defender_losses"], siege["losses"]])
@@ -362,7 +363,7 @@ func _build_summary() -> void:
 		_section("第%d日" % entry["tick"], "\n".join(lines))
 	for army in store.war.active_armies(str(store.war.state["player_faction"])):
 		var id := str(army["id"])
-		report_list.add_child(UISkin.button(str(army["name"]) + "  查看部队", func(): close_view(); army_requested.emit(id)))
+		report_list.add_child(UISkin.button(str(army["name"]) + "  当前复盘", func(): show_review(id)))
 	for army in store.war.state["armies"].values():
 		if army["faction"] != store.war.state["player_faction"] or army["status"] != "ended": continue
 		var id := str(army["id"])
@@ -370,11 +371,16 @@ func _build_summary() -> void:
 
 func show_review(id: String) -> void:
 	mode = "review"
+	UISkin.style_button(report_tab, false)
+	UISkin.style_button(summary_tab, false)
+	army_filter.hide()
+	kind_filter.hide()
 	show()
 	UISkin.clear(detail)
-	var army: Dictionary = store.war.state["armies"].get(id, {})
+	var requested: Dictionary = store.war.request_battle_summary(id)
+	var army: Dictionary = requested.get("army", {})
 	if army.is_empty(): return
-	count_label.text = "战役复盘"
+	count_label.text = "战役复盘" if army["status"] == "ended" else "当前复盘"
 	detail.add_child(UISkin.label(str(army["name"]) + "  " + str(army.get("outcome", "")), 22))
 	_metric_row(detail, [["出征", army["initial_strength"]], ["阵亡", army["dead"]], ["伤兵", army["wounded"]]])
 	_metric_row(detail, [["主将杀敌", store.war.state["officer_personal_kills"].get(army["officer_id"], 0)], ["部队杀敌", int(army.get("enemy_killed", 0)) - int(army.get("personal_soldier_kills", 0))]])

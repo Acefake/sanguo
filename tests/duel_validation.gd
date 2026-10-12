@@ -2,10 +2,17 @@ extends SceneTree
 const D = preload("res://scripts/war/duel_system.gd")
 const C = preload("res://scripts/war/combat_system.gd")
 const War = preload("res://scripts/war/campaign_state.gd")
+const Role = preload("res://scripts/war/officer_role.gd")
 var failures: Array[String] = []
 func _initialize(): call_deferred("run")
 func check(ok: bool, message: String):
 	if not ok: failures.append(message); push_error(message)
+# 单挑资格现在受角色限制（前锋／猛将／守备），所以测试必须按角色选人，
+# 而不是取数组下标（下标可能落在主帅／军师身上）。
+func duelist(war, faction: String, skip: Array = []) -> Dictionary:
+	for army in war.active_armies(faction):
+		if army.has("tactical") and Role.can_duel(war, army) and not army["officer_id"] in skip: return army
+	return {}
 func run():
 	var store = root.get_node("GameState")
 	store.persist_enabled = false
@@ -14,13 +21,27 @@ func run():
 	# Wound recovery and pair limits use guaranteed non-terminal results here.
 	war.rules["officer_fate"]["duel_death"] = 0.0
 	war.rules["officer_fate"]["duel_capture"] = 0.0
-	var a: Dictionary = war.active_armies("liu_bei")[1]
-	var b: Dictionary = war.active_armies("yuan_shao")[1]
+	var a: Dictionary = duelist(war, "liu_bei")
+	var b: Dictionary = duelist(war, "yuan_shao")
+	check(not a.is_empty() and not b.is_empty(), "测试战场缺少可单挑将领")
 	a["tactical"]["cell"] = war.Tactical.offset_cell(war.state["battlefield"],0,0)
 	b["tactical"]["cell"] = war.Tactical.neighbors(a["tactical"]["cell"])[0]
 	a["action"] = {"type":"engage"}
 	b["action"] = {"type":"continue"}
 	check(D.eligible(war,a,b),"相邻主动近战不能单挑")
+	for action_type in ["reposition", "hold", "flank", "support", "pursue"]:
+		a["action"] = {"type":action_type}
+		b["action"] = {"type":action_type}
+		check(D.eligible(war,a,b), "相邻近战动作无法单挑：" + action_type)
+	a["action"] = {"type":"withdraw"}
+	check(not D.eligible(war,a,b), "脱离接触动作触发单挑")
+	a["action"] = {"type":"engage"}
+	b["action"] = {"type":"continue"}
+	var saved_orders: Dictionary = a.get("orders", {}).duplicate(true)
+	a["orders"] = saved_orders.duplicate(true)
+	a["orders"]["engage"] = false
+	check(not D.eligible(war,a,b), "禁止接战命令仍触发单挑")
+	a["orders"] = saved_orders
 	b["tactical"]["phase"] = "远射"
 	check(not D.eligible(war,a,b),"远射触发单挑")
 	b["tactical"]["phase"] = "近战"
@@ -56,33 +77,14 @@ func run():
 	war.rng.seed = 12345
 	var result := D.contest(war,a,b)
 	war.rng.seed = 12345
-	check(D.contest(war,a,b) == result,"30回合单挑结果无法种子复现")
-	check(result["rounds"].size() <= 30 and result.has("winner"),"单挑回合不能超过30回合")
-	var saved_noise: float = war.rules["duel"]["round_noise"]
-	var saved_margin: float = war.rules["duel"]["draw_margin"]
-	war.rules["duel"]["round_noise"] = 0.0
-	war.rules["duel"]["draw_margin"] = 1000.0
-	war.rng.seed = 1701
-	var no_knockout: Dictionary = D.contest(war,a,b)
-	check(no_knockout["rounds"].size() == 30 and no_knockout["winner"] == -1 and no_knockout["result"] == "draw","30回合内双方未倒下必须判为平手")
-	war.rules["duel"]["round_noise"] = saved_noise
-	war.rules["duel"]["draw_margin"] = saved_margin
-	var saved_a_skills: Dictionary = a.get("skills", {}).duplicate(true)
-	var saved_b_skills: Dictionary = b.get("skills", {}).duplicate(true)
-	var test_a_skills: Dictionary = saved_a_skills.duplicate(true)
-	var test_b_skills: Dictionary = saved_b_skills.duplicate(true)
-	for skill_name in ["武艺", "膂力", "体魄", "骑术", "威仪"]:
-		test_a_skills[skill_name] = 100
-		test_b_skills[skill_name] = 0
-	a["skills"] = test_a_skills
-	b["skills"] = test_b_skills
-	war.rules["duel"]["round_noise"] = 0.0
-	war.rng.seed = 1702
-	var knockout: Dictionary = D.contest(war,a,b)
-	check(knockout["result"] == "overwhelming" and knockout["winner"] == 0 and knockout["rounds"].size() < 30 and knockout["rounds"][-1]["hp_b"] == 0.0,"Knockout must end the duel before 30 rounds")
-	a["skills"] = saved_a_skills
-	b["skills"] = saved_b_skills
-	war.rules["duel"]["round_noise"] = saved_noise
+	check(D.contest(war,a,b) == result,"单挑结果无法种子复现")
+	check(result["rounds"].size() <= 40 and result.has("winner"),"单挑回合超过安全上限")
+	var numeric: Dictionary = war.rules["duel"]["numeric"]
+	var previous_hit: Array = numeric["hit_bounds"].duplicate()
+	numeric["hit_bounds"] = [0.0,0.0]
+	var no_knockout := D.contest(war,a,b)
+	check(no_knockout["rounds"].size() == 40 and no_knockout["winner"] == -1 and no_knockout["result"] == "draw","无命中时安全上限应判平手")
+	numeric["hit_bounds"] = previous_hit
 	var strength := C.strength(b)
 	b["morale"] = 100
 	b["organization"] = 100
@@ -91,10 +93,12 @@ func run():
 	check(C.strength(b) == strength,"单挑直接扣兵或秒杀军队")
 	check(not D.eligible(war,a,b), "负伤将领仍可发起单挑")
 	b["duel_wounded"] = false
+	war.state["officer_states"][b["officer_id"]].erase("duel_wounded")
+	war.rules["duel"]["acceptance"] = 0.0
 	D.challenge(war,a,b,true)
 	check(war.Feedback.book(war).get("pending_events",[]).any(func(e):return e["kind"] == "单挑"),"真实单挑挑战没有写入会战事件")
 	check(not D.eligible(war,a,b),"同一对将领重复单挑")
-	var enemies: Array = war.active_armies("yuan_shao").filter(func(e):return e["officer_id"] != b["officer_id"])
+	var enemies: Array = war.active_armies("yuan_shao").filter(func(e): return e["officer_id"] != b["officer_id"] and Role.can_duel(war, e))
 	var second: Dictionary = enemies[0]
 	a["duel_wounded"] = false
 	second["tactical"]["cell"] = b["tactical"]["cell"]

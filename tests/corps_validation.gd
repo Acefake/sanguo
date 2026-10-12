@@ -37,11 +37,13 @@ func _run() -> void:
 	store.persist_enabled = false
 	store.prepare_battle_test(true)
 	var war = store.war
+	# This regression checks coordinated obedience; independent refusal has its own suite.
+	war.rules["corps"] = {"autonomy": {"forced_stance": "obey"}}
 	var corps: Dictionary = war.state["corps"].values().filter(func(c): return c["faction"] == "liu_bei")[0]
 	var opposing: Dictionary = war.state["corps"].values().filter(func(c): return c["faction"] != "liu_bei")[0]
 	var root_army: Dictionary = war.state["armies"][corps["root_id"]]
 	check(war.roster.officers[corps["commander_id"]]["positions"].contains("主帅"), "主帅没有按人物位置选任")
-	check(corps["members"].size() == 10 and corps["appointments"].size() == 10, "随军人员未全部任职")
+	check(corps["members"].size() == corps["appointments"].size(), "自由编制存在未任职成员")
 	var fixture := CommanderFixture.new()
 	root.add_child(fixture)
 	await war.step(fixture)
@@ -59,9 +61,13 @@ func _run() -> void:
 	var board: Dictionary = war.state["battlefield"]
 	for id in opposing["units"]: war.state["armies"][id]["tactical"]["cell"] = Tactical.offset_cell(board, 7, 8)
 	root_army["tactical"]["cell"] = Tactical.offset_cell(board, -7, -8)
+	# In the six-person roster all four field leaders deploy. Regroup one reserve
+	# before testing a new real detachment; the adviser must stay with command.
+	var reserve_id: String = corps["units"].filter(func(id): return war.state["armies"][id]["corps_task"]["type"] == "reserve")[0]
+	Corps.merge(war, corps, war.state["armies"][reserve_id], root_army)
 	var active_officers: Array = corps["units"].map(func(id): return war.state["armies"][id]["officer_id"])
 	var free: Array = corps["members"].filter(func(id): return not active_officers.has(id))
-	var officer: String = Corps.best_member(war, free, "奇兵")
+	var officer: String = Corps.best_member(war, free.filter(func(id): return corps["appointments"][id] != "参军"), "护军")
 	var before: int = war.Combat.strength(root_army)
 	var food: float = root_army["grain"]
 	var initial: int = root_army["initial_strength"]
@@ -139,6 +145,7 @@ func _run() -> void:
 	await Corps.plan(war, reset)
 	check(war.state["corps"].values().all(func(c): return c["orders"].is_empty()), "旧模型回复污染重置后的军团")
 	store._load_demo()
+	war.rules["corps"] = {"autonomy": {"forced_stance": "obey"}}
 	var city: Dictionary = store.city_state("luoyang")
 	city.merge({"faction": "liu_bei", "garrison": 20000, "units": {"infantry": 14000, "archers": 4000, "cavalry": 2000}, "grain": 100000}, true)
 	var members: Array = war.available_officers("liu_bei").map(func(o): return o["id"])
@@ -162,6 +169,11 @@ func _run() -> void:
 			war.state["armies"][id]["location"] = {"node": "hongnong", "edge": "", "progress": 0.0}
 		army["action"] = {"type": "besiege"}
 		war._resolve_sieges()
+		check(store.city_state("hongnong")["faction"] == "yuan_shao", "空城的完好城防被直接绕过")
+		for day in range(160):
+			war.state["tick"] += 1
+			war._resolve_sieges()
+			if store.city_state("hongnong")["faction"] == "liu_bei": break
 		check(store.city_state("hongnong")["faction"] == "liu_bei" and formation["units"].all(func(id): return war.state["armies"][id].get("objective_complete", false)), "军团攻取后分队未统一结束目标")
 
 	store._load_demo()

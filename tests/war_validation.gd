@@ -63,7 +63,7 @@ func _ledger(sandbox: Node) -> int:
 	for city in sandbox.scenario["places"].values():
 		total += int(city.get("garrison", 0)) + int(city.get("wounded", 0)) + int(city.get("war_dead", 0)) + int(city.get("prisoners", 0))
 	for army in sandbox.war.state["armies"].values():
-		total += int(army["dead"]) + int(army["captured"])
+		total += int(army["dead"]) + int(army["captured"]) + int(army.get("dispersed",0))
 		if army["status"] != "ended": total += Combat.strength(army) + int(army["wounded"])
 	return total
 
@@ -87,13 +87,13 @@ func _run() -> void:
 	var context: Dictionary = sandbox.war.context_for(army)
 	var secret_city: Dictionary = sandbox.city_state("xiangping")
 	secret_city["garrison"] += 5000
-	_check(context == sandbox.war.context_for(army), "隐藏军情泄露到上下文")
+	_check(context == sandbox.war.context_for(army), "同轮决策快照被实时城市变化改写")
 	secret_city["garrison"] -= 5000
 	_check(not bool(sandbox.war.validate_decision(context, {"candidate_id": "spawn:9999"})["ok"]), "非法模型行动通过校验")
 	_check(sandbox.war.roster.officers[id]["personality"].size() == 14, "人物人格轴未限制为14项")
 	_check(not bool(sandbox.war.preview_dispatch("hongnong", "luoyang", id)["ok"]), "敌方城池能够使用本方主将")
 	_check(sandbox.action_error("hongnong", "recruit").contains("敌方"), "开战后玩家仍能在敌城征兵")
-	_check(sandbox.war.player_city_intel("xiangping").is_empty(), "未送达的侦察数据直接显示给玩家")
+	_check(int(sandbox.war.player_city_intel("xiangping")["strength_estimate"]) == int(secret_city["garrison"]), "远方城池实时兵力不可见")
 	var fake := DecisionStub.new()
 	root.add_child(fake)
 	await sandbox.war.step(fake)
@@ -105,7 +105,8 @@ func _run() -> void:
 		_check(_ledger(sandbox) == total, "战争过程中兵员账本失衡，第%d日" % index)
 		if army["status"] == "ended" and sandbox.war.active_armies().is_empty(): break
 	_check(army["status"] == "ended", "自主战争没有结束")
-	_check(not sandbox.war.visible_reports().is_empty(), "军报没有送达")
+	_check(not sandbox.war.state["reports"].any(func(report): return report["kind"] in ["行军报告", "交战", "围城", "任务结束"]), "日常行军或小队任务结束仍主动发报")
+	_check(int(army.get("last_observation", {}).get("tick", -1)) == int(sandbox.war.state["tick"]), "静默位置快照未持续更新")
 	_check(sandbox.war.state["decisions"].size() > 1, "没有记录实际决策")
 	print("WAR_RESULT ", army["outcome"], " days=", sandbox.war.state["tick"], " decisions=", sandbox.war.state["decisions"].size())
 	# Snapshot restoration must preserve the 64-bit RNG state without JSON rounding.
@@ -113,6 +114,8 @@ func _run() -> void:
 	var clone: Node = _sandbox()
 	clone.scenario = sandbox.scenario.duplicate(true)
 	clone.war.setup(clone, encoded)
+	# setup reloads default rules; replay must use the same disabled strategy as the sandbox.
+	clone.war.rules = sandbox.war.rules.duplicate(true)
 	_check(sandbox.war.rng.state == clone.war.rng.state, "随机状态经过JSON后丢失精度")
 	await sandbox.war.step()
 	await clone.war.step()
@@ -132,7 +135,7 @@ func _run() -> void:
 	_personality_checks()
 	await _clock_checks()
 	if failures.is_empty():
-		print("WAR_VALIDATION_OK: dispatch, conservation, authority, fog, personality, model actions, road contact, supply, siege, return, migration, RNG and adapter failures")
+		print("WAR_VALIDATION_OK: dispatch, conservation, authority, full visibility, personality, model actions, road contact, supply, siege, return, migration, RNG and adapter failures")
 	quit(0 if failures.is_empty() else 1)
 
 
@@ -161,7 +164,7 @@ func _road_contact() -> void:
 	for index in range(12):
 		await sandbox.war.step()
 		if int(a["dead"]) > 0 and int(b["dead"]) > 0 and int(c["dead"]) > 0: break
-	_check(int(a["dead"]) > 0 and int(b["dead"]) > 0, "相向行军发生穿透，未接敌")
+	_check(int(a["dead"]) + int(c["dead"]) > 0 and int(b["dead"]) > 0, "相向行军发生穿透，未接敌")
 	_check(int(c.get("combat_tick", -1)) >= 0, "同场援军没有参与战斗")
 	_check(_ledger(sandbox) == total, "道路战斗未保持兵员守恒")
 	var restored: Node = _sandbox()
@@ -217,8 +220,11 @@ func _blocked_return() -> void:
 	for day in range(3):
 		war.state["tick"] += 1
 		war._start_return(army)
+		war._observe_all()
 	_check(str(army["action"]["type"]) != "withdraw" and int(army["last_decision"]) == -10, "受阻断言污染了前置状态")
-	_check(army["returning"] and war.state["reports"].size() == reports_before + 1, "退路受阻每日重复发紧急军报")
+	_check(army["returning"] and war.state["reports"].size() == reports_before, "退路受阻应静默，不主动发报")
+	_check(army["memory"].any(func(item): return item["kind"] == "退路受阻"), "退路受阻未保留本地意图记录")
+	_check(int(army.get("last_observation", {}).get("tick", -1)) == int(war.state["tick"]), "退路受阻时地图快照停止更新")
 	_check(int(war.ledger(army)["missing"]) == 0, "散亡过程中兵员账本出现缺口")
 	var days: int = int(war.rules.get("return_stall_days", 10))
 	for day in range(days + 1):

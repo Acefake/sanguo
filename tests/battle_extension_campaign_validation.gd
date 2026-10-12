@@ -54,6 +54,7 @@ func run():
 	Terrain._table = original_table
 	store.restore_battle_test()
 	var file := FileAccess.open("res://docs/validation/battle-extension-campaign-seeds.json",FileAccess.WRITE)
-	file.store_string(JSON.stringify({"control":"关闭新增地形战斗修正和单挑，并保留旧川格通行；阵型系统已移除，同一版本规则引擎，非旧提交快照","results":results},"\t"))
+	check(file != null,"无法写入回归记录，文件错误码 %d" % FileAccess.get_open_error())
+	if file != null: file.store_string(JSON.stringify({"control":"关闭新增地形战斗修正和单挑，并保留旧川格通行；阵型系统已移除，同一版本规则引擎，非旧提交快照","results":results},"\t"))
 	print("BATTLE_EXTENSION_CAMPAIGN_OK: five seeds, control and extended, termination, occupancy and conservation" if failures.is_empty() else "BATTLE_EXTENSION_CAMPAIGN_FAILED")
 	quit(0 if failures.is_empty() else 1)

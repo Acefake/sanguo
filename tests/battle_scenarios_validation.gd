@@ -49,7 +49,7 @@ func run() -> void:
 	root.add_child(offline)
 	var replay := ""
 	for repeat_run in range(2):
-		store.prepare_battle_test(false, "plains_clash", 12345)
+		store.prepare_battle_test(false, "guandu_clash", 12345)
 		for day in range(20): await store.war.step(offline)
 		var projection: Array = []
 		for army in store.war.state["armies"].values(): projection.append([army["id"], army["units"], army["morale"], army["organization"], army["tactical"]["cell"], army["returning"], army["corps_task"]])
@@ -63,10 +63,14 @@ func run() -> void:
 			war = store.war
 			check(war.state["battlefield"]["scenario_id"] == spec["id"], "Wrong scenario metadata")
 			if spec.has("terrain"): check(Tactical.terrain_class(spec["anchor"]) == spec["terrain"], spec["id"] + " is not on real matching terrain")
-			if spec["id"] == "siege_assault": check(war.Feedback.visible_advantage(war)["theirs"] > 0, "Siege advantage omits the city garrison")
+			if spec["id"] in ["siege_assault", "xiapi_siege"]: check(war.Feedback.visible_advantage(war)["theirs"] > 0, "Siege advantage omits the city garrison")
 			var row := {"scenario": spec["id"], "seed": seed_value, "first_retreat": -1, "winner": "交战中", "days": 0, "contact_days": 0, "siege_days": 0, "rotations": 0}
 			var before_snapshot: Dictionary = store.battle_snapshot["scenario"].duplicate(true)
-			for day in range(100):
+			# Wet ground reduces damage and movement; validate a longer physical
+			# engagement rather than ending the simulation at the plain-field budget.
+			# 城防分离后必须真实破墙、入城才能占领，攻城场景需要比野战更长的预算。
+			var budget := 160 if spec["id"] in ["marsh_battle", "wancheng_marsh", "xiapi_siege"] else 140 if spec["id"] in ["siege_assault", "city_relief", "xiangyang_relief"] else 100
+			for day in range(budget):
 				await war.step(offline)
 				row["days"] = day + 1
 				var occupied := {}
@@ -89,8 +93,10 @@ func run() -> void:
 				for order in current_corps["orders"]:
 					if order["action"]["type"] == "rotate_front": row["rotations"] += 1
 			check(row["contact_days"] > 0, spec["id"] + " never enters combat")
+			if row["winner"] == "交战中":
+				for army in war.active_armies(): print("UNFINISHED_UNIT ", JSON.stringify({"name": army["name"], "strength": war.Combat.strength(army), "task": army["corps_task"], "morale": army["morale"], "org": army["organization"], "returning": army["returning"], "phase": army["tactical"].get("phase", ""), "cell": army["tactical"]["cell"]}))
 			check(row["winner"] != "交战中",spec["id"] + " never reaches a battle outcome")
-			if spec["id"] == "siege_assault":
+			if spec["id"] in ["siege_assault", "xiapi_siege"]:
 				check(row["siege_days"] > 0, "Siege scenario never invokes real siege rules")
 				check(not war.state["battlefield"].has("winner") or war.state["sieges"]["xiaopei"]["phase"] == "occupied", "Siege declares victory before taking city")
 			summaries.append(row)

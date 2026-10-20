@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Battle = preload("res://scripts/war/officer_battle.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
 const Combat = preload("res://scripts/war/combat_system.gd")
 const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
 var failures: Array = []
@@ -40,32 +40,26 @@ func _initialize() -> void: call_deferred("_run")
 
 func _run() -> void:
 	var rules: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/war/campaign_rules.json"))
-	# First layer: attack and defense composites are clamped (0.8–1.2 / 0.9–1.1).
-	var high := army(120)
-	var low := army(10)
-	var high_result := Combat.power_breakdown(high, rules, "plains")
-	var low_result := Combat.power_breakdown(low, rules, "plains")
-	check(float(high_result["officer_attack"]) <= 1.2 + 0.0001 and float(high_result["officer_attack"]) >= 1.2 - 0.0001, "进攻合成上限1.2生效")
-	check(is_equal_approx(float(high_result["unit_skill"]) * float(high_result["command"]), float(high_result["officer_attack"])), "进攻合成保持乘子链一致")
-	check(float(low_result["officer_attack"]) >= 0.8 - 0.0001, "进攻合成下限0.8生效")
-	check(Battle.defense(high, "plains", rules) <= 1.1 + 0.0001, "防御合成上限1.1生效")
-	check(Battle.defense(army(0), "plains", rules) >= 0.9 - 0.0001, "防御合成下限0.9生效")
-	# Matchup: same troops, only the commander's ability differs. 90 vs 50 lands in 1.2–1.4.
+	# 将领乘子只剩兵种执行（±6%）：命令已就绪时，90 对 50 的杀伤比不超过 1.06。
+	var high_result := Combat.power_breakdown(army(120), rules, "plains")
+	check(float(high_result["unit_skill"]) <= 1.06 + 0.0001 and float(high_result["readiness"]) == 1.0, "兵种执行上限约 1.06，未下新命令时就绪为 1")
 	var strong := army(90)
 	var plain := army(50)
 	var defender := army(50)
-	var dealt_strong := Combat.losses(strong, defender, rules, "plains", 1.0)
-	var dealt_plain := Combat.losses(plain, defender, rules, "plains", 1.0)
-	var ratio := float(dealt_strong) / float(maxi(dealt_plain, 1))
-	check(ratio >= 1.2 - 0.001 and ratio <= 1.4 + 0.001, "90对50杀伤比落在1.2–1.4（实际%.3f）" % ratio)
+	var ratio := float(Combat.losses(strong, defender, rules, "plains", 1.0)) / float(maxi(Combat.losses(plain, defender, rules, "plains", 1.0), 1))
+	check(ratio >= 1.0 and ratio <= 1.06 + 0.001, "90对50杀伤比在1.00–1.06（实际%.3f）" % ratio)
+	# 差异改在时机：同一天刚下新命令时，高带兵布阵者当天出力更多。
+	Process.issue_order(strong, {"terrain": "plains"})
+	Process.issue_order(plain, {"terrain": "plains"})
+	check(Combat.power(strong, rules, "plains") > Combat.power(plain, rules, "plains") * 1.05, "新命令当天高统率者先动")
 	# Aura formula and range.
 	var capable := army(90)
-	check(is_equal_approx(Battle.aura_strength(capable, rules), 0.12), "光环强度公式：(90-50)×0.003")
-	check(is_equal_approx(Battle.aura_strength(army(120), rules), 0.15), "光环强度封顶0.15")
-	check(is_equal_approx(Battle.aura_strength(army(30), rules), 0.0), "低于50无光环")
+	check(is_equal_approx(Process.aura_strength(capable, rules), 0.12), "光环强度公式：(90-50)×0.003")
+	check(is_equal_approx(Process.aura_strength(army(120), rules), 0.15), "光环强度封顶0.15")
+	check(is_equal_approx(Process.aura_strength(army(30), rules), 0.0), "低于50无光环")
 	var prestiged := army(70)
 	prestiged["skills"]["威仪"] = 80
-	check(Battle.aura_range(army(70), rules) == 3 and Battle.aura_range(prestiged, rules) == 4, "威仪80扩大光环范围")
+	check(Process.aura_range(army(70), rules) == 3 and Process.aura_range(prestiged, rules) == 4, "威仪80扩大光环范围")
 	# Aura softens morale and organization losses; aura=0 is the old behaviour exactly.
 	var soft := army()
 	var hard := army()

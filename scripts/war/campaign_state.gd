@@ -2,8 +2,9 @@ extends RefCounted
 
 const Graph = preload("res://scripts/war/map_graph.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
-const Battle = preload("res://scripts/war/officer_battle.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
+const Signature = preload("res://scripts/officers/signature_traits.gd")
 const Fate = preload("res://scripts/war/officer_fate.gd")
 const Combat = preload("res://scripts/war/combat_system.gd")
 const Policy = preload("res://scripts/agents/baseline_policy.gd")
@@ -1038,6 +1039,9 @@ func validate_decision(context: Dictionary, result: Dictionary) -> Dictionary:
 
 func _execute(army: Dictionary, action: Dictionary) -> void:
 	if not supply_enabled() and action.get("type", "") == "resupply": return
+	# 换了命令才有整理与展开的延迟；同一命令延续不重复扣。
+	if str(action.get("type", "")) != str(army.get("action", {}).get("type", "")):
+		Process.issue_order(army, {"terrain": _terrain(str(army["location"]["node"])), "action": str(action.get("type", ""))})
 	army["action"] = action.duplicate(true)
 	var location: Dictionary = army["location"]
 	match str(action["type"]):
@@ -1136,9 +1140,9 @@ func _move_all() -> Dictionary:
 			else:
 				var leader: Dictionary = army
 				if army.has("corps_id"): leader = state["armies"][state["corps"][army["corps_id"]]["root_id"]]
-				var speed: float = Battle.march_speed(leader, _terrain(str(location["node"])))
+				var speed: float = Process.march_speed(leader, _terrain(str(location["node"])))
 				location["progress"] = minf(1.0, float(location["progress"]) + speed / maxf(float(edge.get("cost", 1)) * float(rules["route_days_per_cost"]), 1))
-				army["fatigue"] = minf(100, float(army["fatigue"]) + Battle.fatigue_cost(army, 3.0))
+				army["fatigue"] = minf(100, float(army["fatigue"]) + Process.fatigue_cost(army, 3.0))
 				if float(location["progress"]) >= 1.0:
 					location["node"] = location["to"]
 					location["edge"] = ""
@@ -1201,10 +1205,10 @@ func _resolve_contacts(motions: Dictionary) -> void:
 				var pursuer: Dictionary = b if bool(a["returning"]) else a
 				if bool(orders_for(pursuer)["pursue"]) and str(pursuer["action"]["type"]) in ["pursue", "engage"]:
 					pursuer["combat_tick"] = int(state["tick"])
-					var chased: int = Combat.apply_loss(fleeing, mini(Combat.strength(fleeing), int(Combat.strength(pursuer) * 0.025 * Battle.factor(pursuer, ["骑术", "奇袭"], 0.004) / Battle.factor(fleeing, ["应变", "治军"], 0.004) * (1.0 + Traits.modifier(pursuer, "pursuit追击")))), true)
+					var chased: int = Combat.apply_loss(fleeing, mini(Combat.strength(fleeing), int(Combat.strength(pursuer) * Process.pursuit_rate(pursuer, fleeing))), true)
 					_report(fleeing, "遭遇追击", "%s撤退途中被追击，%d人被俘。" % [fleeing["name"], chased], true)
 					_remember_loss(fleeing, "遭遇追击")
-					pursuer["fatigue"] = minf(100, float(pursuer["fatigue"]) + Battle.fatigue_cost(pursuer, 8, true))
+					pursuer["fatigue"] = minf(100, float(pursuer["fatigue"]) + Process.fatigue_cost(pursuer, 8, true))
 				continue
 			# Freeze road movement at the contact point for the next day's battle.
 			var edge_id: String = str(a["location"].get("edge", ""))
@@ -1263,7 +1267,7 @@ func _resolve_contacts(motions: Dictionary) -> void:
 					Feedback.loss(self, member, loss)
 					Combat.battle_morale(member, loss, float(side[2]) * before_strength / maxf(total_strength, 1), before_strength, float(side[3]), total_strength, float(side[3]), false, 0.0, 0.5, rules)
 					remaining -= loss
-					member["fatigue"] = minf(100, float(member["fatigue"]) + Battle.fatigue_cost(member, 5, true))
+					member["fatigue"] = minf(100, float(member["fatigue"]) + Process.fatigue_cost(member, 5, true))
 					_check_rout(member)
 					if member["returning"] or member["status"] == "ended":
 						for winner in enemy_members: _battle_victory(winner)
@@ -1439,6 +1443,7 @@ func daily_food(army: Dictionary) -> float:
 
 func _upkeep() -> void:
 	for army in active_armies():
+		Process.end_day(army)
 		if army.has("tactical"):
 			var terrain := Tactical.terrain_class(army["tactical"]["cell"])
 			army["fatigue"] = minf(100, float(army["fatigue"])+float(Terrain.settings(terrain,rules).get("daily_fatigue",0)))
@@ -1455,7 +1460,7 @@ func _upkeep() -> void:
 				_report(army, "缺粮", "%s所部携粮耗尽，士气与组织持续下降。" % army["name"], true)
 		var resting: bool = int(army.get("combat_tick", -1)) != int(state["tick"]) and (str(army["action"]["type"]) in ["hold", "scout", "resupply", "request_support"] or (army.has("tactical") and int(army["tactical"].get("moved_tick", -1)) != int(state["tick"])))
 		if resting:
-			var recovery := Battle.recovery(army)
+			var recovery := Process.recovery(army)
 			army["fatigue"] = maxf(0, float(army["fatigue"]) - float(recovery["fatigue"]))
 			if provided >= needed:
 				army["organization"] = minf(100, float(army["organization"]) + float(recovery["organization"]))
@@ -1594,9 +1599,9 @@ func player_has_city_access(node: String) -> bool:
 func _battle_contact(attacker: Dictionary, defender: Dictionary, melee: bool = true) -> void:
 	if melee and not attacker.has("first_melee_tick"): attacker["first_melee_tick"] = state["tick"]
 	if melee and not defender.has("first_melee_tick"): defender["first_melee_tick"] = state["tick"]
-	if melee and Battle.opening(attacker, defender):
+	if melee and Signature.opening(attacker, defender):
 		_report(attacker, "小霸王连胜", "连续主动出战，首次接敌士气冲击提高8%。", false)
-	if Battle.first_contact(attacker, defender, melee):
+	if Signature.first_contact(attacker, defender, melee):
 		attacker["first_contact_effect_tick"] = state["tick"]
 		defender["first_contact_effect_tick"] = state["tick"]
 		_report(defender, "武圣威压", "%s与%s首次正面交锋，士气下降8。" % [defender["name"], attacker["name"]], true)

@@ -1,5 +1,5 @@
 extends RefCounted
-const Officer = preload("res://scripts/war/officer_battle.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
 const Combat = preload("res://scripts/war/combat_system.gd")
 const Fate = preload("res://scripts/war/officer_fate.gd")
 const Numeric = preload("res://scripts/war/duel_rules_v2.gd")
@@ -105,7 +105,7 @@ static func initiation(war, a: Dictionary, b: Dictionary) -> float:
 	var p := personality(war,a)
 	for row in [["风险承受","risk"],["自尊","pride"],["自制","control"],["耐心","patience"]]:
 		if float(p.get(row[0],50)) >= float(c.get("personality_threshold",70)): chance *= float(c[row[1]])
-	if Officer.skill(b,"名望") - Officer.skill(a,"名望") >= float(c.get("renown_gap",20)): chance *= float(c.get("renown_penalty",0.3))
+	if Process.value(b,"名望") - Process.value(a,"名望") >= float(c.get("renown_gap",20)): chance *= float(c.get("renown_penalty",0.3))
 	chance *= role_factor
 	return clampf(chance,0,1)
 static func acceptance(war, defender: Dictionary, challenger: Dictionary) -> float:

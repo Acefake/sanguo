@@ -3,7 +3,7 @@ extends RefCounted
 # 势力战略 AI：非玩家势力每旬评估一次出兵与增援，复用 preview_dispatch/_mobilize，
 # 不另建战争通道。评分使用实时城池与军队信息。
 
-const Battle = preload("res://scripts/war/officer_battle.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
 
 
 static func plan(war, store) -> Array:
@@ -38,7 +38,7 @@ static func lord_of(roster, faction: String, officer_states: Dictionary = {}) ->
 		var officer: Dictionary = roster.officers[id]
 		if str(officer["faction"]) != faction or str(officer["id"]).begins_with("militia:"): continue
 		if officer_states.get(officer["id"], {}).get("status", "") in ["dead", "captured"]: continue
-		var score := Battle.skill(officer, "名望") + Battle.skill(officer, "威仪") * 0.3 + float(officer.get("personality", {}).get("野心", 50)) * 0.1
+		var score := Process.value(officer, "名望") + Process.value(officer, "威仪") * 0.3 + float(officer.get("personality", {}).get("野心", 50)) * 0.1
 		if "核心位置：君主" in str(officer.get("positions", "")): score += 50.0
 		if score > best_score:
 			best_score = score

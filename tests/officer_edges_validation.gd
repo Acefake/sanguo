@@ -2,7 +2,7 @@ extends SceneTree
 
 const Edges = preload("res://scripts/war/officer_edges.gd")
 const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
-const Officer = preload("res://scripts/war/officer_battle.gd")
+
 const Combat = preload("res://scripts/war/combat_system.gd")
 var failures: Array = []
 

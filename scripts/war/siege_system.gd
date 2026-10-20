@@ -1,7 +1,7 @@
 extends RefCounted
 
 const Combat = preload("res://scripts/war/combat_system.gd")
-const Battle = preload("res://scripts/war/officer_battle.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
 const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
 const Fate = preload("res://scripts/war/officer_fate.gd")
 const Fort = preload("res://scripts/war/city_fortifications.gd")
@@ -78,7 +78,7 @@ static func resolve(war) -> void:
 		var objective_cell: int = board.get("objectives",{}).get(node,-1)
 		var terrain: String = Tactical.terrain_class(objective_cell) if objective_cell >= 0 else war._terrain(node)
 		army["battle_factors"] = war.Feedback.factors(group[0], defender, war.rules, terrain)
-		siege["preparation"] = minf(100, float(siege["preparation"]) + clampf(float(strength) / maxf(defenders, 100) * 3 * Battle.factor(force, ["智计", "治军"], 0.004), 2, 12))
+		siege["preparation"] = minf(100, float(siege["preparation"]) + clampf(float(strength) / maxf(defenders, 100) * 3 * Process.engineering_rate(force), 2, 12))
 		army["siege_progress"] = siege["preparation"]
 		var assembling := false
 		if corps.get("siege_approach", false):
@@ -131,7 +131,7 @@ static func resolve(war) -> void:
 			for unit in wall_targets:
 				unit["action"] = {"type": "besiege"}
 				unit["combat_tick"] = int(war.state["tick"])
-				unit["fatigue"] = minf(100, float(unit["fatigue"]) + Battle.fatigue_cost(unit, 3, true))
+				unit["fatigue"] = minf(100, float(unit["fatigue"]) + Process.fatigue_cost(unit, 3, true))
 				if unit.has("tactical"): unit["tactical"]["phase"] = "破墙攻城"
 		if not entered.is_empty():
 			var exchange: Dictionary = Defense.interior_exchange(war, node, siege, entered, defender, terrain)
@@ -143,7 +143,7 @@ static func resolve(war) -> void:
 			for unit in entered:
 				unit["combat_tick"] = int(war.state["tick"])
 				unit["action"] = {"type": "besiege"}
-				unit["fatigue"] = minf(100, float(unit["fatigue"]) + Battle.fatigue_cost(unit, 3, true))
+				unit["fatigue"] = minf(100, float(unit["fatigue"]) + Process.fatigue_cost(unit, 3, true))
 				if unit.has("tactical"): unit["tactical"]["phase"] = "入城巷战"
 		# 断粮是消耗而非外部攻击：只在主动围困（blockade）且城内断粮时生效。
 		if war.supply_enabled() and siege["mode"] == "blockade" and defenders > 0 and float(city.get("grain", 0)) <= 0:

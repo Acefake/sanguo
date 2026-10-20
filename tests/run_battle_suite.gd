@@ -10,6 +10,7 @@ extends SceneTree
 const SUITE := [
 	# 结算与将领
 	"officers/trait_registry_validation",
+	"officers/officer_process_validation",
 	"officer_battle_validation",
 	"officer_command_validation",
 	"officer_edges_validation",

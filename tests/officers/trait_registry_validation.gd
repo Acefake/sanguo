@@ -5,7 +5,8 @@ extends SceneTree
 ##   godot --headless --path . --script res://tests/officers/trait_registry_validation.gd
 
 const Traits = preload("res://scripts/officers/trait_registry.gd")
-const Battle = preload("res://scripts/war/officer_battle.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
+const Signature = preload("res://scripts/officers/signature_traits.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
 
 var failures: Array[String] = []
@@ -76,17 +77,17 @@ func _initialize() -> void:
 	var famous := army({"infantry": 5000}, [])
 	famous["skills"]["名望"] = 90
 	famous["officer_id"] = "famous"
-	check(not Battle.first_contact(saint, famous, false), "远射不触发武圣")
-	check(Battle.first_contact(saint, famous) and is_equal_approx(famous["morale"], 92.0), "首次正面武圣威压 -8")
-	check(not Battle.first_contact(saint, famous) and is_equal_approx(famous["morale"], 92.0), "同一目标只触发一次")
+	check(not Signature.first_contact(saint, famous, false), "远射不触发武圣")
+	check(Signature.first_contact(saint, famous) and is_equal_approx(famous["morale"], 92.0), "首次正面武圣威压 -8")
+	check(not Signature.first_contact(saint, famous) and is_equal_approx(famous["morale"], 92.0), "同一目标只触发一次")
 	var plain := army({"infantry": 5000}, [])
-	check(not Battle.first_contact(plain, army({"infantry": 5000}, []), true), "没有武圣不触发")
+	check(not Signature.first_contact(plain, army({"infantry": 5000}, []), true), "没有武圣不触发")
 	var chain := army({"infantry": 5000}, ["unique_xiaobawang"])
 	chain["victory_chain"] = true
-	check(is_equal_approx(Battle.march_speed(chain) / Battle.march_speed(army({"infantry": 5000}, ["unique_xiaobawang"])), 1.08), "小霸王首次接敌移动 +8%")
+	check(is_equal_approx(Process.march_speed(chain) / Process.march_speed(army({"infantry": 5000}, ["unique_xiaobawang"])), 1.08), "小霸王首次接敌移动 +8%")
 	var shocked := army({"infantry": 5000}, [])
-	check(Battle.opening(chain, shocked) and is_equal_approx(shocked["incoming_shock"], 1.08), "小霸王首次士气冲击 +8%")
-	check(not Battle.opening(chain, army({"infantry": 5000}, [])), "连胜只触发一次")
+	check(Signature.opening(chain, shocked) and is_equal_approx(shocked["incoming_shock"], 1.08), "小霸王首次士气冲击 +8%")
+	check(not Signature.opening(chain, army({"infantry": 5000}, [])), "连胜只触发一次")
 
 	print("TRAIT_REGISTRY_VALIDATION: " + ("PASS" if failures.is_empty() else "FAIL " + str(failures)))
 	quit(0 if failures.is_empty() else 1)

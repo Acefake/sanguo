@@ -4,7 +4,7 @@ extends RefCounted
 # edge, scored from the same skills and 14 personality axes used elsewhere.
 # Triggers are deterministic and never consume the battle RNG.
 
-const Officer = preload("res://scripts/war/officer_battle.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
 const GridScript = preload("res://scripts/rtk14_hex_grid.gd")
 const PATH := "res://data/war/officer_edges.json"
@@ -30,7 +30,7 @@ static func score_of(officer: Dictionary, edge: Dictionary) -> float:
 	var entry: Dictionary = edge.get("score", {})
 	for name in entry.get("skills", {}):
 		var w := float(entry["skills"][name])
-		value += Officer.skill(officer, name) * w
+		value += Process.value(officer, name) * w
 		weight += w
 	for name in entry.get("personality", {}):
 		var w := float(entry["personality"][name])

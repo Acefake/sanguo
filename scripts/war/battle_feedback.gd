@@ -41,15 +41,11 @@ static func factors(attacker: Dictionary, defender: Dictionary, rules: Dictionar
 	var threshold := float(rules.get("feedback",{}).get("factor_threshold",0.05))
 	var defense_terrain := float(Terrain.settings(terrain,rules).get("defense",1))
 	if terrain != "plains": entries.append({"weight":absf(defense_terrain-1.0),"text":"交战地形：%s，防护×%.2f" % [Terrain.name_of(terrain),defense_terrain]})
-	var labels := {"morale":"士气","training":"训练","equipment":"军备","organization":"组织","fatigue":"疲劳","delay":"进入地形迟滞","wounded":"主将带伤"}
+	var labels := {"morale":"士气","training":"训练","equipment":"军备","organization":"组织","fatigue":"疲劳","readiness":"新命令整理未完","unit_skill":"将领兵种执行","delay":"进入地形迟滞","wounded":"主将带伤"}
 	for key in labels:
 		var value := float(breakdown.get(key,1))
 		if absf(value-1) <= threshold: continue
 		entries.append({"weight":absf(value-1)+(1.0 if key == "morale" and float(attacker.get("morale",100)) < 50 else 0),"text":"%s%s：输出×%.2f" % [attacker.get("name","攻方"),labels[key],value]})
-	# unit_skill and command are two halves of one clamped composite, so reporting
-	# them separately would credit the clamp as a command bonus. Report the product.
-	var officer_attack := float(breakdown.get("officer_attack",1.0))
-	if absf(officer_attack-1) > threshold: entries.append({"weight":absf(officer_attack-1),"text":"%s将领统率：输出×%.2f" % [attacker.get("name","攻方"),officer_attack]})
 	var counters: float = breakdown["counters"]
 	if counters-1 > threshold: entries.append({"weight":counters-1,"text":"兵种克制：伤害×%.2f" % counters})
 	var edge_attack := float(attacker.get("edge_attack", 1.0))

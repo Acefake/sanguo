@@ -1,6 +1,6 @@
 extends RefCounted
 
-const Officer = preload("res://scripts/war/officer_battle.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
 const Terrain = preload("res://scripts/war/battle_terrain.gd")
 const TYPES := ["infantry", "archers", "cavalry"]
 
@@ -58,20 +58,15 @@ static func power_breakdown(army: Dictionary, config: Dictionary, terrain: Strin
 	for type in TYPES:
 		var amount := float(army.get("units", {}).get(type, 0)) * float(units[type]["damage"])
 		base += amount
-		skilled += amount * Officer.unit_attack(army, type, terrain)
-		adjusted += amount * Officer.unit_attack(army, type, terrain) * Terrain.unit_factor(type, terrain, config)
-	var ranged: bool = is_ranged(army)
-	var section: Dictionary = config.get("officer", {})
-	var command := clampf(_num(attributes,"command_base",0.8)+Officer.skill(army,"布阵")/_num(attributes,"command_divisor",250),_num(attributes,"command_min",0.8),_num(attributes,"command_max",1.28))*Officer.factor(army,["带兵","治军"],_num(attributes,"command_weight",0.002))
-	var unit_skill := skilled/maxf(base,1)
-	# First layer: the officer's own attack composite is deliberately narrow.
-	var officer_attack := clampf(unit_skill * command, float(section.get("attack_min",0.8)), float(section.get("attack_max",1.2)))
-	command *= officer_attack / maxf(unit_skill * command, 0.0001)
-	var result := {"base": base, "morale": clampf(float(army.get("morale",100))/_num(attributes,"morale_divisor",100),_num(attributes,"morale_min",0.25),1), "training": _num(attributes,"training_base",0.6)+float(army.get("training",50))/_num(attributes,"training_divisor",125), "equipment": _num(attributes,"equipment_base",0.7)+float(army.get("equipment",50))/_num(attributes,"equipment_divisor",166.7), "organization":clampf(float(army.get("organization",100))/_num(attributes,"organization_divisor",100),_num(attributes,"organization_min",0.3),1), "fatigue":1-float(army.get("fatigue",0))/_num(attributes,"fatigue_divisor",180), "command": command, "unit_skill":unit_skill, "officer_attack":officer_attack, "terrain": adjusted/maxf(skilled,1), "terrain_class":terrain, "delay":Terrain.entry_factor(army,config), "wounded": float(config.get("duel",Terrain.rules().get("duel",{})).get("wounded_attack",0.9)) if army.get("duel_wounded",false) else 1.0}
+		var execution := Process.unit_execution(army, type, terrain)
+		skilled += amount * execution
+		adjusted += amount * execution * Terrain.unit_factor(type, terrain, config)
+	# 将领只以两条流程进入出力：兵种局部执行（±6%）与新命令的整理延迟（当天可用时间）。
+	var result := {"base": base, "morale": clampf(float(army.get("morale",100))/_num(attributes,"morale_divisor",100),_num(attributes,"morale_min",0.25),1), "training": _num(attributes,"training_base",0.6)+float(army.get("training",50))/_num(attributes,"training_divisor",125), "equipment": _num(attributes,"equipment_base",0.7)+float(army.get("equipment",50))/_num(attributes,"equipment_divisor",166.7), "organization":clampf(float(army.get("organization",100))/_num(attributes,"organization_divisor",100),_num(attributes,"organization_min",0.3),1), "fatigue":1-float(army.get("fatigue",0))/_num(attributes,"fatigue_divisor",180), "readiness": Process.readiness(army), "unit_skill":skilled/maxf(base,1), "terrain": adjusted/maxf(skilled,1), "terrain_class":terrain, "delay":Terrain.entry_factor(army,config), "wounded": float(config.get("duel",Terrain.rules().get("duel",{})).get("wounded_attack",0.9)) if army.get("duel_wounded",false) else 1.0}
 	result["power"] = base
 	# Counters belong to the exchange, rather than the army's raw attack power.
 	result["counters"] = counters(army, defender, config)
-	for key in ["morale","training","equipment","organization","fatigue","command","unit_skill","terrain","delay","wounded"]: result["power"] *= float(result[key])
+	for key in ["morale","training","equipment","organization","fatigue","readiness","unit_skill","terrain","delay","wounded"]: result["power"] *= float(result[key])
 	return result
 
 static func power(army: Dictionary, config: Dictionary, terrain: String) -> float:
@@ -105,7 +100,7 @@ static func personal_power(army: Dictionary, config: Dictionary) -> float:
 	if not army.has("officer_id") or army.get("commander_unavailable", false) or army.get("returning", false) or strength(army) <= 0: return 0.0
 	var rules: Dictionary = config.get("personal_combat", {})
 	var tuning: Dictionary = settings(config).get("personal", {})
-	var prowess := (Officer.skill(army, "武艺") * 0.6 + Officer.skill(army, "膂力") * 0.4)
+	var prowess := Process.prowess(army)
 	return clampf((prowess - _num(tuning,"prowess_offset",30)) / _num(tuning,"prowess_divisor",20), 0, float(rules.get("max_damage", 4))) * (1 - float(army.get("fatigue", 0)) / _num(tuning,"fatigue_divisor",150)) * (_num(tuning,"wounded_factor",0.75) if army.get("duel_wounded", false) else 1.0)
 
 static func losses_detail(attacker: Dictionary, defender: Dictionary, config: Dictionary, terrain: String, random_factor: float = 1.0, fortification: float = 1.0, attacker_terrain: String = "") -> Dictionary:
@@ -130,24 +125,22 @@ static func losses_detail(attacker: Dictionary, defender: Dictionary, config: Di
 	var ranged: bool = is_ranged(attacker)
 	var ranged_factor := float(attack_data.get("ranged_attack", 1)) if ranged else 1.0
 	var section: Dictionary = config.get("officer", {})
-	var officer_defense := Officer.defense(defender, terrain, config)
 	var edge_attack := clampf(float(attacker.get("edge_attack", 1.0)), float(section.get("total_min", 0.6)), float(section.get("total_max", 1.6)))
 	var edge_defense := clampf(float(defender.get("edge_defense", 1.0)), float(section.get("total_min", 0.6)), float(section.get("total_max", 1.6)))
 	# Defensive officer effects are received-loss multipliers.
-	var defense := toughness * fortification * officer_defense * float(data.get("defense", 1))
+	var defense := toughness * fortification * float(data.get("defense", 1))
 	var received := edge_defense
 	var role_rules = preload("res://scripts/war/troop_roles.gd")
 	if not ranged:
 		var bow_share := float(defender.get("units",{}).get("archers",0))/maxf(strength(defender),1)
 		received *= lerpf(1.0,float(role_rules.traits(config).get("archers",{}).get("melee_received",1.2)),bow_share)
 		output *= role_rules.exchange_factor(attacker,true,ground,config)
-	var tactic := clampf(Officer.tactic(attacker, defender) * edge_attack, float(section.get("total_min", 0.6)), float(section.get("total_max", 1.6)))
-	var raw := output * frontage * counter_factor * _num(tuning, "damage_scale", 0.035) * random_factor * ranged_factor * received * tactic / maxf(defense, 0.2)
+	var raw := output * frontage * counter_factor * _num(tuning, "damage_scale", 0.035) * random_factor * ranged_factor * received * edge_attack / maxf(defense, 0.2)
 	# A distinct melee strike by the commander, not a share of soldiers' attack.
 	var personal := 0.0 if ranged else personal_power(attacker, config) * random_factor / maxf(defense, 0.2)
 	raw += personal
 	# Factor contributions are ratios around 1.0 so a report can name the largest few.
-	var factors := {"地形": float(data.get("defense", 1)), "远射": ranged_factor, "展开": frontage, "兵种克制": counter_factor, "承受": received, "将领防御": maxf(officer_defense, 0.2), "将领进攻": tactic, "工事": fortification}
+	var factors := {"地形": float(data.get("defense", 1)), "远射": ranged_factor, "展开": frontage, "兵种克制": counter_factor, "承受": received, "工事": fortification}
 	if ground != terrain: factors["进攻地形"] = float(attack_data.get("attack", 1)) * (float(attack_data.get("cavalry_attack", 1)) if float(attacker.get("units", {}).get("cavalry", 0)) > 0 else 1.0)
 	if not is_equal_approx(edge_attack, 1.0): factors["专长进攻"] = edge_attack
 	if not is_equal_approx(edge_defense, 1.0): factors["专长守御"] = edge_defense
@@ -201,8 +194,8 @@ static func apply_loss(army: Dictionary, amount: int, captured: bool = false, mo
 	var shock := float(army.get("incoming_shock", army.get("morale_shock", 1.0)))
 	if army.has("incoming_shock") or army.has("morale_shock"): army["morale_shock"] = shock
 	army.erase("incoming_shock")
-	army["morale"] = maxf(0, float(army.get("morale", 100)) - float(actual) / maxf(total, 1) * _num(attributes,"morale_loss_weight",85.0) * morale_scale * shock / Officer.factor(army, ["沉着", "威仪", "忠义"], 0.003) / (1.0 + aura))
-	army["organization"] = maxf(0, float(army.get("organization", 100)) - float(actual) / maxf(total, 1) * _num(attributes,"organization_loss_weight",70.0) / Officer.factor(army, ["治军", "应变"], 0.004) / (1.0 + aura * aura_org_scale))
+	army["morale"] = maxf(0, float(army.get("morale", 100)) - float(actual) / maxf(total, 1) * _num(attributes,"morale_loss_weight",85.0) * morale_scale * shock / (1.0 + aura))
+	army["organization"] = maxf(0, float(army.get("organization", 100)) - float(actual) / maxf(total, 1) * _num(attributes,"organization_loss_weight",70.0) * Process.organization_loss_factor(army) / (1.0 + aura * aura_org_scale))
 	return actual
 
 
@@ -216,13 +209,12 @@ static func battle_morale(army: Dictionary, received: int, inflicted: float, bef
 	var hurt := float(received) / maxf(before, 1)
 	var success := inflicted / maxf(enemy_before, 1)
 	var advantage := friendly_strength / maxf(enemy_strength, 1)
-	var resilience := Officer.factor(army, ["沉着", "威仪", "忠义"], 0.003)
-	var change := (success * _num(mood,"success_weight",50.0) - hurt * _num(mood,"hurt_weight",85.0) * clampf(1.0 / maxf(advantage, 0.1), _num(mood,"advantage_floor",0.65), _num(mood,"advantage_ceiling",1.5))) / resilience
+	var change := success * _num(mood,"success_weight",50.0) - hurt * _num(mood,"hurt_weight",85.0) * clampf(1.0 / maxf(advantage, 0.1), _num(mood,"advantage_floor",0.65), _num(mood,"advantage_ceiling",1.5))
 	# Winning a light exchange sustains morale; heavy losses still shake a larger army.
 	if inflicted >= received and hurt <= _num(mood,"comfort_hurt",0.03) and advantage >= _num(mood,"comfort_advantage",0.9):
 		change = maxf(change, minf(_num(mood,"comfort_gain_cap",2.5), _num(mood,"comfort_gain_base",0.6) + success * _num(mood,"comfort_gain_per_success",25.0)))
-		army["organization"] = minf(100, float(army["organization"]) + _num(mood,"comfort_organization",1.5) * Officer.factor(army, ["治军", "应变"], 0.004))
-	if hurt >= _num(mood,"panic_hurt",0.08): change = minf(change, -hurt * _num(mood,"panic_weight",65.0) / resilience)
+		army["organization"] = minf(100, float(army["organization"]) + _num(mood,"comfort_organization",1.5) / Process.organization_loss_factor(army))
+	if hurt >= _num(mood,"panic_hurt",0.08): change = minf(change, -hurt * _num(mood,"panic_weight",65.0))
 	# A commander's aura steadies morale losses within range.
 	if aura > 0.0 and change < 0.0: change /= (1.0 + aura)
 	if shock > 1.0 and change < 0.0: change *= shock

@@ -1,6 +1,6 @@
 extends RefCounted
 
-const Battle = preload("res://scripts/war/officer_battle.gd")
+const Process = preload("res://scripts/officers/officer_process.gd")
 const Combat = preload("res://scripts/war/combat_system.gd")
 const GridScript = preload("res://scripts/rtk14_hex_grid.gd")
 const ROLES := {"main_attack": "主攻", "flank": "侧翼", "support": "支援", "reserve": "预备队", "rear_guard": "掩护撤退", "withdraw": "撤退", "command": "中军统筹", "raid_rear": "绕后奇袭", "cut_supply": "截断粮道", "regroup": "归建"}
@@ -743,7 +743,7 @@ static func move(war) -> Dictionary:
 			var entered := terrain_class(next)
 			if entered in ["mountains", "ford"]: tactical["terrain_delay"] = entered
 		tactical["cell"] = next
-		if next != start: army["fatigue"] = minf(100, float(army["fatigue"]) + Battle.fatigue_cost(army, 3*maxi(1,path.size()-1)))
+		if next != start: army["fatigue"] = minf(100, float(army["fatigue"]) + Process.fatigue_cost(army, 3*maxi(1,path.size()-1)))
 		if action == "flank" and next == goal: tactical["flank_ready"] = true
 		tactical["blocked"] = next == start and goal != start and cell_distance(start, goal) > stop_distance
 		tactical["blocked_days"] = int(tactical.get("blocked_days", 0)) + 1 if tactical["blocked"] else 0
@@ -858,7 +858,7 @@ static func _move_committed(war, army: Dictionary, board: Dictionary, occupied: 
 	if current != start:
 		tactical["previous_cell"] = start
 		tactical["moved_tick"] = int(war.state["tick"])
-		army["fatigue"] = minf(100,float(army["fatigue"]) + Battle.fatigue_cost(army,3*(path.size()-1)))
+		army["fatigue"] = minf(100,float(army["fatigue"]) + Process.fatigue_cost(army,3*(path.size()-1)))
 		if terrain_class(current) in ["mountains","ford"]: tactical["terrain_delay"] = terrain_class(current)
 	tactical["blocked"] = current == start and action.get("path",[]).size() > 1 and points >= 1
 	tactical["blocked_days"] = int(tactical.get("blocked_days",0))+1 if tactical["blocked"] else 0
@@ -956,7 +956,7 @@ static func _chase_phase(war, board: Dictionary, occupied: Dictionary, direct: D
 		tactical["moved_tick"] = tick
 		tactical["phase"] = "追击跟进"
 		if terrain_class(current) in ["mountains","ford"]: tactical["terrain_delay"] = terrain_class(current)
-		army["fatigue"] = minf(100, float(army["fatigue"]) + Battle.fatigue_cost(army, 3*path.size()))
+		army["fatigue"] = minf(100, float(army["fatigue"]) + Process.fatigue_cost(army, 3*path.size()))
 		tactical["round_points"] = maxf(0.0, remaining - float(path.size()))
 		tactical["movement_credit"] = minf(float(tactical["round_points"]),0.99)
 		tactical["blocked"] = false
@@ -1065,9 +1065,9 @@ static func _compute_auras(war) -> void:
 		var leader: Dictionary = army
 		if not corps.is_empty(): leader = war.state["armies"].get(str(corps["root_id"]), army)
 		if leader.is_empty() or str(leader["status"]) == "ended" or bool(leader["returning"]): continue
-		var strength := Battle.aura_strength(leader, war.rules)
+		var strength := Process.aura_strength(leader, war.rules)
 		if strength <= 0.0: continue
-		var radius := Battle.aura_range(leader, war.rules)
+		var radius := Process.aura_range(leader, war.rules)
 		var members: Array = [army] if corps.is_empty() else corps["units"]
 		for id in members:
 			var unit: Dictionary = war.state["armies"].get(str(id), {})
@@ -1216,7 +1216,7 @@ static func resolve(war) -> void:
 				army["last_enemy_tick"] = int(war.state["tick"])
 		preload("res://scripts/war/officer_fate.gd").credit(war, weights, int(army["dead"]) - dead_before, {}, personal)
 		Feedback.loss(war, army, loss)
-		army["fatigue"] = minf(100, army["fatigue"] + Battle.fatigue_cost(army, 4, true))
+		army["fatigue"] = minf(100, army["fatigue"] + Process.fatigue_cost(army, 4, true))
 	# Send combat reports only after all simultaneous kill credits are committed.
 	for id in damages:
 		var army: Dictionary = war.state["armies"][id]

@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "note": "属性→战斗流程的基准量（GDD 4.5 的 TaskProfile）。时间以小时计，在日结算里折成“当天可用的作战时间”；形状系数沿用 GDD 4.3 与特性接口 10.1，基准值为初始标定，须由 tests/officers 的对照 harness 校准。",
+  "day_hours": 24.0,
+  "readiness_floor": 0.35,
+  "command": {
+    "hours": 4.0,
+    "standard_unit": 2000,
+    "capacity_base": 2,
+    "capacity_per_u": 6
+  },
+  "formation": {
+    "hours": 3.0,
+    "terrain": {
+      "plains": 1.0,
+      "hills": 1.2,
+      "forest": 1.4,
+      "mountains": 1.6,
+      "river": 1.5,
+      "ford": 1.5,
+      "marsh": 1.4
+    }
+  },
+  "march": {
+    "base": 1.0,
+    "fatigue_divisor": 250,
+    "min": 0.5,
+    "max": 1.3
+  },
+  "rotation": {
+    "hours": 2.0
+  },
+  "volley": {
+    "hours": 1.0
+  },
+  "replan": {
+    "hours": 4.0
+  },
+  "intel": {
+    "sigma0": 0.35
+  },
+  "conceal": {
+    "p0": 0.55
+  },
+  "ambush": {
+    "misread_weight": 0.9,
+    "floor": 0.05,
+    "cap": 0.95
+  },
+  "plan": {
+    "base": 0.35
+  },
+  "execution": {
+    "span": 0.12
+  },
+  "recovery": {
+    "fatigue": 5.0,
+    "organization": 3.0,
+    "morale": 1.0
+  },
+  "pursuit": {
+    "rate": 0.025
+  },
+  "conduct": {
+    "commit_readiness": 0.8,
+    "pursuit_max_steps": 2,
+    "disengage_line": 35,
+    "engage_ratio": 1.05,
+    "advice_base": 0.55
+  }
+}

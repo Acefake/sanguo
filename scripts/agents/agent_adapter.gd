@@ -1,5 +1,6 @@
 extends Node
 
+const Explain = preload("res://scripts/officers/officer_explain.gd")
 const SETTINGS_PATH := "user://officer_agent.cfg"
 var settings_path := SETTINGS_PATH
 const POLICY = preload("res://scripts/agents/baseline_policy.gd")
@@ -209,7 +210,8 @@ func _compact_context(context: Dictionary) -> Dictionary:
 		for entry in POLICY.rank(context).slice(0, 3): top.append({"id": entry["candidate"]["id"], "score": snappedf(float(entry["score"]), 0.1)})
 		if not top.is_empty(): compact["ranking"] = top
 	var officer: Dictionary = context.get("officer", {})
-	compact["officer"] = {"name": officer.get("name", ""), "personality": officer.get("personality", {})}
+	# 核心定义、生效特性与同军团关系一起给模型，否则模型只看得到人格数值。
+	compact["officer"] = Explain.model_profile(officer, context.get("members", []))
 	var experience: Variant = context.get("experience", {})
 	if experience is Dictionary and not experience.is_empty(): compact["experience"] = experience
 	compact["allies"] = []

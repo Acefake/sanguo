@@ -3,6 +3,7 @@ extends VBoxContainer
 signal close_requested
 signal orders_requested(id: String)
 signal reports_requested(id: String)
+const Explain = preload("res://scripts/officers/officer_explain.gd")
 const UISkin = preload("res://scripts/war/war_ui_skin.gd")
 const CommandRoles = preload("res://scripts/war/army_command_roles.gd")
 var store: Node
@@ -298,6 +299,7 @@ func update_info() -> void:
 		task.text += "\n%s%s" % [army["commander_fate"]["name"], "战死" if army["commander_fate"]["status"] == "dead" else "被俘"]
 	var result := decision(store.war, army)
 	judgment.text = preload("res://scripts/ui_text.gd").clean(str(result["text"])) if not str(result["text"]).is_empty() else "尚未返回新的判断。"
+	judgment.text += "\n" + Explain.intent_text(army, {"terrain": store.war.Tactical.terrain_class(army["tactical"]["cell"]) if army.has("tactical") else "plains"}, card)
 	judgment.tooltip_text = judgment.text
 	var origin := "智能体返回" if result["source"] == "model" else "当前军令" if result["source"] == "orders" else "本地策略"
 	if army.has("battle_ai") and not army["battle_ai"].get("plan",{}).is_empty(): origin = {"model":"部将模型建议","safety":"部将安全反应","coordination":"军团配合调整"}.get(result["source"],"部将本地判断")

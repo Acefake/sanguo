@@ -11,6 +11,10 @@ extends SceneTree
 const Probe = preload("res://tests/officers/battle_probe.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
+const Explain = preload("res://scripts/officers/officer_explain.gd")
+## 指标对应的流程 hook，用来给署名情境找署名来源。
+const METRIC_HOOK := {"commit_hour": "command整理", "ambushed": "ambush识破", "org_min": "special轮换", "pursuit_depth": "pursuit深入"}
+const METRIC_TEXT := {"commit_hour": "投入时机", "ambushed": "受伏率", "org_min": "组织最低点", "loss_ratio": "伤亡比", "objective": "目标达成", "pursuit_depth": "追击深度", "disengages": "脱离次数"}
 
 const T_SIGNIFICANT := 2.5
 const T_COST := 2.0
@@ -21,6 +25,7 @@ var scenarios: Dictionary = {}
 var rules: Dictionary
 var failures: Array[String] = []
 var generated_pairs: Array = []
+var subjects_by_name: Dictionary = {}
 
 
 func _initialize() -> void:
@@ -28,6 +33,7 @@ func _initialize() -> void:
 	rules = JSON.parse_string(FileAccess.get_file_as_string("res://data/war/campaign_rules.json"))
 	for scenario in JSON.parse_string(FileAccess.get_file_as_string("res://data/war/battle_scenarios.json")): scenarios[scenario["id"]] = scenario
 	var subjects := _subjects()
+	for officer in subjects: subjects_by_name[officer["name"]] = officer
 	var opponent := _flat_officer(str(settings["opponent"]["name"]), float(settings["opponent"]["skill"]), {})
 	var staff := _flat_officer(str(settings["staff"]["name"]), float(settings["staff"]["skill"]), settings["staff"]["skills"])
 
@@ -188,7 +194,13 @@ func _check_flaws(subjects: Array, opponent: Dictionary, staff: Dictionary, resu
 					if t <= -T_COST and relative >= MIN_COST and (best.is_empty() or relative > float(best["relative"])):
 						best = {"scenario": id, "metric": metric, "with": with_flaw, "without": without, "t": t, "relative": relative}
 			var row := {"label": "%s·%s" % [officer["name"], Traits.definition(flaw)["name"]], "flaw": flaw, "cost": best, "pass": not best.is_empty()}
+			if not best.is_empty():
+				var hook := str(Traits.definition(flaw)["effects"][0]["hook"])
+				var only_flaw: Dictionary = officer.duplicate()
+				only_flaw["trait_ids"] = [flaw]
+				row["report"] = Explain.signed(only_flaw, hook, "%s在%s%s变差（有 %.2f / 无 %.2f）" % [Traits.definition(flaw)["summary"].trim_suffix("。"), scenarios[best["scenario"]]["name"], METRIC_TEXT[best["metric"]], best["with"], best["without"]], {"enemy_renown_gap": 30, "subcommanders_assigned": true, "pressure": 1.0})
 			rows.append(row)
+			if row.has("report"): print("REPORT " + str(row["report"]))
 			print("FLAW %s 代价：%s" % [row["label"], "未复现" if best.is_empty() else "%s@%s 有%.2f/无%.2f (t=%.1f, %+.0f%%)" % [best["metric"], best["scenario"], best["with"], best["without"], best["t"], (best["with"] - best["without"]) / maxf(absf(best["without"]), 0.05) * 100.0]])
 	return rows
 
@@ -224,8 +236,10 @@ func _signatures(results: Dictionary) -> Array:
 				if sd < 1e-6: continue
 				var z := (mean(results[name][id][metric]) - mean(all)) / sd * direction
 				if best.is_empty() or z > float(best["z"]): best = {"scenario": id, "metric": metric, "value": mean(results[name][id][metric]), "field": mean(all), "z": z}
-		rows.append({"name": name, "best": best})
-		print("SIGNATURE %s 最突出：%s@%s %.2f（全体 %.2f，z=%.1f）" % [name, best.get("metric", "-"), best.get("scenario", "-"), best.get("value", 0.0), best.get("field", 0.0), best.get("z", 0.0)])
+		var officer: Dictionary = subjects_by_name.get(name, {})
+		var who := Explain.credit(officer, METRIC_HOOK.get(best.get("metric", ""), ""), {"terrain": scenarios.get(best.get("scenario", ""), {}).get("terrain", "plains")})
+		rows.append({"name": name, "best": best, "credit": who})
+		print("SIGNATURE %s 最突出：%s %s@%s %.2f（全体 %.2f，z=%.1f）" % [name, who if not who.is_empty() else "（属性组合）", METRIC_TEXT.get(best.get("metric", ""), "-"), scenarios.get(best.get("scenario", ""), {}).get("name", "-"), best.get("value", 0.0), best.get("field", 0.0), best.get("z", 0.0)])
 	return rows
 
 

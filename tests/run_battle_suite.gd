@@ -12,6 +12,7 @@ const SUITE := [
 	"officers/trait_registry_validation",
 	"officers/officer_process_validation",
 	"officers/career_template_validation",
+	"officers/officer_explain_validation",
 	"officers/identity_harness",
 	"officer_battle_validation",
 	"officer_command_validation",

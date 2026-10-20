@@ -5,6 +5,7 @@ const Roster = preload("res://scripts/agents/officer_context.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Signature = preload("res://scripts/officers/signature_traits.gd")
+const Explain = preload("res://scripts/officers/officer_explain.gd")
 const Fate = preload("res://scripts/war/officer_fate.gd")
 const Combat = preload("res://scripts/war/combat_system.gd")
 const Policy = preload("res://scripts/agents/baseline_policy.gd")
@@ -1206,7 +1207,8 @@ func _resolve_contacts(motions: Dictionary) -> void:
 				if bool(orders_for(pursuer)["pursue"]) and str(pursuer["action"]["type"]) in ["pursue", "engage"]:
 					pursuer["combat_tick"] = int(state["tick"])
 					var chased: int = Combat.apply_loss(fleeing, mini(Combat.strength(fleeing), int(Combat.strength(pursuer) * Process.pursuit_rate(pursuer, fleeing))), true)
-					_report(fleeing, "遭遇追击", "%s撤退途中被追击，%d人被俘。" % [fleeing["name"], chased], true)
+					_report(fleeing, "遭遇追击", Explain.signed(fleeing, "withdraw撤离", "%s撤退途中被追击，%d人被俘。" % [fleeing["name"], chased]), true)
+					_report(pursuer, "追击", Explain.signed(pursuer, "pursuit追击", "追击%s，俘获%d人。" % [fleeing["name"], chased]), false)
 					_remember_loss(fleeing, "遭遇追击")
 					pursuer["fatigue"] = minf(100, float(pursuer["fatigue"]) + Process.fatigue_cost(pursuer, 8, true))
 				continue
@@ -1600,11 +1602,11 @@ func _battle_contact(attacker: Dictionary, defender: Dictionary, melee: bool = t
 	if melee and not attacker.has("first_melee_tick"): attacker["first_melee_tick"] = state["tick"]
 	if melee and not defender.has("first_melee_tick"): defender["first_melee_tick"] = state["tick"]
 	if melee and Signature.opening(attacker, defender):
-		_report(attacker, "小霸王连胜", "连续主动出战，首次接敌士气冲击提高8%。", false)
+		_report(attacker, "小霸王连胜", "%s小霸王：连续主动出战，首次接敌士气冲击提高8%%。" % attacker["name"], false)
 	if Signature.first_contact(attacker, defender, melee):
 		attacker["first_contact_effect_tick"] = state["tick"]
 		defender["first_contact_effect_tick"] = state["tick"]
-		_report(defender, "武圣威压", "%s与%s首次正面交锋，士气下降8。" % [defender["name"], attacker["name"]], true)
+		_report(defender, "武圣威压", "%s武圣：与%s首次正面交锋，%s士气下降8。" % [attacker["name"], defender["name"], defender["name"]], true)
 
 
 func _battle_victory(army: Dictionary) -> void:

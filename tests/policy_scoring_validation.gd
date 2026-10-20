@@ -12,7 +12,7 @@ func check(value: bool, message: String) -> void:
 
 func _contexts(army: Dictionary, enemies: Array, candidates: Array, officer: Dictionary, extra: Dictionary = {}) -> Dictionary:
 	var context := {
-		"officer": {"personality": officer.get("personality", {}), "battle_traits": officer.get("battle_traits", [])},
+		"officer": {"personality": officer.get("personality", {}), "trait_ids": officer.get("trait_ids", [])},
 		"army": army, "enemies": enemies, "allies": extra.get("allies", []),
 		"operation": extra.get("operation", {}), "mission_type": extra.get("mission_type", "capture"),
 		"at_objective": extra.get("at_objective", false), "target_known": extra.get("target_known", true),

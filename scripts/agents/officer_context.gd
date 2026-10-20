@@ -4,7 +4,7 @@ const AXES := ["野心", "风险承受", "耐心", "决断", "自制", "猜疑",
 const SKILLS := [["带兵", "布阵", "水练", "奇袭", "治军"], ["智计", "沉着", "料敌", "应变", "辩才"], ["膂力", "体魄", "武艺", "骑术", "箭术"], ["农桑", "商贾", "吏治", "律法", "辞令"], ["威仪", "仁德", "忠义", "名望", "雅量"]]
 var officers: Dictionary = {}
 var parsing_audit: Array = []
-const Battle = preload("res://scripts/war/officer_battle.gd")
+const Traits = preload("res://scripts/officers/trait_registry.gd")
 
 static func numeric(value: Variant, maximum: int) -> Dictionary:
 	if typeof(value) not in [TYPE_INT,TYPE_FLOAT] and not (value is String and value.is_valid_float()): return {"value":50,"source":"invalid_default"}
@@ -30,7 +30,7 @@ func setup(cards: Array, mapping: Dictionary) -> void:
 			for skill in group:
 				if not skills.has(skill): skills[skill] = 50; sources["skills"][skill] = "missing_default"
 		var personality: Dictionary = {}
-		var text: String = str(card.get("sections", {}).get("人格数值", "")).replace("记仄", "记仇")
+		var text: String = str(card.get("sections", {}).get("人格数值", ""))
 		for axis in AXES:
 			var regex := RegEx.new()
 			regex.compile(axis + "[\\s:：=]*([+-]?[0-9]+(?:\\.[0-9]+)?)")
@@ -40,7 +40,7 @@ func setup(cards: Array, mapping: Dictionary) -> void:
 			sources["personality"][axis] = parsed["source"]
 		parsing_audit.append({"id":card["id"],"sources":sources.duplicate(true)})
 		# Keep parsing provenance separate from the card's original values.
-		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": str(mapping.get(str(card.get("faction", "")), "")), "stats": card.get("stats", []).duplicate(), "skills": skills, "personality": personality, "battle_traits": Battle.traits(card), "portrait": card.get("thumbnail", ""), "positions": str(card.get("sections", {}).get("位置", "")), "profile_note": str(card.get("sections", {}).get("核心定义", "")).left(350)}
+		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": str(mapping.get(str(card.get("faction", "")), "")), "stats": card.get("stats", []).duplicate(), "skills": skills, "personality": personality, "trait_ids": Traits.ids_for_officer(str(card["id"])), "portrait": card.get("thumbnail", ""), "positions": str(card.get("sections", {}).get("位置", "")), "profile_note": str(card.get("sections", {}).get("核心定义", "")).left(350)}
 		officers[str(card["id"])]["data_sources"] = sources
 
 
@@ -81,7 +81,7 @@ func ensure_factions(scenario: Dictionary) -> void:
 			var personality := {}
 			for axis in AXES: personality[axis] = 40 + absi(hash(id + str(axis))) % 31
 			var name := str(scenario["factions"][faction].get("name", faction))
-			officers[id] = {"id": id, "name": name + ("·代行主政" if index == 0 else "·地方将%d" % index), "faction": faction, "skills": skills, "personality": personality, "battle_traits": [], "portrait": "", "positions": "核心位置：君主" if index == 0 else "地方将领", "generated": true, "home": cities[index % cities.size()], "profile_note": "地方代理将领，补足当前剧本缺少的武将资料。"}
+			officers[id] = {"id": id, "name": name + ("·代行主政" if index == 0 else "·地方将%d" % index), "faction": faction, "skills": skills, "personality": personality, "trait_ids": [], "portrait": "", "positions": "核心位置：君主" if index == 0 else "地方将领", "generated": true, "home": cities[index % cities.size()], "profile_note": "地方代理将领，补足当前剧本缺少的武将资料。"}
 
 
 # 旧档可能带着已经不存在的占位 ID（势力前缀与存档不符时尤其明显）。登记之后必须

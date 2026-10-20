@@ -32,7 +32,7 @@ func army(skill_value: int = 50) -> Dictionary:
 	var names := ["武艺", "膂力", "布阵", "应变", "治军", "带兵", "威仪", "沉着", "忠义", "箭术", "骑术", "水练"]
 	var skills := {}
 	for name in names: skills[name] = skill_value
-	return {"id": "test", "officer_id": "test", "units": {"infantry": 5000, "archers": 0, "cavalry": 0}, "skills": skills, "battle_traits": [], "morale": 100.0, "organization": 100.0, "fatigue": 0.0, "training": 80, "equipment": 70, "action": {"type": "engage"}}
+	return {"id": "test", "officer_id": "test", "units": {"infantry": 5000, "archers": 0, "cavalry": 0}, "skills": skills, "trait_ids": [], "morale": 100.0, "organization": 100.0, "fatigue": 0.0, "training": 80, "equipment": 70, "action": {"type": "engage"}}
 
 
 func _initialize() -> void: call_deferred("_run")

@@ -5,6 +5,7 @@ extends RefCounted
 # Triggers are deterministic and never consume the battle RNG.
 
 const Officer = preload("res://scripts/war/officer_battle.gd")
+const Traits = preload("res://scripts/officers/trait_registry.gd")
 const GridScript = preload("res://scripts/rtk14_hex_grid.gd")
 const PATH := "res://data/war/officer_edges.json"
 
@@ -170,7 +171,7 @@ static func attack_mult(war, attacker: Dictionary, defender: Dictionary, melee: 
 		attacker["edge_active"] = id
 		war._report(attacker, "专长", "%s发动专长  设伏，首轮攻击提高。" % attacker["name"], false)
 		return float(data().get("edges", {}).get(id, {}).get("effect", {}).get("first_attack_mult", 1.2))
-	if id == "awe" and melee and int(edge.get("uses", 0)) == 0 and not Officer.has_trait(attacker, "武圣"):
+	if id == "awe" and melee and int(edge.get("uses", 0)) == 0 and Traits.mechanism(attacker, "first_contact_awe").is_empty():
 		edge["uses"] = int(edge.get("uses", 0)) + 1
 		attacker["edge_active"] = id
 		defender["morale"] = maxf(0.0, float(defender["morale"]) + float(data().get("edges", {}).get(id, {}).get("effect", {}).get("enemy_morale", -6)))

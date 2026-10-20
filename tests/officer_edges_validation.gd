@@ -72,7 +72,7 @@ func _run() -> void:
 	var enemy: Dictionary = war.active_armies().filter(func(a): return a["faction"] != war.state["player_faction"] and a.has("tactical"))[0]
 	var saved_ally := {"cell": int(ally["tactical"]["cell"]), "returning": bool(ally["returning"]), "organization": float(ally["organization"])}
 	var saved_intel: Dictionary = enemy["intel"]["enemies"].duplicate(true)
-	var saved_traits: Array = unit["battle_traits"].duplicate()
+	var saved_traits: Array = unit["trait_ids"].duplicate()
 	# steady: first time morale drops below 40.
 	unit["edge"] = edge("steady")
 	unit["morale"] = 35.0
@@ -129,7 +129,7 @@ func _run() -> void:
 	enemy["intel"]["enemies"] = saved_intel
 	# awe: first frontal contact shakes the enemy; 武圣 keeps its own stronger effect.
 	unit["edge"] = edge("awe")
-	unit["battle_traits"] = []
+	unit["trait_ids"] = []
 	var enemy_morale := float(enemy["morale"])
 	Edges.attack_mult(war, unit, enemy, true)
 	check(is_equal_approx(float(enemy["morale"]), enemy_morale - 6.0) and int(unit["edge"]["uses"]) == 1, "立威首次正面接敌减敌士气6")
@@ -137,11 +137,11 @@ func _run() -> void:
 	Edges.attack_mult(war, unit, enemy, true)
 	check(is_equal_approx(float(enemy["morale"]), after_awe), "立威每战只触发一次")
 	unit["edge"] = edge("awe")
-	unit["battle_traits"] = ["武圣"]
+	unit["trait_ids"] = ["unique_wusheng"]
 	enemy["morale"] = enemy_morale
 	Edges.attack_mult(war, unit, enemy, true)
 	check(is_equal_approx(float(enemy["morale"]), enemy_morale) and int(unit["edge"]["uses"]) == 0, "武圣威压独立结算，专长不重复触发")
-	unit["battle_traits"] = saved_traits
+	unit["trait_ids"] = saved_traits
 	# Save round-trip keeps a real officer's edge id and uses.
 	root_army["edge"] = Edges.ensure(root_army, war.roster.officers[str(root_army["officer_id"])], true)
 	root_army["edge"]["uses"] = 1

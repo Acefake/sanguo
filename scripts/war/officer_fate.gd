@@ -68,7 +68,7 @@ static func settle(war, army: Dictionary, enemy: Dictionary, status: String, cau
 		army["officer_id"] = successor
 		army["name"] = str(war.roster.officers[successor]["name"]) + "队"
 		army["skills"] = war.roster.officers[successor].get("skills", {}).duplicate(true)
-		army["battle_traits"] = war.roster.officers[successor].get("battle_traits", []).duplicate()
+		army["trait_ids"] = war.roster.officers[successor].get("trait_ids", []).duplicate()
 		army["edge"] = war.Edges.ensure(army, war.roster.officers[successor], true)
 		army["duel_wounded"] = false
 		# A new commander has met nobody: inheriting the predecessor's contact list

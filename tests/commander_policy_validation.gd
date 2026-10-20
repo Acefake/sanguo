@@ -21,7 +21,7 @@ func _unit(task: String, fatigue: float = 20.0, organization: float = 90.0, retu
 
 func _context(corps: Dictionary, candidates: Array, officer: Dictionary, extra: Dictionary = {}) -> Dictionary:
 	var context := {
-		"officer": {"personality": _personality(officer), "battle_traits": []},
+		"officer": {"personality": _personality(officer), "trait_ids": []},
 		"corps": corps, "candidates": candidates, "army": extra.get("army", {"grain_days": 20.0}),
 		"battlefield": extra.get("battlefield", {"enemy_to_friendly_ratio": 1.0, "friendly_ready_strength": 0.0}),
 		"siege": extra.get("siege", {}), "unit_mix": extra.get("unit_mix", {}),

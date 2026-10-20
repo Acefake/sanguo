@@ -1,6 +1,7 @@
 extends SceneTree
 
 const Battle = preload("res://scripts/war/officer_battle.gd")
+const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Combat = preload("res://scripts/war/combat_system.gd")
 const Store = preload("res://scripts/game_state.gd")
 var failures: Array = []
@@ -9,7 +10,7 @@ func check(value: bool, message: String) -> void:
 	if not value: failures.append(message); push_error(message)
 
 func army(type: String = "infantry") -> Dictionary:
-	return {"id": "test", "officer_id": "test", "units": {"infantry": 10000 if type == "infantry" else 0, "archers": 10000 if type == "archers" else 0, "cavalry": 10000 if type == "cavalry" else 0}, "skills": {}, "battle_traits": [], "morale": 100.0, "organization": 100.0, "fatigue": 0.0, "training": 80, "equipment": 70, "action": {"type": "engage"}}
+	return {"id": "test", "officer_id": "test", "units": {"infantry": 10000 if type == "infantry" else 0, "archers": 10000 if type == "archers" else 0, "cavalry": 10000 if type == "cavalry" else 0}, "skills": {}, "trait_ids": [], "morale": 100.0, "organization": 100.0, "fatigue": 0.0, "training": 80, "equipment": 70, "action": {"type": "engage"}}
 
 func _initialize() -> void:
 	var rules: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/war/campaign_rules.json"))["units"]
@@ -32,15 +33,15 @@ func _initialize() -> void:
 	check(Combat.power(water, rules, "river") > Combat.power(army(), rules, "river"), "水练影响水战")
 	var over := army(); over["skills"]["箭术"] = 120
 	check(is_equal_approx(Battle.skill(over, "箭术"), 106), "100以上递减收益")
-	var cavalry := army("cavalry"); var trait_cavalry := cavalry.duplicate(true); trait_cavalry["battle_traits"] = ["骑战"]
-	check(is_equal_approx(Combat.power(trait_cavalry, rules, "plains") / Combat.power(cavalry, rules, "plains"), 1.03), "骑战仅额外3%不重复属性加成")
+	var cavalry := army("cavalry"); var trait_cavalry := cavalry.duplicate(true); trait_cavalry["trait_ids"] = ["trait_046"]
+	check(Combat.power(trait_cavalry, rules, "plains") > Combat.power(cavalry, rules, "plains"), "善骑本人骑术+2进入骑兵执行")
 	check(is_equal_approx(Combat.power(Combat.aggregate([trait_cavalry, cavalry]), rules, "plains"), Combat.power(trait_cavalry, rules, "plains") + Combat.power(cavalry, rules, "plains")), "合战保留每支部队特性")
-	var saint := army(); saint["battle_traits"] = ["武圣"]
+	var saint := army(); saint["trait_ids"] = ["unique_wusheng"]
 	var famous := army(); famous["skills"]["名望"] = 90
 	check(not Battle.first_contact(saint, famous, false), "远射不触发武圣")
 	check(Battle.first_contact(saint, famous) and famous["morale"] == 92, "首次正面武圣威压")
 	check(not Battle.first_contact(saint, famous) and famous["morale"] == 92, "同目标不重复")
-	var chain := army(); chain["victory_chain"] = true
+	var chain := army(); chain["victory_chain"] = true; chain["trait_ids"] = ["unique_xiaobawang"]
 	var shocked := army(); var unshocked := army()
 	check(Battle.march_speed(chain) > Battle.march_speed(army()), "小霸王首次接敌移动加成")
 	check(Battle.opening(chain, shocked), "连胜首次接敌")
@@ -52,11 +53,11 @@ func _initialize() -> void:
 	var guan: Dictionary
 	for officer in sandbox.war.roster.officers.values():
 		if officer["name"] == "关羽": guan = officer
-	check(Battle.has_trait(guan, "武圣"), "真实人物卡导入特性")
+	check(Traits.has(guan, "unique_wusheng"), "真实人物卡导入特性")
 	var migrated := army(); migrated["officer_id"] = guan["id"]; migrated["faction"] = "liu_bei"; migrated["home"] = "luoyang"
 	var saved: Dictionary = sandbox.war.export_state(); saved["armies"] = {"test": migrated}
 	sandbox.war.setup(sandbox, saved)
-	check(Battle.has_trait(sandbox.war.state["armies"]["test"], "武圣"), "旧存档自动补齐特性")
+	check(Traits.has(sandbox.war.state["armies"]["test"], "unique_wusheng"), "旧存档自动补齐特性")
 	sandbox.free()
 	print("OFFICER_BATTLE_VALIDATION: " + ("PASS" if failures.is_empty() else str(failures)))
 	quit(0 if failures.is_empty() else 1)

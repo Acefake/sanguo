@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "note": "战斗特性 hook 注册表。百分比与概率 hook 的单来源与合计上限来自 Notion《特性接口与验收》10.1；behavior 类是局限特性的决策失败模式（军事页 十四-8），上限在本表逐项给出。better 表示该 hook 数值往哪个方向是“更好”，用于校验优势特性与局限特性方向不写反。",
+  "caps": {
+    "percent": {"common_min": 0.03, "common_max": 0.05, "elite_max": 0.08, "total": 0.10},
+    "pp": {"common_max": 0.02, "elite_max": 0.03, "total": 0.05},
+    "attribute_point": {"common_up": 2, "common_down": 3, "elite_up": 3, "total": 6}
+  },
+  "hooks": {
+    "command整理": {"kind": "percent", "better": "lower", "reads": "带兵", "stage": "command", "unit": "hour", "formula": "command_hours×(1.2−0.4u带兵)，超出容量 2+floor(6u) 个标准单元时按比例排队"},
+    "formation整队": {"kind": "percent", "better": "lower", "reads": "布阵", "stage": "formation", "unit": "hour", "formula": "formation_hours×地形倍率×(1.3−0.5u布阵)；布阵即新版“机动”"},
+    "march行军": {"kind": "percent", "better": "lower", "reads": "布阵", "stage": "march", "unit": "hour", "formula": "单位路程耗时×(1.3−0.5u布阵)；仅改行军耗时，不改道路流量"},
+    "special轮换": {"kind": "percent", "better": "lower", "reads": "治军", "stage": "specialized_action", "unit": "hour", "formula": "rotation_hours×(1.15−0.25u治军)；轮换越快，接战中组织损失越小"},
+    "special齐射": {"kind": "percent", "better": "lower", "reads": "箭术", "stage": "specialized_action", "unit": "hour", "formula": "volley_hours×(1.15−0.25u箭术)；只改第一次队形/信号准备"},
+    "replan重规划": {"kind": "percent", "better": "lower", "reads": "应变", "stage": "planning", "unit": "hour", "formula": "replan_hours×(1.35−0.55u应变)；须已获知原方案失效"},
+    "intel误差": {"kind": "percent", "better": "lower", "reads": "料敌", "stage": "intelligence", "unit": "ratio", "formula": "σ0×(1−0.4u料敌)；保留来源共同偏差"},
+    "rally收拢": {"kind": "percent", "better": "higher", "reads": "治军", "stage": "recovery", "unit": "organization_per_day", "formula": "rally_base×(0.8+0.4u治军)"},
+    "fatigue疲劳": {"kind": "percent", "better": "lower", "reads": "体魄", "stage": "recovery", "unit": "fatigue", "formula": "基础疲劳×(1.2−0.4u体魄)"},
+    "engineering准备": {"kind": "percent", "better": "lower", "reads": "智计", "stage": "engineering", "unit": "worker_hour", "formula": "准备工时×(1.25−0.45u)；旧 25 键没有攻坚，暂以智计代读"},
+    "pursuit追击": {"kind": "percent", "better": "higher", "reads": "骑术", "stage": "pursuit", "unit": "casualty", "formula": "追击造成的俘获/伤亡×(1+mod)"},
+    "withdraw撤离": {"kind": "percent", "better": "lower", "reads": "", "stage": "disengage", "unit": "casualty", "formula": "撤离途中所受追击损失×(1+mod)"},
+    "pressure失误": {"kind": "pp", "better": "lower", "reads": "沉着", "stage": "decision", "unit": "probability", "formula": "clamp(c×(0.45−0.3u沉着),0,0.45)；压力为0时不制造失误"},
+    "conceal暴露": {"kind": "pp", "better": "lower", "reads": "奇袭", "stage": "detection", "unit": "probability", "formula": "clamp(p0+0.25c−0.2u奇袭,0.05,0.95)；只在真实接触窗口抽一次"},
+    "ambush识破": {"kind": "pp", "better": "higher", "reads": "料敌", "stage": "intelligence", "unit": "probability", "formula": "暴露后被正确解读的概率 = clamp(1−intel误差,0.05,0.95)"},
+    "plan遗漏": {"kind": "pp", "better": "lower", "reads": "智计", "stage": "planning", "unit": "probability", "formula": "clamp(0.35+0.3d−0.3u智计,0.03,0.8)；只处理认知内已有约束"},
+    "personal失控": {"kind": "pp", "better": "lower", "reads": "骑术", "stage": "personal", "unit": "probability", "formula": "clamp(p0+0.3c−0.2u骑术,0.01,0.8)；不改军团骑兵"},
+    "commit投入": {"kind": "behavior", "better": "neutral", "unit": "readiness", "source_max": 0.5, "total": 0.6, "formula": "主力投入前要求的协同就位度 = commit_readiness+mod；负值=协同未到位就投入（急躁）"},
+    "pursuit深入": {"kind": "behavior", "better": "lower", "unit": "step", "source_max": 2, "total": 2, "formula": "追击停止深度 = pursuit_max_steps+mod；正值=越过最大深入（贪功、追击疏算）"},
+    "disengage脱离": {"kind": "behavior", "better": "neutral", "unit": "organization_point", "source_max": 20, "total": 25, "formula": "脱离线 = disengage_line+mod；负值=到线不走（恋战），正值=组织未破先撤（怯战）"},
+    "advice采纳": {"kind": "behavior", "better": "higher", "unit": "probability", "source_max": 0.15, "total": 0.15, "formula": "主将采纳参军建议的概率修正（刚愎为负）"},
+    "advice说服": {"kind": "behavior", "better": "higher", "unit": "probability", "source_max": 0.10, "total": 0.10, "formula": "参军建议被采纳的概率修正（言辞刻薄为负）"},
+    "dissent违令": {"kind": "behavior", "better": "lower", "unit": "probability", "source_max": 0.05, "total": 0.10, "formula": "违令概率修正"},
+    "attribute": {"kind": "attribute_point", "better": "higher", "unit": "attribute_point", "formula": "当前属性+本任务有效点数后统一 E 换算；写作 attribute.<子属性>"}
+  },
+  "attribute_keys": ["带兵", "布阵", "水练", "奇袭", "治军", "智计", "沉着", "料敌", "应变", "辩才", "膂力", "体魄", "武艺", "骑术", "箭术", "农桑", "商贾", "吏治", "律法", "辞令", "威仪", "仁德", "忠义", "名望", "雅量"],
+  "fields": {
+    "ctx.terrain": {"type": "enum", "values": ["plains", "forest", "hills", "mountains", "river", "ford", "marsh"]},
+    "ctx.action": {"type": "enum", "values": ["march", "continue", "engage", "flank", "pursue", "hold", "defend", "withdraw", "besiege", "support"]},
+    "ctx.in_contact": {"type": "bool"},
+    "ctx.resting": {"type": "bool"},
+    "ctx.pressure": {"type": "number"},
+    "ctx.urgency": {"type": "number"},
+    "ctx.independent_groups": {"type": "number"},
+    "ctx.enemy_renown_gap": {"type": "number"},
+    "ctx.subcommanders_assigned": {"type": "bool"},
+    "ctx.lord_pride": {"type": "number"},
+    "unit.infantry_ratio": {"type": "number"},
+    "unit.cavalry_ratio": {"type": "number"},
+    "unit.archer_ratio": {"type": "number"},
+    "unit.training": {"type": "number"},
+    "person.mounted": {"type": "bool"}
+  },
+  "mechanisms": {
+    "first_contact_awe": "首次与敌方高名望主将正面接战时，敌方直属部队士气下降；同一目标一次",
+    "victory_chain": "连续主动战胜后，下一场主动攻战首次接敌移动与士气冲击提高；失败清零"
+  }
+}

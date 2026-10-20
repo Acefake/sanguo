@@ -3,6 +3,7 @@ extends RefCounted
 const Graph = preload("res://scripts/war/map_graph.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
 const Battle = preload("res://scripts/war/officer_battle.gd")
+const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Fate = preload("res://scripts/war/officer_fate.gd")
 const Combat = preload("res://scripts/war/combat_system.gd")
 const Policy = preload("res://scripts/agents/baseline_policy.gd")
@@ -92,7 +93,8 @@ func setup(owner: Node, saved: Dictionary = {}) -> void:
 			state["officer_states"][army["officer_id"]] = entry
 		var officer: Dictionary = roster.officers.get(str(army.get("officer_id", "")), {})
 		if army.get("action", {}).get("type", "") == "scout": army["action"] = {"type": "hold"}
-		army["battle_traits"] = officer.get("battle_traits", []).duplicate()
+		army["trait_ids"] = officer.get("trait_ids", []).duplicate()
+		army.erase("battle_traits")
 		army["edge"] = Edges.ensure(army, officer)
 		if army.has("tactical") and state.has("battlefield") and not army.has("battlefield_id"): army["battlefield_id"] = state["battlefield"]["battle_id"]
 	for corps in state["corps"].values():
@@ -534,9 +536,9 @@ func _mobilize(preview: Dictionary) -> Dictionary:
 	var id: String = "army-%04d" % int(state["next_id"])
 	state["next_id"] += 1
 	var officer: Dictionary = roster.officers[str(preview["officer_id"])]
-	var army: Dictionary = {"id": id, "officer_id": officer["id"], "name": officer["name"], "faction": city["faction"], "home": preview["home"], "target": preview["target"], "mission_type": preview["mission_type"], "status": "active", "location": {"node": preview["home"], "edge": "", "progress": 0.0}, "units": units, "initial_strength": count, "dead": 0, "wounded": 0, "captured": 0, "deposited": 0, "training": int(city.get("training", 50)), "equipment": int(city.get("equipment", 50)), "skills": officer["skills"].duplicate(true), "battle_traits": officer.get("battle_traits", []).duplicate(), "grain": float(preview["grain"]) if supply_enabled() else 0.0, "morale": 100.0, "organization": 100.0, "fatigue": 0.0, "started": int(state["tick"]), "deadline": int(state["tick"]) + int(rules["mission_days"]), "intel": {"cities": {}, "enemies": {}}, "action": {"type": "hold"}, "last_decision": -10, "last_report": {}, "last_reason": "正在准备出征。", "returning": false, "scouted_at": -10, "siege_progress": 0.0, "outcome": "", "last_support": -10, "trust": 0.0, "resentment": 0.0, "memory": [], "experience": {"enemy_notes": {}, "battle_log": [], "streak": {"wins": 0, "losses": 0}, "drift": {}}}
+	var army: Dictionary = {"id": id, "officer_id": officer["id"], "name": officer["name"], "faction": city["faction"], "home": preview["home"], "target": preview["target"], "mission_type": preview["mission_type"], "status": "active", "location": {"node": preview["home"], "edge": "", "progress": 0.0}, "units": units, "initial_strength": count, "dead": 0, "wounded": 0, "captured": 0, "deposited": 0, "training": int(city.get("training", 50)), "equipment": int(city.get("equipment", 50)), "skills": officer["skills"].duplicate(true), "trait_ids": officer.get("trait_ids", []).duplicate(), "grain": float(preview["grain"]) if supply_enabled() else 0.0, "morale": 100.0, "organization": 100.0, "fatigue": 0.0, "started": int(state["tick"]), "deadline": int(state["tick"]) + int(rules["mission_days"]), "intel": {"cities": {}, "enemies": {}}, "action": {"type": "hold"}, "last_decision": -10, "last_report": {}, "last_reason": "正在准备出征。", "returning": false, "scouted_at": -10, "siege_progress": 0.0, "outcome": "", "last_support": -10, "trust": 0.0, "resentment": 0.0, "memory": [], "experience": {"enemy_notes": {}, "battle_log": [], "streak": {"wins": 0, "losses": 0}, "drift": {}}}
 	var last_victory := int(state["battle_victories"].get(str(officer["id"]), -100000))
-	army["victory_chain"] = Battle.has_trait(army, "小霸王") and preview["mission_type"] == "capture" and int(state["tick"]) - last_victory <= int(rules.get("victory_chain_days", 30))
+	army["victory_chain"] = not Traits.mechanism(army, "victory_chain").is_empty() and preview["mission_type"] == "capture" and int(state["tick"]) - last_victory <= int(Traits.mechanism(army, "victory_chain").get("window_days", 0))
 	army["departure_at"] = int(state["tick"]) + Operations.assembly_days(self, str(preview["home"]), [officer["id"]])
 	army["deadline"] += maxi(0, int(army["departure_at"]) - int(state["tick"]))
 	Operations.detach_post(self, str(officer["id"]))
@@ -1012,7 +1014,7 @@ func context_for(army: Dictionary) -> Dictionary:
 	# Decision snapshots need geometry, not the growing authoritative battle ledger.
 	local_map.erase("log")
 	local_map.erase("pending_events")
-	return {"request_id": "%s:%d" % [army["id"], int(state["tick"])], "army_id": army["id"], "observation_revision": state["tick"], "date": store.date_text(), "officer": roster.officers.get(str(army["officer_id"]), {"id": str(army["officer_id"]), "name": str(army.get("name", "")), "skills": army.get("skills", {}), "personality": {}, "battle_traits": army.get("battle_traits", [])}).duplicate(true), "army": own, "mission_type": army["mission_type"], "objective": graph.name_of(target), "at_objective": str(location["node"]) == target and str(location.get("edge", "")) == "", "supply_enabled": supply_enabled(), "returning": army["returning"], "target_known": army["intel"]["cities"].has(target), "cities": known_cities, "enemies": known_enemies, "allies": support["allies"], "battlefield": support["battlefield"], "operation": operation.duplicate(true), "orders": orders.duplicate(true), "local_map": local_map.duplicate(true), "current_action": army["action"].duplicate(true), "memory": army["memory"].duplicate(true), "experience": Experience.summary(army), "candidates": candidates}
+	return {"request_id": "%s:%d" % [army["id"], int(state["tick"])], "army_id": army["id"], "observation_revision": state["tick"], "date": store.date_text(), "officer": roster.officers.get(str(army["officer_id"]), {"id": str(army["officer_id"]), "name": str(army.get("name", "")), "skills": army.get("skills", {}), "personality": {}, "trait_ids": army.get("trait_ids", [])}).duplicate(true), "army": own, "mission_type": army["mission_type"], "objective": graph.name_of(target), "at_objective": str(location["node"]) == target and str(location.get("edge", "")) == "", "supply_enabled": supply_enabled(), "returning": army["returning"], "target_known": army["intel"]["cities"].has(target), "cities": known_cities, "enemies": known_enemies, "allies": support["allies"], "battlefield": support["battlefield"], "operation": operation.duplicate(true), "orders": orders.duplicate(true), "local_map": local_map.duplicate(true), "current_action": army["action"].duplicate(true), "memory": army["memory"].duplicate(true), "experience": Experience.summary(army), "candidates": candidates}
 
 
 func _add_candidate(list: Array, id: String, action: Dictionary, description: String, extra: Dictionary = {}) -> void:
@@ -1199,7 +1201,7 @@ func _resolve_contacts(motions: Dictionary) -> void:
 				var pursuer: Dictionary = b if bool(a["returning"]) else a
 				if bool(orders_for(pursuer)["pursue"]) and str(pursuer["action"]["type"]) in ["pursue", "engage"]:
 					pursuer["combat_tick"] = int(state["tick"])
-					var chased: int = Combat.apply_loss(fleeing, mini(Combat.strength(fleeing), int(Combat.strength(pursuer) * 0.025 * Battle.factor(pursuer, ["骑术", "奇袭"], 0.004) / Battle.factor(fleeing, ["应变", "治军"], 0.004) * (1.03 if Battle.has_trait(pursuer, "乘隙追击") else 1.0))), true)
+					var chased: int = Combat.apply_loss(fleeing, mini(Combat.strength(fleeing), int(Combat.strength(pursuer) * 0.025 * Battle.factor(pursuer, ["骑术", "奇袭"], 0.004) / Battle.factor(fleeing, ["应变", "治军"], 0.004) * (1.0 + Traits.modifier(pursuer, "pursuit追击")))), true)
 					_report(fleeing, "遭遇追击", "%s撤退途中被追击，%d人被俘。" % [fleeing["name"], chased], true)
 					_remember_loss(fleeing, "遭遇追击")
 					pursuer["fatigue"] = minf(100, float(pursuer["fatigue"]) + Battle.fatigue_cost(pursuer, 8, true))
@@ -1602,7 +1604,7 @@ func _battle_contact(attacker: Dictionary, defender: Dictionary, melee: bool = t
 
 func _battle_victory(army: Dictionary) -> void:
 	_remember_win(army, "交战取胜")
-	if Battle.has_trait(army, "小霸王") and army.get("mission_type", "") == "capture" and not army.get("returning", false) and army.get("status", "") != "ended":
+	if not Traits.mechanism(army, "victory_chain").is_empty() and army.get("mission_type", "") == "capture" and not army.get("returning", false) and army.get("status", "") != "ended":
 		state["battle_victories"][str(army["officer_id"])] = int(state["tick"])
 
 

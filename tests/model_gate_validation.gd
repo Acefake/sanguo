@@ -42,7 +42,7 @@ func _candidate(id: String, type: String, extra: Dictionary = {}) -> Dictionary:
 	return {"id": id, "action": action, "description": id}
 
 func _context(candidates: Array, army: Dictionary, extra: Dictionary = {}) -> Dictionary:
-	var context := {"request_id": extra.get("request_id", "r"), "observation_revision": 10, "army": army, "enemies": extra.get("enemies", []), "allies": [], "operation": extra.get("operation", {}), "target_known": extra.get("target_known", true), "returning": extra.get("returning", false), "current_action": {"type": "hold"}, "officer": {"name": "测试", "personality": {}, "battle_traits": []}, "candidates": candidates}
+	var context := {"request_id": extra.get("request_id", "r"), "observation_revision": 10, "army": army, "enemies": extra.get("enemies", []), "allies": [], "operation": extra.get("operation", {}), "target_known": extra.get("target_known", true), "returning": extra.get("returning", false), "current_action": {"type": "hold"}, "officer": {"name": "测试", "personality": {}, "trait_ids": []}, "candidates": candidates}
 	if extra.has("level"): context["level"] = extra["level"]
 	return context
 

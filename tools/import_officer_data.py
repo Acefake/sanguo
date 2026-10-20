@@ -4,6 +4,11 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 pages = json.loads((root/'data/officer_notion_sources.json').read_text(encoding='utf-8'))
 pages += json.loads((root/'data/officer_shuhan_notion_sources.json').read_text(encoding='utf-8'))
+# Notion 原文里的错字。快照保持原样，导入时统一纠正，校验测试会拒绝残留。
+TYPOS = {'运筹帷幂': '运筹帷幄', '骄秽': '骄矜', '带兽': '带兵', '带养': '带兵', '臀力': '膂力', '故兔': '故吏', '急造': '急躁', '尤豫': '犹豫', '记仄': '记仇'}
+def fix_typos(text):
+    for wrong, right in TYPOS.items(): text = text.replace(wrong, right)
+    return text
 officers = []
 for page in pages:
     content = page['text'].split('<content>')[1].split('</content>')[0]
@@ -13,7 +18,7 @@ for page in pages:
     for line in sections['25项子属性'].splitlines():
         if '：' in line:
             sub.append([int(x.split('→')[-1]) for x in re.findall(r'\d+(?:→\d+)?',line)])
-    clean = lambda text: re.sub(r'\*\*|<[^>]+>', '', text).strip()
+    clean = lambda text: fix_typos(re.sub(r'\*\*|<[^>]+>', '', text).strip())
     assert len(sub) == 5 and all(len(row) == 5 for row in sub), page['title']
     name = page['title'].split('｜')[0]
     style = page['title'].split('｜')[-1] if '｜' in page['title'] and name not in ['关凤', '周仓'] else '—'

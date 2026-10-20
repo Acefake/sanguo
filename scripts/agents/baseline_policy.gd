@@ -175,7 +175,6 @@ static func effective_personality(context: Dictionary) -> Dictionary:
 
 static func risk_of(context: Dictionary, personality: Dictionary) -> float:
 	var value: float = float(personality.get("风险承受", 50)) / 100.0
-	if "冒进" in context.get("officer", {}).get("battle_traits", []): value = minf(1.0, value + 0.12)
 	return value
 
 

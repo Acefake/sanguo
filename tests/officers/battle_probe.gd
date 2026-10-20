@@ -28,7 +28,7 @@ static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, s
 	var b0 := Combat.strength(b)
 	var renown_gap := Process.value(a, "名望") - Process.value(b, "名望")
 	var ctx := {"terrain": terrain, "enemy_renown_gap": renown_gap, "subcommanders_assigned": probe.has("flank_hours") or not staff.is_empty(), "independent_groups": 2 if not staff.is_empty() else 1, "urgency": 0.8 if probe.get("relief", false) else 0.3, "action": "engage"}
-	var m := {"commit_hour": 0.0, "pursuit_depth": 0, "disengages": 0, "ambushed": 0, "org_min": float(a["organization"]), "loss_ratio": 0.0, "objective": 0, "errors": 0, "routed": 0, "counter": 0}
+	var m := {"commit_hour": 0.0, "pursuit_depth": 0, "disengages": 0, "ambushed": 0, "org_min": float(a["organization"]), "loss_ratio": 0.0, "objective": 0, "errors": 0, "routed": 0, "counter": 0, "omissions": 0}
 
 	# 敌军隐藏兵力：先按料敌估计，再按人物的迎战门槛决定打不打。
 	if probe.get("decide_engage", false):
@@ -65,6 +65,11 @@ static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, s
 		var wing_hours := Process.formation_hours(wing, ctx) + float(probe["flank_hours"]) * Process.march_time_factor(wing, ctx)
 		flank_share = Conduct.commit_readiness(a, ctx)
 		commit += flank_share * wing_hours
+	# 计划遗漏：认知内已有的约束被漏掉（路线、渡口、坡度），发现后重新展开，侧翼也只到一半。
+	if rng.randf() < Process.plan_omission(a, float(probe.get("plan_difficulty", settings["plan_difficulty"])), ctx):
+		commit += Process.formation_hours(a, ctx)
+		flank_share *= 0.5
+		m["omissions"] = 1
 	var b_delay := 0.0 if probe.get("ambush", false) else Process.order_delay_hours(b, {"terrain": terrain})
 	var fortification := 1.0
 	if probe.get("siege", false):

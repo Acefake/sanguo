@@ -5,6 +5,7 @@ const SKILLS := [["带兵", "布阵", "水练", "奇袭", "治军"], ["智计", 
 var officers: Dictionary = {}
 var parsing_audit: Array = []
 const Traits = preload("res://scripts/officers/trait_registry.gd")
+const Careers = preload("res://scripts/officers/career_templates.gd")
 
 static func numeric(value: Variant, maximum: int) -> Dictionary:
 	if typeof(value) not in [TYPE_INT,TYPE_FLOAT] and not (value is String and value.is_valid_float()): return {"value":50,"source":"invalid_default"}
@@ -57,9 +58,12 @@ func militia(faction: String, city: String) -> String:
 		officers[id] = {"id": id, "name": "守备将", "battlefield_role":"guard", "positions":"核心位置：守备", "faction": faction, "skills": skills, "personality": personality, "portrait": "", "profile_note": "地方守备，遵守守城与保全部队的任务。"}
 	return id
 
-# Deterministic local officers keep incomplete historical data playable. Their
-# names explicitly identify the role; they are not fabricated historical cards.
+## 剧本缺少历史人物时，按职业模板补足生成将（每势力至少 max(3, 城数+2) 人）。
+## 名字写明模板，不冒充历史人物；全部取值由 id 的 hash 决定，可复现。
 func ensure_factions(scenario: Dictionary) -> void:
+	var keys: Array = []
+	for row in SKILLS: keys.append_array(row)
+	var medians := Careers.medians(officers, keys)
 	for faction in scenario.get("factions", {}):
 		var cities: Array = []
 		for city in scenario.get("places", {}):
@@ -75,13 +79,13 @@ func ensure_factions(scenario: Dictionary) -> void:
 			var id := "local:%s:%d" % [faction, index]
 			if officers.has(id): continue
 			count += 1
-			var skills := {}
-			for row in SKILLS:
-				for skill in row: skills[skill] = 55 + absi(hash(id + str(skill))) % 21
-			var personality := {}
-			for axis in AXES: personality[axis] = 40 + absi(hash(id + str(axis))) % 31
+			var template := Careers.pick(faction, index)
+			var officer := Careers.generate(id, template, keys, AXES, medians)
 			var name := str(scenario["factions"][faction].get("name", faction))
-			officers[id] = {"id": id, "name": name + ("·代行主政" if index == 0 else "·地方将%d" % index), "faction": faction, "skills": skills, "personality": personality, "trait_ids": [], "portrait": "", "positions": "核心位置：君主" if index == 0 else "地方将领", "generated": true, "home": cities[index % cities.size()], "profile_note": "地方代理将领，补足当前剧本缺少的武将资料。"}
+			officer.merge({"name": name + ("·代行主政" if index == 0 else "·%s%d" % [template["name"], index]), "faction": faction, "portrait": "", "home": cities[index % cities.size()], "profile_note": "地方%s，补足当前剧本缺少的武将资料。" % template["name"]})
+			# 代行主政仍是君主，岗位轮廓沿用模板。
+			if index == 0: officer["positions"] = "核心位置：君主\n" + str(template["positions"]).replace("核心位置", "次选位置")
+			officers[id] = officer
 
 
 # 旧档可能带着已经不存在的占位 ID（势力前缀与存档不符时尤其明显）。登记之后必须

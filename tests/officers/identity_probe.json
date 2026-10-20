@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "人物特色对照验收的场景覆盖层。地形、兵力、编成取自 data/war/battle_scenarios.json；这里只补探针需要的过程参数（侧翼迂回时长、伏击、守点日数、攻坚准备、解围期限、敌军隐藏兵力）。",
+  "note": "人物特色对照验收的场景覆盖层。地形、兵力、编成取自 data/war/battle_scenarios.json；这里只补探针需要的过程参数（侧翼迂回时长、伏击、守点日数、攻坚准备、解围期限、敌军隐藏兵力）。 generated_pairs 列出取两名生成将做同模板对照的模板。",
   "seeds": 40,
   "max_days": 15,
   "subject_side": "yuan_shao",
@@ -32,7 +32,8 @@
     },
     "hulao_pass": {
       "flank_hours": 10,
-      "hold_days": 4
+      "hold_days": 4,
+      "plan_difficulty": 0.6
     },
     "xiapi_siege": {
       "siege": true,
@@ -46,15 +47,18 @@
       "cover": 1.0,
       "ambush_org": 20,
       "ambush_hours": 8,
-      "staff": true
+      "staff": true,
+      "plan_difficulty": 0.5
     },
     "dingjun_hill": {
       "flank_hours": 8,
-      "hold_days": 5
+      "hold_days": 5,
+      "plan_difficulty": 0.5
     },
     "chibi_ford": {
       "flank_hours": 12,
-      "hold_days": 4
+      "hold_days": 4,
+      "plan_difficulty": 0.6
     },
     "wancheng_marsh": {
       "decide_engage": true,
@@ -102,5 +106,11 @@
       "flaw": "flaw_caustic"
     }
   ],
-  "daily_fatigue": 5
+  "daily_fatigue": 5,
+  "generated_pairs": [
+    "猛将",
+    "骑将",
+    "参军"
+  ],
+  "plan_difficulty": 0.3
 }

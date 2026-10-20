@@ -20,6 +20,7 @@ var settings: Dictionary
 var scenarios: Dictionary = {}
 var rules: Dictionary
 var failures: Array[String] = []
+var generated_pairs: Array = []
 
 
 func _initialize() -> void:
@@ -54,11 +55,24 @@ func _subjects() -> Array:
 	roster.ensure_factions(world)
 	var list: Array = []
 	for card in cards: list.append(roster.officers[str(card["id"])])
-	# 曹方没有历史人物卡，取一名生成将作对照。
-	var generated: Array = roster.officers.values().filter(func(o): return bool(o.get("generated", false)) and str(o["id"]).contains("cao"))
-	generated.sort_custom(func(x, y): return str(x["id"]) < str(y["id"]))
-	if not generated.is_empty(): list.append(generated[min(1, generated.size() - 1)])
+	# 生成将：每个模板取第一人（曹方优先），generated_pairs 里的模板再取第二人做同模板对照。
+	var generated: Array = roster.officers.values().filter(func(o): return bool(o.get("generated", false)) and o.has("career"))
+	generated.sort_custom(func(x, y): return [not str(x["id"]).contains("cao_cao"), str(x["id"])] < [not str(y["id"]).contains("cao_cao"), str(y["id"])])
+	var taken := {}
+	for officer in generated:
+		var career := str(officer["career_name"])
+		var limit := 2 if career in settings["generated_pairs"] else 1
+		if int(taken.get(career, 0)) >= limit: continue
+		taken[career] = int(taken.get(career, 0)) + 1
+		list.append(officer)
+		if int(taken[career]) == 2: generated_pairs.append([_first_of(list, career), officer["name"]])
 	return list
+
+
+func _first_of(list: Array, career: String) -> String:
+	for officer in list:
+		if str(officer.get("career_name", "")) == career: return str(officer["name"])
+	return ""
 
 
 func _flat_officer(name: String, skill: float, overrides: Dictionary) -> Dictionary:
@@ -113,7 +127,7 @@ func _score(samples: Dictionary) -> float:
 
 func _check_pairs(results: Dictionary) -> Array:
 	var rows: Array = []
-	for pair in settings["pairs"]:
+	for pair in settings["pairs"] + generated_pairs:
 		var differing := {}
 		for id in settings["scenarios"]:
 			for metric in Probe.METRICS:

@@ -11,6 +11,7 @@ const SUITE := [
 	# 结算与将领
 	"officers/trait_registry_validation",
 	"officers/officer_process_validation",
+	"officers/officer_conduct_validation",
 	"officers/career_template_validation",
 	"officers/officer_explain_validation",
 	"officers/identity_harness",

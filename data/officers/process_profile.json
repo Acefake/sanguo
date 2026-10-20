@@ -66,6 +66,13 @@
     "pursuit_max_steps": 2,
     "disengage_line": 35,
     "engage_ratio": 1.05,
-    "advice_base": 0.55
+    "advice_base": 0.55,
+    "personality": {
+      "commit": 0.1,
+      "disengage": 8,
+      "engage_ratio": 0.13,
+      "engage_ratio_min": 0.92,
+      "engage_ratio_max": 1.28
+    }
   }
 }

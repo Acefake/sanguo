@@ -6,6 +6,7 @@ const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Signature = preload("res://scripts/officers/signature_traits.gd")
 const Explain = preload("res://scripts/officers/officer_explain.gd")
+const Conduct = preload("res://scripts/officers/officer_conduct.gd")
 const Fate = preload("res://scripts/war/officer_fate.gd")
 const Combat = preload("res://scripts/war/combat_system.gd")
 const Policy = preload("res://scripts/agents/baseline_policy.gd")
@@ -356,7 +357,7 @@ func _evaluate_dissent(army: Dictionary, context: Dictionary, record: Dictionary
 	var orders: Dictionary = orders_for(army)
 	var contact: Dictionary = army.get("tactical", {}).get("contact", {})
 	var urgent := Dissent.urgent(army, contact, supply_enabled())
-	var probability := Dissent.probability(army, officer.get("personality", {}), orders, relation_name, urgent, float(army.get("counter_intel_dissent", 0.0)), params)
+	var probability := clampf(Dissent.probability(army, officer.get("personality", {}), orders, relation_name, urgent, float(army.get("counter_intel_dissent", 0.0)), params) + Conduct.dissent_shift(officer), 0.0, float(params.get("max", 0.6)))
 	var roll := Dissent.roll("%s:%d:%s:dissent" % [str(state.get("dissent_seed", 0)), army["id"], int(state["tick"])], state)
 	var entry: Dictionary = {"tick": state["tick"], "army_id": army["id"], "probability": probability, "gap": gap, "ordered": ordered_top, "suggested": best_free["candidate"]["id"], "roll": roll, "relation": relation_name, "urgent": urgent}
 	if roll >= probability:

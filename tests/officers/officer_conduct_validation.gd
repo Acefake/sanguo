@@ -7,6 +7,7 @@ extends SceneTree
 
 const Conduct = preload("res://scripts/officers/officer_conduct.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
+const Repository = preload("res://scripts/officers/officer_repository.gd")
 
 var failures: Array[String] = []
 
@@ -33,7 +34,7 @@ func _initialize() -> void:
 	check(is_equal_approx(Conduct.dissent_shift(officer({}, ["flaw_stubborn"])), 0.05), "刚愎违令 +5pp")
 
 	# 真实人物：颜良与文丑卡面相近，靠 Notion 行为画像推定的人格型局限区分；郭嘉与田丰风险偏好相反。
-	var cards: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
+	var cards: Array = Repository.cards()
 	var roster := Roster.new()
 	roster.setup(cards, {})
 	var by_name := {}

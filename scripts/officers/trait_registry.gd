@@ -1,15 +1,15 @@
 extends RefCounted
 ## 战斗特性注册表。
 ##
-## 读 data/officers/ 下的 hook 表、特性库，以及人物卡（data/officers.json）上的特性配置，加载时一次校验，
+## 读 data/officers/ 下的 hook 表、特性库，以及人物卡（OfficerRepository）上的特性配置，加载时一次校验，
 ## 运行时只回答一件事：这支部队在当前情境下，某个 hook 被特性改了多少。
 ## 单个特性的幅度在加载时按档位校验；同一 hook 的合计上限在查询时统一夹住，
 ## 调用方不再各自判断特性名。
 
 const HOOKS_PATH := "res://data/officers/hooks.json"
 const TRAITS_PATH := "res://data/officers/traits.json"
-const OFFICERS_PATH := "res://data/officers.json"
 const Card = preload("res://scripts/officers/officer_card.gd")
+const Repository = preload("res://scripts/officers/officer_repository.gd")
 const TIERS := ["common", "elite", "flaw", "unique"]
 const OPERATORS := ["==", "!=", ">=", "<=", ">", "<", "in"]
 ## Notion 原文的错字；人物卡与特性名里出现即校验失败。
@@ -26,17 +26,12 @@ static var _loaded := false
 
 static func _ensure() -> void:
 	if _loaded: return
-	load_data(_read(HOOKS_PATH), _read(TRAITS_PATH), Card.assignments(_cards()))
+	load_data(_read(HOOKS_PATH), _read(TRAITS_PATH), Card.assignments(Repository.cards()))
 
 
 static func _read(path: String) -> Dictionary:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	return parsed if parsed is Dictionary else {}
-
-
-static func _cards() -> Array:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(OFFICERS_PATH))
-	return parsed if parsed is Array else []
 
 
 ## 用给定数据替换注册表并校验，返回错误列表。测试用它喂入坏数据。
@@ -66,7 +61,7 @@ static func load_data(hooks: Dictionary, traits: Dictionary, assignments: Dictio
 static func validate(cards: Array = []) -> Array[String]:
 	_ensure()
 	var errors: Array[String] = _errors.duplicate()
-	if cards.is_empty(): cards = _cards()
+	if cards.is_empty(): cards = Repository.cards()
 	for card in cards:
 		var text := JSON.stringify(card)
 		for typo in TYPOS:

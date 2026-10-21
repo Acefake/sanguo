@@ -8,6 +8,7 @@ const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Signature = preload("res://scripts/officers/signature_traits.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
+const Repository = preload("res://scripts/officers/officer_repository.gd")
 const Card = preload("res://scripts/officers/officer_card.gd")
 
 var failures: Array[String] = []
@@ -28,7 +29,7 @@ func _initialize() -> void:
 	for error in errors: print("  校验错误：", error)
 	check(errors.is_empty(), "真实特性数据应零校验错误，实际 %d 条" % errors.size())
 
-	var cards: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
+	var cards: Array = Repository.cards()
 	var roster := Roster.new()
 	roster.setup(cards, {})
 	var flaw_total := 0

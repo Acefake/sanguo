@@ -7,6 +7,7 @@ const Radar = preload("res://scripts/officers/ui/officer_radar.gd")
 const TraitButton = preload("res://scripts/officers/ui/officer_trait_button.gd")
 const Card = preload("res://scripts/officers/officer_card.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
+const Repository = preload("res://scripts/officers/officer_repository.gd")
 const DIMENSIONS := ["军事", "谋略", "勇武", "政务", "影响"]
 const SUB_NAMES := [["统兵", "攻坚", "机动", "奇袭", "治军"], ["智计", "沉着", "料敌", "应变", "辩论"], ["膂力", "体魄", "武艺", "骑术", "射术"], ["农桑", "财赋", "吏治", "法度", "外交"], ["威仪", "仁德", "信义", "名望", "容人"]]
 ## 特性条的底色：专属金、卓越金、普通银、局限红。
@@ -29,7 +30,7 @@ var footer: Label
 
 func _ready() -> void:
 	officers = []
-	for card in JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json")):
+	for card in Repository.cards():
 		var view := Card.page_view(card)
 		view["traits"] = Card.trait_ids(card).map(func(id): return {"name": str(Traits.definition(id).get("name", id)), "description": str(Traits.definition(id).get("summary", "")), "rank": TRAIT_RANK.get(Traits.tier_of(id), "unranked")})
 		officers.append(view)

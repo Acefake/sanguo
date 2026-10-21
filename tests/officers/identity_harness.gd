@@ -11,6 +11,7 @@ extends SceneTree
 
 const Probe = preload("res://tests/officers/battle_probe.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
+const Repository = preload("res://scripts/officers/officer_repository.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Explain = preload("res://scripts/officers/officer_explain.gd")
 ## 指标对应的流程 hook，用来给署名情境找署名来源。
@@ -56,7 +57,7 @@ func _initialize() -> void:
 
 
 func _subjects() -> Array:
-	var cards: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
+	var cards: Array = Repository.cards()
 	var roster := Roster.new()
 	roster.setup(cards, rules.get("faction_mapping", {}))
 	var world: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/scenario_world_demo.json"))

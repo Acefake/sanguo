@@ -1,5 +1,5 @@
 extends RefCounted
-## 人物卡（data/officers.json，schema 6）到运行时人物字典的唯一换算点。
+## 人物卡（OfficerRepository，schema 6）到运行时人物字典的唯一换算点。
 ##
 ## 卡面用人物系统 GDD v0.3.1 的字典：25 项子属性（统兵…容人）、五兵种适性、十类地形、
 ## 价值倾向/风险偏好/忠诚三轴、有向关系边、推荐/不宜岗位、技术特性与人格型局限。

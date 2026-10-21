@@ -1,4 +1,4 @@
-"""校验 data/officers.json（人物卡 schema 6）。
+"""校验 data/scenarios/guandu/officers.json（人物卡 schema 6）。
 
     python tools/validate/validate_officer_cards.py
 
@@ -119,7 +119,7 @@ def check_card(card, traits, errors, warnings):
 
 
 def main():
-    cards = json.loads((ROOT / "data/officers.json").read_text(encoding="utf-8"))
+    cards = json.loads((ROOT / "data/scenarios/guandu/officers.json").read_text(encoding="utf-8"))
     traits = {t["id"]: t for t in json.loads((ROOT / "data/officers/traits.json").read_text(encoding="utf-8"))["traits"]}
     errors = []
     ids = [c.get("id") for c in cards]

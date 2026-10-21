@@ -5,6 +5,7 @@ extends SceneTree
 ##   godot --headless --path . --script res://tests/officers/career_template_validation.gd
 
 const Roster = preload("res://scripts/agents/officer_context.gd")
+const Repository = preload("res://scripts/officers/officer_repository.gd")
 const Careers = preload("res://scripts/officers/career_templates.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
 
@@ -18,7 +19,7 @@ func check(value: bool, message: String) -> void:
 
 
 func build() -> Roster:
-	var cards: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
+	var cards: Array = Repository.cards()
 	var rules: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/war/campaign_rules.json"))
 	var roster := Roster.new()
 	roster.setup(cards, rules.get("faction_mapping", {}))

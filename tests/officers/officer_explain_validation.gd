@@ -6,6 +6,7 @@ extends SceneTree
 const Explain = preload("res://scripts/officers/officer_explain.gd")
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
+const Repository = preload("res://scripts/officers/officer_repository.gd")
 
 var failures: Array[String] = []
 
@@ -17,7 +18,7 @@ func check(value: bool, message: String) -> void:
 
 
 func _initialize() -> void:
-	var cards: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
+	var cards: Array = Repository.cards()
 	var roster := Roster.new()
 	roster.setup(cards, {})
 	var by_name := {}

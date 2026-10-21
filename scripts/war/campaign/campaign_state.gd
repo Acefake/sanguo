@@ -42,6 +42,9 @@ const Reports = preload("res://scripts/war/campaign/campaign_reports.gd")
 const Orders = preload("res://scripts/war/campaign/campaign_orders.gd")
 const Dispatch = preload("res://scripts/war/campaign/campaign_dispatch.gd")
 const Context = preload("res://scripts/war/campaign/campaign_context.gd")
+const Contacts = preload("res://scripts/war/campaign/campaign_contact_resolver.gd")
+const Outcomes = preload("res://scripts/war/campaign/campaign_outcomes.gd")
+const Actions = preload("res://scripts/war/campaign/campaign_actions.gd")
 var store: Node
 var graph = Graph.new()
 var roster = Roster.new()
@@ -389,498 +392,6 @@ func set_battle_ai_mode(mode: String) -> bool:
 	return true
 
 
-func _execute(army: Dictionary, action: Dictionary) -> void:
-	if not supply_enabled() and action.get("type", "") == "resupply": return
-	# 换了命令才有整理与展开的延迟；同一命令延续不重复扣。
-	if str(action.get("type", "")) != str(army.get("action", {}).get("type", "")):
-		Process.issue_order(army, {"terrain": _terrain(str(army["location"]["node"])), "action": str(action.get("type", ""))})
-	army["action"] = action.duplicate(true)
-	var location: Dictionary = army["location"]
-	match str(action["type"]):
-		"march":
-			var destination := str(action["target"])
-			if destination != str(army["target"]) and not can_cross(str(army["faction"]), destination): army["action"] = {"type": "hold"}; return
-			location["from"] = location["node"]
-			location["to"] = action["target"]
-			location["edge"] = action["edge"]
-			location["progress"] = 0.0
-		"scout": army["scouted_at"] = int(state["tick"])
-		"withdraw":
-			army["returning"] = true
-			if str(army["outcome"]) == "":
-				army["outcome"] = "撤退"
-			state["missions"][army["id"]]["status"] = "returning"
-			_start_return(army)
-		"resupply":
-			var city: Dictionary = store.city_state(str(location["node"]))
-			var need: int = maxi(0, int(ceil(daily_food(army) * float(rules["carry_days"]) - float(army["grain"]))))
-			var take: int = mini(need, mini(int(city.get("grain", 0)), int(ceil(daily_food(army) * 10))))
-			city["grain"] -= take
-			army["grain"] += take
-			store.city_changed.emit(str(location["node"]))
-		"request_support":
-			army["last_support"] = int(state["tick"])
-			_report(army, "求援", "%s请求增援，目前兵力%d。" % [army["name"], Combat.strength(army)], true)
-
-
-func _start_return(army: Dictionary) -> void:
-	if army.has("tactical"): return
-	var location: Dictionary = army["location"]
-	if str(location.get("edge", "")) != "":
-		if not bool(location.get("reversed", false)):
-			var old_from: String = str(location["from"])
-			location["from"] = location["to"]
-			location["node"] = location["to"]
-			location["to"] = old_from
-			location["progress"] = 1.0 - float(location["progress"])
-			location["reversed"] = true
-		return
-	var best: Dictionary = {}
-	var best_cost: float = INF
-	var destination: String = ""
-	# Equal-cost retreat cities need the same tie-break before and after JSON load.
-	var friendly_ids: Array = store.scenario.get("places", {}).keys()
-	friendly_ids.sort()
-	for id in friendly_ids:
-		var city: Dictionary = store.city_state(str(id))
-		if not city.has("garrison") or str(city.get("faction", "")) != str(army["faction"]):
-			continue
-		var path: Dictionary = route(str(army["faction"]), str(location["node"]), str(id))
-		if bool(path["found"]) and float(path["cost"]) < best_cost:
-			best = path
-			best_cost = float(path["cost"])
-			destination = str(id)
-	if destination == "":
-		# 无可达友城时不能无限期滞留：逐日散亡、逐日衰退，逾期按溃散收束，
-		# 否则 returning 永远为真，月度推进被 active_armies 非空永久拒绝。
-		var since := int(army.get("return_stalled_since", state["tick"]))
-		army["return_stalled_since"] = since
-		var stalled := int(state["tick"]) - since
-		if stalled == 0:
-			_report(army, "退路受阻", "%s没有可达的友城，暂时驻守并请求支援。" % army["name"], true)
-		Combat.apply_loss(army, maxi(1, int(ceil(Combat.strength(army) * 0.05))))
-		army["morale"] = maxf(0.0, float(army["morale"]) - 6.0)
-		army["last_reason"] = "退路断绝，部众正在散亡（%d/%d日）" % [stalled, int(rules.get("return_stall_days", 10))]
-		if stalled >= int(rules.get("return_stall_days", 10)) or Combat.strength(army) <= 0:
-			_finish(army, "退路断绝，部众散亡")
-		return
-	army.erase("return_stalled_since")
-	army["return_destination"] = destination
-	if best["nodes"].size() == 1:
-		_finish(army, str(army.get("outcome", "撤退")))
-	else:
-		location["from"] = location["node"]
-		location["to"] = best["nodes"][1]
-		location["edge"] = best["edges"][0]
-		location["progress"] = 0.0
-		location["reversed"] = false
-
-
-func _move_all() -> Dictionary:
-	if state.has("battlefield"): return Tactical.move(self)
-	var motions: Dictionary = Battlefields.run(self, "move")
-	for army in active_armies():
-		if army.has("tactical"): continue
-		if not ready(army): continue
-		var location: Dictionary = army["location"]
-		var before: Dictionary = location.duplicate(true)
-		if str(location.get("edge", "")) != "" and str(army["action"]["type"]) in ["march", "continue", "withdraw"]:
-			var edge: Dictionary = graph.edges.get(location["edge"], {})
-			if graph.blocked.has(location["to"]) or graph.blocked.has(location["from"]):
-				army["action"] = {"type": "hold"}
-				_report(army, "通路受阻", "%s行军通路受阻，正在重新判断。" % army["name"], true)
-			else:
-				var leader: Dictionary = army
-				if army.has("corps_id"): leader = state["armies"][state["corps"][army["corps_id"]]["root_id"]]
-				var speed: float = Process.march_speed(leader, _terrain(str(location["node"])))
-				location["progress"] = minf(1.0, float(location["progress"]) + speed / maxf(float(edge.get("cost", 1)) * float(rules["route_days_per_cost"]), 1))
-				army["fatigue"] = minf(100, float(army["fatigue"]) + Process.fatigue_cost(army, 3.0))
-				if float(location["progress"]) >= 1.0:
-					location["node"] = location["to"]
-					location["edge"] = ""
-					location["progress"] = 0.0
-		motions[army["id"]] = {"before": before, "after": location.duplicate(true)}
-	return motions
-
-
-func _edge_coordinate(location: Dictionary) -> float:
-	var edge: Dictionary = graph.edges.get(location.get("edge", ""), {})
-	return float(location.get("progress", 0)) if str(location.get("from", "")) == str(edge.get("from", "")) else 1.0 - float(location.get("progress", 0))
-
-
-func _contact(a: Dictionary, b: Dictionary, motions: Dictionary) -> bool:
-	var la: Dictionary = a["location"]
-	var lb: Dictionary = b["location"]
-	if str(la.get("edge", "")) == "" and str(lb.get("edge", "")) == "":
-		return str(la["node"]) == str(lb["node"])
-	var ma: Dictionary = motions.get(a["id"], {"before": la, "after": la})
-	var mb: Dictionary = motions.get(b["id"], {"before": lb, "after": lb})
-	var ea: String = str(ma["before"].get("edge", ""))
-	var eb: String = str(mb["before"].get("edge", ""))
-	if ea == "": ea = str(la.get("edge", ""))
-	if eb == "": eb = str(lb.get("edge", ""))
-	if ea == "" or ea != eb:
-		return false
-	var aa: Dictionary = ma["before"] if str(ma["before"].get("edge", "")) != "" else la
-	var bb: Dictionary = mb["before"] if str(mb["before"].get("edge", "")) != "" else lb
-	var old_delta: float = _edge_coordinate(aa) - _edge_coordinate(bb)
-	var a_end: float = _edge_coordinate(la) if str(la.get("edge", "")) != "" else (1.0 if str(la["node"]) == str(graph.edges[ea]["to"]) else 0.0)
-	var b_end: float = _edge_coordinate(lb) if str(lb.get("edge", "")) != "" else (1.0 if str(lb["node"]) == str(graph.edges[ea]["to"]) else 0.0)
-	return absf(a_end - b_end) < 0.13 or old_delta * (a_end - b_end) <= 0
-
-
-func _resolve_contacts(motions: Dictionary) -> void:
-	if state.has("battlefield"):
-		Tactical.resolve(self)
-		return
-	Battlefields.prepare(self)
-	Battlefields.roads(self, motions)
-	Battlefields.run(self, "resolve")
-	var armies: Array = active_armies().filter(func(army): return not army.has("tactical") and ready(army))
-	var engaged: Dictionary = {}
-	for i in range(armies.size()):
-		for j in range(i + 1, armies.size()):
-			var a: Dictionary = armies[i]
-			var b: Dictionary = armies[j]
-			if not hostile(str(a["faction"]), str(b["faction"])) or engaged.has(a["id"]) or engaged.has(b["id"]) or not _contact(a, b, motions):
-				continue
-			if not bool(orders_for(a)["engage"]) or not bool(orders_for(b)["engage"]):
-				var initiated := false
-				for side in [a, b]:
-					var type: String = side["action"]["type"]
-					initiated = initiated or (type == "engage" and bool(orders_for(side)["engage"])) or (type == "pursue" and bool(orders_for(side)["pursue"]))
-				if not initiated: continue
-			engaged[a["id"]] = true
-			engaged[b["id"]] = true
-			if bool(a["returning"]) or bool(b["returning"]):
-				var fleeing: Dictionary = a if bool(a["returning"]) else b
-				var pursuer: Dictionary = b if bool(a["returning"]) else a
-				if bool(orders_for(pursuer)["pursue"]) and str(pursuer["action"]["type"]) in ["pursue", "engage"]:
-					pursuer["combat_tick"] = int(state["tick"])
-					var chased: int = Combat.apply_loss(fleeing, mini(Combat.strength(fleeing), int(Combat.strength(pursuer) * Process.pursuit_rate(pursuer, fleeing))), true)
-					_report(fleeing, "遭遇追击", Explain.signed(fleeing, "withdraw撤离", "%s撤退途中被追击，%d人被俘。" % [fleeing["name"], chased]), true)
-					_report(pursuer, "追击", Explain.signed(pursuer, "pursuit追击", "追击%s，俘获%d人。" % [fleeing["name"], chased]), false)
-					_remember_loss(fleeing, "遭遇追击")
-					pursuer["fatigue"] = minf(100, float(pursuer["fatigue"]) + Process.fatigue_cost(pursuer, 8, true))
-				continue
-			# Freeze road movement at the contact point for the next day's battle.
-			var edge_id: String = str(a["location"].get("edge", ""))
-			if edge_id != "" and str(b["location"].get("edge", "")) == edge_id:
-				var coordinate: float = (_edge_coordinate(a["location"]) + _edge_coordinate(b["location"])) * 0.5
-				for combatant in [a, b]:
-					combatant["location"]["progress"] = coordinate if str(combatant["location"]["from"]) == str(graph.edges[edge_id]["from"]) else 1.0 - coordinate
-			var side_a: Array = [a]
-			var side_b: Array = [b]
-			for support in armies:
-				if engaged.has(support["id"]) or bool(support["returning"]): continue
-				if str(support["faction"]) == str(a["faction"]) and _contact(support, b, motions):
-					side_a.append(support)
-					engaged[support["id"]] = true
-				elif str(support["faction"]) == str(b["faction"]) and _contact(support, a, motions):
-					side_b.append(support)
-					engaged[support["id"]] = true
-			var terrain: String = _terrain(str(a["location"]["node"]))
-			for attacker in side_a:
-				for defender in side_b: _battle_contact(attacker, defender)
-			for attacker in side_b:
-				for defender in side_a: _battle_contact(attacker, defender)
-			if not side_a.is_empty() and not side_b.is_empty(): Duel.challenge(self, side_a[0], side_b[0])
-			var combined_a: Dictionary = Combat.aggregate(side_a)
-			var combined_b: Dictionary = Combat.aggregate(side_b)
-			var hit_a := Combat.losses_detail(combined_b, combined_a, rules, terrain, rng.randf_range(0.9, 1.1))
-			var loss_a: int = int(hit_a["loss"])
-			var hit_b := Combat.losses_detail(combined_a, combined_b, rules, terrain, rng.randf_range(0.9, 1.1))
-			var loss_b: int = int(hit_b["loss"])
-			var report_losses := {}
-			var credit_a := {}
-			var credit_b := {}
-			var commanders := {}
-			for member in side_a + side_b: commanders[member["id"]] = member["officer_id"]
-			for member in side_a: credit_a[member["id"]] = Combat.strength(member)
-			for member in side_b: credit_b[member["id"]] = Combat.strength(member)
-			var personal_a := Fate.personal_weights(side_a, credit_a, float(hit_b.get("personal_fraction", 0)), rules)
-			var personal_b := Fate.personal_weights(side_b, credit_b, float(hit_a.get("personal_fraction", 0)), rules)
-			var sides := [[side_a, loss_a, loss_b, Combat.strength(combined_b)], [side_b, loss_b, loss_a, Combat.strength(combined_a)]]
-			for side_index in sides.size():
-				var side: Array = sides[side_index]
-				var members: Array = side[0]
-				# Index, not members == side_a: Array equality is a deep value compare.
-				var enemy_members: Array = sides[1 - side_index][0]
-				var total_strength: int = Combat.strength(Combat.aggregate(members))
-				var remaining: int = int(side[1])
-				for member in members:
-					member["battle_factors"] = Feedback.factors(enemy_members[0], member, rules, terrain)
-					member["combat_tick"] = int(state["tick"])
-					var loss: int = mini(remaining, int(ceil(float(side[1]) * Combat.strength(member) / maxf(total_strength, 1))))
-					var before_strength := Combat.strength(member)
-					var dead_before := int(member["dead"])
-					loss = Combat.apply_loss(member, loss, false, 0.0, 0.0, 0.5, rules)
-					Fate.credit(self, credit_b if side_index == 0 else credit_a, int(member["dead"]) - dead_before, commanders, personal_b if side_index == 0 else personal_a)
-					report_losses[member["id"]] = loss
-					Feedback.loss(self, member, loss)
-					Combat.battle_morale(member, loss, float(side[2]) * before_strength / maxf(total_strength, 1), before_strength, float(side[3]), total_strength, float(side[3]), false, 0.0, 0.5, rules)
-					remaining -= loss
-					member["fatigue"] = minf(100, float(member["fatigue"]) + Process.fatigue_cost(member, 5, true))
-					_check_rout(member)
-					if member["returning"] or member["status"] == "ended":
-						for winner in enemy_members: _battle_victory(winner)
-
-			for member in side_a + side_b:
-				var loss: int = int(report_losses.get(member["id"], 0))
-				_report(member, "交战", "%s与敌军交战，本日损失%d人，士气%d。" % [member["name"], loss, int(member["morale"])], true)
-
-
-func _terrain(node: String) -> String:
-	var place: Dictionary = graph.places.get(node, {})
-	if str(place.get("type", "")) == "pass":
-		return "mountains"
-	return str(rules["terrain_regions"].get(str(place.get("region_id", "")), "plains"))
-
-
-func _resolve_sieges() -> void:
-	Siege.resolve(self)
-	for node in state["sieges"]:
-		var siege: Dictionary = state["sieges"][node]
-		if float(siege.get("wall", 1)) > 0 and float(siege.get("gate", 1)) > 0: continue
-		for id in siege.get("participants", []):
-			var army: Dictionary = state["armies"].get(id, {})
-			if army.is_empty() or army["faction"] != state["player_faction"]: continue
-			_report(army, "破城", graph.name_of(str(node)) + "防线已出现破口，部队可进入城内作战。", true, "siege:%s:%s" % [node, siege.get("started", 0)])
-			break
-
-
-func _capture_city(army: Dictionary, besiegers: Array, node: String, city: Dictionary) -> void:
-	var old_faction := str(city.get("faction", ""))
-	var guard := str(state["garrison_commanders"].get(node, {}).get("officer_id", ""))
-	for id in state["officer_states"]:
-		var officer: Dictionary = state["officer_states"][id]
-		if id == guard or officer.get("status", "") not in ["available", "recovering"] or officer.get("city", "") != node or roster.officers.get(id, {}).get("faction", "") != old_faction: continue
-		state["officer_fates"][id] = {"officer_id": id, "name": roster.officers[id]["name"], "faction": old_faction, "status": "captured", "tick": int(state["tick"]), "cause": "城池失守", "captor_id": army["officer_id"], "captor_faction": army["faction"], "city": node}
-	Fate.restore(self)
-	city["prisoners"] = int(city.get("prisoners", 0)) + int(city["garrison"]) + int(city.get("wounded", 0))
-	city["wounded"] = 0
-	city["wounded_units"] = {"infantry": 0, "archers": 0, "cavalry": 0}
-	city["garrison"] = 0
-	city["units"] = {"infantry": 0, "archers": 0, "cavalry": 0}
-	city["faction"] = army["faction"]
-	roster.ensure_factions(store.scenario)
-	for id in roster.officers:
-		if roster.officers[id].get("generated", false): state["generated_officers"][id] = roster.officers[id].duplicate(true)
-	city["last_volley_tick"] = -10
-	city["governor_id"] = ""
-	city["occupied_at"] = int(state["tick"])
-	var left := 0
-	for unit in besiegers:
-		var remaining := mini(Combat.strength(unit), maxi(1, int(Combat.strength(unit) * 0.15)))
-		var deposited := remaining
-		for type in Combat.TYPES:
-			var take := mini(remaining, int(unit["units"][type]))
-			unit["units"][type] -= take
-			city["units"][type] += take
-			remaining -= take
-		unit["deposited"] += deposited
-		left += deposited
-	city["garrison"] = left
-	if city.has("population"):
-		for officer in available_officers(str(army["faction"])):
-			city["governor_id"] = officer["id"]
-			break
-	var winners := {}
-	for victor in besiegers:
-		_battle_victory(victor)
-		winners[victor["id"]] = victor
-		var corps: Dictionary = state["corps"].get(victor.get("corps_id", ""), {})
-		for id in corps.get("units", []): winners[id] = state["armies"][id]
-	for unit in winners.values():
-		if unit["status"] == "ended": continue
-		unit["objective_complete"] = true
-		unit["outcome"] = "攻取成功"
-		if _has_independent_action(unit): continue
-		if orders_for(unit)["after_battle"] == "withdraw": _execute(unit, {"type": "withdraw"})
-		else: unit["action"] = {"type": "hold"}
-	_report(army, "占领", "%s攻取%s，留下%d人驻防。" % [army["name"], graph.name_of(node), left], true)
-	if state.get("battlefield", {}).get("objectives", {}).has(node):
-		state["battlefield"]["winner"] = army["faction"]
-		state["battlefield"]["ended_at"] = state["tick"]
-
-
-func _fate_enemy(army: Dictionary) -> Dictionary:
-	var recent: Dictionary = state["armies"].get(army.get("last_enemy_id", ""), {})
-	if int(army.get("last_enemy_tick", -1)) == int(state["tick"]) and not recent.is_empty() and recent["faction"] != army["faction"]: return recent
-	for enemy in active_armies():
-		if not hostile(str(enemy["faction"]), str(army["faction"])) or enemy["returning"]: continue
-		if army.has("tactical") and enemy.has("tactical"):
-			if Tactical.distance(army, enemy) <= 1: return enemy
-		elif _contact(army, enemy, {}): return enemy
-	var guard: Dictionary = state["garrison_commanders"].get(army["target"], {})
-	if not guard.is_empty() and guard["faction"] != army["faction"] and Siege.at_city(self, army, army["target"]):
-		var defender := guard.duplicate(true)
-		defender["units"] = store.city_state(army["target"]).get("units", {})
-		return defender
-	return {}
-
-
-func _check_rout(army: Dictionary) -> void:
-	if army["status"] == "ended": return
-	if Combat.strength(army) <= 0:
-		Fate.encounter(self, army, _fate_enemy(army), "destroyed", 1.0)
-		state["battle_victories"].erase(str(army["officer_id"]))
-		army["victory_chain"] = false
-		_finish(army, "军队覆没")
-		return
-	if army["returning"]: return
-	var morale := float(army["morale"])
-	var organization := float(army["organization"])
-	var aura_shift := float(army.get("aura", 0.0)) * float(rules.get("officer", {}).get("aura_rout_shift", 20))
-	if morale >= 25.0 - aura_shift and organization >= 20:
-		army.erase("rout_crisis_since")
-		return
-	if not army.has("rout_crisis_since"): army["rout_crisis_since"] = int(state["tick"])
-	# A disordered but supplied force can rally behind nearby healthy allies.
-	# Hard panic still routs; manpower alone never makes a shattered army invincible.
-	var supported := false
-	if army.has("tactical"):
-		for friend in active_armies(str(army["faction"])):
-			if friend["id"] != army["id"] and not friend["returning"] and friend.has("tactical") and float(friend["morale"]) >= 35 and float(friend["organization"]) >= 30 and Tactical.distance(army, friend) <= 3:
-				supported = true
-				break
-	var substantial := Combat.strength(army) >= maxf(500, float(army.get("initial_strength", 0)) * 0.4)
-	var corps: Dictionary = state["corps"].get(army.get("corps_id", ""), {})
-	var can_regroup: bool = not corps.is_empty() and army["id"] != corps["root_id"]
-	var rally_window := int(state["tick"]) - int(army["rout_crisis_since"]) < 6
-	if supported and substantial and can_regroup and rally_window and morale > 10 and organization > 8 and (not supply_enabled() or float(army.get("grain", 0)) >= daily_food(army)):
-		var reason := "友军掩护，主帅令本队归建整阵，仍留在战场"
-		var regroup_result := Corps.issue(self, corps, {"type": "assign_task", "unit": army["id"], "task": "regroup"}, reason)
-		if regroup_result.get("ok", false):
-			army["last_reason"] = reason
-			army["rally_requested"] = int(state["tick"])
-			return
-	if supported and morale > 10 and organization > 8 and int(state["tick"]) == int(army["rout_crisis_since"]):
-		army["last_reason"] = "友军接应稳住阵线，等待主帅接替"
-		return
-	army["returning"] = true
-	army["outcome"] = "溃败撤退"
-	Fate.encounter(self, army, _fate_enemy(army), "rout", 1.0)
-	army["retreat_reason"] = "军心崩溃（士气%d）" % int(morale) if morale < 25 else "阵形崩溃（组织%d）" % int(organization)
-	army["last_reason"] = army["retreat_reason"]
-	state["battle_victories"].erase(str(army["officer_id"]))
-	army["victory_chain"] = false
-	_report(army, "溃败", "%s所部%s，剩余%d人，正在有序脱离。" % [army["name"], army["retreat_reason"], Combat.strength(army)], true)
-	_remember_loss(army, "军心崩溃")
-	_start_return(army)
-
-
-func _check_leader_lost() -> void:
-	var section: Dictionary = rules.get("officer", {})
-	for corps in state["corps"].values():
-		if corps.get("ended", false): continue
-		var root: Dictionary = state["armies"].get(str(corps.get("root_id", "")), {})
-		if root.is_empty(): continue
-		if not (str(root.get("status", "")) == "ended" or bool(root.get("returning", false))): continue
-		if str(corps.get("leader_lost_for", "")) == str(corps.get("commander_id", "")): continue
-		corps["leader_lost_for"] = str(corps.get("commander_id", ""))
-		corps["leader_lost"] = true
-		var sample := {}
-		for id in corps.get("units", []):
-			var unit: Dictionary = state["armies"].get(str(id), {})
-			if unit.is_empty() or str(unit["status"]) == "ended" or unit["id"] == root["id"]: continue
-			unit["morale"] = maxf(0.0, float(unit["morale"]) - float(section.get("leader_loss_morale", 8)))
-			unit["organization"] = maxf(0.0, float(unit["organization"]) - float(section.get("leader_loss_org", 4)))
-			if sample.is_empty(): sample = unit
-		if not sample.is_empty():
-			_report(sample, "主帅失位", "主帅失位：%s所部军心动摇，全军士气下降。" % str(corps.get("name", "")), true)
-
-
-func _finish(army: Dictionary, outcome: String) -> void:
-	if str(army["status"]) == "ended":
-		return
-	var node: String = str(army["location"]["node"])
-	var city: Dictionary = store.city_state(node)
-	var strength: int = Combat.strength(army)
-	if outcome == "失去指挥溃散":
-		army["grain"] = 0.0
-	elif city.has("garrison") and str(city.get("faction", "")) == str(army["faction"]):
-		_sync_inventory(city)
-		for type in Combat.TYPES:
-			city["units"][type] += int(army["units"][type])
-		city["garrison"] += strength
-		city["wounded"] = int(city.get("wounded", 0)) + int(army["wounded"])
-		var wounded_units: Dictionary = army.get("wounded_units", {"infantry": int(army["wounded"]), "archers": 0, "cavalry": 0})
-		for type in Combat.TYPES: city["wounded_units"][type] += int(wounded_units.get(type, 0))
-		if city.has("grain"): city["grain"] += int(floor(float(army["grain"])))
-		army["returned_strength"] = strength
-		army["returned_wounded"] = army["wounded"]
-		army["returned_grain"] = int(floor(float(army["grain"])))
-		army["deposited"] += strength
-		army["units"] = {"infantry": 0, "archers": 0, "cavalry": 0}
-		army["grain"] = 0.0
-		store.city_changed.emit(node)
-	elif outcome == "军队覆没" and int(army["wounded"]) > 0:
-		army["captured"] += int(army["wounded"])
-		army["wounded"] = 0
-	elif strength > 0:
-		# 在非本方节点收束（家乡易手、退路断绝、守援/期限到期）：存活兵员既不能
-		# 进城也不该凭空消失，按被俘入账，否则 initial ≠ dead+wounded+captured+现存。
-		Combat.apply_loss(army, strength, true)
-		army["surrendered_at"] = node
-		_report(army, "部众被收容", "%s在%s收束，%d人解甲被俘。" % [army["name"], graph.name_of(node), strength], true)
-	army.erase("return_stalled_since")
-	army["status"] = "ended"
-	army["outcome"] = outcome
-	state["missions"][army["id"]]["status"] = "ended"
-	state["missions"][army["id"]]["result"] = outcome
-	state["officer_states"][army["officer_id"]] = {"status": "available" if outcome != "军队覆没" and not army.get("duel_wounded", false) else "recovering", "city": node, "available_after": int(state["tick"]) + (int(rules["duel"]["recover_days"]) if army.get("duel_wounded", false) else 10)}
-	if army.get("duel_wounded", false): state["officer_states"][army["officer_id"]]["duel_wounded"] = true
-	army.erase("pending_request")
-	army.erase("approved_action")
-	army["trust"] = float(army.get("trust", 0.0)) * 0.5
-	army["resentment"] = float(army.get("resentment", 0.0)) * 0.5
-	Corps.on_finish(self, army)
-	Fate.restore(self)
-	_report(army, "任务结束", "%s：%s。归队%d，伤兵%d，阵亡%d，被俘%d，留驻%d，溃散%d。" % [army["name"], outcome, int(army.get("returned_strength", 0)), int(army["wounded"]), int(army["dead"]), int(army["captured"]), int(army["deposited"]) - int(army.get("returned_strength", 0)), int(army.get("dispersed", 0))], true)
-
-
-func _battle_contact(attacker: Dictionary, defender: Dictionary, melee: bool = true) -> void:
-	if melee and not attacker.has("first_melee_tick"): attacker["first_melee_tick"] = state["tick"]
-	if melee and not defender.has("first_melee_tick"): defender["first_melee_tick"] = state["tick"]
-	if melee and Signature.opening(attacker, defender):
-		_report(attacker, "小霸王连胜", "%s小霸王：连续主动出战，首次接敌士气冲击提高8%%。" % attacker["name"], false)
-	if Signature.first_contact(attacker, defender, melee):
-		attacker["first_contact_effect_tick"] = state["tick"]
-		defender["first_contact_effect_tick"] = state["tick"]
-		_report(defender, "武圣威压", "%s武圣：与%s首次正面交锋，%s士气下降8。" % [attacker["name"], defender["name"], defender["name"]], true)
-
-
-func _battle_victory(army: Dictionary) -> void:
-	_remember_win(army, "交战取胜")
-	if not Traits.mechanism(army, "victory_chain").is_empty() and army.get("mission_type", "") == "capture" and not army.get("returning", false) and army.get("status", "") != "ended":
-		state["battle_victories"][str(army["officer_id"])] = int(state["tick"])
-
-
-func _remember_win(army: Dictionary, cause: String) -> void:
-	if int(army.get("experience_tick", -1)) == int(state["tick"]): return
-	army["experience_tick"] = int(state["tick"])
-	Experience.record_win(self, army, _nearest_enemy_id(army), cause)
-
-
-func _remember_loss(army: Dictionary, cause: String) -> void:
-	if int(army.get("experience_tick", -1)) == int(state["tick"]): return
-	army["experience_tick"] = int(state["tick"])
-	Experience.record_loss(self, army, _nearest_enemy_id(army), cause)
-
-
-func _nearest_enemy_id(army: Dictionary) -> String:
-	var best := ""
-	var closest := 1 << 30
-	for other in active_armies():
-		if not hostile(str(other.get("faction", "")), str(army.get("faction", ""))): continue
-		var distance := 1
-		if army.has("tactical") and other.has("tactical"): distance = Tactical.distance(army, other)
-		elif str(army.get("location", {}).get("node", "")) == str(other.get("location", {}).get("node", "")): distance = 0
-		if distance < closest: closest = distance; best = str(other.get("id", ""))
-	return best
-
-
 ## ── 粮草与兵员：转发到 CampaignLogistics（campaign_logistics.gd）
 func supply_enabled() -> bool:
 	return Logistics.supply_enabled(self)
@@ -982,3 +493,48 @@ func _should_reconsider(army: Dictionary, context: Dictionary, adapter, key: Str
 	return Context._should_reconsider(self, army, context, adapter, key)
 func _decision_key(context: Dictionary) -> String:
 	return Context._decision_key(self, context)
+
+
+## ── 行军与接敌结算：转发到 CampaignContactResolver（campaign_contact_resolver.gd）
+func _terrain(node: String) -> String:
+	return Contacts._terrain(self, node)
+func _move_all() -> Dictionary:
+	return Contacts._move_all(self)
+func _edge_coordinate(location: Dictionary) -> float:
+	return Contacts._edge_coordinate(self, location)
+func _contact(a: Dictionary, b: Dictionary, motions: Dictionary) -> bool:
+	return Contacts._contact(self, a, b, motions)
+func _resolve_contacts(motions: Dictionary) -> void:
+	Contacts._resolve_contacts(self, motions)
+func _battle_contact(attacker: Dictionary, defender: Dictionary, melee: bool = true) -> void:
+	Contacts._battle_contact(self, attacker, defender, melee)
+
+
+## ── 战果：转发到 CampaignOutcomes（campaign_outcomes.gd）
+func _resolve_sieges() -> void:
+	Outcomes._resolve_sieges(self)
+func _capture_city(army: Dictionary, besiegers: Array, node: String, city: Dictionary) -> void:
+	Outcomes._capture_city(self, army, besiegers, node, city)
+func _fate_enemy(army: Dictionary) -> Dictionary:
+	return Outcomes._fate_enemy(self, army)
+func _check_rout(army: Dictionary) -> void:
+	Outcomes._check_rout(self, army)
+func _check_leader_lost() -> void:
+	Outcomes._check_leader_lost(self)
+func _battle_victory(army: Dictionary) -> void:
+	Outcomes._battle_victory(self, army)
+func _remember_win(army: Dictionary, cause: String) -> void:
+	Outcomes._remember_win(self, army, cause)
+func _remember_loss(army: Dictionary, cause: String) -> void:
+	Outcomes._remember_loss(self, army, cause)
+func _nearest_enemy_id(army: Dictionary) -> String:
+	return Outcomes._nearest_enemy_id(self, army)
+
+
+## ── 行动执行与收束：转发到 CampaignActions（campaign_actions.gd）
+func _execute(army: Dictionary, action: Dictionary) -> void:
+	Actions._execute(self, army, action)
+func _start_return(army: Dictionary) -> void:
+	Actions._start_return(self, army)
+func _finish(army: Dictionary, outcome: String) -> void:
+	Actions._finish(self, army, outcome)

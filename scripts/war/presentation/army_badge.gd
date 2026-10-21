@@ -20,6 +20,7 @@ var faction_color := Color("8ac56b")
 var highlighted := false
 var estimated := false
 var commander := ""
+var officer_id := ""
 var commander_state := ""
 var squad_number := 1
 var hostile := false

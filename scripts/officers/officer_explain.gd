@@ -10,14 +10,14 @@ const Conduct = preload("res://scripts/officers/officer_conduct.gd")
 const Dissent = preload("res://scripts/agents/officer_dissent.gd")
 const Card = preload("res://scripts/officers/officer_card.gd")
 
-## 属性达到这个值才在署名里提属性，避免“淳于琼料敌：……”这种名不副实的署名。
+## 属性达到这个值才在署名里提属性，避免给属性平平的人署上“某将料敌：……”这种名不副实的名。
 const NOTABLE := 80.0
 const INTENTS := {"engage": "正面接战", "flank": "侧翼包抄", "pursue": "追击", "hold": "固守", "defend": "固守", "withdraw": "撤离", "march": "行军", "continue": "推进", "besiege": "围城", "support": "支援", "scout": "侦察", "resupply": "补给"}
 const SOURCE_MODEL := "模型"
 
 
 ## 某个 hook 的结果该署谁的名：先找改了它的特性，其次是读它的子属性（够高才提）。
-## 返回“颜良急躁”“田丰料敌”这样的前缀（属性用 GDD 名）；都不够格时返回空字符串。
+## 返回“某将急躁”“某将料敌”这样的前缀（某将为人物名，属性用 GDD 名）；都不够格时返回空字符串。
 static func credit(army: Dictionary, hook: String, ctx: Dictionary = {}) -> String:
 	var name := str(army.get("name", ""))
 	var sources := Traits.sources(army, hook, ctx)
@@ -27,7 +27,7 @@ static func credit(army: Dictionary, hook: String, ctx: Dictionary = {}) -> Stri
 	return ""
 
 
-## 署名军报：“田丰料敌：识破林中伏兵”。没有可署之名时原样返回。
+## 署名军报：“某将料敌：识破林中伏兵”。没有可署之名时原样返回。
 static func signed(army: Dictionary, hook: String, text: String, ctx: Dictionary = {}) -> String:
 	var prefix := credit(army, hook, ctx)
 	return text if prefix.is_empty() else "%s：%s" % [prefix, text]

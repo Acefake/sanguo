@@ -1,30 +1,15 @@
 extends RefCounted
+## 战场喊话。台词在 data/war/battle_chatter.json：lines 按事件给通用台词，
+## personal 按人物 id 给个人台词，有个人台词时优先。
 
-# Project-authored battlefield dialogue, not quotations from the original game.
-const LINES := {
-	"evade": ["避开箭阵，前军压住敌弓！", "中军转移，莫让敌箭白白伤兵！"],
-	"attack": ["诸军齐进，莫失阵脚！", "列阵迎敌，随我破阵！", "敌军已近，奋力向前！"],
-	"ranged": ["弓手就位，瞄准放箭！", "张弓待令，齐射敌阵！", "看准来敌，不可虚发！"],
-	"siege": ["靠近城墙，准备强攻！", "诸军合力，攻破城门！", "稳住阵列，步步向前！"],
-	"retreat": ["莫要恋战，依次撤回！", "收拢队伍，整军再战！", "后队掩护，缓缓退却！"],
-	"rally": ["莫要慌乱，守住阵脚！", "诸位勿惧，我仍在此！", "重整旗鼓，不可散乱！"],
-	"march": ["保持队形，向前推进！", "沿路警戒，勿失同伴！", "诸军随行，谨防伏兵！"],
-	"hold": ["整军待命，听候军令。", "养精蓄锐，静候战机。", "守住此地，不可懈怠。"]
-}
-const PERSONAL := {
-	"袁绍": {"attack": "诸军并进，不可失阵！", "siege": "合兵攻城，一举克之！"},
-	"田丰": {"hold": "先观其势，再寻破绽。", "siege": "审势而进，勿徒耗兵。"},
-	"沮授": {"hold": "粮道为本，不可轻动。", "march": "步步为营，勿使敌乘。"},
-	"颜良": {"attack": "来将通名，与某一战！"},
-	"文丑": {"attack": "贼将何在，速来迎战！", "march": "轻骑随我，追上敌军！"},
-	"张郃": {"hold": "营垒坚固，不可强攻。", "attack": "趁其未整，侧击其阵！"},
-	"曹操": {"attack": "诸将随我，直取要害！", "hold": "各守其位，听我节度。"},
-	"张辽": {"attack": "敌阵未稳，随我突击！"},
-	"许褚": {"attack": "谁敢近主公一步！"},
-	"于禁": {"hold": "军法在此，不得擅离！"}
-}
+const PATH := "res://data/war/battle_chatter.json"
+static var _data: Dictionary = {}
 
-static func line_for(name: String, event: String, variation: int) -> String:
-	if PERSONAL.get(name, {}).has(event): return PERSONAL[name][event]
-	var options: Array = LINES.get(event, LINES["hold"])
+
+static func line_for(officer_id: String, event: String, variation: int) -> String:
+	if _data.is_empty(): _data = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+	var personal: Dictionary = _data["personal"].get(officer_id, {})
+	if personal.has(event): return personal[event]
+	var lines: Dictionary = _data["lines"]
+	var options: Array = lines.get(event, lines["hold"])
 	return options[posmod(variation, options.size())]

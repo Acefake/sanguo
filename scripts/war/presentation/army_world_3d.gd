@@ -514,6 +514,7 @@ func refresh() -> void:
 		badge.title = str(army["name"])
 		badge.portrait = _portrait(str(store.war.roster.officers.get(army.get("officer_id", ""), {}).get("name", army["name"])))
 		badge.commander = str(store.war.roster.officers.get(army.get("officer_id", ""), {}).get("name", army["name"]))
+		badge.officer_id = str(army.get("officer_id", ""))
 		badge.commander_state = "战死" if army.get("commander_unavailable", false) and army.get("commander_fate", {}).get("status", "") == "dead" else "被俘" if army.get("commander_unavailable", false) else ""
 		if str(army["location"].get("edge", "")) != "":
 			var direction: Vector2 = points.get(str(army["location"].get("to", "")), Vector2.ZERO) - points.get(str(army["location"].get("from", "")), Vector2.ZERO)
@@ -738,7 +739,7 @@ func _update_chatter(force: bool = false) -> void:
 	if candidates.is_empty(): return
 	var choice: Dictionary = candidates[0]
 	var badge: Control = badges[choice["id"]]
-	badge.set_speech(Chatter.line_for(badge.commander,choice["event"],choice["order"]),chatter_time+4.5)
+	badge.set_speech(Chatter.line_for(badge.officer_id,choice["event"],choice["order"]),chatter_time+4.5)
 	chatter_cooldowns[choice["id"]] = chatter_time+12.0
 
 func _march_position(id: String, progress: float) -> Vector3:

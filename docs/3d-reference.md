@@ -34,13 +34,13 @@ Historical local-reference notes. The current default is the complete world; see
 
 使用 Godot 4.7.2 Forward+、MSAA、TAA 和叶片 Alpha 覆盖抗锯齿。局部开启环境遮蔽与间接光。雾气随镜头距离调整，避免遮住全图。已在 RTX 3060 Laptop GPU 实际渲染截图，并通过源模型绘制范围、局部布局、全国地图、镜头边界和场景往返检查。截图是运行结果。
 
-入口为 `scenes/rtk14_reference.tscn`、`scripts/rtk14_reference.gd`；全国地图为 `scenes/rtk14_world_3d.tscn`、`scripts/rtk14_world_3d.gd`；材质为 `shaders/rtk14_*.gdshader`。
+入口为 `scenes/rtk14_reference.tscn`、`scripts/world/rtk14_reference.gd`；全国地图为 `scenes/rtk14_world_3d.tscn`、`scripts/world/rtk14_world_3d.gd`；材质为 `shaders/rtk14_*.gdshader`。
 
 重建工具：
 
-- `tools/build_reference_surfaces.py` 生成地表混合图、预览道路与旗帜。
-- `tools/build_autumn_vegetation.py` 生成全国森林。
-- `tools/convert_rtk14_models.py --source <原始提取目录>` 重建 GLB。
-- `tools/validate_rtk14_models.py` 核对全部模型。
+- `tools/assets/build_reference_surfaces.py` 生成地表混合图、预览道路与旗帜。
+- `tools/assets/build_autumn_vegetation.py` 生成全国森林。
+- `tools/assets/convert_rtk14_models.py --source <原始提取目录>` 重建 GLB。
+- `tools/validate/validate_rtk14_models.py` 核对全部模型。
 
-运行检查：`scripts/rtk14_reference_validation.gd`、`scripts/rtk14_world_validation.gd`、`scripts/rtk14_scene_navigation_validation.gd`。3D 画面尚未与二维城务、势力和战斗系统绑定。
+运行检查：`tests/world/rtk14_reference_validation.gd`、`tests/world/rtk14_world_validation.gd`、`tests/world/rtk14_scene_navigation_validation.gd`。3D 画面尚未与二维城务、势力和战斗系统绑定。

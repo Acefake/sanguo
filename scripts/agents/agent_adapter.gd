@@ -158,7 +158,7 @@ func choose_batch(contexts: Array) -> Dictionary:
 
 
 func _local_choice(context: Dictionary) -> Dictionary:
-	return preload("res://scripts/war/army_corps.gd").fallback(context) if context.get("level", "") == "commander" else POLICY.choose(context)
+	return preload("res://scripts/war/campaign/army_corps.gd").fallback(context) if context.get("level", "") == "commander" else POLICY.choose(context)
 
 func _brief_candidate(candidate: Dictionary) -> Dictionary:
 	var brief := {"id":candidate["id"], "action":candidate["action"], "forecast":_brief_forecast(candidate), "description":str(candidate.get("description", "")).left(80)}

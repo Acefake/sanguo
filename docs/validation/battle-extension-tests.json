@@ -31,14 +31,14 @@
     "test": "tactical_battlefield_validation",
     "passed": false,
     "exit_code": 1,
-    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nERROR: 三格内远程支援未造成伤害\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/tactical_battlefield_validation.gd:11)\n       [1] _run (res://tests/tactical_battlefield_validation.gd:82)\n",
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nERROR: 三格内远程支援未造成伤害\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/war/battle/tactical_battlefield_validation.gd:11)\n       [1] _run (res://tests/war/battle/tactical_battlefield_validation.gd:82)\n",
     "elapsed_ms": 2203
   },
   {
     "test": "encirclement_validation",
     "passed": false,
     "exit_code": 1,
-    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nENCIRCLEMENT_FAILED\nERROR: 主攻孤立时仍脱离阵线追敌\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/encirclement_validation.gd:11)\n       [1] _run (res://tests/encirclement_validation.gd:69)\n",
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nENCIRCLEMENT_FAILED\nERROR: 主攻孤立时仍脱离阵线追敌\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/war/battle/encirclement_validation.gd:11)\n       [1] _run (res://tests/war/battle/encirclement_validation.gd:69)\n",
     "elapsed_ms": 1828
   },
   {
@@ -59,7 +59,7 @@
     "test": "battle_discipline_validation",
     "passed": false,
     "exit_code": 1,
-    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nBATTLE_DISCIPLINE_FAILED\nERROR: 目标承诺忽略贴身威胁\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/battle_discipline_validation.gd:8)\n       [1] run (res://tests/battle_discipline_validation.gd:76)\n",
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nBATTLE_DISCIPLINE_FAILED\nERROR: 目标承诺忽略贴身威胁\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/war/battle/battle_discipline_validation.gd:8)\n       [1] run (res://tests/war/battle/battle_discipline_validation.gd:76)\n",
     "elapsed_ms": 2766
   },
   {

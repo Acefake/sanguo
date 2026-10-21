@@ -6,7 +6,7 @@ extends RefCounted
 ## 主力投入、逐日交战（combat_system）、压力失误、脱离、溃败与追击。
 ## 人物差异只经 officer_process / officer_conduct / signature_traits 进入，同一种子下只换人。
 
-const Combat = preload("res://scripts/war/combat_system.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Conduct = preload("res://scripts/officers/officer_conduct.gd")
 const Signature = preload("res://scripts/officers/signature_traits.gd")

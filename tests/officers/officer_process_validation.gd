@@ -6,7 +6,7 @@ extends SceneTree
 
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Conduct = preload("res://scripts/officers/officer_conduct.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
 
 var failures: Array[String] = []

@@ -25,11 +25,11 @@
 
 ## 验证
 
-`scripts/rtk14_world_validation.gd` 验证 46 城、10 关口、1120 个原场景摆放、源地格来源、关口镜头和近远镜头植被实例数量不变。六角格交互线默认隐藏，可按 G 临时查看。`tools/build_source_gates.py` 可重建关口清单。
+`tests/world/rtk14_world_validation.gd` 验证 46 城、10 关口、1120 个原场景摆放、源地格来源、关口镜头和近远镜头植被实例数量不变。六角格交互线默认隐藏，可按 G 临时查看。`tools/assets/build_source_gates.py` 可重建关口清单。
 
 原始高度缓存与来源逐字节相同；运行时城市和关口仍有局部地基处理。原始高度、地表控制、植被分布与密度的独立来源检查见 `validation/native-source-map-check.json`。58 个模型的来源绘制范围与颜色贴图绑定检查通过。
 
-新增 `tools/validate_rtk14_water.py`：两张水面法线共 524288 个像素与原始 G1T 完全一致；50 个分块的 448797 个顶点高度与水位缓存一致，809140 个三角形均为一米格的一半。水位缓存本身仍为重建值，检查不证明水位与原作一致。最终场景检查日志为 `validation/native-water-validation.log`。
+新增 `tools/validate/validate_rtk14_water.py`：两张水面法线共 524288 个像素与原始 G1T 完全一致；50 个分块的 448797 个顶点高度与水位缓存一致，809140 个三角形均为一米格的一半。水位缓存本身仍为重建值，检查不证明水位与原作一致。最终场景检查日志为 `validation/native-water-validation.log`。
 
 ![汉中新水面实际运行](validation/native-water-hanzhong.png)
 ![洛阳新水面实际运行](validation/native-water-luoyang.png)

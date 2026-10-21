@@ -41,6 +41,7 @@ const Logistics = preload("res://scripts/war/campaign/campaign_logistics.gd")
 const Reports = preload("res://scripts/war/campaign/campaign_reports.gd")
 const Orders = preload("res://scripts/war/campaign/campaign_orders.gd")
 const Dispatch = preload("res://scripts/war/campaign/campaign_dispatch.gd")
+const Context = preload("res://scripts/war/campaign/campaign_context.gd")
 var store: Node
 var graph = Graph.new()
 var roster = Roster.new()
@@ -386,317 +387,6 @@ func set_battle_ai_mode(mode: String) -> bool:
 		for army in active_armies():
 			if army.get("action",{}).get("tactical_contract",false): army["action"] = {"type":"hold"}
 	return true
-
-
-func _should_reconsider(army: Dictionary, context: Dictionary, adapter, key: String) -> bool:
-	var age := int(state["tick"]) - int(army["last_decision"])
-	if adapter != null and adapter.has_method("is_ollama") and adapter.is_ollama() and age < 3:
-		var own: Dictionary = context["army"]
-		var role: String = str(context.get("operation", {}).get("role", ""))
-		var urgent: bool = float(own["morale"]) < 30 or float(own["organization"]) < 25 or float(own["grain_days"]) < 4 or int(own.get("blocked_days", 0)) >= 2
-		urgent = urgent or role != str(army.get("decision_role", role)) or bool(own.get("contact", {}).get("flanked", false)) and not bool(army.get("decision_flanked", false))
-		urgent = urgent or float(context.get("battlefield", {}).get("enemy_to_friendly_ratio", 0)) >= 2.0
-		var valid_plan := false
-		for candidate in context["candidates"]:
-			if candidate["action"] == army["action"]: valid_plan = true
-		if not urgent and valid_plan: return false
-	return key != str(army.get("decision_key", "")) or age >= 3
-
-
-func _decision_key(context: Dictionary) -> String:
-	var own: Dictionary = context["army"]
-	var location: Dictionary = own["location"]
-	var enemies: Array = []
-	for enemy in context["enemies"]:
-		var proximity := -1
-		if own.has("cell") and int(enemy.get("tactical_cell", -1)) >= 0:
-			var separation := Tactical.cell_distance(int(own["cell"]), int(enemy["tactical_cell"]))
-			proximity = 0 if separation <= 1 else 1 if separation <= 3 else 2
-		enemies.append([enemy["id"], int(enemy["strength_estimate"]) / 500, enemy["location"].get("node", ""), enemy["routing"], proximity])
-	var allies: Array = []
-	for friend in context.get("allies", []):
-		allies.append([friend["id"], int(friend["strength"]) / 500, friend["can_support"], friend["returning"], friend.get("role", ""), friend["last_action"].get("type", "")])
-	var operation: Dictionary = context.get("operation", {})
-	var task := [operation.get("role", ""), operation.get("commander", ""), operation.get("support_id", ""), operation.get("suggested_target", "")]
-	var actions: Array = []
-	for candidate in context["candidates"]: actions.append(candidate["id"])
-	var pressure := int(float(context.get("battlefield", {}).get("enemy_to_friendly_ratio", 0)) * 4)
-	return JSON.stringify([location.get("node", ""), location.get("edge", ""), context["returning"], context["target_known"], int(float(own["grain_days"]) / 4), int(float(own["morale"]) / 15), int(float(own["organization"]) / 15), enemies, allies, pressure, task, own.get("contact", {}).get("adjacent_enemies", 0), int(own.get("blocked_days", 0)) >= 2, actions])
-
-
-func city_intel(node: String) -> Dictionary:
-	var city: Dictionary = store.city_state(node)
-	if city.is_empty(): return {}
-	var result := city.duplicate(true)
-	result["node"] = node
-	result["strength_estimate"] = int(city.get("garrison", 0))
-	result["uncertainty"] = 0
-	result["observed_at"] = int(state["tick"])
-	result["source"] = "live_state"
-	return result
-
-
-func enemy_intel(enemy: Dictionary) -> Dictionary:
-	var result := {"id": enemy["id"], "location": enemy["location"].duplicate(true), "strength_estimate": Combat.strength(enemy), "observed_at": int(state["tick"]), "uncertainty": 0, "routing": bool(enemy.get("returning", false)), "fighting": int(enemy.get("combat_tick", -1)) == int(state["tick"]), "unit_mix_estimate": enemy["units"].duplicate(true), "source": "live_state"}
-	if enemy.has("tactical"): result["tactical_cell"] = int(enemy["tactical"]["cell"])
-	return result
-
-
-func _observe_all() -> void:
-	Tactical.clear_target_cache()
-	var cities := {}
-	for node in store.scenario.get("places", {}):
-		cities[node] = city_intel(str(node))
-	var armies := active_armies()
-	for army in armies:
-		# Keep the intelligence schema for saves and decision snapshots, with no sight limits.
-		army["intel"] = {"cities": cities.duplicate(true), "enemies": {}}
-		for enemy in armies:
-			if hostile(str(enemy["faction"]), str(army["faction"])):
-				army["intel"]["enemies"][enemy["id"]] = enemy_intel(enemy)
-	ReportPolicy.observe(self)
-
-
-func _update_operations() -> void:
-	if not state["corps"].is_empty(): Corps.update(self)
-	var assigned := {}
-	for anchor in active_armies():
-		if anchor.has("corps_id"): continue
-		if assigned.has(anchor["id"]): continue
-		var group: Array = []
-		for friend in active_armies(str(anchor["faction"])):
-			if not friend.has("corps_id") and not assigned.has(friend["id"]) and _near_battle(anchor["location"], friend["location"]): group.append(friend)
-		group.sort_custom(func(a, b):
-			var left := int(a["skills"].get("带兵",50))+int(a["skills"].get("治军",50))-(10000 if a["returning"] else 0)
-			var right := int(b["skills"].get("带兵",50))+int(b["skills"].get("治军",50))-(10000 if b["returning"] else 0)
-			return left > right if left != right else str(a["id"]) < str(b["id"]))
-		if group.is_empty(): continue
-		var covered_retreats := {}
-		for index in range(group.size()):
-			var army: Dictionary = group[index]
-			assigned[army["id"]] = true
-			var operation: Dictionary = army.get("operation", {})
-			var previous_role: String = str(operation.get("role", ""))
-			var role := "main_attack" if index < 2 else "flank" if index == 2 else "support" if index < group.size() - 1 else "reserve"
-			if army.has("tactical"): role = army["tactical"]["role"]
-			var fleeing: Array = group.filter(func(friend): return bool(friend["returning"]))
-			var covered_friend := ""
-			if role in ["reserve", "support"] and not fleeing.is_empty() and not bool(army["returning"]):
-				if army.has("tactical"):
-					fleeing.sort_custom(func(a, b): return Tactical.distance(army, a) < Tactical.distance(army, b))
-					for friend in fleeing:
-						if not covered_retreats.has(friend["id"]) and Tactical.distance(army, friend) <= 3:
-							covered_friend = friend["id"]
-							covered_retreats[covered_friend] = true
-							role = "rear_guard"
-							break
-				else:
-					role = "rear_guard"
-					covered_friend = fleeing[0]["id"]
-			if army.get("tactical", {}).get("role", "") == "reserve":
-				var frontline: Array = group.filter(func(friend): return friend.get("tactical", {}).get("role", "") == "main_attack" and not friend["returning"])
-				if frontline.size() < 2: role = "main_attack"
-			operation["role"] = "withdraw" if bool(army["returning"]) else role
-			operation["role_label"] = Tactical.ROLES.get(operation["role"], "自主行动")
-			operation["commander"] = group[0]["id"]
-			operation["support_id"] = group[0]["id"] if index > 0 else ""
-			if army.has("tactical") and role == "support": operation["support_id"] = army["tactical"]["support_id"]
-			if role == "rear_guard": operation["support_id"] = covered_friend
-			operation["objective"] = graph.name_of(str(army["target"]))
-			# JSON saves reorder dictionary keys. Target assignment must depend on
-			# current sightings and explicit tie-breaks, never their insertion order.
-			var enemies: Array = army["intel"]["enemies"].values().filter(func(sight): return int(sight.get("observed_at",-1)) == int(state["tick"]))
-			enemies.sort_custom(func(a,b): return str(a["id"]) < str(b["id"]))
-			if army.has("tactical"):
-				enemies.sort_custom(func(a, b):
-					var left := Tactical.cell_distance(int(army["tactical"]["cell"]),int(a.get("tactical_cell",-1))) if int(a.get("tactical_cell",-1)) >= 0 else 10000
-					var right := Tactical.cell_distance(int(army["tactical"]["cell"]),int(b.get("tactical_cell",-1))) if int(b.get("tactical_cell",-1)) >= 0 else 10000
-					return left < right if left != right else str(a["id"]) < str(b["id"]))
-				var previous_target: String = str(operation.get("suggested_target", ""))
-				if not enemies.any(func(sight): return sight["id"] == previous_target): operation["suggested_target"] = enemies[0]["id"] if not enemies.is_empty() else ""
-			else: operation["suggested_target"] = enemies[index % enemies.size()]["id"] if not enemies.is_empty() else ""
-			operation["plan_until"] = operation.get("plan_until", 0)
-			operation["change_reason"] = operation.get("change_reason", "主帅按部队能力安排作战职责")
-			if previous_role != "" and previous_role != operation["role"]:
-				operation["change_reason"] = "战线发生变化，职责调整为" + operation["role_label"]
-				operation["plan_until"] = 0
-			army["operation"] = operation
-
-
-func _near_battle(a: Dictionary, b: Dictionary) -> bool:
-	var edge_a := str(a.get("edge", ""))
-	var edge_b := str(b.get("edge", ""))
-	if edge_a != "" and edge_a == edge_b:
-		return absf(_edge_coordinate(a) - _edge_coordinate(b)) <= 0.3
-	if edge_a == "" and edge_b == "": return a["node"] == b["node"]
-	if edge_a == "": return _near_battle(b, a)
-	if edge_b != "": return false
-	return (b["node"] == a.get("from", "") and float(a.get("progress", 0)) <= 0.3) or (b["node"] == a.get("to", "") and float(a.get("progress", 0)) >= 0.7)
-
-
-func _support_context(army: Dictionary) -> Dictionary:
-	var allies: Array = []
-	var ready := Combat.strength(army)
-	var nearby: Array = graph.visible_nodes(str(army["location"]["node"]), 1)
-	for friend in active_armies(str(army["faction"])):
-		if friend["id"] == army["id"]: continue
-		var local := _near_battle(army["location"], friend["location"])
-		if army.has("tactical") and friend.has("tactical"): local = Tactical.distance(army, friend) <= 5
-		if not local and not nearby.has(friend["location"]["node"]): continue
-		var available := not bool(friend["returning"]) and float(friend["morale"]) >= 30 and float(friend["organization"]) >= 25 and (not supply_enabled() or float(friend["grain"]) > 0) and bool(orders_for(friend)["engage"])
-		if friend.get("operation", {}).get("role", "") == "reserve" and friend["action"]["type"] == "hold": available = false
-		var strength := Combat.strength(friend)
-		if local and available: ready += strength
-		allies.append({"id": friend["id"], "name": friend["name"], "strength": strength, "location": friend["location"].duplicate(true), "morale": friend["morale"], "organization": friend["organization"], "returning": friend["returning"], "last_action": friend["action"].duplicate(true), "target": graph.name_of(str(friend["target"])), "near_battle": local, "can_support": local and available, "reinforcement_possible": not local and available, "role": friend.get("operation", {}).get("role", ""), "tactical_cell": int(friend.get("tactical", {}).get("cell", -1))})
-	var enemy_total := 0
-	var uncertainty := 0
-	for enemy in army["intel"]["enemies"].values():
-		if army.has("tactical") and int(enemy.get("tactical_cell", -1)) >= 0:
-			var cell: int = int(army["tactical"]["cell"])
-			var enemy_cell: int = int(enemy["tactical_cell"])
-			if Tactical.cell_distance(cell, enemy_cell) > 5: continue
-		if not bool(enemy.get("routing", false)) and _near_battle(army["location"], enemy["location"]):
-			enemy_total += int(enemy["strength_estimate"])
-			uncertainty += int(enemy.get("uncertainty", 0))
-	return {"allies": allies, "battlefield": {"friendly_ready_strength": ready, "enemy_estimated_strength": enemy_total, "enemy_strength_min": maxi(0, enemy_total - uncertainty), "enemy_strength_max": enemy_total + uncertainty, "enemy_to_friendly_ratio": float(enemy_total) / maxf(ready, 1), "note": "友军计划为上一轮行动；可支援表示邻近且状态允许，不保证本轮行动。远处援军与撤退、低士气、低组织、断粮友军不计入可用兵力。敌军兵力为实时信息。"}}
-
-
-func _observed_contact(army: Dictionary) -> Dictionary:
-	var cell := int(army.get("tactical", {}).get("cell", -1))
-	if cell < 0: return {"adjacent_enemies": 0, "engaged_by": [], "flanked": false, "attackers": 0, "required_preparation": 0}
-	var engaged: Array = []
-	var adjacent := 0
-	var attackers := 0
-	var cover := 0
-	var flanked := false
-	var observed: Dictionary = army.get("intel", {}).get("enemies", {})
-	for record in observed.values():
-		# Old sightings remain intelligence, but cannot pin a formation in
-		# immediate melee after the opponent has left or ceased reporting.
-		if int(record.get("observed_at",-100)) < int(state["tick"])-1: continue
-		var enemy_cell := int(record.get("tactical_cell", -1))
-		if enemy_cell >= 0 and enemy_cell == cell: continue
-		if enemy_cell < 0: continue
-		var separation := Tactical.cell_distance(cell, enemy_cell)
-		if separation <= 1: adjacent += 1
-		if separation <= 1 and not bool(record.get("routing", false)):
-			engaged.append(str(record.get("id", "")))
-			attackers += 1
-		if separation <= 2 and not bool(record.get("routing", false)): flanked = true
-	# Observed friendly rear guards count as cover, matching contact_state's intent.
-	for other in active_armies(str(army["faction"])):
-		if other["id"] == army["id"] or not other.has("tactical"): continue
-		if bool(other["returning"]) or str(other.get("operation", {}).get("role", "")) != "rear_guard": continue
-		if Tactical.cell_distance(cell, int(other["tactical"]["cell"])) <= 1: cover += 1
-	# context_for hands required_preparation to the forecast for withdraw candidates, so
-	# the key has to stay present or disengagement would look free.
-	var preparation := maxi(1, 1 + maxi(0, attackers - cover))
-	return {"adjacent_enemies": adjacent, "engaged_by": engaged, "flanked": flanked, "attackers": attackers, "covered_by": cover, "required_preparation": preparation}
-
-
-func context_for(army: Dictionary) -> Dictionary:
-	var target: String = str(army["home"] if bool(army["returning"]) else army["target"])
-	var location: Dictionary = army["location"]
-	var own: Dictionary = {"strength": Combat.strength(army), "initial_strength": int(army.get("initial_strength", 0)), "units": army["units"].duplicate(true), "morale": army["morale"], "organization": army["organization"], "fatigue": army["fatigue"], "grain_days": food_days(army), "location": location.duplicate(true), "training": army["training"], "equipment": army["equipment"]}
-	if army.has("tactical"):
-		own["cell"] = int(army["tactical"]["cell"])
-		own["blocked"] = army["tactical"]["blocked"]
-		own["blocked_days"] = int(army["tactical"].get("blocked_days", 0))
-		own["phase"] = army["tactical"]["phase"]
-		# Observed contact only. contact_state() counts adjacent enemies by true
-		# distance, and this drives model-call gating and escape readiness, so
-		# feeding it unobserved truth let the harness spend calls on hidden threats.
-		own["contact"] = _observed_contact(army)
-		own["withdraw_preparation"] = army["tactical"].get("withdraw_preparation", 0)
-	var candidates: Array = []
-	var support := _support_context(army)
-	var operation: Dictionary = army.get("operation", {})
-	if army.has("tactical"):
-		_add_candidate(candidates, "hold", {"type": "hold"}, "保持战线或预备位置，等待战局变化。")
-		var partner: String = str(operation.get("support_id", ""))
-		if partner != "" and operation.get("role", "") in ["support", "rear_guard"]:
-			var partner_army: Dictionary = state["armies"].get(partner, {})
-			var relation_name := Dissent.relation(roster.officers.get(str(army["officer_id"]), {}), roster.officers.get(str(partner_army.get("officer_id", "")), {}))
-			_add_candidate(candidates, "support:" + partner, {"type": "support", "ally": partner}, "跟随指定友军提供远程支援。", {"relation": relation_name})
-	if str(location.get("edge", "")) != "":
-		_add_candidate(candidates, "continue", {"type": "continue"}, "按既定计划继续行军。")
-	else:
-		_add_candidate(candidates, "hold", {"type": "hold"}, "驻守当前位置，整顿组织并恢复疲劳。")
-		var current: String = str(location["node"])
-		var current_path: Dictionary = route(str(army["faction"]), current, target)
-		for link in graph.neighbors(current):
-			var node: String = str(link["node"])
-			if node != target and not can_cross(str(army["faction"]), node): continue
-			var alternative: Dictionary = route(str(army["faction"]), node, target)
-			if not alternative["found"]: continue
-			_add_candidate(candidates, "march:" + node, {"type": "march", "target": node, "edge": link["edge"]}, "向%s行军，按局势选择通路。" % graph.name_of(node), {"progress_gain": float(current_path.get("cost", 0)) - float(alternative.get("cost", 999))})
-		var city: Dictionary = store.city_state(current)
-		if str(city.get("faction", "")) == str(army["faction"]) and int(city.get("grain", 0)) > 0:
-			_add_candidate(candidates, "resupply", {"type": "resupply"}, "在友城补充携粮。")
-		if current == str(army["target"]) and str(army["mission_type"]) == "capture" and hostile(str(city.get("faction", "")), str(army["faction"])):
-			var intel: Dictionary = army["intel"]["cities"].get(current, {})
-			_add_candidate(candidates, "besiege", {"type": "besiege"}, "继续围城，寻找攻城机会。", {"defender_ratio": float(intel.get("strength_estimate", 0)) / maxf(Combat.strength(army), 1)})
-	for enemy in army["intel"]["enemies"].values():
-		var observed: Dictionary = enemy["location"]
-		if str(observed.get("node", "")) == str(location["node"]) or str(location.get("edge", "")) != "" and str(observed.get("edge", "")) == str(location["edge"]):
-			_add_candidate(candidates, "engage:" + str(enemy["id"]), {"type": "engage", "enemy": enemy["id"]}, "与已发现的敌军交战。")
-			if army.has("tactical") and operation.get("role", "") == "flank":
-				_add_candidate(candidates, "flank:" + str(enemy["id"]), {"type": "flank", "enemy": enemy["id"]}, "绕向敌军侧翼，通路被阻挡时重新判断。")
-			if bool(enemy.get("routing", false)):
-				_add_candidate(candidates, "pursue:" + str(enemy["id"]), {"type": "pursue", "enemy": enemy["id"]}, "追击已发现的败退敌军。")
-	var orders: Dictionary = orders_for(army)
-	candidates = candidates.filter(func(candidate):
-		var type: String = candidate["action"]["type"]
-		if type in ["engage", "flank", "support"] and not bool(orders["engage"]): return false
-		if army.has("tactical") and operation.get("role", "") == "flank" and type == "engage":
-			# Use the observed cell, not the authoritative one: an unscouted enemy
-			# silently removing the option hides it from the officer and the model alike.
-			var seen: Dictionary = army.get("intel", {}).get("enemies", {}).get(str(candidate["action"].get("enemy", "")), {})
-			var seen_cell := int(seen.get("tactical_cell", -1))
-			var own_cell := int(army["tactical"]["cell"])
-			if seen_cell >= 0 and own_cell >= 0 and Tactical.cell_distance(own_cell, seen_cell) > 1: return false
-		if army.has("tactical") and operation.get("role", "") == "reserve" and type not in ["hold", "scout", "resupply", "request_support"]: return false
-		if army.has("tactical") and operation.get("role", "") == "rear_guard" and type not in ["hold", "support", "resupply", "request_support"]: return false
-		return type != "pursue" or bool(orders["pursue"])
-	)
-	candidates = filter_candidates(candidates, orders)
-	if bool(orders["retreat"]):
-		_add_candidate(candidates, "withdraw", {"type": "withdraw"}, "保存兵力，撤往安全的本方城池。")
-	if int(army["last_support"]) < int(state["tick"]) - 7:
-		_add_candidate(candidates, "request_support", {"type": "request_support"}, "等待支援并向后方报告军情。")
-	candidates.sort_custom(func(a, b): return str(a["id"]) < str(b["id"]))
-	var forecast_terrain: String = Tactical.terrain_class(int(own.get("cell", 0))) if own.has("cell") else _terrain(str(location["node"]))
-	candidates = candidates.filter(func(c): return supply_enabled() or c["action"]["type"] != "resupply")
-	Forecast.annotate(self, army, candidates, {"terrain": forecast_terrain, "enemies": army["intel"]["enemies"], "required_preparation": int(own.get("contact", {}).get("required_preparation", 0))})
-	# Snapshot arrays are sorted so decision records replay identically after a save round-trip.
-	var known_cities: Array = army["intel"]["cities"].values().duplicate(true)
-	known_cities.sort_custom(func(a, b): return str(a["node"]) < str(b["node"]))
-	var known_enemies: Array = army["intel"]["enemies"].values().duplicate(true)
-	known_enemies.sort_custom(func(a, b): return str(a["id"]) < str(b["id"]))
-	var local_map: Dictionary = Tactical.board_for(self, army).duplicate()
-	# Decision snapshots need geometry, not the growing authoritative battle ledger.
-	local_map.erase("log")
-	local_map.erase("pending_events")
-	return {"request_id": "%s:%d" % [army["id"], int(state["tick"])], "army_id": army["id"], "observation_revision": state["tick"], "date": store.date_text(), "officer": roster.officers.get(str(army["officer_id"]), {"id": str(army["officer_id"]), "name": str(army.get("name", "")), "skills": army.get("skills", {}), "personality": {}, "trait_ids": army.get("trait_ids", [])}).duplicate(true), "army": own, "mission_type": army["mission_type"], "objective": graph.name_of(target), "at_objective": str(location["node"]) == target and str(location.get("edge", "")) == "", "supply_enabled": supply_enabled(), "returning": army["returning"], "target_known": army["intel"]["cities"].has(target), "cities": known_cities, "enemies": known_enemies, "allies": support["allies"], "battlefield": support["battlefield"], "operation": operation.duplicate(true), "orders": orders.duplicate(true), "local_map": local_map.duplicate(true), "current_action": army["action"].duplicate(true), "memory": army["memory"].duplicate(true), "experience": Experience.summary(army), "candidates": candidates}
-
-
-func _add_candidate(list: Array, id: String, action: Dictionary, description: String, extra: Dictionary = {}) -> void:
-	var candidate: Dictionary = {"id": id, "action": action, "description": description}
-	candidate.merge(extra)
-	list.append(candidate)
-
-
-func validate_decision(context: Dictionary, result: Dictionary) -> Dictionary:
-	var army: Dictionary = state["armies"].get(context.get("army_id", ""), {})
-	if army.is_empty() or str(army["status"]) == "ended" or int(context.get("observation_revision", -1)) != int(state["tick"]) or int(army["last_decision"]) == int(state["tick"]):
-		return {"ok": false, "message": "行动请求过期或已经执行。"}
-	var choice: Variant = result.get("candidate_id", null)
-	if not choice is String:
-		return {"ok": false, "message": "未返回有效选择。"}
-	for candidate in context.get("candidates", []):
-		if str(candidate["id"]) == choice:
-			return {"ok": true, "action": candidate["action"].duplicate(true)}
-	return {"ok": false, "message": "选择了授权范围之外的行动。"}
 
 
 func _execute(army: Dictionary, action: Dictionary) -> void:
@@ -1150,14 +840,6 @@ func _finish(army: Dictionary, outcome: String) -> void:
 	_report(army, "任务结束", "%s：%s。归队%d，伤兵%d，阵亡%d，被俘%d，留驻%d，溃散%d。" % [army["name"], outcome, int(army.get("returned_strength", 0)), int(army["wounded"]), int(army["dead"]), int(army["captured"]), int(army["deposited"]) - int(army.get("returned_strength", 0)), int(army.get("dispersed", 0))], true)
 
 
-func player_city_intel(node: String) -> Dictionary:
-	return city_intel(node)
-
-
-func player_has_city_access(node: String) -> bool:
-	return not store.city_state(node).is_empty() and str(store.city_state(node).get("faction", "")) == str(state["player_faction"])
-
-
 func _battle_contact(attacker: Dictionary, defender: Dictionary, melee: bool = true) -> void:
 	if melee and not attacker.has("first_melee_tick"): attacker["first_melee_tick"] = state["tick"]
 	if melee and not defender.has("first_melee_tick"): defender["first_melee_tick"] = state["tick"]
@@ -1269,3 +951,34 @@ func _mobilize(preview: Dictionary) -> Dictionary:
 	return Dispatch._mobilize(self, preview)
 func _spawn_defenders() -> void:
 	Dispatch._spawn_defenders(self)
+
+
+## ── 观察与决策上下文：转发到 CampaignContext（campaign_context.gd）
+func city_intel(node: String) -> Dictionary:
+	return Context.city_intel(self, node)
+func enemy_intel(enemy: Dictionary) -> Dictionary:
+	return Context.enemy_intel(self, enemy)
+func player_city_intel(node: String) -> Dictionary:
+	return Context.player_city_intel(self, node)
+func player_has_city_access(node: String) -> bool:
+	return Context.player_has_city_access(self, node)
+func _observe_all() -> void:
+	Context._observe_all(self)
+func _update_operations() -> void:
+	Context._update_operations(self)
+func _near_battle(a: Dictionary, b: Dictionary) -> bool:
+	return Context._near_battle(self, a, b)
+func _support_context(army: Dictionary) -> Dictionary:
+	return Context._support_context(self, army)
+func _observed_contact(army: Dictionary) -> Dictionary:
+	return Context._observed_contact(self, army)
+func context_for(army: Dictionary) -> Dictionary:
+	return Context.context_for(self, army)
+func _add_candidate(list: Array, id: String, action: Dictionary, description: String, extra: Dictionary = {}) -> void:
+	Context._add_candidate(self, list, id, action, description, extra)
+func validate_decision(context: Dictionary, result: Dictionary) -> Dictionary:
+	return Context.validate_decision(self, context, result)
+func _should_reconsider(army: Dictionary, context: Dictionary, adapter, key: String) -> bool:
+	return Context._should_reconsider(self, army, context, adapter, key)
+func _decision_key(context: Dictionary) -> String:
+	return Context._decision_key(self, context)

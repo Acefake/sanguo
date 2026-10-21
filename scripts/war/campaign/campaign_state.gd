@@ -39,6 +39,8 @@ const Autonomy = preload("res://scripts/agents/officer_autonomy.gd")
 const TacticalPlan = preload("res://scripts/agents/tactical_plan.gd")
 const Logistics = preload("res://scripts/war/campaign/campaign_logistics.gd")
 const Reports = preload("res://scripts/war/campaign/campaign_reports.gd")
+const Orders = preload("res://scripts/war/campaign/campaign_orders.gd")
+const Dispatch = preload("res://scripts/war/campaign/campaign_dispatch.gd")
 var store: Node
 var graph = Graph.new()
 var roster = Roster.new()
@@ -226,203 +228,6 @@ func start_campaign() -> void:
 	Operations.residence(self)
 
 
-func orders_for(army: Dictionary) -> Dictionary:
-	var orders: Dictionary = {"engage": true, "retreat": true, "pursue": true, "after_battle": "withdraw", "intent": str(rules.get("orders", {}).get("default_intent", "稳扎")), "risk_allowance": str(rules.get("orders", {}).get("default_risk", "常规")), "retreat_line": {"strength": 0.0, "morale": 0.0}}
-	orders.merge(army.get("orders", {}), true)
-	orders.erase("report_level")
-	return orders
-
-
-func filter_candidates(candidates: Array, orders: Dictionary) -> Array:
-	# 保守许可在候选生成阶段就挡掉侧击、追击等高风险行动。
-	if str(orders.get("risk_allowance", "常规")) != "保守": return candidates
-	return candidates.filter(func(candidate): return str(candidate.get("action", {}).get("type", "")) not in ["flank", "pursue"])
-
-
-func filter_commander_candidates(candidates: Array, orders: Dictionary) -> Array:
-	if str(orders.get("risk_allowance", "常规")) != "保守": return candidates
-	return candidates.filter(func(candidate): return str(candidate.get("action", {}).get("task", "")) not in ["raid_rear", "cut_supply"])
-
-
-func command_army(id: String, changes: Dictionary = {}, withdraw: bool = false) -> Dictionary:
-	if campaign_finished(): return {"ok": false, "message": "战役已经结束"}
-	if store.busy:
-		return {"ok": false, "message": "日期正在推进，请稍候。"}
-	var army: Dictionary = state["armies"].get(id, {})
-	if army.is_empty() or army.get("faction", "") != state["player_faction"]:
-		return {"ok": false, "message": "只能向本方军队下令。"}
-	if army.get("status", "") == "ended":
-		return {"ok": false, "message": "这支军队已结束任务。"}
-	if withdraw and bool(army["returning"]):
-		return {"ok": false, "message": "军队正在撤退。"}
-	var orders: Dictionary = orders_for(army)
-	for key in changes:
-		if key in ["engage", "retreat", "pursue", "local_disengage", "must_hold_objective"] and typeof(changes[key]) == TYPE_BOOL:
-			orders[key] = changes[key]
-		elif key == "after_battle" and changes[key] in ["withdraw", "hold"]:
-			orders[key] = changes[key]
-		elif key == "intent" and changes[key] in rules.get("orders", {}).get("intents", ["速胜", "稳扎", "牵制", "斩首", "保存实力"]):
-			orders[key] = changes[key]
-		elif key == "risk_allowance" and changes[key] in rules.get("orders", {}).get("risk_levels", ["保守", "常规", "放手"]):
-			orders[key] = changes[key]
-		elif key == "retreat_line" and typeof(changes[key]) == TYPE_DICTIONARY:
-			orders[key] = {"strength": clampf(float(changes[key].get("strength", 0.0)), 0.0, 1.0), "morale": clampf(float(changes[key].get("morale", 0.0)), 0.0, 100.0)}
-		elif key in ["pursuit_limit_cells","local_retreat_cells"] and typeof(changes[key]) in [TYPE_INT,TYPE_FLOAT]: orders[key] = clampi(int(changes[key]),1,5)
-		else:
-			return {"ok": false, "message": "未知军令。"}
-	if withdraw: orders["retreat"] = true
-	var corps: Dictionary = state["corps"].get(army.get("corps_id", ""), {})
-	if not corps.is_empty() and corps["root_id"] == id:
-		for unit_id in corps["units"].duplicate():
-			var unit: Dictionary = state["armies"][unit_id]
-			if unit["status"] == "ended": continue
-			if str(unit["officer_id"]) != str(corps["commander_id"]):
-				Autonomy.ensure_evaluated(self, corps, str(unit["officer_id"]), {"action": {"type": "player_orders"}, "reason": "玩家军令"})
-				if Autonomy.blocks_override(self, corps, str(unit["officer_id"])).get("blocked", false): continue
-			unit["orders"] = orders.duplicate(true)
-			unit["decision_key"] = ""
-	var refused := false
-	if not corps.is_empty() and str(army["officer_id"]) != str(corps["commander_id"]):
-		Autonomy.ensure_evaluated(self, corps, str(army["officer_id"]), {"action": {"type": "player_orders"}, "reason": "玩家军令"})
-		refused = bool(Autonomy.blocks_override(self, corps, str(army["officer_id"])).get("blocked", false))
-	if not refused: army["orders"] = orders
-	army["decision_key"] = ""
-	if withdraw:
-		army["last_reason"] = "收到主公撤军令，各部将独立决定执行。"
-		if not corps.is_empty() and corps["root_id"] == id:
-			Corps.issue(self, corps, {"type": "withdraw_corps"}, "玩家撤军令")
-		elif corps.is_empty() or not Autonomy.blocks_override(self, corps, str(army["officer_id"])).get("blocked", false):
-			_execute(army, {"type": "withdraw"})
-		_report(army, "撤退军令", army["name"] + "已收到撤退命令。", false)
-	store._save()
-	store.campaign_changed.emit()
-	return {"ok": true, "message": "撤退军令已下达，各角色按自身判断执行。" if withdraw else "军令已更新。"}
-
-
-func resolve_request(army_id: String, approve: bool) -> Dictionary:
-	if campaign_finished(): return {"ok": false, "message": "战役已经结束"}
-	if store.busy: return {"ok": false, "message": "日期正在推进，请稍候。"}
-	var army: Dictionary = state["armies"].get(army_id, {})
-	var request: Dictionary = army.get("pending_request", {})
-	if army.is_empty() or request.is_empty(): return {"ok": false, "message": "没有待批复的请示。"}
-	if str(army.get("faction", "")) != str(state["player_faction"]): return {"ok": false, "message": "只能批复本方请示。"}
-	var officer: Dictionary = roster.officers.get(str(army["officer_id"]), {})
-	army.erase("pending_request")
-	if approve:
-		var action: Dictionary = request.get("action", {}).duplicate(true)
-		var reason: String = str(request.get("reason", "临机行动"))
-		army["trust"] = minf(0.5, float(army.get("trust", 0.0)) + 0.1)
-		_report(army, "违令批准", "主公批准%s执行建议：%s。" % [army["name"], reason], true)
-		# 批准即执行。只写 approved_action 会绕过 _execute 的副作用（march 不写
-		# location.from/to/edge、scout 不更新 scouted_at、resupply 不转粮、
-		# request_support 不发报），而次日 step 把 last_decision 置为当日又让
-		# validate_decision 的两次校验全部过期，部队原地冻结且不入复盘记录。
-		_execute(army, action)
-		if str(army.get("status", "active")) != "ended":
-			army["last_reason"] = "主公批准违令：" + reason
-			# 只记当日，不预写次日；否则明日两次校验都会被判为已执行。
-			army["last_decision"] = int(state["tick"])
-			army["decision_key"] = ""
-			_record_approved(army, request, action)
-	else:
-		if float(officer.get("personality", {}).get("自尊", 50)) >= 65.0: army["resentment"] = minf(0.5, float(army.get("resentment", 0.0)) + 0.1)
-		_report(army, "违令驳回", "主公驳回%s的违令请示，按原军令执行。" % army["name"], false)
-	store._save()
-	store.campaign_changed.emit()
-	return {"ok": true, "approved": approve}
-
-
-# 主公批准的违令也要进入复盘记录，否则决策历史里查不到这天为什么反常。
-func _record_approved(army: Dictionary, request: Dictionary, action: Dictionary) -> void:
-	var summary := "主公批准违令：" + str(request.get("reason", "临机行动"))
-	var record: Dictionary = {"request_id": "approved:%s:%d" % [str(army["id"]), int(state["tick"])], "tick": int(state["tick"]), "army_id": army["id"], "candidate_id": str(request.get("candidate_id", "")), "action": action.duplicate(true), "reason_summary": summary, "source": "player_approval", "model": "", "rules_version": rules["version"], "prompt_version": 5, "policy_version": Policy.version(), "weights_version": Policy.weights().get("version", 0), "score_breakdown": {}, "vetoed": false, "fallback_reason": "", "observation": context_for(army).duplicate(true)}
-	state["decisions"].append(record)
-	while state["decisions"].size() > 160: state["decisions"].pop_front()
-	if not army.has("decision_history"): army["decision_history"] = []
-	army["decision_history"].append(record)
-
-
-func _expire_requests() -> void:
-	for army in state["armies"].values():
-		var request: Dictionary = army.get("pending_request", {})
-		if request.is_empty(): continue
-		if int(request.get("tick", 0)) >= int(state["tick"]): continue
-		army.erase("pending_request")
-		_report(army, "请示超时", "%s的违令请示未获批复，按原军令执行。" % army["name"], false)
-
-
-func _evaluate_dissent(army: Dictionary, context: Dictionary, record: Dictionary) -> void:
-	if army.get("returning", false) or str(army["status"]) == "ended": return
-	if army.has("pending_request"): return
-	var ranked_free: Array = Policy.rank(context, false)
-	if ranked_free.is_empty(): return
-	var ordered_top := str(Policy.choose(context).get("candidate_id", ""))
-	var best_free: Dictionary = ranked_free[0]
-	if str(best_free["candidate"]["id"]) == ordered_top: return
-	var params: Dictionary = rules.get("orders", {}).get("dissent", {})
-	var ordered_score := 0.0
-	for entry in ranked_free:
-		if str(entry["candidate"]["id"]) == ordered_top: ordered_score = float(entry["score"])
-	var gap := float(best_free["score"]) - ordered_score
-	if gap <= float(params.get("gap", 12)): return
-	var officer: Dictionary = roster.officers.get(str(army["officer_id"]), {})
-	var relation_name := "中立"
-	var corps: Dictionary = state["corps"].get(army.get("corps_id", ""), {})
-	if not corps.is_empty():
-		relation_name = Dissent.relation(officer, roster.officers.get(str(corps.get("commander_id", "")), {}))
-	var orders: Dictionary = orders_for(army)
-	var contact: Dictionary = army.get("tactical", {}).get("contact", {})
-	var urgent := Dissent.urgent(army, contact, supply_enabled())
-	var probability := clampf(Dissent.probability(army, officer.get("personality", {}), orders, relation_name, urgent, float(army.get("counter_intel_dissent", 0.0)), params) + Conduct.dissent_shift(officer), 0.0, float(params.get("max", 0.6)))
-	var roll := Dissent.roll("%s:%d:%s:dissent" % [str(state.get("dissent_seed", 0)), army["id"], int(state["tick"])], state)
-	var entry: Dictionary = {"tick": state["tick"], "army_id": army["id"], "probability": probability, "gap": gap, "ordered": ordered_top, "suggested": best_free["candidate"]["id"], "roll": roll, "relation": relation_name, "urgent": urgent}
-	if roll >= probability:
-		entry["result"] = "服从"
-		_append_dissent(army, entry)
-		record["dissent"] = entry
-		return
-	var extreme := float(officer.get("personality", {}).get("自尊", 50)) >= 85.0 and float(officer.get("personality", {}).get("风险承受", 50)) >= 85.0
-	if bool(params.get("direct", false)) and extreme:
-		entry["result"] = "直接违令"
-		_execute(army, best_free["candidate"]["action"].duplicate(true))
-		army["last_reason"] = "违令：" + str(best_free["candidate"].get("description", "临机行动"))
-		_report(army, "违令", "%s拒绝遵从军令，擅自%s。" % [army["name"], str(best_free["candidate"].get("description", "临机行动"))], true)
-		_append_dissent(army, entry)
-		record["dissent"] = entry
-		return
-	if str(army["faction"]) != str(state["player_faction"]):
-		var lord := Strategic.lord_of(roster, str(army["faction"]))
-		var permit := urgent or float(lord.get("personality", {}).get("风险承受", 50)) >= 45.0
-		entry["result"] = "主公批准" if permit else "主公驳回"
-		if permit:
-			_execute(army, best_free["candidate"]["action"].duplicate(true))
-			army["last_reason"] = "主公批准临机调整：" + str(best_free["candidate"].get("description", ""))
-		_append_dissent(army, entry)
-		record["dissent"] = entry
-		return
-	entry["result"] = "建议违令"
-	army["pending_request"] = {"tick": state["tick"], "army_id": army["id"], "officer_id": army["officer_id"], "officer": army["name"], "candidate_id": best_free["candidate"]["id"], "action": best_free["candidate"]["action"].duplicate(true), "reason": str(best_free["candidate"].get("description", "临机行动")), "probability": probability, "gap": gap}
-	_report(army, "违令请示", "%s请求违令：建议%s（把握%.0f%%），等待主公批复。" % [army["name"], str(best_free["candidate"].get("description", "临机行动")), probability * 100.0], true)
-	_append_dissent(army, entry)
-	record["dissent"] = entry
-
-
-func _append_dissent(army: Dictionary, entry: Dictionary) -> void:
-	if not army.has("dissent_history"): army["dissent_history"] = []
-	army["dissent_history"].append(entry)
-	while army["dissent_history"].size() > 12: army["dissent_history"].pop_front()
-
-
-func available_officers(faction: String) -> Array:
-	var result: Array = []
-	var deployed: Array = active_armies().map(func(army): return army["officer_id"])
-	for officer in roster.officers.values():
-		if str(officer["faction"]) == faction and not deployed.has(officer["id"]) and not Fate.unavailable(self, str(officer["id"])) and not str(officer["id"]).begins_with("militia:") and str(state["officer_states"].get(officer["id"], {}).get("status", "available")) == "available":
-			result.append(officer)
-	result.sort_custom(func(a, b): return str(a["name"]) < str(b["name"]))
-	return result
-
-
 func set_player_faction(faction: String) -> bool:
 	if store.busy or state.get("campaign_started", false) or not active_armies(str(state["player_faction"])).is_empty() or not store.scenario.get("factions", {}).has(faction):
 		return false
@@ -432,106 +237,6 @@ func set_player_faction(faction: String) -> bool:
 	state["player_faction"] = faction
 	store._save()
 	return true
-
-
-func preview_dispatch(home: String, target: String, officer_id: String, defending: bool = false, troop_count: int = 0) -> Dictionary:
-	if campaign_finished(): return {"ok": false, "message": "战役已经结束，请开始新的战役"}
-	var city: Dictionary = store.city_state(home)
-	var officer: Dictionary = roster.officers.get(officer_id, {})
-	var failure: Dictionary = {"ok": false, "message": "请选择可用的主将与本方出发城。"}
-	if city.is_empty() or officer.is_empty() or not city.has("garrison") or not graph.places.has(target):
-		return failure
-	if str(city.get("faction", "")) != str(officer.get("faction", "")):
-		return failure
-	if not defending and str(store.city_state(target).get("faction", "")) != str(city["faction"]) and not hostile(str(city["faction"]), str(store.city_state(target).get("faction", ""))):
-		return {"ok": false, "message": "双方处于互不交战关系，不能进攻"}
-	if str(state["officer_states"].get(officer_id, {}).get("status", "available")) != "available" or active_armies().any(func(army): return army["officer_id"] == officer_id) or Fate.unavailable(self, officer_id):
-		return {"ok": false, "message": "这位将领已经在执行任务。"}
-	var path: Dictionary = route(str(city["faction"]), home, target)
-	if not bool(path["found"]):
-		return {"ok": false, "message": "目标没有可用通路。"}
-	if Operations.assembly_days(self, home, [officer_id]) < 0: return {"ok": false, "message": "主将无法从驻地到达出发城"}
-	var garrison: int = int(city.get("garrison", 0))
-	var reserve: int = maxi(int(rules["minimum_reserve"]), int(ceil(garrison * float(rules["reserve_ratio"]))))
-	var count: int = mini(garrison - reserve, int(garrison * float(rules["mobilization_ratio"])))
-	var food_per_day: float = float(rules["grain_per_soldier_day"])
-	var reserve_food: int = int(ceil(reserve * food_per_day * 10))
-	var food_available: int = maxi(0, int(city.get("grain", 0)) - reserve_food)
-	if supply_enabled(): count = mini(count, int(food_available / (food_per_day * 12.0)))
-	if count < int(rules["minimum_army"]):
-		return {"ok": false, "message": "兵力不足，需保留至少 %d 名守军。" % reserve}
-	var maximum: int = count
-	if troop_count > 0:
-		if troop_count < int(rules["minimum_army"]) or troop_count > maximum: return {"ok": false, "message": "所选兵力超出可动员范围。"}
-		count = troop_count
-	var food: int = mini(food_available, int(ceil(count * food_per_day * float(rules["carry_days"])) )) if supply_enabled() else 0
-	return {"ok": true, "message": "", "home": home, "target": target, "officer_id": officer_id, "strength": count, "maximum": maximum, "grain": food, "grain_days": int(food / maxf(count * food_per_day, 1)) if supply_enabled() else 999, "reserve": garrison - count, "travel_days": int(ceil(float(path["cost"]) * float(rules["route_days_per_cost"]))), "mission_type": "defend" if defending or str(store.city_state(target).get("faction", "")) == str(city["faction"]) else "capture"}
-
-
-func dispatch(home: String, target: String, officer_id: String, companions: Array = [], as_corps: bool = false, troop_count: int = 0) -> Dictionary:
-	companions = companions.filter(func(id): return id != officer_id)
-	if store.busy:
-		return {"ok": false, "message": "日期正在推进，请稍候。"}
-	if str(store.city_state(home).get("faction", "")) != str(state["player_faction"]):
-		return {"ok": false, "message": "只能派遣本方城池的军队。"}
-	var preview: Dictionary = preview_dispatch(home, target, officer_id, false, troop_count)
-	if not bool(preview["ok"]):
-		return preview
-	for id in companions:
-		if id == officer_id or not available_officers(str(state["player_faction"])).any(func(officer): return officer["id"] == id): return {"ok": false, "message": "随军人员包含不可用武将"}
-	if Operations.assembly_days(self, home, companions) < 0: return {"ok": false, "message": "随军人员没有可用的调任通路"}
-	companions = Corps.select_members(self, officer_id, companions, home)
-	var custom_plan: Dictionary = state.get("pending_corps_plan", {})
-	if not custom_plan.is_empty():
-		var validation: Dictionary = Corps.validate_plan(self, officer_id, companions, custom_plan, int(preview["strength"]))
-		if not validation.get("ok", false): return validation
-	var army: Dictionary = _mobilize(preview)
-	if as_corps or not companions.is_empty():
-		Corps.form(self, army, companions)
-		if store.persist_enabled and store.agent.enabled and store.agent.has_method("supports_background_decisions"): Corps.plan_background(self, store.agent)
-	_observe_all()
-	_report(army, "出征", "%s奉命从%s出发，带兵%d，目标%s。" % [army["name"], graph.name_of(home), int(preview["strength"]), graph.name_of(target)], false)
-	store._save()
-	store.city_changed.emit(home)
-	return {"ok": true, "army_id": army["id"], "message": "军队已出发，行军与作战由主将自主决定。"}
-
-
-func _mobilize(preview: Dictionary) -> Dictionary:
-	var city: Dictionary = store.city_state(str(preview["home"]))
-	_sync_inventory(city)
-	var count: int = int(preview["strength"])
-	var before: int = int(city["garrison"])
-	var units: Dictionary = {"infantry": 0, "archers": 0, "cavalry": 0}
-	var remaining: int = count
-	for index in range(Combat.TYPES.size()):
-		var type: String = Combat.TYPES[index]
-		var take: int = mini(int(city["units"][type]), remaining if index == Combat.TYPES.size() - 1 else int(ceil(float(count) * int(city["units"][type]) / maxf(before, 1))))
-		take = mini(take, remaining)
-		units[type] = take
-		city["units"][type] -= take
-		remaining -= take
-	# Rounding cannot discard unallocated soldiers.
-	for type in Combat.TYPES:
-		var take: int = mini(remaining, int(city["units"][type]))
-		units[type] += take
-		city["units"][type] -= take
-		remaining -= take
-	city["garrison"] = before - count
-	if supply_enabled(): city["grain"] -= int(preview["grain"])
-	var id: String = "army-%04d" % int(state["next_id"])
-	state["next_id"] += 1
-	var officer: Dictionary = roster.officers[str(preview["officer_id"])]
-	var army: Dictionary = {"id": id, "officer_id": officer["id"], "name": officer["name"], "faction": city["faction"], "home": preview["home"], "target": preview["target"], "mission_type": preview["mission_type"], "status": "active", "location": {"node": preview["home"], "edge": "", "progress": 0.0}, "units": units, "initial_strength": count, "dead": 0, "wounded": 0, "captured": 0, "deposited": 0, "training": int(city.get("training", 50)), "equipment": int(city.get("equipment", 50)), "skills": officer["skills"].duplicate(true), "trait_ids": officer.get("trait_ids", []).duplicate(), "grain": float(preview["grain"]) if supply_enabled() else 0.0, "morale": 100.0, "organization": 100.0, "fatigue": 0.0, "started": int(state["tick"]), "deadline": int(state["tick"]) + int(rules["mission_days"]), "intel": {"cities": {}, "enemies": {}}, "action": {"type": "hold"}, "last_decision": -10, "last_report": {}, "last_reason": "正在准备出征。", "returning": false, "scouted_at": -10, "siege_progress": 0.0, "outcome": "", "last_support": -10, "trust": 0.0, "resentment": 0.0, "memory": [], "experience": {"enemy_notes": {}, "battle_log": [], "streak": {"wins": 0, "losses": 0}, "drift": {}}}
-	var last_victory := int(state["battle_victories"].get(str(officer["id"]), -100000))
-	army["victory_chain"] = not Traits.mechanism(army, "victory_chain").is_empty() and preview["mission_type"] == "capture" and int(state["tick"]) - last_victory <= int(Traits.mechanism(army, "victory_chain").get("window_days", 0))
-	army["departure_at"] = int(state["tick"]) + Operations.assembly_days(self, str(preview["home"]), [officer["id"]])
-	army["deadline"] += maxi(0, int(army["departure_at"]) - int(state["tick"]))
-	Operations.detach_post(self, str(officer["id"]))
-	army["edge"] = Edges.ensure(army, officer, true)
-	state["armies"][id] = army
-	state["missions"][id] = {"army_id": id, "home": preview["home"], "target": preview["target"], "status": "active", "type": preview["mission_type"], "result": ""}
-	state["officer_states"][officer["id"]] = {"status": "commanding", "army_id": id}
-	return army
 
 
 func step(adapter: Node = null) -> void:
@@ -717,39 +422,6 @@ func _decision_key(context: Dictionary) -> String:
 	for candidate in context["candidates"]: actions.append(candidate["id"])
 	var pressure := int(float(context.get("battlefield", {}).get("enemy_to_friendly_ratio", 0)) * 4)
 	return JSON.stringify([location.get("node", ""), location.get("edge", ""), context["returning"], context["target_known"], int(float(own["grain_days"]) / 4), int(float(own["morale"]) / 15), int(float(own["organization"]) / 15), enemies, allies, pressure, task, own.get("contact", {}).get("adjacent_enemies", 0), int(own.get("blocked_days", 0)) >= 2, actions])
-
-
-func _spawn_defenders() -> void:
-	var approaching: Array = active_armies()
-	for attacker in approaching:
-		if bool(attacker.get("returning", false)) or str(attacker["mission_type"]) != "capture":
-			continue
-		var target: String = str(attacker["target"])
-		var city: Dictionary = store.city_state(target)
-		var faction: String = str(city.get("faction", ""))
-		if faction == "" or not hostile(faction, str(attacker["faction"])) or not city.has("population"):
-			continue
-		var policy: Dictionary = Operations.policy(self, target)
-		if policy["defense"] == "hold": continue
-		if policy["defense"] == "adaptive" and int(city["garrison"]) < Combat.strength(attacker) * 0.7: continue
-		var visible: Array = graph.visible_nodes(target)
-		var location: Dictionary = attacker["location"]
-		if not visible.has(location["node"]) and not visible.has(location.get("to", "")):
-			continue
-		var exists: bool = false
-		for defender in active_armies(faction):
-			if str(defender["home"]) == target:
-				exists = true
-		if exists or int(state["defense_cooldowns"].get(target, -100)) + 20 > int(state["tick"]):
-			continue
-		var officers: Array = available_officers(faction)
-		var officer_id: String = str(officers[0]["id"]) if not officers.is_empty() else roster.militia(faction, target)
-		if Fate.unavailable(self, officer_id): officer_id = roster.militia(faction, target + ":" + str(state["tick"]))
-		var preview: Dictionary = preview_dispatch(target, target, officer_id, true)
-		if bool(preview["ok"]):
-			_mobilize(preview)
-			state["defense_cooldowns"][target] = int(state["tick"])
-			store.city_changed.emit(target)
 
 
 func city_intel(node: String) -> Dictionary:
@@ -1527,13 +1199,6 @@ func _nearest_enemy_id(army: Dictionary) -> String:
 	return best
 
 
-func _has_independent_action(army: Dictionary) -> bool:
-	var autonomy: Dictionary = army.get("autonomy", {})
-	if str(autonomy.get("stance", "obey")) != "obey" and int(autonomy.get("until", 0)) > int(state["tick"]): return true
-	var corps: Dictionary = state["corps"].get(army.get("corps_id", ""), {})
-	return not corps.is_empty() and bool(Autonomy.blocks_override(self, corps, str(army["officer_id"])).get("blocked", false))
-
-
 ## ── 粮草与兵员：转发到 CampaignLogistics（campaign_logistics.gd）
 func supply_enabled() -> bool:
 	return Logistics.supply_enabled(self)
@@ -1568,3 +1233,39 @@ func _summarize_finished_battles() -> void:
 	Reports._summarize_finished_battles(self)
 func _casualty_summary(members: Array) -> String:
 	return Reports._casualty_summary(self, members)
+
+
+## ── 军令与违令：转发到 CampaignOrders（campaign_orders.gd）
+func orders_for(army: Dictionary) -> Dictionary:
+	return Orders.orders_for(self, army)
+func filter_candidates(candidates: Array, orders: Dictionary) -> Array:
+	return Orders.filter_candidates(self, candidates, orders)
+func filter_commander_candidates(candidates: Array, orders: Dictionary) -> Array:
+	return Orders.filter_commander_candidates(self, candidates, orders)
+func command_army(id: String, changes: Dictionary = {}, withdraw: bool = false) -> Dictionary:
+	return Orders.command_army(self, id, changes, withdraw)
+func resolve_request(army_id: String, approve: bool) -> Dictionary:
+	return Orders.resolve_request(self, army_id, approve)
+func _record_approved(army: Dictionary, request: Dictionary, action: Dictionary) -> void:
+	Orders._record_approved(self, army, request, action)
+func _expire_requests() -> void:
+	Orders._expire_requests(self)
+func _evaluate_dissent(army: Dictionary, context: Dictionary, record: Dictionary) -> void:
+	Orders._evaluate_dissent(self, army, context, record)
+func _append_dissent(army: Dictionary, entry: Dictionary) -> void:
+	Orders._append_dissent(self, army, entry)
+func _has_independent_action(army: Dictionary) -> bool:
+	return Orders._has_independent_action(self, army)
+
+
+## ── 出征与动员：转发到 CampaignDispatch（campaign_dispatch.gd）
+func available_officers(faction: String) -> Array:
+	return Dispatch.available_officers(self, faction)
+func preview_dispatch(home: String, target: String, officer_id: String, defending: bool = false, troop_count: int = 0) -> Dictionary:
+	return Dispatch.preview_dispatch(self, home, target, officer_id, defending, troop_count)
+func dispatch(home: String, target: String, officer_id: String, companions: Array = [], as_corps: bool = false, troop_count: int = 0) -> Dictionary:
+	return Dispatch.dispatch(self, home, target, officer_id, companions, as_corps, troop_count)
+func _mobilize(preview: Dictionary) -> Dictionary:
+	return Dispatch._mobilize(self, preview)
+func _spawn_defenders() -> void:
+	Dispatch._spawn_defenders(self)

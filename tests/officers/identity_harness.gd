@@ -2,9 +2,10 @@ extends SceneTree
 ## 人物特色对照验收（M6）。
 ##
 ## 8 个 battle_scenarios × 固定种子；同一场景同一种子下只换主将。硬验收：
-##   1. 同类型两人（identity_probe.json 的 pairs）至少 2 项指标显著不同；
+##   1. 同类型两人（identity_probe.json 的 pairs）至少 2 项指标显著不同（reference_pairs 只打印）；
 ##   2. 每人至少 1 个场景的表现分高于全体中位；
-##   3. 每个已分配的局限特性至少在 1 个场景里复现代价（与去掉该特性的同一人物对照）。
+##   3. 每个已分配的局限特性至少在 1 个场景里复现代价（与去掉该特性的同一人物、同一组种子配对对照）；
+##   4. identity_probe.json 的 key_officers 每人至少有一个署名情境（署名来自特性或≥80 的子属性），且重跑结果一致。
 ##
 ##   godot --headless --path . --script res://tests/officers/identity_harness.gd [-- --out=/abs/path.json]
 
@@ -13,9 +14,12 @@ const Roster = preload("res://scripts/agents/officer_context.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Explain = preload("res://scripts/officers/officer_explain.gd")
 ## 指标对应的流程 hook，用来给署名情境找署名来源。
-const METRIC_HOOK := {"commit_hour": "command整理", "ambushed": "ambush识破", "org_min": "special轮换", "pursuit_depth": "pursuit深入"}
+## 投入时机在攻城、解围、伏击场景里分别由攻坚准备、行军、重规划主导。
+const METRIC_HOOK := {"commit_hour": "command整理", "ambushed": "ambush识破", "org_min": "special轮换", "pursuit_depth": "pursuit深入", "objective": ""}
+const COMMIT_HOOK_BY_KIND := {"siege": "engineering准备", "relief": "march行军", "ambush": "replan重规划"}
 const METRIC_TEXT := {"commit_hour": "投入时机", "ambushed": "受伏率", "org_min": "组织最低点", "loss_ratio": "伤亡比", "objective": "目标达成", "pursuit_depth": "追击深度", "disengages": "脱离次数"}
 
+const OFF_BATTLE_STAGES := ["logistics", "council", "influence"]
 const T_SIGNIFICANT := 2.5
 const T_COST := 2.0
 const MIN_COST := 0.03
@@ -42,12 +46,10 @@ func _initialize() -> void:
 	print("IDENTITY: 主将 %d 人 × 场景 %d × 种子 %d" % [subjects.size(), scenarios.size(), int(settings["seeds"])])
 	_print_table(results)
 
-	var report := {"pairs": _check_pairs(results), "median": _check_median(results), "flaws": _check_flaws(subjects, opponent, staff, results), "signatures": _signatures(results)}
-	report["advice"] = _check_advice(subjects, opponent)
-	for key in ["pairs", "median", "flaws"]:
+	var report := {"pairs": _check_pairs(results), "median": _check_median(results), "flaws": _check_flaws(subjects, opponent, staff, results), "signatures": _signatures(results, opponent, staff)}
+	for key in ["pairs", "median", "flaws", "signatures"]:
 		for row in report[key]:
 			if not bool(row["pass"]): failures.append("%s: %s" % [key, row["label"]])
-	if not report["advice"].is_empty() and not bool(report["advice"][0]["pass"]): failures.append("advice: " + str(report["advice"][0]["label"]))
 	_write(report, results)
 	print("IDENTITY_HARNESS: " + ("PASS" if failures.is_empty() else "FAIL %d 项 %s" % [failures.size(), str(failures)]))
 	quit(0 if failures.is_empty() else 1)
@@ -127,13 +129,23 @@ static func welch(x: Array, y: Array) -> float:
 	return diff / se
 
 
+## 配对 t：同一组种子下“有/无局限”的逐场差值。共同随机数下这是正确的检验；差值全相同记为无穷大。
+static func paired(x: Array, y: Array) -> float:
+	var diffs: Array = []
+	for i in mini(x.size(), y.size()): diffs.append(float(x[i]) - float(y[i]))
+	var mu := mean(diffs)
+	var se := sqrt(variance(diffs) / maxf(diffs.size(), 1))
+	if se < 1e-9: return 0.0 if absf(mu) < 1e-9 else INF * signf(mu)
+	return mu / se
+
+
 func _score(samples: Dictionary) -> float:
 	return mean(samples["objective"]) - 0.2 * minf(mean(samples["loss_ratio"]), 5.0)
 
 
 func _check_pairs(results: Dictionary) -> Array:
 	var rows: Array = []
-	for pair in settings["pairs"] + generated_pairs:
+	for pair in settings["pairs"] + generated_pairs + settings.get("reference_pairs", []):
 		var differing := {}
 		for id in settings["scenarios"]:
 			for metric in Probe.METRICS:
@@ -143,9 +155,10 @@ func _check_pairs(results: Dictionary) -> Array:
 				if absf(t) >= T_SIGNIFICANT and absf(mean(x) - mean(y)) >= 0.05 * maxf(absf(mean(x)), absf(mean(y))):
 					if not differing.has(metric) or absf(t) > absf(float(differing[metric]["t"])):
 						differing[metric] = {"scenario": id, "a": mean(x), "b": mean(y), "t": t}
-		var row := {"label": "%s/%s" % pair, "differing": differing, "pass": differing.size() >= 2}
+		var reference: bool = pair in settings.get("reference_pairs", [])
+		var row := {"label": "%s/%s" % pair, "differing": differing, "pass": reference or differing.size() >= 2, "reference": reference}
 		rows.append(row)
-		print("PAIR %s/%s 显著不同指标 %d 项：%s" % [pair[0], pair[1], differing.size(), _describe(differing)])
+		print("PAIR %s%s/%s 显著不同指标 %d 项：%s" % ["（参考）" if reference else "", pair[0], pair[1], differing.size(), _describe(differing)])
 	return rows
 
 
@@ -177,7 +190,9 @@ func _check_flaws(subjects: Array, opponent: Dictionary, staff: Dictionary, resu
 	var rows: Array = []
 	for officer in subjects:
 		for flaw in Traits.flaws(officer):
-			if flaw == "flaw_caustic": continue
+			if _off_battle(flaw):
+				print("FLAW %s·%s 不在战斗探针范围（只改 %s），跳过" % [officer["name"], Traits.definition(flaw)["name"], ",".join(Traits.definition(flaw)["effects"].map(func(e): return e["hook"]))])
+				continue
 			var ablated: Dictionary = officer.duplicate(true)
 			ablated["trait_ids"] = officer["trait_ids"].filter(func(id): return id != flaw)
 			var control := _run_all(ablated, opponent, staff)
@@ -186,7 +201,7 @@ func _check_flaws(subjects: Array, opponent: Dictionary, staff: Dictionary, resu
 				for metric in Probe.METRICS:
 					var direction := int(Probe.BETTER[metric])
 					if direction == 0: continue
-					var t := welch(results[officer["name"]][id][metric], control[id][metric]) * direction
+					var t := paired(results[officer["name"]][id][metric], control[id][metric]) * direction
 					var with_flaw := mean(results[officer["name"]][id][metric])
 					var without := mean(control[id][metric])
 					var relative := absf(with_flaw - without) / maxf(absf(without), 0.05)
@@ -205,28 +220,23 @@ func _check_flaws(subjects: Array, opponent: Dictionary, staff: Dictionary, resu
 	return rows
 
 
-## 言辞刻薄只在当参军时起作用：同一主将配同一参军，对照去掉该特性的参军。
-func _check_advice(subjects: Array, opponent: Dictionary) -> Array:
-	var rows: Array = []
-	for case in settings["advice_cases"]:
-		var commander: Dictionary = subjects.filter(func(o): return o["name"] == case["commander"])[0]
-		var adviser: Dictionary = subjects.filter(func(o): return o["name"] == case["adviser"])[0]
-		var plain: Dictionary = adviser.duplicate(true)
-		plain["trait_ids"] = adviser["trait_ids"].filter(func(id): return id != case["flaw"])
-		var with_flaw := _run_scenario(case["scenario"], commander, opponent, adviser)
-		var without := _run_scenario(case["scenario"], commander, opponent, plain)
-		var t := welch(with_flaw["ambushed"], without["ambushed"])
-		var row := {"label": "%s进言%s·%s" % [case["adviser"], case["commander"], Traits.definition(case["flaw"])["name"]], "with": mean(with_flaw["ambushed"]), "without": mean(without["ambushed"]), "t": t, "pass": t >= T_COST}
-		rows.append(row)
-		print("ADVICE %s 受伏率 有%.2f/无%.2f (t=%.1f)" % [row["label"], row["with"], row["without"], t])
-	return rows
+## 只改后勤、议事、传播流程的局限（如粮账紊乱）在战斗探针里没有对应环节。
+func _off_battle(flaw: String) -> bool:
+	return Traits.definition(flaw)["effects"].all(func(e): return str(Traits.hook_spec(str(e["hook"])).get("stage", "")) in OFF_BATTLE_STAGES)
 
 
-## 每人最突出的一处：相对全体均值、以全体标准差计的 z 分数最高（按“更好”方向）。
-func _signatures(results: Dictionary) -> Array:
+## 每人最突出的一处：相对全体均值、以全体标准差计的 z 分数最高（按“更好”方向）；
+## 署名情境：z>0 且能署名（特性或≥80 的子属性改了该指标所在流程）的最高一处。
+## key_officers 必须有署名情境，并在同一组种子下重跑一次核对均值一致。
+func _signatures(results: Dictionary, opponent: Dictionary, staff: Dictionary) -> Array:
 	var rows: Array = []
 	for name in results:
+		var officer: Dictionary = subjects_by_name.get(name, {})
+		# 署名只认长处：局限特性改了同一流程时不拿来署“表现突出”的名。
+		var strengths: Dictionary = officer.duplicate()
+		strengths["trait_ids"] = officer.get("trait_ids", []).filter(func(id): return Traits.tier_of(str(id)) != "flaw")
 		var best := {}
+		var signed := {}
 		for id in settings["scenarios"]:
 			for metric in Probe.METRICS:
 				var direction := int(Probe.BETTER[metric])
@@ -235,12 +245,38 @@ func _signatures(results: Dictionary) -> Array:
 				var sd := sqrt(variance(all))
 				if sd < 1e-6: continue
 				var z := (mean(results[name][id][metric]) - mean(all)) / sd * direction
-				if best.is_empty() or z > float(best["z"]): best = {"scenario": id, "metric": metric, "value": mean(results[name][id][metric]), "field": mean(all), "z": z}
-		var officer: Dictionary = subjects_by_name.get(name, {})
-		var who := Explain.credit(officer, METRIC_HOOK.get(best.get("metric", ""), ""), {"terrain": scenarios.get(best.get("scenario", ""), {}).get("terrain", "plains")})
-		rows.append({"name": name, "best": best, "credit": who})
-		print("SIGNATURE %s 最突出：%s %s@%s %.2f（全体 %.2f，z=%.1f）" % [name, who if not who.is_empty() else "（属性组合）", METRIC_TEXT.get(best.get("metric", ""), "-"), scenarios.get(best.get("scenario", ""), {}).get("name", "-"), best.get("value", 0.0), best.get("field", 0.0), best.get("z", 0.0)])
+				var row := {"scenario": id, "metric": metric, "value": mean(results[name][id][metric]), "field": mean(all), "z": z}
+				if best.is_empty() or z > float(best["z"]): best = row
+				var who := Explain.credit(strengths, _hook(id, metric), _credit_context(id))
+				if z > 0.0 and not who.is_empty() and (signed.is_empty() or z > float(signed["z"])):
+					signed = row
+					signed["credit"] = who
+		var key: bool = name in settings["key_officers"]
+		var reproducible := false
+		if not signed.is_empty() and key:
+			var again := _run_scenario(str(signed["scenario"]), officer, opponent, staff if settings["scenarios"][signed["scenario"]].get("staff", false) else {})
+			reproducible = is_equal_approx(mean(again[signed["metric"]]), float(signed["value"]))
+		var row := {"label": name, "best": best, "signed": signed, "key": key, "reproducible": reproducible, "pass": not key or reproducible}
+		rows.append(row)
+		print("SIGNATURE %s 最突出：%s@%s %.2f（全体 %.2f，z=%.1f）；署名情境：%s" % [name, METRIC_TEXT.get(best.get("metric", ""), "-"), scenarios.get(best.get("scenario", ""), {}).get("name", "-"), best.get("value", 0.0), best.get("field", 0.0), best.get("z", 0.0),
+			"无" if signed.is_empty() else "%s %s@%s %.2f（全体 %.2f，z=%.1f）%s" % [signed["credit"], METRIC_TEXT[signed["metric"]], scenarios[signed["scenario"]]["name"], signed["value"], signed["field"], signed["z"], "，重跑一致" if reproducible else ""]])
 	return rows
+
+
+func _hook(scenario_id: String, metric: String) -> String:
+	if metric != "commit_hour": return str(METRIC_HOOK.get(metric, ""))
+	var probe: Dictionary = settings["scenarios"][scenario_id]
+	for kind in COMMIT_HOOK_BY_KIND:
+		if probe.get(kind, false): return str(COMMIT_HOOK_BY_KIND[kind])
+	return str(METRIC_HOOK["commit_hour"])
+
+
+## 署名用的情境：开战前字段；伏击场景按被伏后（原方案失效、高压）判断。
+func _credit_context(scenario_id: String) -> Dictionary:
+	var probe: Dictionary = settings["scenarios"][scenario_id]
+	var ctx := Probe.context(scenarios[scenario_id], probe, settings, {"staff": true} if probe.get("staff", false) else {})
+	if probe.get("ambush", false): ctx.merge({"plan_invalid_known": true, "pressure": 0.8}, true)
+	return ctx
 
 
 func _print_table(results: Dictionary) -> void:

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "人物特色对照验收的场景覆盖层。地形、兵力、编成取自 data/war/battle_scenarios.json；这里只补探针需要的过程参数（侧翼迂回时长、伏击、守点日数、攻坚准备、解围期限、敌军隐藏兵力）。 generated_pairs 列出取两名生成将做同模板对照的模板。",
+  "note": "人物特色对照验收的场景覆盖层。地形、兵力、编成取自 data/war/battle_scenarios.json；这里只补探针需要的过程参数（侧翼迂回时长、伏击、守点日数、攻坚准备、解围期限、敌军隐藏兵力、伏击后可选路线数）。pairs 是官渡 20 人里的同类型配对（硬验收）；reference_pairs 只打印不判定（张郃/张辽 两人同为骑兵统帅，探针 8 场景里拉不开，留作观察）；key_officers 每人必须有一个可复现的署名情境；generated_pairs 列出取两名生成将做同模板对照的模板。",
   "seeds": 40,
   "max_days": 15,
   "subject_side": "yuan_shao",
@@ -48,7 +48,8 @@
       "ambush_org": 20,
       "ambush_hours": 8,
       "staff": true,
-      "plan_difficulty": 0.5
+      "plan_difficulty": 0.5,
+      "route_alternatives": 2
     },
     "dingjun_hill": {
       "flank_hours": 8,
@@ -78,33 +79,59 @@
       "文丑"
     ],
     [
-      "关兴",
-      "张苞"
+      "文丑",
+      "张辽"
     ],
     [
-      "袁尚",
-      "袁谭"
+      "张郃",
+      "徐晃"
     ],
     [
       "田丰",
-      "诸葛亮"
+      "沮授"
     ],
     [
-      "廖化",
-      "周仓"
+      "荀攸",
+      "郭嘉"
     ],
     [
-      "关羽",
-      "黄忠"
+      "于禁",
+      "乐进"
+    ],
+    [
+      "袁绍",
+      "曹操"
+    ],
+    [
+      "审配",
+      "程昱"
+    ],
+    [
+      "许攸",
+      "郭图"
+    ],
+    [
+      "淳于琼",
+      "曹洪"
     ]
   ],
-  "advice_cases": [
-    {
-      "commander": "袁绍",
-      "adviser": "田丰",
-      "scenario": "yiling_forest",
-      "flaw": "flaw_caustic"
-    }
+  "reference_pairs": [
+    [
+      "张郃",
+      "张辽"
+    ]
+  ],
+  "key_officers": [
+    "颜良",
+    "文丑",
+    "张郃",
+    "田丰",
+    "沮授",
+    "审配",
+    "许攸",
+    "袁绍",
+    "曹操",
+    "郭嘉"
   ],
   "daily_fatigue": 5,
   "generated_pairs": [

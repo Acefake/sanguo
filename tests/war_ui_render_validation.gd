@@ -48,10 +48,7 @@ func run() -> void:
 	var fixture := LocalAgent.new()
 	root.add_child(fixture)
 	for day in range(5): await store.war.step(fixture)
-	var own: Dictionary = {}
-	for army in store.war.active_armies("liu_bei"):
-		if store.war.roster.officers[army["officer_id"]]["name"] == "关羽": own = army
-	if own.is_empty(): own = store.war.active_armies("liu_bei")[0]
+	var own: Dictionary = store.war.active_armies("liu_bei")[0]
 	var scene: Node3D = load("res://scenes/rtk14_world_3d.tscn").instantiate()
 	root.add_child(scene)
 	while not scene.loaded: await process_frame

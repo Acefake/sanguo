@@ -8,21 +8,22 @@ const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Conduct = preload("res://scripts/officers/officer_conduct.gd")
 const Dissent = preload("res://scripts/agents/officer_dissent.gd")
+const Card = preload("res://scripts/officers/officer_card.gd")
 
-## 属性达到这个值才在署名里提属性，避免“张苞料敌：……”这种名不副实的署名。
+## 属性达到这个值才在署名里提属性，避免“淳于琼料敌：……”这种名不副实的署名。
 const NOTABLE := 80.0
 const INTENTS := {"engage": "正面接战", "flank": "侧翼包抄", "pursue": "追击", "hold": "固守", "defend": "固守", "withdraw": "撤离", "march": "行军", "continue": "推进", "besiege": "围城", "support": "支援", "scout": "侦察", "resupply": "补给"}
 const SOURCE_MODEL := "模型"
 
 
 ## 某个 hook 的结果该署谁的名：先找改了它的特性，其次是读它的子属性（够高才提）。
-## 返回“颜良恋战”“田丰料敌”这样的前缀；都不够格时返回空字符串。
+## 返回“颜良急躁”“田丰料敌”这样的前缀（属性用 GDD 名）；都不够格时返回空字符串。
 static func credit(army: Dictionary, hook: String, ctx: Dictionary = {}) -> String:
 	var name := str(army.get("name", ""))
 	var sources := Traits.sources(army, hook, ctx)
 	if not sources.is_empty(): return name + str(sources[0]["name"])
 	var reads := str(Traits.hook_spec(hook).get("reads", ""))
-	if not reads.is_empty() and Process.value(army, reads, ctx) >= NOTABLE: return name + reads
+	if not reads.is_empty() and Process.value(army, reads, ctx) >= NOTABLE: return name + Card.label(reads)
 	return ""
 
 
@@ -38,7 +39,7 @@ static func intent(army: Dictionary, ctx: Dictionary = {}, officer: Dictionary =
 	var action := str(army.get("action", {}).get("type", "hold"))
 	var reasons: Array = []
 	var delay := float(army.get("order_delay_hours", 0.0))
-	if delay > 0.0: reasons.append({"text": "新命令整理与展开还需 %.1f 小时（带兵 %d、布阵 %d）" % [delay, int(Process.value(army, "带兵")), int(Process.value(army, "布阵"))], "source": "属性"})
+	if delay > 0.0: reasons.append({"text": "新命令整理与展开还需 %.1f 小时（统兵 %d、机动 %d）" % [delay, int(Process.value(army, "带兵")), int(Process.value(army, "布阵"))], "source": "属性"})
 	for hook in ["commit投入", "disengage脱离", "pursuit深入", "command整理", "formation整队"]:
 		for source in Traits.sources(army, hook, ctx):
 			reasons.append({"text": "%s：%s" % [source["name"], Traits.definition(str(source["id"])).get("summary", "")], "source": "特性"})
@@ -64,7 +65,8 @@ static func intent_text(army: Dictionary, ctx: Dictionary = {}, officer: Diction
 	return "\n".join(lines)
 
 
-## 人物卡摘要：“适合做什么”来自优势与专属特性，“遇到什么会吃亏”来自局限特性。
+## 人物卡摘要：“适合做什么”来自优势与专属特性，“遇到什么会吃亏”来自局限特性，
+## 再补上卡面失败模式里没被特性覆盖的条目（如 Notion 的脆弱环节）。
 static func card(officer: Dictionary) -> Dictionary:
 	var suits: Array = []
 	var weak: Array = []
@@ -73,6 +75,8 @@ static func card(officer: Dictionary) -> Dictionary:
 		var line := "%s：%s" % [definition.get("name", id), definition.get("summary", "")]
 		if str(definition.get("tier", "")) == "flaw": weak.append(line)
 		else: suits.append(line)
+	for mode in officer.get("failure_modes", []):
+		if not mode.has("trait"): weak.append(str(mode["text"]))
 	return {"suits": suits, "weak": weak}
 
 

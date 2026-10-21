@@ -32,17 +32,20 @@ func _initialize() -> void:
 	check(Conduct.commit_readiness(officer({"耐心": 90}, ["flaw_rash"])) < Conduct.commit_readiness(officer({"耐心": 90})) - 0.4, "急躁在高耐心者身上照样把就位度压低 0.5")
 	check(is_equal_approx(Conduct.dissent_shift(officer({}, ["flaw_stubborn"])), 0.05), "刚愎违令 +5pp")
 
-	# 真实人物：颜良与文丑卡面几乎相同，靠局限区分；田丰与魏延人格相反。
+	# 真实人物：颜良与文丑卡面相近，靠 Notion 行为画像推定的人格型局限区分；郭嘉与田丰风险偏好相反。
 	var cards: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
 	var roster := Roster.new()
 	roster.setup(cards, {})
 	var by_name := {}
 	for o in roster.officers.values(): by_name[o["name"]] = o
-	print("CONDUCT: 迎战门槛 魏延 %.2f 田丰 %.2f；脱离线 魏延 %.1f 田丰 %.1f 黄忠 %.1f；就位度 文丑 %.2f 颜良 %.2f(对低名望 %.2f) 袁绍 %.2f" % [
-		Conduct.engage_ratio(by_name["魏延"]), Conduct.engage_ratio(by_name["田丰"]),
-		Conduct.disengage_line(by_name["魏延"]), Conduct.disengage_line(by_name["田丰"]), Conduct.disengage_line(by_name["黄忠"]),
-		Conduct.commit_readiness(by_name["文丑"]), Conduct.commit_readiness(by_name["颜良"]), Conduct.commit_readiness(by_name["颜良"], {"enemy_renown_gap": 20}), Conduct.commit_readiness(by_name["袁绍"])])
-	check(Conduct.engage_ratio(by_name["魏延"]) < Conduct.engage_ratio(by_name["田丰"]), "魏延比田丰更敢迎战")
+	print("CONDUCT: 迎战门槛 郭嘉 %.2f 田丰 %.2f；脱离线 文丑 %.1f 田丰 %.1f；就位度 颜良 %.2f 文丑 %.2f 袁绍 %.2f；追击上限 文丑 %d 颜良 %d" % [
+		Conduct.engage_ratio(by_name["郭嘉"]), Conduct.engage_ratio(by_name["田丰"]),
+		Conduct.disengage_line(by_name["文丑"]), Conduct.disengage_line(by_name["田丰"]),
+		Conduct.commit_readiness(by_name["颜良"]), Conduct.commit_readiness(by_name["文丑"]), Conduct.commit_readiness(by_name["袁绍"]),
+		Conduct.pursuit_limit(by_name["文丑"]), Conduct.pursuit_limit(by_name["颜良"])])
+	check(Conduct.engage_ratio(by_name["郭嘉"]) < Conduct.engage_ratio(by_name["田丰"]), "郭嘉比田丰更敢迎战")
+	check(Conduct.commit_readiness(by_name["颜良"]) < Conduct.commit_readiness(by_name["文丑"]) - 0.4, "颜良急躁：侧翼未到位就投入")
+	check(Conduct.pursuit_limit(by_name["文丑"]) > Conduct.pursuit_limit(by_name["颜良"]), "文丑穷追：追击更深")
 
 	# 效用表：七个人格因素在主轴 90 与 30 之间的权重差。
 	var weights: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/agents/policy_weights.json"))

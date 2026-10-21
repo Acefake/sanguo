@@ -4,45 +4,21 @@ const AXES := ["野心", "风险承受", "耐心", "决断", "自制", "猜疑",
 const SKILLS := [["带兵", "布阵", "水练", "奇袭", "治军"], ["智计", "沉着", "料敌", "应变", "辩才"], ["膂力", "体魄", "武艺", "骑术", "箭术"], ["农桑", "商贾", "吏治", "律法", "辞令"], ["威仪", "仁德", "忠义", "名望", "雅量"]]
 var officers: Dictionary = {}
 var parsing_audit: Array = []
-const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Careers = preload("res://scripts/officers/career_templates.gd")
+const Card = preload("res://scripts/officers/officer_card.gd")
+## 运行时额外键：GDD 有、旧 25 键没有的子属性。
+const EXTRA_SKILLS := ["攻坚"]
 
-static func numeric(value: Variant, maximum: int) -> Dictionary:
-	if typeof(value) not in [TYPE_INT,TYPE_FLOAT] and not (value is String and value.is_valid_float()): return {"value":50,"source":"invalid_default"}
-	var number := float(value)
-	if is_nan(number) or is_inf(number): return {"value":50,"source":"invalid_default"}
-	return {"value":int(clampf(number,0,maximum)),"source":"clamped_card" if number < 0 or number > maximum else "card"}
-
-
+## 读入人物卡（schema 6），经 OfficerCard 换算成运行时人物字典；换算来源记在 data_sources 与 parsing_audit。
 func setup(cards: Array, mapping: Dictionary) -> void:
 	officers.clear()
 	parsing_audit.clear()
 	for card in cards:
-		var skills: Dictionary = {}
-		var sources := {"skills":{},"personality":{}}
-		var rows: Array = card.get("substats", []) if card.get("substats",[]) is Array else []
-		for row in range(mini(rows.size(), SKILLS.size())):
-			if not rows[row] is Array: continue
-			for col in range(mini(rows[row].size(), SKILLS[row].size())):
-				var parsed := numeric(rows[row][col],120)
-				skills[SKILLS[row][col]] = parsed["value"]
-				sources["skills"][SKILLS[row][col]] = parsed["source"]
-		for group in SKILLS:
-			for skill in group:
-				if not skills.has(skill): skills[skill] = 50; sources["skills"][skill] = "missing_default"
-		var personality: Dictionary = {}
-		var text: String = str(card.get("sections", {}).get("人格数值", ""))
-		for axis in AXES:
-			var regex := RegEx.new()
-			regex.compile(axis + "[\\s:：=]*([+-]?[0-9]+(?:\\.[0-9]+)?)")
-			var match_value := regex.search(text)
-			var parsed := numeric(match_value.get_string(1),100) if match_value != null else {"value":50,"source":"invalid_default" if text.contains(axis) else "missing_default"}
-			personality[axis] = parsed["value"]
-			sources["personality"][axis] = parsed["source"]
-		parsing_audit.append({"id":card["id"],"sources":sources.duplicate(true)})
-		# Keep parsing provenance separate from the card's original values.
-		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": str(mapping.get(str(card.get("faction", "")), "")), "stats": card.get("stats", []).duplicate(), "skills": skills, "personality": personality, "trait_ids": Traits.ids_for_officer(str(card["id"])), "portrait": card.get("thumbnail", ""), "positions": str(card.get("sections", {}).get("位置", "")), "profile_note": str(card.get("sections", {}).get("核心定义", "")).left(350)}
-		officers[str(card["id"])]["data_sources"] = sources
+		var skills := Card.runtime_skills(card)
+		var personality := Card.personality_axes(card, AXES)
+		var sources := {"skills": skills["sources"], "personality": personality["sources"]}
+		parsing_audit.append({"id": card["id"], "sources": sources.duplicate(true)})
+		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": str(mapping.get(str(card.get("faction", "")), "")), "stats": Card.dimensions(card), "skills": skills["skills"], "personality": personality["personality"], "trait_ids": Card.trait_ids(card), "portrait": str(card.get("thumbnail", "")), "positions": Card.positions_text(card), "profile_note": str(card.get("summary", "")).left(350), "relations": card.get("relations", []).duplicate(true), "failure_modes": card.get("failure_modes", []).duplicate(true), "data_sources": sources}
 
 
 func militia(faction: String, city: String) -> String:
@@ -52,6 +28,7 @@ func militia(faction: String, city: String) -> String:
 		for row in SKILLS:
 			for skill in row:
 				skills[skill] = 50
+		for skill in EXTRA_SKILLS: skills[skill] = 50
 		var personality: Dictionary = {}
 		for axis in AXES:
 			personality[axis] = 50
@@ -63,6 +40,7 @@ func militia(faction: String, city: String) -> String:
 func ensure_factions(scenario: Dictionary) -> void:
 	var keys: Array = []
 	for row in SKILLS: keys.append_array(row)
+	keys.append_array(EXTRA_SKILLS)
 	var medians := Careers.medians(officers, keys)
 	for faction in scenario.get("factions", {}):
 		var cities: Array = []

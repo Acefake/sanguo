@@ -148,8 +148,7 @@
   },
   "faction_mapping": {
     "袁绍集团": "yuan_shao",
-    "孙吴集团": "sun_jian",
-    "蜀汉集团": "liu_bei"
+    "曹操集团": "cao_cao"
   },
   "terrain_regions": {
     "yizhou": "mountains",

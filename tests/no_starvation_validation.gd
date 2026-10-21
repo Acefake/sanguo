@@ -18,9 +18,7 @@ func _initialize() -> void:
 	home["garrison"] = 10000
 	home["units"] = {"infantry": 10000, "archers": 0, "cavalry": 0}
 	home["grain"] = 0
-	var officer_id := ""
-	for officer in war.roster.officers.values():
-		if officer["name"] == "关羽": officer_id = officer["id"]
+	var officer_id := str(war.available_officers("liu_bei")[0]["id"])
 	var preview: Dictionary = war.preview_dispatch("luoyang", "hongnong", officer_id)
 	check(not war.supply_enabled() and preview["ok"] and preview["strength"] > 0, "零粮仍能出征")
 	var army: Dictionary = war._mobilize(preview)

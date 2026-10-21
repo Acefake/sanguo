@@ -27,10 +27,9 @@ func _capture() -> void:
 	ui.store = campaign
 	root.add_child(ui)
 	ui.show_dispatch("hongnong")
-	for index in range(ui.officer_choice.item_count):
-		if ui.officer_choice.get_item_text(index).begins_with("关羽"):
-			ui.officer_choice.select(index)
-			ui._update_preview()
+	if ui.officer_choice.item_count > 0:
+		ui.officer_choice.select(0)
+		ui._update_preview()
 	if ui.confirm_button.disabled or not ui.preview_label.text.contains("自动动员"):
 		push_error("派遣界面没有显示可执行预览")
 		quit(1)

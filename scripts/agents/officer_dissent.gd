@@ -8,8 +8,16 @@ static func axis(officer: Dictionary, name: String) -> float:
 	return float(officer.get("personality", {}).get(name, 50))
 
 
+## a 对 b 的关系类别。人物卡写了 a→b 有向边时按边定（怨恨≥40 宿怨、怨恨≥20 或信任<35 猜忌、
+## 信任≥70 且怨恨<10 同袍）；没写边的（生成将、守备将、卡外人物）按人格轴推导。
 static func relation(a: Dictionary, b: Dictionary) -> String:
 	if a.is_empty() or b.is_empty() or str(a.get("id", "")) == str(b.get("id", "")): return "中立"
+	for edge in a.get("relations", []):
+		if str(edge.get("to", "")) != str(b.get("name", "")): continue
+		if float(edge["怨恨"]) >= 40.0: return "宿怨"
+		if float(edge["怨恨"]) >= 20.0 or float(edge["信任"]) < 35.0: return "猜忌"
+		if float(edge["信任"]) >= 70.0 and float(edge["怨恨"]) < 10.0: return "同袍"
+		return "中立"
 	var score := (axis(a, "记仇") - 50.0) * 0.45 + (axis(a, "猜疑") - 50.0) * 0.25 - (axis(a, "容人") - 50.0) * 0.3 - (axis(b, "容人") - 50.0) * 0.2 - (axis(b, "忠义") - 50.0) * 0.15
 	if score >= 18.0: return "宿怨"
 	if score >= 8.0: return "猜忌"

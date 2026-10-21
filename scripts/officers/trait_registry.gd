@@ -1,15 +1,15 @@
 extends RefCounted
 ## 战斗特性注册表。
 ##
-## 读 data/officers/ 下的 hook 表、特性库和人物特性配置，加载时一次校验，
+## 读 data/officers/ 下的 hook 表、特性库，以及人物卡（data/officers.json）上的特性配置，加载时一次校验，
 ## 运行时只回答一件事：这支部队在当前情境下，某个 hook 被特性改了多少。
 ## 单个特性的幅度在加载时按档位校验；同一 hook 的合计上限在查询时统一夹住，
 ## 调用方不再各自判断特性名。
 
 const HOOKS_PATH := "res://data/officers/hooks.json"
 const TRAITS_PATH := "res://data/officers/traits.json"
-const ASSIGNMENTS_PATH := "res://data/officers/officer_traits.json"
 const OFFICERS_PATH := "res://data/officers.json"
+const Card = preload("res://scripts/officers/officer_card.gd")
 const TIERS := ["common", "elite", "flaw", "unique"]
 const OPERATORS := ["==", "!=", ">=", "<=", ">", "<", "in"]
 ## Notion 原文的错字；人物卡与特性名里出现即校验失败。
@@ -26,12 +26,17 @@ static var _loaded := false
 
 static func _ensure() -> void:
 	if _loaded: return
-	load_data(_read(HOOKS_PATH), _read(TRAITS_PATH), _read(ASSIGNMENTS_PATH))
+	load_data(_read(HOOKS_PATH), _read(TRAITS_PATH), Card.assignments(_cards()))
 
 
 static func _read(path: String) -> Dictionary:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	return parsed if parsed is Dictionary else {}
+
+
+static func _cards() -> Array:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(OFFICERS_PATH))
+	return parsed if parsed is Array else []
 
 
 ## 用给定数据替换注册表并校验，返回错误列表。测试用它喂入坏数据。
@@ -61,15 +66,11 @@ static func load_data(hooks: Dictionary, traits: Dictionary, assignments: Dictio
 static func validate(cards: Array = []) -> Array[String]:
 	_ensure()
 	var errors: Array[String] = _errors.duplicate()
-	if cards.is_empty():
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(OFFICERS_PATH))
-		cards = parsed if parsed is Array else []
+	if cards.is_empty(): cards = _cards()
 	for card in cards:
-		var id := str(card.get("id", ""))
-		var text := JSON.stringify(card.get("sections", {}))
+		var text := JSON.stringify(card)
 		for typo in TYPOS:
-			if text.contains(typo): errors.append("%s 人物卡含错字：%s" % [card.get("name", id), typo])
-		if not _assignments.has(id): errors.append("%s 没有结构化特性配置" % card.get("name", id))
+			if text.contains(typo): errors.append("%s 人物卡含错字：%s" % [card.get("name", card.get("id", "")), typo])
 	return errors
 
 
@@ -116,6 +117,7 @@ static func display_names(ids: Array) -> Array:
 ## percent 为相对倍率（-0.05 即耗时 -5%），pp 为概率绝对值，behavior 按各自单位。
 static func modifier(army: Dictionary, hook: String, ctx: Dictionary = {}) -> float:
 	_ensure()
+	ctx = _with_task(hook, ctx)
 	var total := 0.0
 	for id in army.get("trait_ids", []):
 		for effect in _index.get(id, {}).get(hook, []):
@@ -132,6 +134,7 @@ static func attribute_points(army: Dictionary, key: String, ctx: Dictionary = {}
 ## 哪些特性改了这个 hook、各改多少（未夹上限前），供战报和面板标注来源。
 static func sources(army: Dictionary, hook: String, ctx: Dictionary = {}) -> Array:
 	_ensure()
+	ctx = _with_task(hook, ctx)
 	var result: Array = []
 	for id in army.get("trait_ids", []):
 		for effect in _index.get(id, {}).get(hook, []):
@@ -146,6 +149,15 @@ static func mechanism(army: Dictionary, type: String) -> Dictionary:
 		var params: Dictionary = _traits.get(id, {}).get("mechanism", {})
 		if str(params.get("type", "")) == type: return params
 	return {}
+
+
+## 调用方没说任务种类时，按 hook 所在流程补上（hooks.json 的 task），供 task.kind 条件判断。
+static func _with_task(hook: String, ctx: Dictionary) -> Dictionary:
+	var task := str(hook_spec(hook).get("task", ""))
+	if task.is_empty() or ctx.has("task"): return ctx
+	var merged := ctx.duplicate()
+	merged["task"] = task
+	return merged
 
 
 static func _total_cap(hook: String) -> float:
@@ -166,10 +178,16 @@ static func _applies(effect: Dictionary, army: Dictionary, ctx: Dictionary) -> b
 	return true
 
 
-## 条件字段取值。ctx.* 由调用方给出，缺失视为“不知道”，条件不成立；
-## unit.* 从部队编成算出；person.mounted 未给出时按骑兵过半推定。
+## 条件字段取值（字段名沿用 Notion 特性库 v1.1）。ctx.* / task.* / intel.* / person.* 由调用方在 ctx 里给出，
+## 缺失视为“不知道”，条件不成立；cargo.X 读 ctx.cargo_X；task.kind 读 ctx.task（_with_task 已按 hook 补上）；
+## task.recipient_count 未给出时按标准指挥单元数推定；unit.* 从部队编成算出；person.mounted 未给出时按骑兵过半推定。
 static func _field(field: String, army: Dictionary, ctx: Dictionary) -> Variant:
 	if field.begins_with("ctx."): return ctx.get(field.trim_prefix("ctx."), null)
+	if field == "task.kind": return ctx.get("task", null)
+	if field == "task.recipient_count": return ctx.get("recipient_count", _recipients(army))
+	if field.begins_with("cargo."): return ctx.get("cargo_" + field.trim_prefix("cargo."), null)
+	if field.begins_with("task.") or field.begins_with("intel."): return ctx.get(field.get_slice(".", 1), null)
+	if field.begins_with("person.") and field != "person.mounted": return ctx.get(field.trim_prefix("person."), null)
 	match field:
 		"unit.infantry_ratio": return _ratio(army, "infantry")
 		"unit.cavalry_ratio": return _ratio(army, "cavalry")
@@ -177,6 +195,13 @@ static func _field(field: String, army: Dictionary, ctx: Dictionary) -> Variant:
 		"unit.training": return float(army.get("training", 50))
 		"person.mounted": return bool(ctx.get("mounted", _ratio(army, "cavalry") >= 0.5))
 	return null
+
+
+## 部队的标准指挥单元数（每 2000 人一单元），即一次全军命令的受令单位数。
+static func _recipients(army: Dictionary) -> int:
+	var total := 0
+	for value in army.get("units", {}).values(): total += int(value)
+	return maxi(1, ceili(total / 2000.0))
 
 
 static func _ratio(army: Dictionary, type: String) -> float:
@@ -267,13 +292,16 @@ static func _validate_effect(id: String, tier: String, effect: Dictionary) -> Ar
 	return errors
 
 
+## GDD 8.1：技术特性每人普通≤3（含普通·局限）、卓越≤2、专属≤1、总数≤5，允许零特性；
+## 人格型局限（flaw_*，卡面 personality.flaws）不占技术特性名额，每人≤2。
+## 没有任何局限的人物须在卡上写明 no_flaw_reason；Notion 原文本身超预算的（卡上 gdd_exceptions.trait_budget）放行。
 static func _validate_assignments() -> Array[String]:
 	var errors: Array[String] = []
 	for officer_id in _assignments:
 		var entry: Dictionary = _assignments[officer_id]
 		var name := str(entry.get("name", officer_id))
 		var ids: Array = entry.get("trait_ids", [])
-		var counts := {"common": 0, "elite": 0, "flaw": 0, "unique": 0}
+		var counts := {"common": 0, "elite": 0, "unique": 0, "personality": 0, "flaw": 0}
 		var seen: Dictionary = {}
 		for id in ids:
 			if seen.has(id): errors.append("%s 特性重复：%s" % [name, id])
@@ -282,10 +310,15 @@ static func _validate_assignments() -> Array[String]:
 				errors.append("%s 使用了未注册的特性：%s" % [name, id])
 				continue
 			var tier := tier_of(str(id))
-			if counts.has(tier): counts[tier] += 1
-		if ids.size() < 2 or ids.size() > 4: errors.append("%s 生效特性 %d 个，应为 2–4 个" % [name, ids.size()])
-		if counts["flaw"] < 1: errors.append("%s 没有局限特性" % name)
-		if counts["common"] + counts["flaw"] > 3 or counts["elite"] > 2 or counts["unique"] > 1: errors.append("%s 档位数量超出 GDD 8.1（普通≤3、卓越≤2、专属≤1）" % name)
+			if tier == "flaw": counts["flaw"] += 1
+			if str(id).begins_with("flaw_"): counts["personality"] += 1
+			elif tier in ["common", "flaw"]: counts["common"] += 1
+			elif counts.has(tier): counts[tier] += 1
+		var over_budget: bool = counts["common"] > 3 or counts["elite"] > 2 or counts["unique"] > 1 or counts["common"] + counts["elite"] + counts["unique"] > 5
+		if over_budget and str(entry.get("budget_exception", "")).is_empty():
+			errors.append("%s 技术特性数量超出 GDD 8.1（普通≤3、卓越≤2、专属≤1、总数≤5）" % name)
+		if counts["personality"] > 2: errors.append("%s 人格型局限超过 2 个" % name)
+		if counts["flaw"] == 0 and str(entry.get("no_flaw_reason", "")).is_empty(): errors.append("%s 没有局限，也没写 no_flaw_reason" % name)
 		for id in entry.get("inferred", []):
 			if not id in ids: errors.append("%s 推定条目 %s 不在生效特性里" % [name, id])
 	return errors

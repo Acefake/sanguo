@@ -24,10 +24,9 @@ func _run() -> void:
 	home["units"] = {"infantry": 8000, "archers": 0, "cavalry": 0}
 	home["grain"] = 50000
 	store.city_state("zitong")["faction"] = "liu_bei"
-	var officer_id := ""
-	for officer in store.war.available_officers("liu_bei"):
-		if officer["name"] == "关羽": officer_id = officer["id"]
-	check(officer_id != "", "关羽不可派遣")
+	var available: Array = store.war.available_officers("liu_bei")
+	var officer_id := str(available[0]["id"]) if not available.is_empty() else ""
+	check(officer_id != "", "刘备势力没有可派遣武将")
 	var result: Dictionary = store.war.dispatch("chengdu", "hanzhong", officer_id)
 	check(bool(result["ok"]), "3D测试派遣失败")
 	var id: String = result.get("army_id", "")

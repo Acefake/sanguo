@@ -8,7 +8,7 @@ func _ready() -> void:
 	var faces: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/officer_portraits.json"))
 	var left_face: Texture2D = null
 	var right_face: Texture2D = null
-	for pair in [["关羽", 0], ["颜良", 1]]:
+	for pair in [["张辽", 0], ["颜良", 1]]:
 		var path: String = str(faces.get(pair[0], {}).get("thumbnail", ""))
 		if ResourceLoader.exists(path):
 			if pair[1] == 0: left_face = load(path)

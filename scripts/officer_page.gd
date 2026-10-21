@@ -5,8 +5,12 @@ const OfficerSkin = preload("res://scripts/city_ui_skin.gd")
 const Layout = preload("res://scripts/ui_layout.gd")
 const Radar = preload("res://scripts/officer_radar.gd")
 const TraitButton = preload("res://scripts/officer_trait_button.gd")
-const DIMENSIONS := ["军事", "谋略", "勇武", "政治", "魅力"]
-const SUB_NAMES := [["带兵", "布阵", "水练", "奇袭", "治军"], ["智计", "沉着", "料敌", "应变", "辩才"], ["膂力", "体魄", "武艺", "骑术", "箭术"], ["农桑", "商贾", "吏治", "律法", "辞令"], ["威仪", "仁德", "忠义", "名望", "雅量"]]
+const Card = preload("res://scripts/officers/officer_card.gd")
+const Traits = preload("res://scripts/officers/trait_registry.gd")
+const DIMENSIONS := ["军事", "谋略", "勇武", "政务", "影响"]
+const SUB_NAMES := [["统兵", "攻坚", "机动", "奇袭", "治军"], ["智计", "沉着", "料敌", "应变", "辩论"], ["膂力", "体魄", "武艺", "骑术", "射术"], ["农桑", "财赋", "吏治", "法度", "外交"], ["威仪", "仁德", "信义", "名望", "容人"]]
+## 特性条的底色：专属金、卓越金、普通银、局限红。
+const TRAIT_RANK := {"unique": "legend", "elite": "gold", "common": "silver", "flaw": "negative"}
 var officers: Array = []
 var selected := 0
 var tab := "基本"
@@ -24,7 +28,11 @@ var faction: OptionButton
 var footer: Label
 
 func _ready() -> void:
-	officers = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
+	officers = []
+	for card in JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json")):
+		var view := Card.page_view(card)
+		view["traits"] = Card.trait_ids(card).map(func(id): return {"name": str(Traits.definition(id).get("name", id)), "description": str(Traits.definition(id).get("summary", "")), "rank": TRAIT_RANK.get(Traits.tier_of(id), "unranked")})
+		officers.append(view)
 	frame = Control.new()
 	frame.size = Layout.DESIGN
 	frame.theme = Theme.new()
@@ -65,7 +73,7 @@ func _ready() -> void:
 	faction = OptionButton.new()
 	faction.position = Vector2(1000, 113)
 	faction.size = Vector2(143, 30)
-	for value in ["全部势力", "袁绍集团", "孙吴集团", "蜀汉集团"]:
+	for value in ["全部势力", "袁绍集团", "曹操集团"]:
 		faction.add_item(value)
 	OfficerSkin.style_button(faction)
 	faction.add_theme_font_size_override("font_size", 14)
@@ -168,7 +176,7 @@ func _render_detail() -> void:
 		var button := _button(column, str(officers[index]["name"]), Rect2(0, 0, 137, 32), func() -> void: selected = index; _render())
 		button.custom_minimum_size = Vector2(137, 32)
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.icon = load(str(officers[index]["thumbnail"]))
+		button.icon = _texture(str(officers[index]["thumbnail"]))
 		button.expand_icon = true
 		button.add_theme_constant_override("icon_max_width", 21)
 		button.add_theme_stylebox_override("normal", _row_style(index == selected))
@@ -218,7 +226,7 @@ func _render_detail() -> void:
 	match tab:
 		"基本": _basic(right, person)
 		"人格": _personality_page(right, person)
-		"关系": _prose(right, person, [], "关系与记忆", "关系档案尚未录入。\n\n当前没有可展示的关系与事件记忆。")
+		"关系": _prose(right, person, ["关系"], "关系与记忆")
 		"列传": _prose(right, person, ["定位", "核心定义"], "人物列传")
 
 func _position_icons(parent: Control, person: Dictionary) -> void:
@@ -356,22 +364,7 @@ func _section_title(parent: Control, title: String, y: float) -> void:
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 func _traits(person: Dictionary) -> Array:
-	if person.has("traits"): return person["traits"]
-	var result: Array = []
-	var sections: Dictionary = person["sections"]
-	var unique := str(sections.get("独有特性", ""))
-	if not unique.is_empty():
-		result.append({"name": unique.split("\n")[0], "description": unique, "asset": "trait-gold"})
-	for key in ["共享与负面特性", "特性"]:
-		for line in str(sections.get(key, "")).split("\n"):
-			if not "：" in line: continue
-			var parts := line.split("：", true, 1)
-			var name := parts[0]
-			if name.begins_with("独有"): continue
-			var negative := name.begins_with("负面") or name.begins_with("人格限制") or name in ["好谋少决", "骄秽", "多疑", "冒进", "自负"]
-			name = name.split("·")[-1]
-			result.append({"name": name, "description": line, "asset": "trait-red" if negative else "trait-common"})
-	return result
+	return person.get("traits", [])
 
 func _trait_chips(parent: Control, person: Dictionary, rect: Rect2) -> void:
 	var traits := _traits(person)
@@ -411,13 +404,11 @@ func _trait_chips(parent: Control, person: Dictionary, rect: Rect2) -> void:
 		strip.add_child(chip)
 
 func _trait_rank(entry: Dictionary) -> String:
-	if entry.has("rank"): return entry["rank"]
-	if entry["asset"] == "trait-gold": return "legend"
-	if entry["asset"] == "trait-red": return "negative"
-	var tiers: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/officer_trait_tiers.json"))
-	for rank in ["gold", "silver", "bronze"]:
-		if entry["name"] in tiers[rank]: return rank
-	return "unranked"
+	return str(entry.get("rank", "unranked"))
+
+## 缺立绘的人物（官渡新卡多数还没有头像）返回 null，不报加载错误。
+func _texture(path: String) -> Texture2D:
+	return load(path) if not path.is_empty() and ResourceLoader.exists(path) else null
 
 func _trait_style(kind: String, hovered: bool) -> StyleBoxTexture:
 	var asset := "trait-common" if kind == "unranked" else "personality-gold" if kind == "legend" else "personality-" + kind
@@ -500,7 +491,7 @@ func _render_table() -> void:
 		row.tooltip_text = "查看" + str(person["name"]) + "的详细资料"
 		var thumbnail := TextureRect.new()
 		thumbnail.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		thumbnail.texture = load(str(person["thumbnail"]))
+		thumbnail.texture = _texture(str(person["thumbnail"]))
 		thumbnail.position = Vector2(28, 4)
 		thumbnail.size = Vector2(23, 23)
 		thumbnail.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -511,7 +502,7 @@ func _render_table() -> void:
 		var values: Array = person["stats"]
 		if tab == "个人": values = [person["style_name"]]
 		if tab == "名声": values = [person["substats"][4][3]]
-		if tab == "关系": values = ["尚未录入关系档案"]
+		if tab == "关系": values = ["%d 条有向关系" % str(person["sections"].get("关系", "")).split("\n", false).size()]
 		if tab == "属性": values = ["25项子属性  点击查看"]
 		if tab == "特性":
 			values = []

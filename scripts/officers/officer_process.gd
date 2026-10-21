@@ -4,7 +4,7 @@ extends RefCounted
 ## 每项子属性只拥有一个战斗流程，按 GDD 4.2 的 E(x)/u 曲线进入该流程的耗时或概率，
 ## 不再折成全局伤害乘子：
 ##   带兵→命令整理  布阵→展开/整队/行军  治军→轮换与组织恢复  沉着→压力失误
-##   应变→重规划    料敌→敌情误差/识破伏兵  奇袭→接触暴露  智计→计划遗漏（兼代攻坚准备）
+##   应变→重规划    料敌→敌情误差/识破伏兵  奇袭→接触暴露  智计→计划遗漏  攻坚→工事准备
 ##   体魄→疲劳      威仪→士气光环          膂力/箭术/骑术→对应兵种的局部执行  武艺→个人遭遇
 ## 同一结算里每项属性只读一次；特性修正都经 TraitRegistry 的 hook 进入，已按上限夹住。
 ## 时间以小时计，日结算用 readiness() 折成“当天还能打多少”。
@@ -182,9 +182,9 @@ static func march_speed(army: Dictionary, terrain: String = "plains") -> float:
 	return clampf(speed, float(p["min"]), float(p["max"]))
 
 
-## 攻坚/工事准备速率倍率。旧 25 键没有攻坚，暂以智计代读。
-static func engineering_rate(army: Dictionary) -> float:
-	return 1.0 / _with(army, "engineering准备", {}, 1.25 - 0.45 * u(army, "智计"))
+## 攻坚/工事准备速率倍率（读攻坚；生成将与守备将的攻坚按模板/默认值给出）。
+static func engineering_rate(army: Dictionary, ctx: Dictionary = {}) -> float:
+	return 1.0 / _with(army, "engineering准备", ctx, 1.25 - 0.45 * u(army, "攻坚", ctx))
 
 
 ## 敌溃后追击造成损失的速率，已含被追一方的撤离修正。

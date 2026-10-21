@@ -16,6 +16,12 @@ const METRICS := ["commit_hour", "pursuit_depth", "disengages", "ambushed", "org
 const BETTER := {"commit_hour": -1, "pursuit_depth": 0, "disengages": 0, "ambushed": -1, "org_min": 1, "loss_ratio": -1, "objective": 1}
 
 
+## 本场景开战前的情境字段（特性触发条件读它）；伏击后的字段由 run 补上。
+static func context(scenario: Dictionary, probe: Dictionary, settings: Dictionary, staff: Dictionary, renown_gap: float = 0.0) -> Dictionary:
+	var terrain := str(probe.get("terrain", scenario.get("terrain", "plains")))
+	return {"terrain": terrain, "enemy_renown_gap": renown_gap, "subcommanders_assigned": probe.has("flank_hours") or not staff.is_empty(), "independent_groups": 2 if not staff.is_empty() else 1, "urgency": 0.8 if probe.get("relief", false) else 0.3, "action": "engage", "communication": true, "route_alternatives": int(probe.get("route_alternatives", 1))}
+
+
 ## 跑一场；subject/opponent/staff 是 roster 里的人物字典（skills、trait_ids、personality）。
 static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, subject: Dictionary, opponent: Dictionary, staff: Dictionary, seed: int, rules: Dictionary) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
@@ -27,7 +33,7 @@ static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, s
 	var a0 := Combat.strength(a)
 	var b0 := Combat.strength(b)
 	var renown_gap := Process.value(a, "名望") - Process.value(b, "名望")
-	var ctx := {"terrain": terrain, "enemy_renown_gap": renown_gap, "subcommanders_assigned": probe.has("flank_hours") or not staff.is_empty(), "independent_groups": 2 if not staff.is_empty() else 1, "urgency": 0.8 if probe.get("relief", false) else 0.3, "action": "engage"}
+	var ctx := context(scenario, probe, settings, staff, renown_gap)
 	var m := {"commit_hour": 0.0, "pursuit_depth": 0, "disengages": 0, "ambushed": 0, "org_min": float(a["organization"]), "loss_ratio": 0.0, "objective": 0, "errors": 0, "routed": 0, "counter": 0, "omissions": 0}
 
 	# 敌军隐藏兵力：先按料敌估计，再按人物的迎战门槛决定打不打。
@@ -57,6 +63,8 @@ static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, s
 			a_lost_hours = float(probe["ambush_hours"])
 
 	# 部署：命令整理+展开（伏击后还要重规划），侧翼迂回就位，按人物的就位度门槛投入。
+	ctx["plan_invalid_known"] = plan_invalid
+	ctx["pressure"] = pressure
 	var commit := Process.order_delay_hours(a, ctx, plan_invalid) + a_lost_hours
 	var flank_share := 0.0
 	if probe.has("flank_hours"):
@@ -73,7 +81,7 @@ static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, s
 	var b_delay := 0.0 if probe.get("ambush", false) else Process.order_delay_hours(b, {"terrain": terrain})
 	var fortification := 1.0
 	if probe.get("siege", false):
-		var prep_days := ceili(float(probe["prep_points"]) / (float(probe["prep_rate"]) * Process.engineering_rate(a)))
+		var prep_days := ceili(float(probe["prep_points"]) / (float(probe["prep_rate"]) * Process.engineering_rate(a, ctx)))
 		commit += 24.0 * prep_days
 		fortification = float(probe["fortification"])
 	var late := false
@@ -112,6 +120,7 @@ static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, s
 		# 压力：当日伤亡比例与被伏，次日按沉着抽一次失误。
 		pressure = clampf(float(hit_a) / maxf(a_before, 1) * 6.0 + (0.5 if plan_invalid and day == start_day else 0.0), 0.0, 1.0)
 		for side in [a, b]: side["fatigue"] = minf(100.0, float(side["fatigue"]) + Process.fatigue_cost(side, float(settings["daily_fatigue"]), true))
+		ctx["pressure"] = pressure
 		if rng.randf() < Process.pressure_error(a, pressure, ctx):
 			m["errors"] += 1
 			m["pending_error"] = 1

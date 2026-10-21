@@ -41,6 +41,12 @@ func _sandbox() -> Node:
 	return sandbox
 
 
+## 刘备势力在官渡剧本里没有历史人物卡，取可派遣的生成将（按名字排序后的第 index 个）。
+func _officer_of(sandbox: Node, faction: String, index: int = 0) -> String:
+	var officers: Array = sandbox.war.available_officers(faction)
+	return str(officers[index]["id"]) if index < officers.size() else ""
+
+
 func _officer(sandbox: Node, name: String) -> String:
 	for officer in sandbox.war.roster.officers.values():
 		if officer["name"] == name: return str(officer["id"])
@@ -72,7 +78,7 @@ func _run() -> void:
 	var sandbox: Node = _sandbox()
 	_city(sandbox, "luoyang", "liu_bei", 10000)
 	_city(sandbox, "hongnong", "yuan_shao", 1600)
-	var id: String = _officer(sandbox, "关羽")
+	var id: String = _officer_of(sandbox, "liu_bei")
 	var total: int = _ledger(sandbox)
 	var grain: int = int(sandbox.city_state("luoyang")["grain"])
 	var preview: Dictionary = sandbox.war.preview_dispatch("luoyang", "hongnong", id)
@@ -143,11 +149,11 @@ func _road_contact() -> void:
 	var sandbox: Node = _sandbox()
 	_city(sandbox, "luoyang", "liu_bei", 10000)
 	_city(sandbox, "hongnong", "yuan_shao", 10000)
-	var attacker_id: String = _officer(sandbox, "关羽")
+	var attacker_id: String = _officer_of(sandbox, "liu_bei")
 	var defender_id: String = _officer(sandbox, "颜良")
 	var a: Dictionary = sandbox.war._mobilize(sandbox.war.preview_dispatch("luoyang", "hongnong", attacker_id))
 	var b: Dictionary = sandbox.war._mobilize(sandbox.war.preview_dispatch("hongnong", "luoyang", defender_id))
-	var c: Dictionary = sandbox.war._mobilize(sandbox.war.preview_dispatch("luoyang", "hongnong", _officer(sandbox, "魏延")))
+	var c: Dictionary = sandbox.war._mobilize(sandbox.war.preview_dispatch("luoyang", "hongnong", _officer_of(sandbox, "liu_bei", 1)))
 	var path: Dictionary = sandbox.war.graph.path("luoyang", "hongnong")
 	_check(path["edges"].size() == 1, "道路接敌测试需要直连路线")
 	var edge: String = str(path["edges"][0])
@@ -183,7 +189,7 @@ func _road_contact() -> void:
 func _supply_and_withdrawal() -> void:
 	var sandbox: Node = _sandbox()
 	_city(sandbox, "luoyang", "liu_bei", 10000)
-	var preview: Dictionary = sandbox.war.preview_dispatch("luoyang", "hongnong", _officer(sandbox, "关羽"))
+	var preview: Dictionary = sandbox.war.preview_dispatch("luoyang", "hongnong", _officer_of(sandbox, "liu_bei"))
 	var army: Dictionary = sandbox.war._mobilize(preview)
 	army["grain"] = 0.0
 	var food_before: int = int(sandbox.city_state("luoyang")["grain"])
@@ -205,7 +211,7 @@ func _blocked_return() -> void:
 	sandbox.persist_enabled = false
 	var war = sandbox.war
 	_city(sandbox, "luoyang", "liu_bei", 10000)
-	var army: Dictionary = war._mobilize(war.preview_dispatch("luoyang", "hongnong", _officer(sandbox, "关羽")))
+	var army: Dictionary = war._mobilize(war.preview_dispatch("luoyang", "hongnong", _officer_of(sandbox, "liu_bei")))
 	army.erase("tactical")
 	army["returning"] = true
 	army["outcome"] = "撤退"
@@ -246,7 +252,7 @@ func _save_migration() -> void:
 	sandbox._load_save()
 	_check(sandbox.year == 192 and sandbox.month == 3 and sandbox.day == 1 and sandbox.war.active_armies().is_empty(), "旧存档迁移错误")
 	_city(sandbox, "luoyang", "liu_bei", 10000)
-	var dispatch: Dictionary = sandbox.war.dispatch("luoyang", "hongnong", _officer(sandbox, "关羽"))
+	var dispatch: Dictionary = sandbox.war.dispatch("luoyang", "hongnong", _officer_of(sandbox, "liu_bei"))
 	await sandbox.war.step()
 	sandbox.persist_enabled = true
 	sandbox._save()

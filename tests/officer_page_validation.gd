@@ -17,20 +17,22 @@ func _run() -> void:
 		assert(ResourceLoader.exists("res://assets/officers/position-" + role_kinds[role] + ".png"))
 	assert(page._position_kind("都督") == "commander")
 	var portrait_paths: Array = []
+	# 官渡新卡多数还没有立绘：有专属立绘的不得重复，其余用默认立绘、列表不显示头像。
 	for person in page.officers:
-		assert(ResourceLoader.exists(person["portrait"]) and ResourceLoader.exists(person["thumbnail"]))
-		assert(not person["portrait"] in portrait_paths)
+		assert(ResourceLoader.exists(person["portrait"]))
+		if person["thumbnail"].is_empty(): continue
+		assert(ResourceLoader.exists(person["thumbnail"]) and not person["portrait"] in portrait_paths)
 		portrait_paths.append(person["portrait"])
-	for i in range(5): assert(int(page.officers[0]["stats"][i]) == [84, 80, 56, 82, 93][i])
-	var hovered_officer := _find_button(page.content, "袁尚")
+	for i in range(5): assert(int(page.officers[0]["stats"][i]) == [79, 73, 59, 80, 83][i])
+	var hovered_officer := _find_button(page.content, "沮授")
 	await _hover(hovered_officer)
 	assert(hovered_officer.get_theme_color("icon_hover_color") == Color.WHITE)
 	assert(hovered_officer.get_rect().size.x <= 146)
 	if "--capture" in OS.get_cmdline_user_args(): await _save("res://assets/officers/officer-list-hover-preview.png")
 	await _click(page.tabs.get_child(1))
 	assert(page.tab == "人格")
-	await _click(_find_button(page.frame, "孙策"))
-	assert(page.officers[page.selected]["name"] == "孙策")
+	await _click(_find_button(page.frame, "曹操"))
+	assert(page.officers[page.selected]["name"] == "曹操")
 	await _click(_find_button(page.frame, "情报一览"))
 	assert(page.overview)
 	await _click(_find_button(page.frame, "军事"))
@@ -40,7 +42,6 @@ func _run() -> void:
 	for person in page.officers:
 		assert(person["substats"].size() == 5)
 		for group in person["substats"]: assert(group.size() == 5)
-	var expected_role_counts := [4, 4, 4, 3, 2, 2, 4, 4, 4, 4, 3, 4, 5, 3, 4, 3, 5, 5]
 	for index in page.officers.size():
 		page.selected = index
 		for name in ["基本", "人格", "关系", "列传"]:
@@ -55,7 +56,7 @@ func _run() -> void:
 					assert(not "不宜位置" in child.tooltip_text)
 					assert(child.position.x + child.size.x <= 444)
 					assert(child.name == "PrimaryPosition")
-			assert(role_icons == (1 if expected_role_counts[index] > 0 else 0))
+			assert(role_icons == 1)
 			if name == "基本" and "--capture" in OS.get_cmdline_user_args():
 				await _save("res://assets/officers/portraits/%02d-page.png" % index)
 	page.selected = 13
@@ -68,7 +69,7 @@ func _run() -> void:
 		if child is TextureButton and child.has_meta("position_role"):
 			alternate_role = child
 			break
-	assert(alternate_role != null and "次选位置：偏将" in alternate_role.tooltip_text)
+	assert(page.officers[13]["name"] == "程昱" and alternate_role != null and "次选位置：参军" in alternate_role.tooltip_text)
 	await _hover(alternate_role)
 	assert(alternate_role.is_hovered())
 	await create_timer(0.8).timeout
@@ -84,10 +85,10 @@ func _run() -> void:
 			break
 	assert(position_icon != null and "核心位置" in position_icon.tooltip_text)
 	assert(position_icon.get_meta("position_role") == "君主")
-	var zhuge_roles: Array = page._available_positions(page.officers[12])
-	assert(zhuge_roles.map(func(role: Dictionary) -> String: return role["name"]) == ["主帅", "军师", "治政", "军需", "参军"])
-	var huangzhong_roles: Array = page._available_positions(page.officers[16])
-	assert(huangzhong_roles[0]["name"] == "前锋" and huangzhong_roles[0]["source"] == "前锋 105")
+	var guojia_roles: Array = page._available_positions(page.officers[12])
+	assert(page.officers[12]["name"] == "郭嘉" and guojia_roles.map(func(role: Dictionary) -> String: return role["name"]) == ["军师", "参军"])
+	var xuchu_roles: Array = page._available_positions(page.officers[14])
+	assert(page.officers[14]["name"] == "许褚" and xuchu_roles[0]["name"] == "护军" and xuchu_roles[1]["group"] == "次选位置")
 	var tooltip = position_icon._make_custom_tooltip(position_icon.tooltip_text)
 	assert(tooltip is PanelContainer)
 	tooltip.free()
@@ -106,10 +107,10 @@ func _run() -> void:
 	page.sort_column = 0
 	page.sort_descending = true
 	page._render()
-	assert(page.officers[page._filtered()[0]]["name"] == "诸葛亮")
+	assert(page.officers[page._filtered()[0]]["name"] == "曹操")
 	if "--capture" in OS.get_cmdline_user_args(): await _save("res://assets/officers/intelligence-preview.png")
 	# Exercise actual pointer states rather than validating only the normal appearance.
-	var hovered_row := _find_row(page.content, "诸葛亮")
+	var hovered_row := _find_row(page.content, "曹操")
 	assert(hovered_row != null)
 	await _hover(hovered_row)
 	assert(hovered_row.is_hovered())
@@ -117,35 +118,32 @@ func _run() -> void:
 	await _hover(_find_button(page.content, "谋略"))
 	if "--capture" in OS.get_cmdline_user_args(): await _save("res://assets/officers/intelligence-header-hover-preview.png")
 	page.filter_text = "袁"
-	assert(page._filtered().size() == 4)
-	page.faction_filter = "孙吴集团"
+	assert(page._filtered().size() == 1)
+	page.faction_filter = "曹操集团"
 	assert(page._filtered().is_empty())
 	page.filter_text = ""
-	assert(page._filtered().size() == 1)
-	page.faction.select(3)
-	page.faction.item_selected.emit(3)
-	assert(page.faction_filter == "蜀汉集团")
+	page.faction.select(2)
+	page.faction.item_selected.emit(2)
+	assert(page.faction_filter == "曹操集团")
 	assert(page._filtered().size() == 10)
 	for index in page._filtered():
 		var person: Dictionary = page.officers[index]
 		assert(not page._traits(person).is_empty())
 		for entry in page._traits(person):
 			assert(not entry["name"] in ["独有特性", "负面特性", "生涯限制", "效果", "机制"])
-		if person["name"] == "诸葛亮":
-			for i in range(5): assert(int(person["stats"][i]) == [95, 105, 48, 105, 96][i])
-			assert(page._traits(person)[0]["name"] == "卧龙")
-			assert(page._trait_rank(page._traits(person)[0]) == "legend")
-		if person["name"] == "周仓":
-			assert(page._trait_rank(page._traits(person)[2]) == "unranked")
-		if person["name"] == "黄忠": assert(page._traits(person).size() == 2)
-		if person["name"] == "魏延": assert(page._traits(person).size() == 4)
+		if person["name"] == "曹操":
+			for i in range(5): assert(int(person["stats"][i]) == [90, 92, 68, 86, 81][i])
+			assert(page._traits(person)[0]["name"] == "临机")
+			assert(page._trait_rank(page._traits(person)[0]) == "gold")
+			assert(page._trait_rank(page._traits(person)[2]) == "negative")
+		if person["name"] == "许褚": assert(page._traits(person).size() == 2)
 	if "--capture" in OS.get_cmdline_user_args():
 		page._render()
-		await _save("res://assets/officers/shuhan-intelligence-preview.png")
+		await _save("res://assets/officers/cao-intelligence-preview.png")
 		page.overview = false
 		page.selected = 12
 		page._render()
-		await _save("res://assets/officers/shuhan-basic-preview.png")
+		await _save("res://assets/officers/cao-basic-preview.png")
 	page.faction_filter = "全部势力"
 	page.faction.select(0)
 	page.overview = false
@@ -153,9 +151,9 @@ func _run() -> void:
 	page.tab = "基本"
 	page._render()
 	if "--capture" in OS.get_cmdline_user_args(): await _save("res://assets/officers/skills-preview.png")
-	var chip := _find_button(page.content, "四世名门")
-	assert(chip != null and "名望+3" in chip.tooltip_text)
-	assert(page._traits(page.officers[0]).size() == 7)
+	var chip := _find_button(page.content, "临危不乱")
+	assert(chip != null and "压力失误" in chip.tooltip_text)
+	assert(page._traits(page.officers[0]).size() == 4)
 	await _hover(chip)
 	await create_timer(0.8).timeout
 	if "--capture" in OS.get_cmdline_user_args(): await _save("res://assets/officers/trait-tooltip-preview.png")
@@ -168,7 +166,7 @@ func _run() -> void:
 	assert(page.visible and page.overview)
 	page.queue_free()
 	await process_frame
-	print("武将页验证通过：18张人物卡、蜀汉10人、全部分页、特性等级、搜索、势力筛选、排序与返回。")
+	print("武将页验证通过：官渡20张人物卡、曹操方10人、全部分页、特性等级、搜索、势力筛选、排序与返回。")
 	quit()
 
 func _save(path: String) -> void:

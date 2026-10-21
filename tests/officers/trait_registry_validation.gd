@@ -1,6 +1,6 @@
 extends SceneTree
 ## 特性注册表校验：真实数据零错误；上限在查询时统一夹住；坏数据必须被拒绝；
-## 武圣、小霸王迁入注册表后行为与迁移前一致。
+## 人物卡特性与注册表一致；Notion task.kind 条件；武圣、小霸王机制不变。
 ##
 ##   godot --headless --path . --script res://tests/officers/trait_registry_validation.gd
 
@@ -8,6 +8,7 @@ const Traits = preload("res://scripts/officers/trait_registry.gd")
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Signature = preload("res://scripts/officers/signature_traits.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
+const Card = preload("res://scripts/officers/officer_card.gd")
 
 var failures: Array[String] = []
 
@@ -31,11 +32,21 @@ func _initialize() -> void:
 	var roster := Roster.new()
 	roster.setup(cards, {})
 	var flaw_total := 0
+	var sides := {}
 	for card in cards:
 		var ids: Array = roster.officers[str(card["id"])]["trait_ids"]
 		flaw_total += Traits.flaws({"trait_ids": ids}).size()
-		check(ids.size() >= 2 and ids.size() <= 4, "%s 生效特性数 %d" % [card["name"], ids.size()])
+		sides[card["faction"]] = int(sides.get(card["faction"], 0)) + 1
+		check(ids == Traits.ids_for_officer(str(card["id"])), "%s 运行时特性与注册表配置一致" % card["name"])
+	check(sides == {"袁绍集团": 10, "曹操集团": 10}, "官渡人物卡每方 10 人：%s" % str(sides))
 	print("REGISTRY: traits=%d officers=%d flaws_assigned=%d" % [Traits.all_ids().size(), cards.size(), flaw_total])
+
+	# Notion 特性库的 task.kind：调用方没给时按 hook 所在流程补上；本人动作类要调用方明说。
+	var host := army({"infantry": 14000, "archers": 0, "cavalry": 6000}, ["trait_015", "trait_049"])
+	check(is_equal_approx(Traits.modifier(host, "command整理", {"subcommanders_assigned": true, "communication": true}), -0.08), "合阵：十个受令单位、分统、通信齐备时整理 -8%")
+	check(Traits.modifier(host, "command整理", {"subcommanders_assigned": true}) == 0.0, "合阵：通信不明时不触发")
+	check(Traits.attribute_points(host, "武艺", {"task": "personal_melee", "mounted": true}) == 2, "骑战：马上近战武艺 +2")
+	check(Traits.attribute_points(host, "武艺") == 0, "骑战：不是本人近战时不触发")
 
 	# 合计上限：急行 -5% + 山行 -5% + 善骑 -3% = -13%，夹到 -10%。
 	var rider := army({"infantry": 0, "archers": 0, "cavalry": 6000}, ["trait_016", "trait_033", "trait_046"])
@@ -61,19 +72,16 @@ func _initialize() -> void:
 		{"id": "trait_904", "name": "叠点甲", "tier": "elite", "effects": [{"hook": "attribute.武艺", "value": 3}]},
 		{"id": "trait_905", "name": "叠点乙", "tier": "elite", "effects": [{"hook": "attribute.武艺", "value": 3}]},
 		{"id": "trait_906", "name": "叠点丙", "tier": "elite", "effects": [{"hook": "attribute.武艺", "value": 3}]}]}
-	var bad_assign := {"officers": {"x": {"name": "单特性", "trait_ids": ["trait_904"]}}}
+	var bad_assign := {"officers": {"x": {"name": "三卓越", "trait_ids": ["trait_904", "trait_905", "trait_906"]}}}
 	var bad := Traits.load_data(hooks, bad_traits, bad_assign)
 	var joined := "\n".join(bad)
-	for needle in ["未注册的 hook", "trait_901", "flaw_backward", "enemy.true_strength", "运筹帷幂", "应为 2–4", "没有局限"]:
+	for needle in ["未注册的 hook", "trait_901", "flaw_backward", "enemy.true_strength", "运筹帷幂", "超出 GDD 8.1", "没有局限"]:
 		check(joined.contains(needle), "校验应拒绝：" + needle)
 	check(Traits.attribute_points(army({"infantry": 1}, ["trait_904", "trait_905", "trait_906"]), "武艺") == 6, "属性点合计夹到 +6")
 
-	# 恢复真实数据，验证专属机制迁移后行为不变。
-	Traits.load_data(hooks, JSON.parse_string(FileAccess.get_file_as_string(Traits.TRAITS_PATH)), JSON.parse_string(FileAccess.get_file_as_string(Traits.ASSIGNMENTS_PATH)))
-	var guan_id := ""
-	for card in cards:
-		if card["name"] == "关羽": guan_id = str(card["id"])
-	var saint := army({"infantry": 5000}, Traits.ids_for_officer(guan_id))
+	# 恢复真实数据，验证专属机制行为不变（Notion 专属库为空，当前无人持有，用合成部队测）。
+	Traits.load_data(hooks, JSON.parse_string(FileAccess.get_file_as_string(Traits.TRAITS_PATH)), Card.assignments(cards))
+	var saint := army({"infantry": 5000}, ["unique_wusheng"])
 	var famous := army({"infantry": 5000}, [])
 	famous["skills"]["名望"] = 90
 	famous["officer_id"] = "famous"

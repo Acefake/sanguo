@@ -9,7 +9,7 @@ class PreviewContext extends RefCounted:
 
 static func build(war) -> Dictionary:
 	var fighters: Array = []
-	for name in ["关羽", "颜良"]:
+	for name in ["张辽", "颜良"]:
 		for card in war.roster.officers.values():
 			if card.get("name", "") == name:
 				fighters.append({"officer_id":card["id"], "stats":card.get("stats", []), "name":name, "skills":card["skills"].duplicate(true), "units":{"cavalry":1}})

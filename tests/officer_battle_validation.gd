@@ -57,14 +57,14 @@ func _initialize() -> void:
 	Combat.battle_morale(unshocked, 200, 100, 2000, 2000, 2000, 2000)
 	check(shocked["morale"] < unshocked["morale"] and not shocked.has("incoming_shock"), "首次士气冲击消费")
 	var sandbox := Store.new(); sandbox.persist_enabled = false; sandbox._load_demo()
-	var guan: Dictionary
+	var yan: Dictionary
 	for officer in sandbox.war.roster.officers.values():
-		if officer["name"] == "关羽": guan = officer
-	check(Traits.has(guan, "unique_wusheng"), "真实人物卡导入特性")
-	var migrated := army(); migrated["officer_id"] = guan["id"]; migrated["faction"] = "liu_bei"; migrated["home"] = "luoyang"
+		if officer["name"] == "颜良": yan = officer
+	check(Traits.has(yan, "trait_049") and Traits.has(yan, "flaw_rash"), "真实人物卡导入技术特性与人格型局限")
+	var migrated := army(); migrated["officer_id"] = yan["id"]; migrated["faction"] = "yuan_shao"; migrated["home"] = "ye"
 	var saved: Dictionary = sandbox.war.export_state(); saved["armies"] = {"test": migrated}
 	sandbox.war.setup(sandbox, saved)
-	check(Traits.has(sandbox.war.state["armies"]["test"], "unique_wusheng"), "旧存档自动补齐特性")
+	check(Traits.has(sandbox.war.state["armies"]["test"], "flaw_rash"), "旧存档自动补齐特性")
 	sandbox.free()
 	print("OFFICER_BATTLE_VALIDATION: " + ("PASS" if failures.is_empty() else str(failures)))
 	quit(0 if failures.is_empty() else 1)

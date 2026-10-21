@@ -1,4 +1,10 @@
 extends RefCounted
+## 战役状态：军队、军团、城防、军报等全部存档数据都在 state 里，step() 推进一日。
+##
+## 各项职责的实现在同目录的协作模块里（CampaignLogistics、CampaignReports、CampaignOrders、
+## CampaignDispatch、CampaignContext、CampaignContactResolver、CampaignOutcomes、CampaignActions），
+## 它们都是静态函数，第一个参数 war 就是本实例。本文件末尾为每个搬走的函数保留同签名的转发，
+## 仓库内外（含只在本地的脚本）原有调用 war.xxx() 一律照常可用；常量同样全部保留，外部会以 war.Combat 等形式访问。
 
 const Graph = preload("res://scripts/war/campaign/map_graph.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
@@ -31,6 +37,8 @@ const UnitBrain = preload("res://scripts/agents/unit_brain.gd")
 const OfficerBrain = preload("res://scripts/agents/officer_brain.gd")
 const Autonomy = preload("res://scripts/agents/officer_autonomy.gd")
 const TacticalPlan = preload("res://scripts/agents/tactical_plan.gd")
+const Logistics = preload("res://scripts/war/campaign/campaign_logistics.gd")
+const Reports = preload("res://scripts/war/campaign/campaign_reports.gd")
 var store: Node
 var graph = Graph.new()
 var roster = Roster.new()
@@ -177,18 +185,22 @@ func active_armies(faction: String = "") -> Array:
 	result.sort_custom(func(a, b): return str(a["id"]) < str(b["id"]))
 	return result
 
+
 func ready(army: Dictionary) -> bool:
 	return int(army.get("departure_at", 0)) <= int(state["tick"])
+
 
 func is_besieged(city: String) -> bool:
 	var siege: Dictionary = state["sieges"].get(city, {})
 	return int(siege.get("active_tick", -100)) >= int(state["tick"]) - 1 and siege.get("phase", "") not in ["occupied", "解围"]
+
 
 func hostile(first: String, second: String) -> bool:
 	if first == second: return false
 	var pair: Array = [first, second]
 	pair.sort()
 	return state.get("relations", {}).get("|".join(pair), "hostile") == "hostile"
+
 
 func can_cross(faction: String, node: String) -> bool:
 	var owner := str(store.city_state(node).get("faction", ""))
@@ -197,14 +209,17 @@ func can_cross(faction: String, node: String) -> bool:
 	pair.sort()
 	return state.get("relations", {}).get("|".join(pair), "hostile") == "allied"
 
+
 func route(faction: String, start: String, finish: String) -> Dictionary:
 	var excluded: Array = []
 	for node in graph.places:
 		if node != start and node != finish and not can_cross(faction, str(node)): excluded.append(node)
 	return graph.path(start, finish, excluded)
 
+
 func campaign_finished() -> bool:
 	return not state.get("campaign_result", {}).is_empty()
+
 
 func start_campaign() -> void:
 	state["campaign_started"] = true
@@ -417,40 +432,6 @@ func set_player_faction(faction: String) -> bool:
 	state["player_faction"] = faction
 	store._save()
 	return true
-
-
-func _sync_inventory(city: Dictionary) -> void:
-	if not city.get("wounded_units") is Dictionary: city["wounded_units"] = {"infantry": int(city.get("wounded", 0)), "archers": 0, "cavalry": 0}
-	var wounded_count := 0
-	for type in Combat.TYPES:
-		city["wounded_units"][type] = maxi(0, int(city["wounded_units"].get(type, 0)))
-		wounded_count += int(city["wounded_units"][type])
-	if wounded_count < int(city.get("wounded", 0)): city["wounded_units"]["infantry"] += int(city["wounded"]) - wounded_count
-	var total: int = int(city.get("garrison", 0))
-	if not city.get("units", null) is Dictionary:
-		city["units"] = {"infantry": total, "archers": 0, "cavalry": 0}
-	var counted: int = 0
-	for type in Combat.TYPES:
-		city["units"][type] = maxi(0, int(city["units"].get(type, 0)))
-		counted += int(city["units"][type])
-	if counted < total:
-		city["units"]["infantry"] += total - counted
-	elif counted > total:
-		var excess: int = counted - total
-		for type in Combat.TYPES:
-			var loss: int = mini(excess, int(city["units"][type]))
-			city["units"][type] -= loss
-			excess -= loss
-
-
-func recruit_units(city: Dictionary, count: int) -> void:
-	_sync_inventory(city)
-	# The city's garrison has already increased; replace part of the new infantry.
-	var archers: int = int(count * 0.2) if int(city.get("training", 0)) >= 50 else 0
-	var cavalry: int = int(count * 0.1) if int(city.get("equipment", 0)) >= 70 else 0
-	city["units"]["infantry"] -= archers + cavalry
-	city["units"]["archers"] += archers
-	city["units"]["cavalry"] += cavalry
 
 
 func preview_dispatch(home: String, target: String, officer_id: String, defending: bool = false, troop_count: int = 0) -> Dictionary:
@@ -686,8 +667,10 @@ func step(adapter: Node = null) -> void:
 	state["rng_state"] = str(rng.state)
 	state["dissent_state"] = int(state.get("dissent_state", 0))
 
+
 func uses_unit_brain(army: Dictionary) -> bool:
 	return army.has("tactical") and str(rules.get("battle_ai",{}).get("mode","active")) == "active"
+
 
 func set_battle_ai_mode(mode: String) -> bool:
 	if mode not in ["legacy","shadow","active"]: return false
@@ -713,6 +696,7 @@ func _should_reconsider(army: Dictionary, context: Dictionary, adapter, key: Str
 			if candidate["action"] == army["action"]: valid_plan = true
 		if not urgent and valid_plan: return false
 	return key != str(army.get("decision_key", "")) or age >= 3
+
 
 func _decision_key(context: Dictionary) -> String:
 	var own: Dictionary = context["army"]
@@ -866,6 +850,7 @@ func _update_operations() -> void:
 				operation["plan_until"] = 0
 			army["operation"] = operation
 
+
 func _near_battle(a: Dictionary, b: Dictionary) -> bool:
 	var edge_a := str(a.get("edge", ""))
 	var edge_b := str(b.get("edge", ""))
@@ -875,6 +860,7 @@ func _near_battle(a: Dictionary, b: Dictionary) -> bool:
 	if edge_a == "": return _near_battle(b, a)
 	if edge_b != "": return false
 	return (b["node"] == a.get("from", "") and float(a.get("progress", 0)) <= 0.3) or (b["node"] == a.get("to", "") and float(a.get("progress", 0)) >= 0.7)
+
 
 func _support_context(army: Dictionary) -> Dictionary:
 	var allies: Array = []
@@ -901,6 +887,7 @@ func _support_context(army: Dictionary) -> Dictionary:
 			enemy_total += int(enemy["strength_estimate"])
 			uncertainty += int(enemy.get("uncertainty", 0))
 	return {"allies": allies, "battlefield": {"friendly_ready_strength": ready, "enemy_estimated_strength": enemy_total, "enemy_strength_min": maxi(0, enemy_total - uncertainty), "enemy_strength_max": enemy_total + uncertainty, "enemy_to_friendly_ratio": float(enemy_total) / maxf(ready, 1), "note": "友军计划为上一轮行动；可支援表示邻近且状态允许，不保证本轮行动。远处援军与撤退、低士气、低组织、断粮友军不计入可用兵力。敌军兵力为实时信息。"}}
+
 
 func _observed_contact(army: Dictionary) -> Dictionary:
 	var cell := int(army.get("tactical", {}).get("cell", -1))
@@ -1370,6 +1357,7 @@ func _fate_enemy(army: Dictionary) -> Dictionary:
 		return defender
 	return {}
 
+
 func _check_rout(army: Dictionary) -> void:
 	if army["status"] == "ended": return
 	if Combat.strength(army) <= 0:
@@ -1441,51 +1429,6 @@ func _check_leader_lost() -> void:
 			_report(sample, "主帅失位", "主帅失位：%s所部军心动摇，全军士气下降。" % str(corps.get("name", "")), true)
 
 
-func daily_food(army: Dictionary) -> float:
-	return (Combat.strength(army) + int(army.get("wounded", 0))) * float(rules["grain_per_soldier_day"])
-
-
-func _upkeep() -> void:
-	for army in active_armies():
-		Process.end_day(army)
-		if army.has("tactical"):
-			var terrain := Tactical.terrain_class(army["tactical"]["cell"])
-			army["fatigue"] = minf(100, float(army["fatigue"])+float(Terrain.settings(terrain,rules).get("daily_fatigue",0)))
-		var needed: float = 0
-		var provided: float = 0
-		if supply_enabled():
-			needed = daily_food(army)
-			provided = minf(float(army["grain"]), needed)
-			army["grain"] = maxf(0, float(army["grain"]) - provided)
-			if provided + 0.001 < needed:
-				army["morale"] = maxf(0, float(army["morale"]) - 8)
-				army["organization"] = maxf(0, float(army["organization"]) - 5)
-				Combat.apply_loss(army, int(ceil(Combat.strength(army) * 0.005)))
-				_report(army, "缺粮", "%s所部携粮耗尽，士气与组织持续下降。" % army["name"], true)
-		var resting: bool = int(army.get("combat_tick", -1)) != int(state["tick"]) and (str(army["action"]["type"]) in ["hold", "scout", "resupply", "request_support"] or (army.has("tactical") and int(army["tactical"].get("moved_tick", -1)) != int(state["tick"])))
-		if resting:
-			var recovery := Process.recovery(army)
-			army["fatigue"] = maxf(0, float(army["fatigue"]) - float(recovery["fatigue"]))
-			if provided >= needed:
-				army["organization"] = minf(100, float(army["organization"]) + float(recovery["organization"]))
-				army["morale"] = minf(100, float(army["morale"]) + float(recovery["morale"]))
-		if int(state["tick"]) >= int(army["deadline"]):
-			army["returning"] = true
-			if str(army["outcome"]) == "": army["outcome"] = "任务期限已到"
-		if str(army["mission_type"]) == "capture" and not _has_independent_action(army) and str(store.city_state(str(army["target"])).get("faction", "")) == str(army["faction"]) and not bool(army["returning"]) and orders_for(army)["after_battle"] == "withdraw":
-			army["returning"] = true
-			army["outcome"] = "目标已由本方控制"
-		if str(army["location"].get("edge", "")) == "" and str(army["location"]["node"]) == str(army["target"]) and not army.has("arrived_at"):
-			army["arrived_at"] = int(state["tick"])
-		if str(army["mission_type"]) == "defend" and army.has("arrived_at") and int(state["tick"]) >= int(army["arrived_at"]) + 15 and army["intel"]["enemies"].is_empty():
-			army["returning"] = true
-			army["outcome"] = "守援完成"
-		if bool(army["returning"]) and str(army["location"].get("edge", "")) == "":
-			_start_return(army)
-		_check_rout(army)
-
-
-
 func _finish(army: Dictionary, outcome: String) -> void:
 	if str(army["status"]) == "ended":
 		return
@@ -1535,66 +1478,9 @@ func _finish(army: Dictionary, outcome: String) -> void:
 	_report(army, "任务结束", "%s：%s。归队%d，伤兵%d，阵亡%d，被俘%d，留驻%d，溃散%d。" % [army["name"], outcome, int(army.get("returned_strength", 0)), int(army["wounded"]), int(army["dead"]), int(army["captured"]), int(army["deposited"]) - int(army.get("returned_strength", 0)), int(army.get("dispersed", 0))], true)
 
 
-func _report(army: Dictionary, kind: String, message: String, urgent: bool, event_key: String = "") -> void:
-	if ReportPolicy.eligible(kind) or kind in ["武将战死", "武将被俘", "斩获", "主将接替", "单挑", "溃败", "变阵", "粮道截断", "占领", "主帅分兵", "专长", "主帅失位", "违令", "违令请示"]: Feedback.event(self, kind, message, army["faction"])
-	if kind in ["交战", "战线交战", "围城"]:
-		var factors: Array = army.get("battle_factors", [])
-		if not factors.is_empty(): message += " " + "；".join(factors)
-	# Keep tactical memory even when the event produces no notification.
-	army["memory"].append({"tick": state["tick"], "kind": kind, "event": message})
-	while army["memory"].size() > 8: army["memory"].pop_front()
-	if str(army["faction"]) != str(state["player_faction"]): return
-	if not ReportPolicy.allow(state, army, kind, event_key): return
-	var reports: Array = state["reports"]
-	var id: String = "report-%d-%d" % [int(state["tick"]), int(state["next_id"])]
-	state["next_id"] += 1
-	reports.append({"id": id, "army_id": army["id"], "faction": army["faction"], "kind": kind, "message": message, "sent_tick": int(state["tick"]), "sent_date": store.date_text(), "delivery_tick": int(state["tick"]) + (0 if kind in ["战役总结", "战役终结"] else int(rules["report_delay_days"])), "received": false, "urgent": urgent, "snapshot": {"commander": roster.officers.get(army["officer_id"], {}).get("name", army["name"]), "enemy_killed": int(army.get("enemy_killed", 0)), "commander_killed": int(state["officer_personal_kills"].get(army["officer_id"], 0)), "troop_killed": int(army.get("enemy_killed", 0)) - int(army.get("personal_soldier_kills", 0)), "commander_fate": army.get("commander_fate", {}).duplicate(true), "location": army["location"].duplicate(true), "strength": Combat.strength(army), "morale": army["morale"], "grain_days": int(food_days(army)), "battle_factors": army.get("battle_factors", []).duplicate() if kind in ["交战", "战线交战", "围城"] else [], "wounded": int(army["wounded"]), "organization": float(army["organization"]), "fatigue": float(army["fatigue"]), "daily_loss": int(army.get("daily_loss", 0)) if int(army.get("daily_loss_tick", -1)) == int(state["tick"]) else 0, "terrain": Tactical.terrain_class(army["tactical"]["cell"]) if army.has("tactical") else "", "reason": str(army["last_reason"]), "ended": str(army["status"]) == "ended", "cities": army["intel"]["cities"].duplicate(true)}})
-	while reports.size() > 200:
-		reports.pop_front()
-
-
-func _deliver_reports() -> void:
-	Duel.recover(self)
-	for report in state["reports"]:
-		if not bool(report["received"]) and int(report["delivery_tick"]) <= int(state["tick"]):
-			report["received"] = true
-			report["received_date"] = store.date_text()
-			var army: Dictionary = state["armies"].get(report["army_id"], {})
-			if not army.is_empty(): army["last_report"] = report.duplicate(true)
-			if bool(report["urgent"]): urgent_event = true
-	for id in state["officer_states"]:
-		var officer: Dictionary = state["officer_states"][id]
-		if str(officer.get("status", "")) == "recovering" and int(officer.get("available_after", 0)) <= int(state["tick"]):
-			var corps: Dictionary = state["corps"].get(officer.get("corps_id", ""), {})
-			officer["status"] = "deployed" if not corps.is_empty() and not corps.get("ended", false) else "available"
-			officer.erase("duel_wounded")
-
-
-func visible_reports() -> Array:
-	var result: Array = []
-	for report in state["reports"]:
-		if bool(report["received"]): result.push_front(report)
-	return result
-
-
-func has_pending_urgent_report() -> bool:
-	for report in state["reports"]:
-		if not bool(report["received"]) and bool(report["urgent"]): return true
-	return false
-
-
-func player_markers() -> Array:
-	var result: Array = []
-	for army in state["armies"].values():
-		if str(army["faction"]) != str(state["player_faction"]): continue
-		var observation: Dictionary = army.get("last_observation", {})
-		if not observation.is_empty() and not bool(observation.get("ended", false)):
-			result.append({"id": army["id"], "name": army["name"], "location": observation["location"], "date": observation["date"], "strength": observation["strength"]})
-	return result
-
-
 func player_city_intel(node: String) -> Dictionary:
 	return city_intel(node)
+
 
 func player_has_city_access(node: String) -> bool:
 	return not store.city_state(node).is_empty() and str(store.city_state(node).get("faction", "")) == str(state["player_faction"])
@@ -1641,82 +1527,44 @@ func _nearest_enemy_id(army: Dictionary) -> String:
 	return best
 
 
-func supply_enabled() -> bool:
-	return bool(rules.get("supply_enabled", false))
-
-# 兵员账本：出征兵力必须等于 现存 + 留驻 + 阵亡 + 伤兵 + 被俘 + 溃散。
-# 任何一条收束路径漏记都会在这里暴露为非零 missing。
-func ledger(army: Dictionary) -> Dictionary:
-	var accounted: int = Combat.strength(army) + int(army.get("deposited", 0)) + int(army.get("dead", 0)) + int(army.get("wounded", 0)) + int(army.get("captured", 0)) + int(army.get("dispersed", 0))
-	var initial := int(army.get("initial_strength", 0))
-	return {"initial": initial, "accounted": accounted, "missing": initial - accounted}
-
-func food_days(army: Dictionary) -> float:
-	return float(army.get("grain", 0)) / maxf(daily_food(army), 0.001) if supply_enabled() else 999.0
-
-
-func request_battle_summary(army_id: String = "") -> Dictionary:
-	# Player requests are immediate reads and do not consume notification dedup keys.
-	if army_id.is_empty(): return Feedback.summary(self)
-	var army: Dictionary = state["armies"].get(army_id, {})
-	if army.is_empty() or army.get("faction", "") != state["player_faction"]: return {}
-	return {"army": army.duplicate(true), "decisions": army.get("decision_history", []).duplicate(true), "orders": state["corps"].get(army.get("corps_id", ""), {}).get("orders", []).duplicate(true)}
-
-func _summarize_finished_battles() -> void:
-	var boards: Array = state.get("battlefields", {}).values().duplicate()
-	if state.has("battlefield") and not state["battlefield"] in boards: boards.append(state["battlefield"])
-	var covered := {}
-	for board in boards:
-		if not board.has("ended_at"): continue
-		var board_id := str(board.get("battle_id", "field:" + str(board.get("anchor", ""))))
-		var members: Array = state["armies"].values().filter(func(army): return army.get("battlefield_id", "") == board_id or army.get("last_battlefield_id", "") == board_id)
-		var sample: Dictionary = {}
-		for army in members:
-			covered[ReportPolicy.scope(army)] = true
-			if army["faction"] == state["player_faction"] and sample.is_empty(): sample = army
-		if sample.is_empty(): continue
-		var starting_strength := 0
-		for army in members: starting_strength += int(army.get("initial_strength", 0))
-		var key_objective: bool = bool(board.get("key_objective", false)) or not board.get("control_point", {}).is_empty() or not board.get("objectives", {}).is_empty()
-		if starting_strength < int(rules.get("report_policy", {}).get("major_strength", 10000)) and not board.get("major_battle", false) and not key_objective: continue
-		var message := "会战结束：%s。%s" % [str(board.get("victory_reason", board.get("winner", "双方已脱离战场"))), _casualty_summary(members)]
-		_report(sample, "战役总结", message, true, "battle:" + board_id)
-	for corps in state["corps"].values():
-		if covered.has(str(corps.get("id", ""))): continue
-		var members: Array = []
-		for id in corps.get("units", []):
-			if state["armies"].has(id): members.append(state["armies"][id])
-		if members.is_empty() or members.any(func(army): return army["status"] != "ended"): continue
-		var strength := 0
-		for army in members: strength += int(army.get("initial_strength", 0))
-		if strength < int(rules.get("report_policy", {}).get("major_strength", 10000)) and not corps.get("major_battle", false): continue
-		var fought: bool = members.any(func(army): return int(army.get("combat_tick", -1)) >= int(army.get("started", 0)) or int(army.get("enemy_killed", 0)) > 0 or int(army.get("dead", 0)) + int(army.get("wounded", 0)) > 0)
-		if not fought and not corps.get("major_battle", false): continue
-		var sample: Dictionary = members[0]
-		if sample["faction"] != state["player_faction"]: continue
-		_report(sample, "战役总结", str(corps.get("name", "军团")) + "行动结束。" + _casualty_summary(members), true, "corps:" + str(corps.get("id", sample.get("corps_id", ""))))
-	var result: Dictionary = state.get("campaign_result", {})
-	if not result.is_empty():
-		for army in state["armies"].values():
-			if army["faction"] != state["player_faction"]: continue
-			_report(army, "战役终结", str(result.get("message", "战役结束")) + _casualty_summary(state["armies"].values()), true, "campaign:" + str(result.get("tick", "")))
-			break
-
-func _casualty_summary(members: Array) -> String:
-	var initial := 0
-	var dead := 0
-	var wounded := 0
-	var captured := 0
-	for army in members:
-		initial += int(army.get("initial_strength", 0))
-		dead += int(army.get("dead", 0))
-		wounded += int(army.get("wounded", 0))
-		captured += int(army.get("captured", 0))
-	return "出战%d，阵亡%d，伤兵%d，被俘%d。" % [initial, dead, wounded, captured]
-
-
 func _has_independent_action(army: Dictionary) -> bool:
 	var autonomy: Dictionary = army.get("autonomy", {})
 	if str(autonomy.get("stance", "obey")) != "obey" and int(autonomy.get("until", 0)) > int(state["tick"]): return true
 	var corps: Dictionary = state["corps"].get(army.get("corps_id", ""), {})
 	return not corps.is_empty() and bool(Autonomy.blocks_override(self, corps, str(army["officer_id"])).get("blocked", false))
+
+
+## ── 粮草与兵员：转发到 CampaignLogistics（campaign_logistics.gd）
+func supply_enabled() -> bool:
+	return Logistics.supply_enabled(self)
+func daily_food(army: Dictionary) -> float:
+	return Logistics.daily_food(self, army)
+func food_days(army: Dictionary) -> float:
+	return Logistics.food_days(self, army)
+func ledger(army: Dictionary) -> Dictionary:
+	return Logistics.ledger(self, army)
+func _upkeep() -> void:
+	Logistics._upkeep(self)
+func _sync_inventory(city: Dictionary) -> void:
+	Logistics._sync_inventory(self, city)
+func recruit_units(city: Dictionary, count: int) -> void:
+	Logistics.recruit_units(self, city, count)
+
+
+## ── 军报：转发到 CampaignReports（campaign_reports.gd）
+func _report(army: Dictionary, kind: String, message: String, urgent: bool, event_key: String = "") -> void:
+	Reports._report(self, army, kind, message, urgent, event_key)
+func _deliver_reports() -> void:
+	Reports._deliver_reports(self)
+func visible_reports() -> Array:
+	return Reports.visible_reports(self)
+func has_pending_urgent_report() -> bool:
+	return Reports.has_pending_urgent_report(self)
+func player_markers() -> Array:
+	return Reports.player_markers(self)
+func request_battle_summary(army_id: String = "") -> Dictionary:
+	return Reports.request_battle_summary(self, army_id)
+func _summarize_finished_battles() -> void:
+	Reports._summarize_finished_battles(self)
+func _casualty_summary(members: Array) -> String:
+	return Reports._casualty_summary(self, members)

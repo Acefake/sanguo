@@ -1,6 +1,6 @@
 extends SceneTree
 ## 特性注册表校验：真实数据零错误；上限在查询时统一夹住；坏数据必须被拒绝；
-## 人物卡特性与注册表一致；Notion task.kind 条件；武圣、小霸王机制不变。
+## 人物卡特性与注册表一致；Notion task.kind 条件；令辞含混、过度负责的条件分支；武圣、小霸王机制不变。
 ##
 ##   godot --headless --path . --script res://tests/officers/trait_registry_validation.gd
 
@@ -47,6 +47,14 @@ func _initialize() -> void:
 	check(Traits.modifier(host, "command整理", {"subcommanders_assigned": true}) == 0.0, "合阵：通信不明时不触发")
 	check(Traits.attribute_points(host, "武艺", {"task": "personal_melee", "mounted": true}) == 2, "骑战：马上近战武艺 +2")
 	check(Traits.attribute_points(host, "武艺") == 0, "骑战：不是本人近战时不触发")
+	# 令辞含混、过度负责是条件分支：多路命令、原方案失效或高压时才付代价，幅度仍在普通档上限内。
+	var garbled := army({"infantry": 20000}, ["trait_011"])
+	var small := army({"infantry": 4000}, ["trait_011"])
+	check(is_equal_approx(Traits.modifier(garbled, "command整理"), 0.05) and Traits.modifier(small, "command整理") == 0.0, "令辞含混：四路以上命令才返工 +5%")
+	check(is_equal_approx(Traits.modifier(garbled, "pressure失误", {"pressure": 0.6}), 0.02) and Traits.modifier(garbled, "pressure失误", {"pressure": 0.3}) == 0.0, "令辞含混：多路命令且压力≥0.5 才加失误 +2pp")
+	var micro := army({"infantry": 20000}, ["flaw_micromanage"])
+	check(is_equal_approx(Traits.modifier(micro, "command整理", {"subcommanders_assigned": true}), 0.05) and Traits.modifier(micro, "command整理") == 0.0, "过度负责：设了分统仍逐部节度才 +5%")
+	check(is_equal_approx(Traits.modifier(micro, "replan重规划", {"subcommanders_assigned": true, "plan_invalid_known": true}), 0.05) and Traits.modifier(micro, "replan重规划", {"subcommanders_assigned": true}) == 0.0, "过度负责：原方案失效后重排 +5%")
 
 	# 合计上限：急行 -5% + 山行 -5% + 善骑 -3% = -13%，夹到 -10%。
 	var rider := army({"infantry": 0, "archers": 0, "cavalry": 6000}, ["trait_016", "trait_033", "trait_046"])

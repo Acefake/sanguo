@@ -12,8 +12,10 @@ const Conduct = preload("res://scripts/officers/officer_conduct.gd")
 const Signature = preload("res://scripts/officers/signature_traits.gd")
 
 const METRICS := ["commit_hour", "pursuit_depth", "disengages", "ambushed", "org_min", "loss_ratio", "objective"]
+## 流程指标：只量一个结算环节（命令整理+重规划耗时），不含随机；局限对照用，不参与同类对照和中位比较。
+const STAGE_METRICS := ["command_hours"]
 ## 每项指标“更好”的方向：-1 越小越好，+1 越大越好，0 无优劣（只看是否不同）。
-const BETTER := {"commit_hour": -1, "pursuit_depth": 0, "disengages": 0, "ambushed": -1, "org_min": 1, "loss_ratio": -1, "objective": 1}
+const BETTER := {"commit_hour": -1, "pursuit_depth": 0, "disengages": 0, "ambushed": -1, "org_min": 1, "loss_ratio": -1, "objective": 1, "command_hours": -1}
 
 
 ## 本场景开战前的情境字段（特性触发条件读它）；伏击后的字段由 run 补上。
@@ -34,7 +36,7 @@ static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, s
 	var b0 := Combat.strength(b)
 	var renown_gap := Process.value(a, "名望") - Process.value(b, "名望")
 	var ctx := context(scenario, probe, settings, staff, renown_gap)
-	var m := {"commit_hour": 0.0, "pursuit_depth": 0, "disengages": 0, "ambushed": 0, "org_min": float(a["organization"]), "loss_ratio": 0.0, "objective": 0, "errors": 0, "routed": 0, "counter": 0, "omissions": 0}
+	var m := {"command_hours": 0.0, "commit_hour": 0.0, "pursuit_depth": 0, "disengages": 0, "ambushed": 0, "org_min": float(a["organization"]), "loss_ratio": 0.0, "objective": 0, "errors": 0, "routed": 0, "counter": 0, "omissions": 0}
 
 	# 敌军隐藏兵力：先按料敌估计，再按人物的迎战门槛决定打不打。
 	if probe.get("decide_engage", false):
@@ -65,6 +67,7 @@ static func run(scenario: Dictionary, probe: Dictionary, settings: Dictionary, s
 	# 部署：命令整理+展开（伏击后还要重规划），侧翼迂回就位，按人物的就位度门槛投入。
 	ctx["plan_invalid_known"] = plan_invalid
 	ctx["pressure"] = pressure
+	m["command_hours"] = Process.command_hours(a, ctx) + (Process.replan_hours(a, ctx) if plan_invalid else 0.0)
 	var commit := Process.order_delay_hours(a, ctx, plan_invalid) + a_lost_hours
 	var flank_share := 0.0
 	if probe.has("flank_hours"):

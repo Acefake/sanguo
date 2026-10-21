@@ -17,7 +17,7 @@ const Explain = preload("res://scripts/officers/officer_explain.gd")
 ## 投入时机在攻城、解围、伏击场景里分别由攻坚准备、行军、重规划主导。
 const METRIC_HOOK := {"commit_hour": "command整理", "ambushed": "ambush识破", "org_min": "special轮换", "pursuit_depth": "pursuit深入", "objective": ""}
 const COMMIT_HOOK_BY_KIND := {"siege": "engineering准备", "relief": "march行军", "ambush": "replan重规划"}
-const METRIC_TEXT := {"commit_hour": "投入时机", "ambushed": "受伏率", "org_min": "组织最低点", "loss_ratio": "伤亡比", "objective": "目标达成", "pursuit_depth": "追击深度", "disengages": "脱离次数"}
+const METRIC_TEXT := {"commit_hour": "投入时机", "ambushed": "受伏率", "org_min": "组织最低点", "loss_ratio": "伤亡比", "objective": "目标达成", "pursuit_depth": "追击深度", "disengages": "脱离次数", "command_hours": "命令整理耗时"}
 
 const OFF_BATTLE_STAGES := ["logistics", "council", "influence"]
 const T_SIGNIFICANT := 2.5
@@ -101,10 +101,10 @@ func _run_all(officer: Dictionary, opponent: Dictionary, staff: Dictionary) -> D
 
 func _run_scenario(id: String, officer: Dictionary, opponent: Dictionary, staff: Dictionary) -> Dictionary:
 	var samples := {}
-	for metric in Probe.METRICS: samples[metric] = []
+	for metric in Probe.METRICS + Probe.STAGE_METRICS: samples[metric] = []
 	for index in int(settings["seeds"]):
 		var m := Probe.run(scenarios[id], settings["scenarios"][id], settings, officer, opponent, staff, hash([id, index]), rules)
-		for metric in Probe.METRICS: samples[metric].append(float(m[metric]))
+		for metric in Probe.METRICS + Probe.STAGE_METRICS: samples[metric].append(float(m[metric]))
 	return samples
 
 
@@ -198,7 +198,7 @@ func _check_flaws(subjects: Array, opponent: Dictionary, staff: Dictionary, resu
 			var control := _run_all(ablated, opponent, staff)
 			var best := {}
 			for id in settings["scenarios"]:
-				for metric in Probe.METRICS:
+				for metric in Probe.METRICS + Probe.STAGE_METRICS:
 					var direction := int(Probe.BETTER[metric])
 					if direction == 0: continue
 					var t := paired(results[officer["name"]][id][metric], control[id][metric]) * direction
@@ -213,7 +213,7 @@ func _check_flaws(subjects: Array, opponent: Dictionary, staff: Dictionary, resu
 				var hook := str(Traits.definition(flaw)["effects"][0]["hook"])
 				var only_flaw: Dictionary = officer.duplicate()
 				only_flaw["trait_ids"] = [flaw]
-				row["report"] = Explain.signed(only_flaw, hook, "%s在%s%s变差（有 %.2f / 无 %.2f）" % [Traits.definition(flaw)["summary"].trim_suffix("。"), scenarios[best["scenario"]]["name"], METRIC_TEXT[best["metric"]], best["with"], best["without"]], {"enemy_renown_gap": 30, "subcommanders_assigned": true, "pressure": 1.0})
+				row["report"] = Explain.signed(only_flaw, hook, "%s在%s%s变差（有 %.2f / 无 %.2f）" % [Traits.definition(flaw)["summary"].trim_suffix("。"), scenarios[best["scenario"]]["name"], METRIC_TEXT[best["metric"]], best["with"], best["without"]], {"enemy_renown_gap": 30, "subcommanders_assigned": true, "pressure": 1.0, "recipient_count": 10, "plan_invalid_known": true})
 			rows.append(row)
 			if row.has("report"): print("REPORT " + str(row["report"]))
 			print("FLAW %s 代价：%s" % [row["label"], "未复现" if best.is_empty() else "%s@%s 有%.2f/无%.2f (t=%.1f, %+.0f%%)" % [best["metric"], best["scenario"], best["with"], best["without"], best["t"], (best["with"] - best["without"]) / maxf(absf(best["without"]), 0.05) * 100.0]])
@@ -295,6 +295,6 @@ func _write(report: Dictionary, results: Dictionary) -> void:
 			summary[name] = {}
 			for id in results[name]:
 				summary[name][id] = {}
-				for metric in Probe.METRICS: summary[name][id][metric] = snappedf(mean(results[name][id][metric]), 0.001)
+				for metric in Probe.METRICS + Probe.STAGE_METRICS: summary[name][id][metric] = snappedf(mean(results[name][id][metric]), 0.001)
 		var file := FileAccess.open(arg.substr(6), FileAccess.WRITE)
 		file.store_string(JSON.stringify({"report": report, "means": summary}, "  "))

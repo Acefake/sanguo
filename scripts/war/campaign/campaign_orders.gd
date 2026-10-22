@@ -10,6 +10,7 @@ const Corps = preload("res://scripts/war/campaign/army_corps.gd")
 const Strategic = preload("res://scripts/war/campaign/strategic_ai.gd")
 const Dissent = preload("res://scripts/agents/officer_dissent.gd")
 const Autonomy = preload("res://scripts/agents/officer_autonomy.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 
 ## 军队当前生效的军令：规则默认值叠加该军自己的设置。
@@ -38,8 +39,8 @@ static func command_army(war, id: String, changes: Dictionary = {}, withdraw: bo
 	if war.campaign_finished(): return {"ok": false, "message": "战役已经结束"}
 	if war.store.busy:
 		return {"ok": false, "message": "日期正在推进，请稍候。"}
-	var army: Dictionary = war.state["armies"].get(id, {})
-	if army.is_empty() or army.get("faction", "") != war.state["player_faction"]:
+	var army: Dictionary = war.state[StateKeys.ARMIES].get(id, {})
+	if army.is_empty() or army.get("faction", "") != war.state[StateKeys.PLAYER_FACTION]:
 		return {"ok": false, "message": "只能向本方军队下令。"}
 	if army.get("status", "") == "ended":
 		return {"ok": false, "message": "这支军队已结束任务。"}
@@ -61,10 +62,10 @@ static func command_army(war, id: String, changes: Dictionary = {}, withdraw: bo
 		else:
 			return {"ok": false, "message": "未知军令。"}
 	if withdraw: orders["retreat"] = true
-	var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+	var corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	if not corps.is_empty() and corps["root_id"] == id:
 		for unit_id in corps["units"].duplicate():
-			var unit: Dictionary = war.state["armies"][unit_id]
+			var unit: Dictionary = war.state[StateKeys.ARMIES][unit_id]
 			if unit["status"] == "ended": continue
 			if str(unit["officer_id"]) != str(corps["commander_id"]):
 				Autonomy.ensure_evaluated(war, corps, str(unit["officer_id"]), {"action": {"type": "player_orders"}, "reason": "玩家军令"})
@@ -93,10 +94,10 @@ static func command_army(war, id: String, changes: Dictionary = {}, withdraw: bo
 static func resolve_request(war, army_id: String, approve: bool) -> Dictionary:
 	if war.campaign_finished(): return {"ok": false, "message": "战役已经结束"}
 	if war.store.busy: return {"ok": false, "message": "日期正在推进，请稍候。"}
-	var army: Dictionary = war.state["armies"].get(army_id, {})
+	var army: Dictionary = war.state[StateKeys.ARMIES].get(army_id, {})
 	var request: Dictionary = army.get("pending_request", {})
 	if army.is_empty() or request.is_empty(): return {"ok": false, "message": "没有待批复的请示。"}
-	if str(army.get("faction", "")) != str(war.state["player_faction"]): return {"ok": false, "message": "只能批复本方请示。"}
+	if str(army.get("faction", "")) != str(war.state[StateKeys.PLAYER_FACTION]): return {"ok": false, "message": "只能批复本方请示。"}
 	var officer: Dictionary = war.roster.officers.get(str(army["officer_id"]), {})
 	army.erase("pending_request")
 	if approve:
@@ -112,7 +113,7 @@ static func resolve_request(war, army_id: String, approve: bool) -> Dictionary:
 		if str(army.get("status", "active")) != "ended":
 			army["last_reason"] = "主公批准违令：" + reason
 			# 只记当日，不预写次日；否则明日两次校验都会被判为已执行。
-			army["last_decision"] = int(war.state["tick"])
+			army["last_decision"] = int(war.state[StateKeys.TICK])
 			army["decision_key"] = ""
 			_record_approved(war, army, request, action)
 	else:
@@ -126,19 +127,19 @@ static func resolve_request(war, army_id: String, approve: bool) -> Dictionary:
 # 主公批准的违令也要进入复盘记录，否则决策历史里查不到这天为什么反常。
 static func _record_approved(war, army: Dictionary, request: Dictionary, action: Dictionary) -> void:
 	var summary := "主公批准违令：" + str(request.get("reason", "临机行动"))
-	var record: Dictionary = {"request_id": "approved:%s:%d" % [str(army["id"]), int(war.state["tick"])], "tick": int(war.state["tick"]), "army_id": army["id"], "candidate_id": str(request.get("candidate_id", "")), "action": action.duplicate(true), "reason_summary": summary, "source": "player_approval", "model": "", "rules_version": war.rules["version"], "prompt_version": 5, "policy_version": Policy.version(), "weights_version": Policy.weights().get("version", 0), "score_breakdown": {}, "vetoed": false, "fallback_reason": "", "observation": war.context_for(army).duplicate(true)}
-	war.state["decisions"].append(record)
-	while war.state["decisions"].size() > 160: war.state["decisions"].pop_front()
+	var record: Dictionary = {"request_id": "approved:%s:%d" % [str(army["id"]), int(war.state[StateKeys.TICK])], "tick": int(war.state[StateKeys.TICK]), "army_id": army["id"], "candidate_id": str(request.get("candidate_id", "")), "action": action.duplicate(true), "reason_summary": summary, "source": "player_approval", "model": "", "rules_version": war.rules["version"], "prompt_version": 5, "policy_version": Policy.version(), "weights_version": Policy.weights().get("version", 0), "score_breakdown": {}, "vetoed": false, "fallback_reason": "", "observation": war.context_for(army).duplicate(true)}
+	war.state[StateKeys.DECISIONS].append(record)
+	while war.state[StateKeys.DECISIONS].size() > 160: war.state[StateKeys.DECISIONS].pop_front()
 	if not army.has("decision_history"): army["decision_history"] = []
 	army["decision_history"].append(record)
 
 
 ## 上一日未批复的违令请示作废，按原军令执行。
 static func _expire_requests(war) -> void:
-	for army in war.state["armies"].values():
+	for army in war.state[StateKeys.ARMIES].values():
 		var request: Dictionary = army.get("pending_request", {})
 		if request.is_empty(): continue
-		if int(request.get("tick", 0)) >= int(war.state["tick"]): continue
+		if int(request.get("tick", 0)) >= int(war.state[StateKeys.TICK]): continue
 		army.erase("pending_request")
 		war._report(army, "请示超时", "%s的违令请示未获批复，按原军令执行。" % army["name"], false)
 
@@ -160,15 +161,15 @@ static func _evaluate_dissent(war, army: Dictionary, context: Dictionary, record
 	if gap <= float(params.get("gap", 12)): return
 	var officer: Dictionary = war.roster.officers.get(str(army["officer_id"]), {})
 	var relation_name := "中立"
-	var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+	var corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	if not corps.is_empty():
 		relation_name = Dissent.relation(officer, war.roster.officers.get(str(corps.get("commander_id", "")), {}))
 	var orders: Dictionary = orders_for(war, army)
 	var contact: Dictionary = army.get("tactical", {}).get("contact", {})
 	var urgent := Dissent.urgent(army, contact, war.supply_enabled())
 	var probability := clampf(Dissent.probability(army, officer.get("personality", {}), orders, relation_name, urgent, float(army.get("counter_intel_dissent", 0.0)), params) + Conduct.dissent_shift(officer), 0.0, float(params.get("max", 0.6)))
-	var roll := Dissent.roll("%s:%d:%s:dissent" % [str(war.state.get("dissent_seed", 0)), army["id"], int(war.state["tick"])], war.state)
-	var entry: Dictionary = {"tick": war.state["tick"], "army_id": army["id"], "probability": probability, "gap": gap, "ordered": ordered_top, "suggested": best_free["candidate"]["id"], "roll": roll, "relation": relation_name, "urgent": urgent}
+	var roll := Dissent.roll("%s:%d:%s:dissent" % [str(war.state.get(StateKeys.DISSENT_SEED, 0)), army["id"], int(war.state[StateKeys.TICK])], war.state)
+	var entry: Dictionary = {"tick": war.state[StateKeys.TICK], "army_id": army["id"], "probability": probability, "gap": gap, "ordered": ordered_top, "suggested": best_free["candidate"]["id"], "roll": roll, "relation": relation_name, "urgent": urgent}
 	if roll >= probability:
 		entry["result"] = "服从"
 		_append_dissent(war, army, entry)
@@ -183,7 +184,7 @@ static func _evaluate_dissent(war, army: Dictionary, context: Dictionary, record
 		_append_dissent(war, army, entry)
 		record["dissent"] = entry
 		return
-	if str(army["faction"]) != str(war.state["player_faction"]):
+	if str(army["faction"]) != str(war.state[StateKeys.PLAYER_FACTION]):
 		var lord := Strategic.lord_of(war.roster, str(army["faction"]))
 		var permit := urgent or float(lord.get("personality", {}).get("风险承受", 50)) >= 45.0
 		entry["result"] = "主公批准" if permit else "主公驳回"
@@ -194,7 +195,7 @@ static func _evaluate_dissent(war, army: Dictionary, context: Dictionary, record
 		record["dissent"] = entry
 		return
 	entry["result"] = "建议违令"
-	army["pending_request"] = {"tick": war.state["tick"], "army_id": army["id"], "officer_id": army["officer_id"], "officer": army["name"], "candidate_id": best_free["candidate"]["id"], "action": best_free["candidate"]["action"].duplicate(true), "reason": str(best_free["candidate"].get("description", "临机行动")), "probability": probability, "gap": gap}
+	army["pending_request"] = {"tick": war.state[StateKeys.TICK], "army_id": army["id"], "officer_id": army["officer_id"], "officer": army["name"], "candidate_id": best_free["candidate"]["id"], "action": best_free["candidate"]["action"].duplicate(true), "reason": str(best_free["candidate"].get("description", "临机行动")), "probability": probability, "gap": gap}
 	war._report(army, "违令请示", "%s请求违令：建议%s（把握%.0f%%），等待主公批复。" % [army["name"], str(best_free["candidate"].get("description", "临机行动")), probability * 100.0], true)
 	_append_dissent(war, army, entry)
 	record["dissent"] = entry
@@ -210,6 +211,6 @@ static func _append_dissent(war, army: Dictionary, entry: Dictionary) -> void:
 ## 部队是否处于自主行动期，或主帅的军令对它无效。
 static func _has_independent_action(war, army: Dictionary) -> bool:
 	var autonomy: Dictionary = army.get("autonomy", {})
-	if str(autonomy.get("stance", "obey")) != "obey" and int(autonomy.get("until", 0)) > int(war.state["tick"]): return true
-	var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+	if str(autonomy.get("stance", "obey")) != "obey" and int(autonomy.get("until", 0)) > int(war.state[StateKeys.TICK]): return true
+	var corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	return not corps.is_empty() and bool(Autonomy.blocks_override(war, corps, str(army["officer_id"])).get("blocked", false))

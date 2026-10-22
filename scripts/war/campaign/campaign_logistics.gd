@@ -8,6 +8,7 @@ const Process = preload("res://scripts/officers/officer_process.gd")
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Terrain = preload("res://scripts/war/battle/battle_terrain.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 
 ## 规则是否启用粮草补给。
@@ -51,22 +52,22 @@ static func _upkeep(war) -> void:
 				army["organization"] = maxf(0, float(army["organization"]) - 5)
 				Combat.apply_loss(army, int(ceil(Combat.strength(army) * 0.005)))
 				war._report(army, "缺粮", "%s所部携粮耗尽，士气与组织持续下降。" % army["name"], true)
-		var resting: bool = int(army.get("combat_tick", -1)) != int(war.state["tick"]) and (str(army["action"]["type"]) in ["hold", "scout", "resupply", "request_support"] or (army.has("tactical") and int(army["tactical"].get("moved_tick", -1)) != int(war.state["tick"])))
+		var resting: bool = int(army.get("combat_tick", -1)) != int(war.state[StateKeys.TICK]) and (str(army["action"]["type"]) in ["hold", "scout", "resupply", "request_support"] or (army.has("tactical") and int(army["tactical"].get("moved_tick", -1)) != int(war.state[StateKeys.TICK])))
 		if resting:
 			var recovery := Process.recovery(army)
 			army["fatigue"] = maxf(0, float(army["fatigue"]) - float(recovery["fatigue"]))
 			if provided >= needed:
 				army["organization"] = minf(100, float(army["organization"]) + float(recovery["organization"]))
 				army["morale"] = minf(100, float(army["morale"]) + float(recovery["morale"]))
-		if int(war.state["tick"]) >= int(army["deadline"]):
+		if int(war.state[StateKeys.TICK]) >= int(army["deadline"]):
 			army["returning"] = true
 			if str(army["outcome"]) == "": army["outcome"] = "任务期限已到"
 		if str(army["mission_type"]) == "capture" and not war._has_independent_action(army) and str(war.store.city_state(str(army["target"])).get("faction", "")) == str(army["faction"]) and not bool(army["returning"]) and war.orders_for(army)["after_battle"] == "withdraw":
 			army["returning"] = true
 			army["outcome"] = "目标已由本方控制"
 		if str(army["location"].get("edge", "")) == "" and str(army["location"]["node"]) == str(army["target"]) and not army.has("arrived_at"):
-			army["arrived_at"] = int(war.state["tick"])
-		if str(army["mission_type"]) == "defend" and army.has("arrived_at") and int(war.state["tick"]) >= int(army["arrived_at"]) + 15 and army["intel"]["enemies"].is_empty():
+			army["arrived_at"] = int(war.state[StateKeys.TICK])
+		if str(army["mission_type"]) == "defend" and army.has("arrived_at") and int(war.state[StateKeys.TICK]) >= int(army["arrived_at"]) + 15 and army["intel"]["enemies"].is_empty():
 			army["returning"] = true
 			army["outcome"] = "守援完成"
 		if bool(army["returning"]) and str(army["location"].get("edge", "")) == "":

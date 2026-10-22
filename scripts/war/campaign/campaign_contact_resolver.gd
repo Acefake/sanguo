@@ -13,6 +13,7 @@ const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Duel = preload("res://scripts/war/duel/duel_system.gd")
 const Feedback = preload("res://scripts/war/battle/battle_feedback.gd")
 const Battlefields = preload("res://scripts/war/campaign/campaign_battlefields.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 
 ## 节点地形：关隘为山地，其余按地区。
@@ -25,7 +26,7 @@ static func _terrain(war, node: String) -> String:
 
 ## 推进一日行军，返回各军移动前后位置；有战术战场时交给战术层。
 static func _move_all(war) -> Dictionary:
-	if war.state.has("battlefield"): return Tactical.move(war)
+	if war.state.has(StateKeys.BATTLEFIELD): return Tactical.move(war)
 	var motions: Dictionary = Battlefields.run(war, "move")
 	for army in war.active_armies():
 		if army.has("tactical"): continue
@@ -39,7 +40,7 @@ static func _move_all(war) -> Dictionary:
 				war._report(army, "通路受阻", "%s行军通路受阻，正在重新判断。" % army["name"], true)
 			else:
 				var leader: Dictionary = army
-				if army.has("corps_id"): leader = war.state["armies"][war.state["corps"][army["corps_id"]]["root_id"]]
+				if army.has("corps_id"): leader = war.state[StateKeys.ARMIES][war.state[StateKeys.CORPS][army["corps_id"]]["root_id"]]
 				var speed: float = Process.march_speed(leader, _terrain(war, str(location["node"])))
 				location["progress"] = minf(1.0, float(location["progress"]) + speed / maxf(float(edge.get("cost", 1)) * float(war.rules["route_days_per_cost"]), 1))
 				army["fatigue"] = minf(100, float(army["fatigue"]) + Process.fatigue_cost(army, 3.0))
@@ -81,7 +82,7 @@ static func _contact(war, a: Dictionary, b: Dictionary, motions: Dictionary) -> 
 
 ## 结算一日接敌：追击、道路会战、伤亡与士气。
 static func _resolve_contacts(war, motions: Dictionary) -> void:
-	if war.state.has("battlefield"):
+	if war.state.has(StateKeys.BATTLEFIELD):
 		Tactical.resolve(war)
 		return
 	Battlefields.prepare(war)
@@ -107,7 +108,7 @@ static func _resolve_contacts(war, motions: Dictionary) -> void:
 				var fleeing: Dictionary = a if bool(a["returning"]) else b
 				var pursuer: Dictionary = b if bool(a["returning"]) else a
 				if bool(war.orders_for(pursuer)["pursue"]) and str(pursuer["action"]["type"]) in ["pursue", "engage"]:
-					pursuer["combat_tick"] = int(war.state["tick"])
+					pursuer["combat_tick"] = int(war.state[StateKeys.TICK])
 					var chased: int = Combat.apply_loss(fleeing, mini(Combat.strength(fleeing), int(Combat.strength(pursuer) * Process.pursuit_rate(pursuer, fleeing))), true)
 					war._report(fleeing, "遭遇追击", Explain.signed(fleeing, "withdraw撤离", "%s撤退途中被追击，%d人被俘。" % [fleeing["name"], chased]), true)
 					war._report(pursuer, "追击", Explain.signed(pursuer, "pursuit追击", "追击%s，俘获%d人。" % [fleeing["name"], chased]), false)
@@ -161,7 +162,7 @@ static func _resolve_contacts(war, motions: Dictionary) -> void:
 				var remaining: int = int(side[1])
 				for member in members:
 					member["battle_factors"] = Feedback.factors(enemy_members[0], member, war.rules, terrain)
-					member["combat_tick"] = int(war.state["tick"])
+					member["combat_tick"] = int(war.state[StateKeys.TICK])
 					var loss: int = mini(remaining, int(ceil(float(side[1]) * Combat.strength(member) / maxf(total_strength, 1))))
 					var before_strength := Combat.strength(member)
 					var dead_before := int(member["dead"])
@@ -183,11 +184,11 @@ static func _resolve_contacts(war, motions: Dictionary) -> void:
 
 ## 记录首次近战并触发署名特性的接敌效果。
 static func _battle_contact(war, attacker: Dictionary, defender: Dictionary, melee: bool = true) -> void:
-	if melee and not attacker.has("first_melee_tick"): attacker["first_melee_tick"] = war.state["tick"]
-	if melee and not defender.has("first_melee_tick"): defender["first_melee_tick"] = war.state["tick"]
+	if melee and not attacker.has("first_melee_tick"): attacker["first_melee_tick"] = war.state[StateKeys.TICK]
+	if melee and not defender.has("first_melee_tick"): defender["first_melee_tick"] = war.state[StateKeys.TICK]
 	if melee and Signature.opening(attacker, defender):
 		war._report(attacker, "小霸王连胜", "%s小霸王：连续主动出战，首次接敌士气冲击提高8%%。" % attacker["name"], false)
 	if Signature.first_contact(attacker, defender, melee):
-		attacker["first_contact_effect_tick"] = war.state["tick"]
-		defender["first_contact_effect_tick"] = war.state["tick"]
+		attacker["first_contact_effect_tick"] = war.state[StateKeys.TICK]
+		defender["first_contact_effect_tick"] = war.state[StateKeys.TICK]
 		war._report(defender, "武圣威压", "%s武圣：与%s首次正面交锋，%s士气下降8。" % [attacker["name"], defender["name"], defender["name"]], true)

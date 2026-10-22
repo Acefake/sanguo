@@ -46,6 +46,7 @@ const Context = preload("res://scripts/war/campaign/campaign_context.gd")
 const Contacts = preload("res://scripts/war/campaign/campaign_contact_resolver.gd")
 const Outcomes = preload("res://scripts/war/campaign/campaign_outcomes.gd")
 const Actions = preload("res://scripts/war/campaign/campaign_actions.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var store: Node
 var graph = Graph.new()
 var roster = Roster.new()
@@ -66,73 +67,73 @@ func setup(owner: Node, saved: Dictionary = {}) -> void:
 	for edge in graph.edges.values():
 		if Fortifications.road_path(store, str(edge["from"]), str(edge["to"])).is_empty(): graph.closed_routes.append(edge["id"])
 	roster.setup(Repository.cards(), rules.get("faction_mapping", {}))
-	state = {"version": 2, "tick": 0, "next_id": 1, "player_faction": "liu_bei", "armies": {}, "corps": {}, "sieges": {}, "missions": {}, "reports": [], "report_policy": {"sent": {}}, "decisions": [], "officer_states": {}, "officer_fates": {}, "officer_kills": {}, "officer_personal_kills": {}, "officer_personal_soldiers": {}, "garrison_commanders": {}, "battle_victories": {}, "defense_cooldowns": {}, "rng_state": "0", "dissent_seed": 0, "dissent_state": 0, "duels": {"pairs": {}, "counts": {}, "records": []}, "battle_feedback": {}, "strategy_log": []}
+	state = {StateKeys.VERSION: 2, StateKeys.TICK: 0, StateKeys.NEXT_ID: 1, StateKeys.PLAYER_FACTION: "liu_bei", StateKeys.ARMIES: {}, StateKeys.CORPS: {}, StateKeys.SIEGES: {}, StateKeys.MISSIONS: {}, StateKeys.REPORTS: [], StateKeys.REPORT_POLICY: {"sent": {}}, StateKeys.DECISIONS: [], StateKeys.OFFICER_STATES: {}, StateKeys.OFFICER_FATES: {}, StateKeys.OFFICER_KILLS: {}, StateKeys.OFFICER_PERSONAL_KILLS: {}, StateKeys.OFFICER_PERSONAL_SOLDIERS: {}, StateKeys.GARRISON_COMMANDERS: {}, StateKeys.BATTLE_VICTORIES: {}, StateKeys.DEFENSE_COOLDOWNS: {}, StateKeys.RNG_STATE: "0", StateKeys.DISSENT_SEED: 0, StateKeys.DISSENT_STATE: 0, StateKeys.DUELS: {"pairs": {}, "counts": {}, "records": []}, StateKeys.BATTLE_FEEDBACK: {}, StateKeys.STRATEGY_LOG: []}
 	if not saved.is_empty():
 		for key in state:
 			if saved.has(key) and typeof(state[key]) == TYPE_INT and typeof(saved[key]) in [TYPE_INT, TYPE_FLOAT]:
 				state[key] = int(saved[key])
 			elif saved.has(key) and typeof(saved[key]) == typeof(state[key]):
 				state[key] = saved[key]
-	state["version"] = 3
-	state["battle_ai_version"] = 1
-	state["battle_round"] = int(saved.get("battle_round",state["tick"]))
-	for key in ["battle_ai_messages","battle_ai_model_log","battle_ai_replay"]:
+	state[StateKeys.VERSION] = 3
+	state[StateKeys.BATTLE_AI_VERSION] = 1
+	state[StateKeys.BATTLE_ROUND] = int(saved.get(StateKeys.BATTLE_ROUND,state[StateKeys.TICK]))
+	for key in [StateKeys.BATTLE_AI_MESSAGES,StateKeys.BATTLE_AI_MODEL_LOG,StateKeys.BATTLE_AI_REPLAY]:
 		state[key] = saved.get(key,[]).duplicate(true) if saved.get(key,[]) is Array else []
-	state["battle_ai_shadow"] = []
-	state["officer_agents"] = saved.get("officer_agents",{}).duplicate(true) if saved.get("officer_agents",{}) is Dictionary else {}
-	for key in ["faction_action_points", "faction_intel", "battlefields", "generated_officers", "faction_status", "city_policies", "campaign_result", "relations"]:
+	state[StateKeys.BATTLE_AI_SHADOW] = []
+	state[StateKeys.OFFICER_AGENTS] = saved.get(StateKeys.OFFICER_AGENTS,{}).duplicate(true) if saved.get(StateKeys.OFFICER_AGENTS,{}) is Dictionary else {}
+	for key in [StateKeys.FACTION_ACTION_POINTS, StateKeys.FACTION_INTEL, StateKeys.BATTLEFIELDS, StateKeys.GENERATED_OFFICERS, StateKeys.FACTION_STATUS, StateKeys.CITY_POLICIES, StateKeys.CAMPAIGN_RESULT, StateKeys.RELATIONS]:
 		state[key] = saved.get(key, {}).duplicate(true) if saved.get(key, {}) is Dictionary else {}
-	state["campaign_started"] = bool(saved.get("campaign_started", false))
-	if not saved.has("relations"): state["relations"] = store.scenario.get("relations", rules.get("relations", {})).duplicate(true)
-	state["city_volleys"] = []
-	for id in state["generated_officers"]: roster.officers[id] = state["generated_officers"][id].duplicate(true)
+	state[StateKeys.CAMPAIGN_STARTED] = bool(saved.get(StateKeys.CAMPAIGN_STARTED, false))
+	if not saved.has(StateKeys.RELATIONS): state[StateKeys.RELATIONS] = store.scenario.get("relations", rules.get("relations", {})).duplicate(true)
+	state[StateKeys.CITY_VOLLEYS] = []
+	for id in state[StateKeys.GENERATED_OFFICERS]: roster.officers[id] = state[StateKeys.GENERATED_OFFICERS][id].duplicate(true)
 	roster.ensure_factions(store.scenario)
 	for id in roster.officers:
-		if roster.officers[id].get("generated", false): state["generated_officers"][id] = roster.officers[id].duplicate(true)
-	if saved.get("battlefield") is Dictionary:
-		state["battlefield"] = saved["battlefield"].duplicate(true)
-		if not state["battlefield"].has("battle_id"): state["battlefield"]["battle_id"] = "field:" + str(state["battlefield"].get("anchor",0))
+		if roster.officers[id].get("generated", false): state[StateKeys.GENERATED_OFFICERS][id] = roster.officers[id].duplicate(true)
+	if saved.get(StateKeys.BATTLEFIELD) is Dictionary:
+		state[StateKeys.BATTLEFIELD] = saved[StateKeys.BATTLEFIELD].duplicate(true)
+		if not state[StateKeys.BATTLEFIELD].has("battle_id"): state[StateKeys.BATTLEFIELD]["battle_id"] = "field:" + str(state[StateKeys.BATTLEFIELD].get("anchor",0))
 	rng.seed = 1910901
-	if int(state.get("rng_state", 0)) != 0:
-		rng.state = int(state["rng_state"])
+	if int(state.get(StateKeys.RNG_STATE, 0)) != 0:
+		rng.state = int(state[StateKeys.RNG_STATE])
 	# 违令掷点走独立随机流：种子来自剧本/存档，而不是当日战斗随机流的快照，
 	# 否则任何一处战斗消耗的差异都会改写全部违令结果，"同种子可复现"不再成立。
-	state["dissent_seed"] = int(state.get("dissent_seed", 0))
-	for army in state["armies"].values():
+	state[StateKeys.DISSENT_SEED] = int(state.get(StateKeys.DISSENT_SEED, 0))
+	for army in state[StateKeys.ARMIES].values():
 		# 旧档缺将领档案时先补登记，再回写 officer_id；只补不写会留下悬空引用。
 		var previous_id := str(army.get("officer_id", ""))
 		army["officer_id"] = roster.adopt_militia(army)
 		if army["officer_id"] != previous_id:
-			var previous_state: Dictionary = state["officer_states"].get(previous_id, {})
-			if not previous_state.is_empty(): state["officer_states"].erase(previous_id)
-			var entry: Dictionary = state["officer_states"].get(army["officer_id"], {})
+			var previous_state: Dictionary = state[StateKeys.OFFICER_STATES].get(previous_id, {})
+			if not previous_state.is_empty(): state[StateKeys.OFFICER_STATES].erase(previous_id)
+			var entry: Dictionary = state[StateKeys.OFFICER_STATES].get(army["officer_id"], {})
 			if entry.is_empty(): entry = previous_state
 			entry["status"] = str(entry.get("status", "commanding"))
 			entry["army_id"] = army["id"]
-			state["officer_states"][army["officer_id"]] = entry
+			state[StateKeys.OFFICER_STATES][army["officer_id"]] = entry
 		var officer: Dictionary = roster.officers.get(str(army.get("officer_id", "")), {})
 		if army.get("action", {}).get("type", "") == "scout": army["action"] = {"type": "hold"}
 		army["trait_ids"] = officer.get("trait_ids", []).duplicate()
 		army.erase("battle_traits")
 		army["edge"] = Edges.ensure(army, officer)
-		if army.has("tactical") and state.has("battlefield") and not army.has("battlefield_id"): army["battlefield_id"] = state["battlefield"]["battle_id"]
-	for corps in state["corps"].values():
+		if army.has("tactical") and state.has(StateKeys.BATTLEFIELD) and not army.has("battlefield_id"): army["battlefield_id"] = state[StateKeys.BATTLEFIELD]["battle_id"]
+	for corps in state[StateKeys.CORPS].values():
 		Corps.migrate(self, corps)
 		corps["leader_lost"] = bool(corps.get("leader_lost", false))
 		corps["leader_lost_for"] = str(corps.get("leader_lost_for", ""))
 		corps.erase("last_requested")
 		corps.erase("request_signature")
 	if not supply_enabled():
-		for army in state["armies"].values():
+		for army in state[StateKeys.ARMIES].values():
 			if army.get("action", {}).get("type", "") == "resupply": army["action"] = {"type": "hold"}
 			if army.get("corps_task", {}).get("type", "") == "cut_supply":
-				army["corps_task"] = {"type": "flank", "reason": "侧翼协同", "issued_at": state["tick"]}
-		for corps in state["corps"].values():
+				army["corps_task"] = {"type": "flank", "reason": "侧翼协同", "issued_at": state[StateKeys.TICK]}
+		for corps in state[StateKeys.CORPS].values():
 			corps["known_supplies"] = {}
 			corps["siege_mode"] = "assault"
 			corps["supply"]["blocked_until"] = 0
-	for army in state["armies"].values(): Experience.ensure(army)
-	for guard in state["garrison_commanders"].values():
+	for army in state[StateKeys.ARMIES].values(): Experience.ensure(army)
+	for guard in state[StateKeys.GARRISON_COMMANDERS].values():
 		var officer_id: String = str(guard["officer_id"])
 		if roster.officers.has(officer_id) or not officer_id.begins_with("militia:"): continue
 		var resolved := roster.adopt_militia({"officer_id": officer_id, "faction": str(guard["faction"])})
@@ -140,18 +141,18 @@ func setup(owner: Node, saved: Dictionary = {}) -> void:
 	preload("res://scripts/war/campaign/legacy_formation_migration.gd").apply(state)
 	Fate.restore(self)
 	Duel.journal(self)
-	for id in state["duels"].get("stamina", {}):
+	for id in state[StateKeys.DUELS].get("stamina", {}):
 		Duel.stamina(self, {"officer_id":id})
 	Tactical.migrate_positions(self)
 	# Old saves may still contain leaderless formations on an orderly return route.
 	for army in active_armies():
 		if army.get("commander_unavailable", false) and Fate.unavailable(self, str(army["officer_id"])):
 			Fate.disperse(self, army)
-	if not state.has("battlefield"):
-		for board in state["battlefields"].values():
-			state["battlefield"] = board
+	if not state.has(StateKeys.BATTLEFIELD):
+		for board in state[StateKeys.BATTLEFIELDS].values():
+			state[StateKeys.BATTLEFIELD] = board
 			Tactical.migrate_positions(self)
-			state.erase("battlefield")
+			state.erase(StateKeys.BATTLEFIELD)
 	for city in store.scenario.get("places", {}).values():
 		if city.has("garrison"):
 			_sync_inventory(city)
@@ -174,11 +175,11 @@ func _json(path: String) -> Variant:
 
 
 func export_state() -> Dictionary:
-	state["rng_state"] = str(rng.state)
+	state[StateKeys.RNG_STATE] = str(rng.state)
 	var snapshot := state.duplicate(true)
-	snapshot.erase("battle_ai_metrics")
-	snapshot.erase("battle_ai_shadow")
-	for corps in snapshot["corps"].values():
+	snapshot.erase(StateKeys.BATTLE_AI_METRICS)
+	snapshot.erase(StateKeys.BATTLE_AI_SHADOW)
+	for corps in snapshot[StateKeys.CORPS].values():
 		corps.erase("last_requested")
 		corps.erase("request_signature")
 	return snapshot
@@ -186,7 +187,7 @@ func export_state() -> Dictionary:
 
 func active_armies(faction: String = "") -> Array:
 	var result: Array = []
-	for army in state["armies"].values():
+	for army in state[StateKeys.ARMIES].values():
 		if str(army.get("status", "")) != "ended" and (faction == "" or str(army["faction"]) == faction):
 			result.append(army)
 	result.sort_custom(func(a, b): return str(a["id"]) < str(b["id"]))
@@ -194,19 +195,19 @@ func active_armies(faction: String = "") -> Array:
 
 
 func ready(army: Dictionary) -> bool:
-	return int(army.get("departure_at", 0)) <= int(state["tick"])
+	return int(army.get("departure_at", 0)) <= int(state[StateKeys.TICK])
 
 
 func is_besieged(city: String) -> bool:
-	var siege: Dictionary = state["sieges"].get(city, {})
-	return int(siege.get("active_tick", -100)) >= int(state["tick"]) - 1 and siege.get("phase", "") not in ["occupied", "解围"]
+	var siege: Dictionary = state[StateKeys.SIEGES].get(city, {})
+	return int(siege.get("active_tick", -100)) >= int(state[StateKeys.TICK]) - 1 and siege.get("phase", "") not in ["occupied", "解围"]
 
 
 func hostile(first: String, second: String) -> bool:
 	if first == second: return false
 	var pair: Array = [first, second]
 	pair.sort()
-	return state.get("relations", {}).get("|".join(pair), "hostile") == "hostile"
+	return state.get(StateKeys.RELATIONS, {}).get("|".join(pair), "hostile") == "hostile"
 
 
 func can_cross(faction: String, node: String) -> bool:
@@ -214,7 +215,7 @@ func can_cross(faction: String, node: String) -> bool:
 	if owner == "" or owner == faction: return true
 	var pair: Array = [faction, owner]
 	pair.sort()
-	return state.get("relations", {}).get("|".join(pair), "hostile") == "allied"
+	return state.get(StateKeys.RELATIONS, {}).get("|".join(pair), "hostile") == "allied"
 
 
 func route(faction: String, start: String, finish: String) -> Dictionary:
@@ -225,21 +226,21 @@ func route(faction: String, start: String, finish: String) -> Dictionary:
 
 
 func campaign_finished() -> bool:
-	return not state.get("campaign_result", {}).is_empty()
+	return not state.get(StateKeys.CAMPAIGN_RESULT, {}).is_empty()
 
 
 func start_campaign() -> void:
-	state["campaign_started"] = true
+	state[StateKeys.CAMPAIGN_STARTED] = true
 	Operations.residence(self)
 
 
 func set_player_faction(faction: String) -> bool:
-	if store.busy or state.get("campaign_started", false) or not active_armies(str(state["player_faction"])).is_empty() or not store.scenario.get("factions", {}).has(faction):
+	if store.busy or state.get(StateKeys.CAMPAIGN_STARTED, false) or not active_armies(str(state[StateKeys.PLAYER_FACTION])).is_empty() or not store.scenario.get("factions", {}).has(faction):
 		return false
-	var previous := str(state["player_faction"])
-	state["faction_action_points"][previous] = store.action_points
-	store.action_points = int(state["faction_action_points"].get(faction, 3))
-	state["player_faction"] = faction
+	var previous := str(state[StateKeys.PLAYER_FACTION])
+	state[StateKeys.FACTION_ACTION_POINTS][previous] = store.action_points
+	store.action_points = int(state[StateKeys.FACTION_ACTION_POINTS].get(faction, 3))
+	state[StateKeys.PLAYER_FACTION] = faction
 	store._save()
 	return true
 
@@ -247,9 +248,9 @@ func set_player_faction(faction: String) -> bool:
 func step(adapter: Node = null) -> void:
 	var feedback_before := Feedback.snapshot(self)
 	urgent_event = false
-	state["tick"] += 1
-	state["battle_round"] = int(state.get("battle_round",state["tick"]-1)) + 1
-	planner.begin_round(int(state["battle_round"]))
+	state[StateKeys.TICK] += 1
+	state[StateKeys.BATTLE_ROUND] = int(state.get(StateKeys.BATTLE_ROUND,state[StateKeys.TICK]-1)) + 1
+	planner.begin_round(int(state[StateKeys.BATTLE_ROUND]))
 	_expire_requests()
 	Fate.restore(self)
 	Tactical.clear_target_cache()
@@ -258,14 +259,14 @@ func step(adapter: Node = null) -> void:
 	_deliver_reports()
 	Lifecycle.maintain(self)
 	Operations.residence(self)
-	if not state.has("battlefield"): _spawn_defenders()
+	if not state.has(StateKeys.BATTLEFIELD): _spawn_defenders()
 	Strategic.plan(self, store)
 	Battlefields.prepare(self)
 	_observe_all()
 	if rules.get("battle_ai",{}).get("mode","active") == "active":
 		UnitBrain.communicate(self)
 		OfficerBrain.deliberate(self,adapter)
-	if not state["corps"].is_empty():
+	if not state[StateKeys.CORPS].is_empty():
 		await Corps.plan(self, adapter)
 		if generation != epoch: return
 	Fate.restore(self)
@@ -274,7 +275,7 @@ func step(adapter: Node = null) -> void:
 	if ai_mode in ["active","shadow"]: UnitBrain.decide(self,adapter,ai_mode == "shadow")
 	var contexts: Array = []
 	for army in active_armies():
-		if str(army.get("autonomy", {}).get("stance", "obey")) != "obey" and int(army.get("autonomy", {}).get("until", 0)) > int(state["tick"]): continue
+		if str(army.get("autonomy", {}).get("stance", "obey")) != "obey" and int(army.get("autonomy", {}).get("until", 0)) > int(state[StateKeys.TICK]): continue
 		if uses_unit_brain(army): continue
 		if not ready(army): army["last_reason"] = "等待主将与随军人员到齐，第%d日出发" % int(army["departure_at"]); continue
 		if army.has("corps_id"): continue
@@ -302,7 +303,7 @@ func step(adapter: Node = null) -> void:
 		for context in contexts:
 			var key: String = "army:" + str(context["army_id"])
 			var signature: String = _decision_key(context) + str(adapter.model) + str(adapter.endpoint)
-			var proposal: Dictionary = planner.take(key, signature, int(state["tick"]))
+			var proposal: Dictionary = planner.take(key, signature, int(state[StateKeys.TICK]))
 			outputs[str(context["request_id"])] = proposal["result"] if not proposal.is_empty() else Policy.choose(context)
 			if str(context["officer"]["id"]).begins_with("militia:") or planner.has_pending(key): continue
 			requests.append(context)
@@ -319,7 +320,7 @@ func step(adapter: Node = null) -> void:
 		return
 	# Every decision observes the same day-start state; only now commit actions.
 	for context in contexts:
-		var army: Dictionary = state["armies"].get(context["army_id"], {})
+		var army: Dictionary = state[StateKeys.ARMIES].get(context["army_id"], {})
 		var result: Dictionary = outputs.get(str(context["request_id"]), {})
 		var validated: Dictionary = validate_decision(context, result)
 		if not bool(validated.get("ok", false)):
@@ -335,29 +336,29 @@ func step(adapter: Node = null) -> void:
 			_execute(army, validated["action"])
 			army["last_reason"] = str(result.get("reason_summary", "")).left(160)
 			if previous_action != army["action"]: army["operation"]["change_reason"] = army["last_reason"]
-			army["operation"]["plan_until"] = int(state["tick"]) + 3
-			army["last_decision"] = int(state["tick"])
+			army["operation"]["plan_until"] = int(state[StateKeys.TICK]) + 3
+			army["last_decision"] = int(state[StateKeys.TICK])
 			# 请求真正落地后才登记 decision_key；否则未发出的请求会被当成已决策。
 			army["decision_key"] = str(context.get("decision_key", army.get("decision_key", "")))
 			army["decision_role"] = str(army["operation"].get("role", ""))
 			army["decision_flanked"] = bool(context["army"].get("contact", {}).get("flanked", false))
-			var record: Dictionary = {"request_id": context["request_id"], "tick": state["tick"], "army_id": army["id"], "candidate_id": result.get("candidate_id", ""), "action": validated["action"].duplicate(true), "reason_summary": army["last_reason"], "source": result.get("source", "baseline"), "model": str(adapter.model) if adapter != null else "", "rules_version": rules["version"], "prompt_version": 5, "policy_version": Policy.version(), "weights_version": Policy.weights().get("version", 0), "score_breakdown": result.get("score_breakdown", {}), "vetoed": bool(result.get("vetoed", false)), "fallback_reason": result.get("fallback_reason", ""), "observation": context.duplicate(true)}
-			state["decisions"].append(record)
+			var record: Dictionary = {"request_id": context["request_id"], "tick": state[StateKeys.TICK], "army_id": army["id"], "candidate_id": result.get("candidate_id", ""), "action": validated["action"].duplicate(true), "reason_summary": army["last_reason"], "source": result.get("source", "baseline"), "model": str(adapter.model) if adapter != null else "", "rules_version": rules["version"], "prompt_version": 5, "policy_version": Policy.version(), "weights_version": Policy.weights().get("version", 0), "score_breakdown": result.get("score_breakdown", {}), "vetoed": bool(result.get("vetoed", false)), "fallback_reason": result.get("fallback_reason", ""), "observation": context.duplicate(true)}
+			state[StateKeys.DECISIONS].append(record)
 			if not army.has("decision_history"): army["decision_history"] = []
 			army["decision_history"].append(record)
 			_evaluate_dissent(army, context, record)
-	while state["decisions"].size() > 160:
-		state["decisions"].pop_front()
+	while state[StateKeys.DECISIONS].size() > 160:
+		state[StateKeys.DECISIONS].pop_front()
 	# Immediate self-defence must run after proposals, so a routine hold decision
 	# cannot overwrite the response to the previous day's arrow fire.
-	if state.has("battlefield") and ai_mode != "active":
-		for corps in state["corps"].values(): preload("res://scripts/war/battle/ranged_pressure.gd").respond(self, corps)
+	if state.has(StateKeys.BATTLEFIELD) and ai_mode != "active":
+		for corps in state[StateKeys.CORPS].values(): preload("res://scripts/war/battle/ranged_pressure.gd").respond(self, corps)
 	var motions: Dictionary = _move_all()
 	_resolve_contacts(motions)
-	if not state["corps"].is_empty(): Corps.logistics(self)
+	if not state[StateKeys.CORPS].is_empty(): Corps.logistics(self)
 	Fortifications.fire(self)
 	_resolve_sieges()
-	for army in state["armies"].values():
+	for army in state[StateKeys.ARMIES].values():
 		if army.has("battlefield_id"): army["last_battlefield_id"] = army["battlefield_id"]
 	if not store.battle_test: Battlefields.cleanup(self)
 	Lifecycle.maintain(self)
@@ -374,8 +375,8 @@ func step(adapter: Node = null) -> void:
 	ReportPolicy.observe(self)
 	_summarize_finished_battles()
 	_deliver_reports()
-	state["rng_state"] = str(rng.state)
-	state["dissent_state"] = int(state.get("dissent_state", 0))
+	state[StateKeys.RNG_STATE] = str(rng.state)
+	state[StateKeys.DISSENT_STATE] = int(state.get(StateKeys.DISSENT_STATE, 0))
 
 
 func uses_unit_brain(army: Dictionary) -> bool:

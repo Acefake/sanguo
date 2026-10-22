@@ -9,6 +9,7 @@ extends RefCounted
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Traits = preload("res://scripts/officers/trait_registry.gd")
 const GridScript = preload("res://scripts/world/rtk14_hex_grid.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 const PATH := "res://data/war/officer_edges.json"
 
 static var _data: Dictionary = {}
@@ -66,7 +67,7 @@ static func ensure(army: Dictionary, officer: Dictionary, reset: bool = false) -
 # Runs once per day on the strategic map, not only inside a hex battlefield, so a
 # multiplier earned in the hex cannot survive the hex and apply forever on the road.
 static func day_start(war) -> void:
-	var tick := int(war.state["tick"])
+	var tick := int(war.state[StateKeys.TICK])
 	for army in war.active_armies():
 		army.erase("edge_attack")
 		army.erase("edge_defense")
@@ -96,22 +97,22 @@ static func _effect_for(war, army: Dictionary, id: String, config: Dictionary) -
 			if float(army.get("morale", 100)) >= 40.0: return {}
 			return {"morale": float(effect.get("morale", 10))}
 		"prev_day_advantage":
-			if int(army.get("edge_advantage_tick", -1)) != int(war.state["tick"]) - 1: return {}
+			if int(army.get("edge_advantage_tick", -1)) != int(war.state[StateKeys.TICK]) - 1: return {}
 			return {"attack_mult": float(effect.get("attack_mult", 1.1))}
 		"ally_retreating_adjacent":
-			var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+			var corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 			for unit_id in corps.get("units", []):
-				var friend: Dictionary = war.state["armies"][unit_id]
+				var friend: Dictionary = war.state[StateKeys.ARMIES][unit_id]
 				if friend["id"] == army["id"] or friend["status"] == "ended" or not friend.has("tactical"): continue
 				if bool(friend["returning"]) and _distance(army, friend) <= 1:
 					return {"received_mult": float(effect.get("received_mult", 0.8))}
 			return {}
 		"ally_low_organization":
-			var corps2: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+			var corps2: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 			var target := ""
 			var lowest := 100.0
 			for unit_id in corps2.get("units", []):
-				var friend: Dictionary = war.state["armies"][unit_id]
+				var friend: Dictionary = war.state[StateKeys.ARMIES][unit_id]
 				if friend["id"] == army["id"] or friend["status"] == "ended" or not friend.has("tactical"): continue
 				if float(friend.get("organization", 100)) >= 40.0: continue
 				if _distance(army, friend) > 3: continue
@@ -137,7 +138,7 @@ static func _distance(a: Dictionary, b: Dictionary) -> int:
 
 static func _apply(war, army: Dictionary, id: String, config: Dictionary, effect: Dictionary) -> void:
 	var edge: Dictionary = army["edge"]
-	var tick := int(war.state["tick"])
+	var tick := int(war.state[StateKeys.TICK])
 	if effect.has("morale"):
 		army["morale"] = minf(100.0, float(army["morale"]) + float(effect["morale"]))
 	if effect.has("attack_mult"):
@@ -149,7 +150,7 @@ static func _apply(war, army: Dictionary, id: String, config: Dictionary, effect
 		army["edge_active"] = id
 		edge["cooldown_until"] = tick + int(config.get("cooldown", 0))
 	if effect.has("organization"):
-		var target: Dictionary = war.state["armies"].get(str(effect.get("target", "")), {})
+		var target: Dictionary = war.state[StateKeys.ARMIES].get(str(effect.get("target", "")), {})
 		if not target.is_empty():
 			target["organization"] = minf(100.0, float(target["organization"]) + float(effect["organization"]))
 			army["edge_active"] = id
@@ -165,7 +166,7 @@ static func _apply(war, army: Dictionary, id: String, config: Dictionary, effect
 static func attack_mult(war, attacker: Dictionary, defender: Dictionary, melee: bool) -> float:
 	var edge: Dictionary = attacker.get("edge", {})
 	var id := str(edge.get("id", ""))
-	if id == "" or int(edge.get("cooldown_until", 0)) > int(war.state["tick"]): return 1.0
+	if id == "" or int(edge.get("cooldown_until", 0)) > int(war.state[StateKeys.TICK]): return 1.0
 	if id == "ambush" and int(edge.get("uses", 0)) == 0:
 		# The target must still be unaware of this unit for the ambush to land.
 		if defender.get("intel", {}).get("enemies", {}).has(str(attacker["id"])): return 1.0

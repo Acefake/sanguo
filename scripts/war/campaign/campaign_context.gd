@@ -11,6 +11,7 @@ const ReportPolicy = preload("res://scripts/war/campaign/report_policy.gd")
 const Dissent = preload("res://scripts/agents/officer_dissent.gd")
 const Forecast = preload("res://scripts/agents/forecast.gd")
 const Experience = preload("res://scripts/agents/experience.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 
 ## 城池情报（全图实时可见）。
@@ -21,14 +22,14 @@ static func city_intel(war, node: String) -> Dictionary:
 	result["node"] = node
 	result["strength_estimate"] = int(city.get("garrison", 0))
 	result["uncertainty"] = 0
-	result["observed_at"] = int(war.state["tick"])
+	result["observed_at"] = int(war.state[StateKeys.TICK])
 	result["source"] = "live_state"
 	return result
 
 
 ## 敌军情报（全图实时可见）。
 static func enemy_intel(war, enemy: Dictionary) -> Dictionary:
-	var result := {"id": enemy["id"], "location": enemy["location"].duplicate(true), "strength_estimate": Combat.strength(enemy), "observed_at": int(war.state["tick"]), "uncertainty": 0, "routing": bool(enemy.get("returning", false)), "fighting": int(enemy.get("combat_tick", -1)) == int(war.state["tick"]), "unit_mix_estimate": enemy["units"].duplicate(true), "source": "live_state"}
+	var result := {"id": enemy["id"], "location": enemy["location"].duplicate(true), "strength_estimate": Combat.strength(enemy), "observed_at": int(war.state[StateKeys.TICK]), "uncertainty": 0, "routing": bool(enemy.get("returning", false)), "fighting": int(enemy.get("combat_tick", -1)) == int(war.state[StateKeys.TICK]), "unit_mix_estimate": enemy["units"].duplicate(true), "source": "live_state"}
 	if enemy.has("tactical"): result["tactical_cell"] = int(enemy["tactical"]["cell"])
 	return result
 
@@ -40,7 +41,7 @@ static func player_city_intel(war, node: String) -> Dictionary:
 
 ## 城池是否为玩家势力所有。
 static func player_has_city_access(war, node: String) -> bool:
-	return not war.store.city_state(node).is_empty() and str(war.store.city_state(node).get("faction", "")) == str(war.state["player_faction"])
+	return not war.store.city_state(node).is_empty() and str(war.store.city_state(node).get("faction", "")) == str(war.state[StateKeys.PLAYER_FACTION])
 
 
 ## 刷新每支在役军队的城池与敌军情报。
@@ -61,7 +62,7 @@ static func _observe_all(war) -> void:
 
 ## 给相邻作战的友军编组并分配职责（主攻、侧翼、支援、预备、殿后）与建议目标。
 static func _update_operations(war) -> void:
-	if not war.state["corps"].is_empty(): Corps.update(war)
+	if not war.state[StateKeys.CORPS].is_empty(): Corps.update(war)
 	var assigned := {}
 	for anchor in war.active_armies():
 		if anchor.has("corps_id"): continue
@@ -108,7 +109,7 @@ static func _update_operations(war) -> void:
 			operation["objective"] = war.graph.name_of(str(army["target"]))
 			# JSON saves reorder dictionary keys. Target assignment must depend on
 			# current sightings and explicit tie-breaks, never their insertion order.
-			var enemies: Array = army["intel"]["enemies"].values().filter(func(sight): return int(sight.get("observed_at",-1)) == int(war.state["tick"]))
+			var enemies: Array = army["intel"]["enemies"].values().filter(func(sight): return int(sight.get("observed_at",-1)) == int(war.state[StateKeys.TICK]))
 			enemies.sort_custom(func(a,b): return str(a["id"]) < str(b["id"]))
 			if army.has("tactical"):
 				enemies.sort_custom(func(a, b):
@@ -179,7 +180,7 @@ static func _observed_contact(war, army: Dictionary) -> Dictionary:
 	for record in observed.values():
 		# Old sightings remain intelligence, but cannot pin a formation in
 		# immediate melee after the opponent has left or ceased reporting.
-		if int(record.get("observed_at",-100)) < int(war.state["tick"])-1: continue
+		if int(record.get("observed_at",-100)) < int(war.state[StateKeys.TICK])-1: continue
 		var enemy_cell := int(record.get("tactical_cell", -1))
 		if enemy_cell >= 0 and enemy_cell == cell: continue
 		if enemy_cell < 0: continue
@@ -222,7 +223,7 @@ static func context_for(war, army: Dictionary) -> Dictionary:
 		_add_candidate(war, candidates, "hold", {"type": "hold"}, "保持战线或预备位置，等待战局变化。")
 		var partner: String = str(operation.get("support_id", ""))
 		if partner != "" and operation.get("role", "") in ["support", "rear_guard"]:
-			var partner_army: Dictionary = war.state["armies"].get(partner, {})
+			var partner_army: Dictionary = war.state[StateKeys.ARMIES].get(partner, {})
 			var relation_name := Dissent.relation(war.roster.officers.get(str(army["officer_id"]), {}), war.roster.officers.get(str(partner_army.get("officer_id", "")), {}))
 			_add_candidate(war, candidates, "support:" + partner, {"type": "support", "ally": partner}, "跟随指定友军提供远程支援。", {"relation": relation_name})
 	if str(location.get("edge", "")) != "":
@@ -269,7 +270,7 @@ static func context_for(war, army: Dictionary) -> Dictionary:
 	candidates = war.filter_candidates(candidates, orders)
 	if bool(orders["retreat"]):
 		_add_candidate(war, candidates, "withdraw", {"type": "withdraw"}, "保存兵力，撤往安全的本方城池。")
-	if int(army["last_support"]) < int(war.state["tick"]) - 7:
+	if int(army["last_support"]) < int(war.state[StateKeys.TICK]) - 7:
 		_add_candidate(war, candidates, "request_support", {"type": "request_support"}, "等待支援并向后方报告军情。")
 	candidates.sort_custom(func(a, b): return str(a["id"]) < str(b["id"]))
 	var forecast_terrain: String = Tactical.terrain_class(int(own.get("cell", 0))) if own.has("cell") else war._terrain(str(location["node"]))
@@ -284,7 +285,7 @@ static func context_for(war, army: Dictionary) -> Dictionary:
 	# Decision snapshots need geometry, not the growing authoritative battle ledger.
 	local_map.erase("log")
 	local_map.erase("pending_events")
-	return {"request_id": "%s:%d" % [army["id"], int(war.state["tick"])], "army_id": army["id"], "observation_revision": war.state["tick"], "date": war.store.date_text(), "officer": war.roster.officers.get(str(army["officer_id"]), {"id": str(army["officer_id"]), "name": str(army.get("name", "")), "skills": army.get("skills", {}), "personality": {}, "trait_ids": army.get("trait_ids", [])}).duplicate(true), "army": own, "mission_type": army["mission_type"], "objective": war.graph.name_of(target), "at_objective": str(location["node"]) == target and str(location.get("edge", "")) == "", "supply_enabled": war.supply_enabled(), "returning": army["returning"], "target_known": army["intel"]["cities"].has(target), "cities": known_cities, "enemies": known_enemies, "allies": support["allies"], "battlefield": support["battlefield"], "operation": operation.duplicate(true), "orders": orders.duplicate(true), "local_map": local_map.duplicate(true), "current_action": army["action"].duplicate(true), "memory": army["memory"].duplicate(true), "experience": Experience.summary(army), "candidates": candidates}
+	return {"request_id": "%s:%d" % [army["id"], int(war.state[StateKeys.TICK])], "army_id": army["id"], "observation_revision": war.state[StateKeys.TICK], "date": war.store.date_text(), "officer": war.roster.officers.get(str(army["officer_id"]), {"id": str(army["officer_id"]), "name": str(army.get("name", "")), "skills": army.get("skills", {}), "personality": {}, "trait_ids": army.get("trait_ids", [])}).duplicate(true), "army": own, "mission_type": army["mission_type"], "objective": war.graph.name_of(target), "at_objective": str(location["node"]) == target and str(location.get("edge", "")) == "", "supply_enabled": war.supply_enabled(), "returning": army["returning"], "target_known": army["intel"]["cities"].has(target), "cities": known_cities, "enemies": known_enemies, "allies": support["allies"], "battlefield": support["battlefield"], "operation": operation.duplicate(true), "orders": orders.duplicate(true), "local_map": local_map.duplicate(true), "current_action": army["action"].duplicate(true), "memory": army["memory"].duplicate(true), "experience": Experience.summary(army), "candidates": candidates}
 
 
 ## 向候选列表追加一个行动。
@@ -296,8 +297,8 @@ static func _add_candidate(war, list: Array, id: String, action: Dictionary, des
 
 ## 校验决策结果：请求未过期且选中的是授权候选。
 static func validate_decision(war, context: Dictionary, result: Dictionary) -> Dictionary:
-	var army: Dictionary = war.state["armies"].get(context.get("army_id", ""), {})
-	if army.is_empty() or str(army["status"]) == "ended" or int(context.get("observation_revision", -1)) != int(war.state["tick"]) or int(army["last_decision"]) == int(war.state["tick"]):
+	var army: Dictionary = war.state[StateKeys.ARMIES].get(context.get("army_id", ""), {})
+	if army.is_empty() or str(army["status"]) == "ended" or int(context.get("observation_revision", -1)) != int(war.state[StateKeys.TICK]) or int(army["last_decision"]) == int(war.state[StateKeys.TICK]):
 		return {"ok": false, "message": "行动请求过期或已经执行。"}
 	var choice: Variant = result.get("candidate_id", null)
 	if not choice is String:
@@ -310,7 +311,7 @@ static func validate_decision(war, context: Dictionary, result: Dictionary) -> D
 
 ## 今日是否需要重新决策。
 static func _should_reconsider(war, army: Dictionary, context: Dictionary, adapter, key: String) -> bool:
-	var age := int(war.state["tick"]) - int(army["last_decision"])
+	var age := int(war.state[StateKeys.TICK]) - int(army["last_decision"])
 	if adapter != null and adapter.has_method("is_ollama") and adapter.is_ollama() and age < 3:
 		var own: Dictionary = context["army"]
 		var role: String = str(context.get("operation", {}).get("role", ""))

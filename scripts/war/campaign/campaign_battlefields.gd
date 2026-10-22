@@ -4,18 +4,19 @@ extends RefCounted
 
 const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 static func make_board(war, id: String, anchor: int, objectives: Dictionary) -> Dictionary:
-	if war.state["battlefields"].has(id) and war.state["battlefields"][id].has("ended_at"):
-		id += "@%d" % int(war.state["tick"])
-		while war.state["battlefields"].has(id): id += "+"
+	if war.state[StateKeys.BATTLEFIELDS].has(id) and war.state[StateKeys.BATTLEFIELDS][id].has("ended_at"):
+		id += "@%d" % int(war.state[StateKeys.TICK])
+		while war.state[StateKeys.BATTLEFIELDS].has(id): id += "+"
 	var q := anchor % 220
 	var r := anchor / 220
-	var board := {"battle_id": id, "grid": "global", "anchor": anchor, "center_column": q, "center_row": r, "min_column": maxi(0, q - 9), "max_column": mini(219, q + 9), "min_row": maxi(0, r - 9), "max_row": mini(219, r + 9), "blocked": [], "objectives": objectives, "started_at": int(war.state["tick"]), "log": [], "sides": {}}
-	var ids: Array = war.state["battlefields"].keys()
+	var board := {"battle_id": id, "grid": "global", "anchor": anchor, "center_column": q, "center_row": r, "min_column": maxi(0, q - 9), "max_column": mini(219, q + 9), "min_row": maxi(0, r - 9), "max_row": mini(219, r + 9), "blocked": [], "objectives": objectives, "started_at": int(war.state[StateKeys.TICK]), "log": [], "sides": {}}
+	var ids: Array = war.state[StateKeys.BATTLEFIELDS].keys()
 	ids.sort()
 	for key in ids:
-		var existing: Dictionary = war.state["battlefields"][key]
+		var existing: Dictionary = war.state[StateKeys.BATTLEFIELDS][key]
 		if existing.has("ended_at") or Tactical.cell_distance(anchor, int(existing["anchor"])) > 12: continue
 		existing["objectives"].merge(objectives)
 		for field in ["min_column", "min_row"]: existing[field] = mini(int(existing[field]), int(board[field]))
@@ -28,11 +29,11 @@ static func make_board(war, id: String, anchor: int, objectives: Dictionary) -> 
 			var cell := Tactical.cell_at(column, row)
 			if not Tactical.grid().walkable(cell): board["blocked"].append(cell)
 	Fort.attach(war, board)
-	war.state["battlefields"][board["battle_id"]] = board
+	war.state[StateKeys.BATTLEFIELDS][board["battle_id"]] = board
 	return board
 
 static func roads(war, motions: Dictionary) -> void:
-	if war.store.battle_test or war.state.has("battlefield"): return
+	if war.store.battle_test or war.state.has(StateKeys.BATTLEFIELD): return
 	var armies: Array = war.active_armies().filter(func(army): return not army.has("tactical") and war.ready(army))
 	for first in armies:
 		if first.has("tactical"): continue
@@ -56,7 +57,7 @@ static func roads(war, motions: Dictionary) -> void:
 				if candidates.is_empty(): continue
 				anchor = candidates[0]
 			var id := "road:" + edge
-			var board: Dictionary = war.state["battlefields"].get(id, {})
+			var board: Dictionary = war.state[StateKeys.BATTLEFIELDS].get(id, {})
 			if board.is_empty() or board.has("ended_at"): board = make_board(war, id, anchor, {})
 			if not board.has("roads"): board["roads"] = {}
 			board["roads"][edge] = fraction
@@ -72,7 +73,7 @@ static func roads(war, motions: Dictionary) -> void:
 # Formal campaigns own multiple independent boards. The legacy battlefield key
 # is reserved for the standalone scenario and a synchronous tactical call scope.
 static func prepare(war) -> void:
-	if war.store.battle_test or war.state.has("battlefield"): return
+	if war.store.battle_test or war.state.has(StateKeys.BATTLEFIELD): return
 	for army in war.active_armies():
 		if army.has("tactical") or army["returning"] or not war.ready(army): continue
 		var location: Dictionary = army["location"]
@@ -85,23 +86,23 @@ static func prepare(war) -> void:
 		if not enemy_city and not contact: continue
 		var id := "city:" + node
 		var current: Dictionary = {}
-		var ids: Array = war.state["battlefields"].keys()
+		var ids: Array = war.state[StateKeys.BATTLEFIELDS].keys()
 		ids.sort()
 		for key in ids:
-			var existing: Dictionary = war.state["battlefields"][key]
+			var existing: Dictionary = war.state[StateKeys.BATTLEFIELDS][key]
 			if not existing.has("ended_at") and existing["objectives"].has(node): current = existing; break
-		if not war.state["battlefields"].has(id) or war.state["battlefields"][id].has("ended_at"):
+		if not war.state[StateKeys.BATTLEFIELDS].has(id) or war.state[StateKeys.BATTLEFIELDS][id].has("ended_at"):
 			var site := Fort.for_city(war.store, node)
 			if site.is_empty(): continue
 			var anchor := int(site["center"])
 			if current.is_empty(): current = make_board(war, id, anchor, {node: anchor})
-		elif current.is_empty(): current = war.state["battlefields"][id]
+		elif current.is_empty(): current = war.state[StateKeys.BATTLEFIELDS][id]
 		for participant in war.active_armies():
 			if not war.ready(participant): continue
 			if participant.has("tactical") or participant["location"].get("edge", "") != "" or participant["location"].get("node", "") != node: continue
 			join(war, current, participant)
 	# A reinforcement joins an existing board at arrival, with no global reset.
-	for board in war.state["battlefields"].values():
+	for board in war.state[StateKeys.BATTLEFIELDS].values():
 		if board.has("ended_at"): continue
 		for army in war.active_armies():
 			if not war.ready(army): continue
@@ -138,19 +139,19 @@ static func join(war, board: Dictionary, army: Dictionary) -> void:
 
 static func run(war, method: String) -> Dictionary:
 	var motions := {}
-	var ids: Array = war.state["battlefields"].keys()
+	var ids: Array = war.state[StateKeys.BATTLEFIELDS].keys()
 	ids.sort()
 	for id in ids:
-		var board: Dictionary = war.state["battlefields"][id]
+		var board: Dictionary = war.state[StateKeys.BATTLEFIELDS][id]
 		if board.has("ended_at") and Tactical.participants(war, board).is_empty(): continue
-		war.state["battlefield"] = board
+		war.state[StateKeys.BATTLEFIELD] = board
 		if method == "move": motions.merge(Tactical.move(war))
 		else: Tactical.resolve(war)
-		war.state.erase("battlefield")
+		war.state.erase(StateKeys.BATTLEFIELD)
 	return motions
 
 static func cleanup(war) -> void:
-	for board in war.state["battlefields"].values():
+	for board in war.state[StateKeys.BATTLEFIELDS].values():
 		var participants := Tactical.participants(war, board)
 		if board.has("ended_at") and participants.is_empty(): continue
 		var hostile := participants.any(func(army): return not army["returning"] and army["mission_type"] == "capture" and board["objectives"].has(army["target"]) and war.hostile(str(war.store.city_state(army["target"]).get("faction", "")), str(army["faction"])))
@@ -162,7 +163,7 @@ static func cleanup(war) -> void:
 			for second in factions:
 				if war.hostile(str(first), str(second)): fighting = true
 		if hostile or fighting: continue
-		board["ended_at"] = int(war.state["tick"])
+		board["ended_at"] = int(war.state[StateKeys.TICK])
 		for army in participants:
 			army.erase("tactical")
 			army.erase("battlefield_id")

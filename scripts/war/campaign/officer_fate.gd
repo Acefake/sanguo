@@ -3,16 +3,17 @@ extends RefCounted
 ## 武将去向：阵亡、被俘、溃散、归还与释放，个人与守城战功记录，城破后的处置。
 
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 static func unavailable(war, id: String) -> bool:
-	return war.state.get("officer_fates", {}).get(id, {}).get("status", "") in ["dead", "captured"]
+	return war.state.get(StateKeys.OFFICER_FATES, {}).get(id, {}).get("status", "") in ["dead", "captured"]
 
 static func credit_personal(war, army: Dictionary, officer: String, count: int, soldiers: bool = true) -> void:
 	if count <= 0: return
-	war.state["officer_personal_kills"][officer] = int(war.state["officer_personal_kills"].get(officer, 0)) + count
+	war.state[StateKeys.OFFICER_PERSONAL_KILLS][officer] = int(war.state[StateKeys.OFFICER_PERSONAL_KILLS].get(officer, 0)) + count
 	if soldiers:
 		army["personal_soldier_kills"] = int(army.get("personal_soldier_kills", 0)) + count
-		war.state["officer_personal_soldiers"][officer] = int(war.state["officer_personal_soldiers"].get(officer, 0)) + count
+		war.state[StateKeys.OFFICER_PERSONAL_SOLDIERS][officer] = int(war.state[StateKeys.OFFICER_PERSONAL_SOLDIERS].get(officer, 0)) + count
 
 static func personal_weights(armies: Array, weights: Dictionary, fraction: float, config: Dictionary) -> Dictionary:
 	var result := {}
@@ -37,34 +38,34 @@ static func credit(war, weights: Dictionary, deaths: int, commanders: Dictionary
 		rows.append({"id": str(id), "count": count, "fraction": exact - count})
 	rows.sort_custom(func(a, b): return a["fraction"] > b["fraction"] if not is_equal_approx(a["fraction"], b["fraction"]) else a["id"] < b["id"])
 	for i in range(deaths - assigned): rows[i]["count"] += 1
-	if not war.state.has("officer_kills"): war.state["officer_kills"] = {}
+	if not war.state.has(StateKeys.OFFICER_KILLS): war.state[StateKeys.OFFICER_KILLS] = {}
 	for row in rows:
-		var army: Dictionary = war.state["armies"].get(row["id"], {})
+		var army: Dictionary = war.state[StateKeys.ARMIES].get(row["id"], {})
 		if army.is_empty(): continue
 		army["enemy_killed"] = int(army.get("enemy_killed", 0)) + row["count"]
 		var officer: String = str(commanders.get(row["id"], army["officer_id"]))
-		war.state["officer_kills"][officer] = int(war.state["officer_kills"].get(officer, 0)) + row["count"]
+		war.state[StateKeys.OFFICER_KILLS][officer] = int(war.state[StateKeys.OFFICER_KILLS].get(officer, 0)) + row["count"]
 		var personal_count := clampi(roundi(row["count"] * float(personal.get(row["id"], 0)) / maxf(float(weights[row["id"]]), 0.001)), 0, row["count"])
 		credit_personal(war, army, officer, personal_count)
 
 static func settle(war, army: Dictionary, enemy: Dictionary, status: String, cause: String) -> Dictionary:
 	var id: String = str(army["officer_id"])
-	if unavailable(war, id): return war.state["officer_fates"][id]
-	if not war.state.has("officer_fates"): war.state["officer_fates"] = {}
+	if unavailable(war, id): return war.state[StateKeys.OFFICER_FATES][id]
+	if not war.state.has(StateKeys.OFFICER_FATES): war.state[StateKeys.OFFICER_FATES] = {}
 	var name: String = str(war.roster.officers.get(id, {}).get("name", army["name"]))
-	var record := {"officer_id": id, "name": name, "faction": army["faction"], "status": status, "tick": int(war.state["tick"]), "cause": cause, "captor_id": enemy.get("officer_id", ""), "captor_faction": enemy.get("faction", ""), "army_id": army["id"]}
-	war.state["officer_fates"][id] = record
+	var record := {"officer_id": id, "name": name, "faction": army["faction"], "status": status, "tick": int(war.state[StateKeys.TICK]), "cause": cause, "captor_id": enemy.get("officer_id", ""), "captor_faction": enemy.get("faction", ""), "army_id": army["id"]}
+	war.state[StateKeys.OFFICER_FATES][id] = record
 	if status == "dead" and cause == "单挑落败" and not enemy.is_empty(): credit_personal(war, enemy, str(enemy["officer_id"]), 1, false)
-	war.state["officer_states"][id] = record.duplicate(true)
-	war.state["officer_states"][id]["lost"] = true
+	war.state[StateKeys.OFFICER_STATES][id] = record.duplicate(true)
+	war.state[StateKeys.OFFICER_STATES][id]["lost"] = true
 	army["commander_fate"] = record.duplicate(true)
 	var message := "%s%s（%s）" % [name, "战死" if status == "dead" else "被俘", cause]
 	war._report(army, "武将战死" if status == "dead" else "武将被俘", message, true)
-	if war.state["armies"].has(enemy.get("id", "")): war._report(enemy, "斩获", message, true)
-	var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+	if war.state[StateKeys.ARMIES].has(enemy.get("id", "")): war._report(enemy, "斩获", message, true)
+	var corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	if not corps.is_empty(): corps["members"].erase(id)
 	var busy: Array = war.active_armies().map(func(unit): return unit["officer_id"])
-	var candidates: Array = corps.get("members", []).filter(func(member): return not busy.has(member) and not unavailable(war, member) and not war.state["officer_states"].get(member, {}).get("duel_wounded", false))
+	var candidates: Array = corps.get("members", []).filter(func(member): return not busy.has(member) and not unavailable(war, member) and not war.state[StateKeys.OFFICER_STATES].get(member, {}).get("duel_wounded", false))
 	if not candidates.is_empty():
 		var successor: String = str(candidates[0])
 		army["officer_id"] = successor
@@ -77,7 +78,7 @@ static func settle(war, army: Dictionary, enemy: Dictionary, status: String, cau
 		# suppressed their own first-contact effect against officers already seen.
 		army["battle_contacts"] = []
 		army.erase("opening_used")
-		war.state["officer_states"][successor] = {"status": "deployed", "army_id": army["id"], "corps_id": corps.get("id", "")}
+		war.state[StateKeys.OFFICER_STATES][successor] = {"status": "deployed", "army_id": army["id"], "corps_id": corps.get("id", "")}
 		if corps.get("commander_id", "") == id:
 			corps["commander_id"] = successor
 			corps["appointments"][successor] = "代理主帅"
@@ -103,7 +104,7 @@ static func disperse(war, army: Dictionary) -> void:
 	army["organization"] = 0.0
 	army["returning"] = true
 	army["victory_chain"] = false
-	war.state["battle_victories"].erase(str(army["officer_id"]))
+	war.state[StateKeys.BATTLE_VICTORIES].erase(str(army["officer_id"]))
 	army["action"] = {"type": "hold"}
 	army["last_reason"] = "随军武将尽失，无人接掌，士兵溃散"
 	war._report(army, "溃败", "%s无人接掌，剩余%d人溃散，退出战斗。" % [army["name"], count], true)
@@ -123,40 +124,40 @@ static func encounter(war, army: Dictionary, enemy: Dictionary, cause: String, s
 
 static func restore(war) -> void:
 	# Terminal fates survive return, merge, staff release and old save migration.
-	for id in war.state.get("officer_fates", {}):
-		var fate: Dictionary = war.state["officer_fates"][id]
+	for id in war.state.get(StateKeys.OFFICER_FATES, {}):
+		var fate: Dictionary = war.state[StateKeys.OFFICER_FATES][id]
 		if fate.get("status", "") in ["dead", "captured"]:
-			war.state["officer_states"][id] = fate.duplicate(true)
-			war.state["officer_states"][id]["lost"] = true
+			war.state[StateKeys.OFFICER_STATES][id] = fate.duplicate(true)
+			war.state[StateKeys.OFFICER_STATES][id]["lost"] = true
 
 static func release(war, id: String) -> bool:
 	if war.campaign_finished() or war.store.busy: return false
-	var fate: Dictionary = war.state.get("officer_fates", {}).get(id, {})
-	if fate.get("status", "") != "captured" or fate.get("captor_faction", "") != war.state["player_faction"]: return false
+	var fate: Dictionary = war.state.get(StateKeys.OFFICER_FATES, {}).get(id, {})
+	if fate.get("status", "") != "captured" or fate.get("captor_faction", "") != war.state[StateKeys.PLAYER_FACTION]: return false
 	fate["status"] = "released"
-	fate["released_at"] = int(war.state["tick"])
-	war.state["officer_states"][id] = {"status": "recovering", "available_after": int(war.state["tick"]) + 10}
+	fate["released_at"] = int(war.state[StateKeys.TICK])
+	war.state[StateKeys.OFFICER_STATES][id] = {"status": "recovering", "available_after": int(war.state[StateKeys.TICK]) + 10}
 	return true
 
 static func garrison(war, node: String, city: Dictionary) -> Dictionary:
-	var guards: Dictionary = war.state["garrison_commanders"]
+	var guards: Dictionary = war.state[StateKeys.GARRISON_COMMANDERS]
 	var guard: Dictionary = guards.get(node, {})
-	if not guard.is_empty() and guard["faction"] == city["faction"] and not unavailable(war, guard["officer_id"]) and war.state["officer_states"].get(guard["officer_id"], {}).get("status", "available") in ["available", "guarding"]:
-		war.state["officer_states"][guard["officer_id"]] = {"status": "guarding", "city": node}
+	if not guard.is_empty() and guard["faction"] == city["faction"] and not unavailable(war, guard["officer_id"]) and war.state[StateKeys.OFFICER_STATES].get(guard["officer_id"], {}).get("status", "available") in ["available", "guarding"]:
+		war.state[StateKeys.OFFICER_STATES][guard["officer_id"]] = {"status": "guarding", "city": node}
 		return guard
 	var available: Array = war.available_officers(str(city["faction"]))
-	if war.state.get("campaign_started", false): available = available.filter(func(officer): return war.state["officer_states"].get(officer["id"], {}).get("city", node) == node and city.get("governor_id", "") != officer["id"])
+	if war.state.get(StateKeys.CAMPAIGN_STARTED, false): available = available.filter(func(officer): return war.state[StateKeys.OFFICER_STATES].get(officer["id"], {}).get("city", node) == node and city.get("governor_id", "") != officer["id"])
 	available.sort_custom(func(a, b): return float(a["skills"].get("带兵", 50)) > float(b["skills"].get("带兵", 50)))
 	var id: String = str(available[0]["id"]) if not available.is_empty() else war.roster.militia(str(city["faction"]), node)
-	if unavailable(war, id): id = war.roster.militia(str(city["faction"]), node + ":" + str(war.state["tick"]))
+	if unavailable(war, id): id = war.roster.militia(str(city["faction"]), node + ":" + str(war.state[StateKeys.TICK]))
 	guard = {"officer_id": id, "name": war.roster.officers[id]["name"], "faction": city["faction"], "enemy_killed": 0, "city": node}
 	guards[node] = guard
-	war.state["officer_states"][id] = {"status": "guarding", "city": node}
+	war.state[StateKeys.OFFICER_STATES][id] = {"status": "guarding", "city": node}
 	return guard
 
 static func credit_garrison(war, guard: Dictionary, deaths: int, personal_fraction: float = 0.0) -> void:
 	guard["enemy_killed"] = int(guard.get("enemy_killed", 0)) + deaths
-	war.state["officer_kills"][guard["officer_id"]] = int(war.state["officer_kills"].get(guard["officer_id"], 0)) + deaths
+	war.state[StateKeys.OFFICER_KILLS][guard["officer_id"]] = int(war.state[StateKeys.OFFICER_KILLS].get(guard["officer_id"], 0)) + deaths
 	credit_personal(war, guard, str(guard["officer_id"]), clampi(roundi(deaths * personal_fraction), 0, deaths))
 
 static func city_falls(war, guard: Dictionary, winner: Dictionary) -> void:
@@ -167,9 +168,9 @@ static func city_falls(war, guard: Dictionary, winner: Dictionary) -> void:
 	var death := float(rules.get("city_death", 0.15))
 	var capture := float(rules.get("city_capture", 0.55))
 	if roll >= death + capture:
-		war.state["officer_states"][id] = {"status": "recovering", "available_after": int(war.state["tick"]) + 10}
+		war.state[StateKeys.OFFICER_STATES][id] = {"status": "recovering", "available_after": int(war.state[StateKeys.TICK]) + 10}
 		return
 	var status := "dead" if roll < death else "captured"
-	war.state["officer_fates"][id] = {"officer_id": id, "name": guard["name"], "faction": guard["faction"], "status": status, "tick": int(war.state["tick"]), "cause": "城破失守", "captor_id": winner["officer_id"], "captor_faction": winner["faction"], "city": guard["city"]}
+	war.state[StateKeys.OFFICER_FATES][id] = {"officer_id": id, "name": guard["name"], "faction": guard["faction"], "status": status, "tick": int(war.state[StateKeys.TICK]), "cause": "城破失守", "captor_id": winner["officer_id"], "captor_faction": winner["faction"], "city": guard["city"]}
 	restore(war)
 	war._report(winner, "武将战死" if status == "dead" else "武将被俘", "守城主将%s%s。" % [guard["name"], "战死" if status == "dead" else "被俘"], true)

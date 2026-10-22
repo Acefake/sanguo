@@ -11,17 +11,18 @@ const Corps = preload("res://scripts/war/campaign/army_corps.gd")
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Siege = preload("res://scripts/war/battle/siege_system.gd")
 const Experience = preload("res://scripts/agents/experience.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 
 ## 结算围城，城防出现破口时通知本方参战部队。
 static func _resolve_sieges(war) -> void:
 	Siege.resolve(war)
-	for node in war.state["sieges"]:
-		var siege: Dictionary = war.state["sieges"][node]
+	for node in war.state[StateKeys.SIEGES]:
+		var siege: Dictionary = war.state[StateKeys.SIEGES][node]
 		if float(siege.get("wall", 1)) > 0 and float(siege.get("gate", 1)) > 0: continue
 		for id in siege.get("participants", []):
-			var army: Dictionary = war.state["armies"].get(id, {})
-			if army.is_empty() or army["faction"] != war.state["player_faction"]: continue
+			var army: Dictionary = war.state[StateKeys.ARMIES].get(id, {})
+			if army.is_empty() or army["faction"] != war.state[StateKeys.PLAYER_FACTION]: continue
 			war._report(army, "破城", war.graph.name_of(str(node)) + "防线已出现破口，部队可进入城内作战。", true, "siege:%s:%s" % [node, siege.get("started", 0)])
 			break
 
@@ -29,11 +30,11 @@ static func _resolve_sieges(war) -> void:
 ## 攻占城池：俘获守军与武将、留兵驻防、各胜方部队完成目标。
 static func _capture_city(war, army: Dictionary, besiegers: Array, node: String, city: Dictionary) -> void:
 	var old_faction := str(city.get("faction", ""))
-	var guard := str(war.state["garrison_commanders"].get(node, {}).get("officer_id", ""))
-	for id in war.state["officer_states"]:
-		var officer: Dictionary = war.state["officer_states"][id]
+	var guard := str(war.state[StateKeys.GARRISON_COMMANDERS].get(node, {}).get("officer_id", ""))
+	for id in war.state[StateKeys.OFFICER_STATES]:
+		var officer: Dictionary = war.state[StateKeys.OFFICER_STATES][id]
 		if id == guard or officer.get("status", "") not in ["available", "recovering"] or officer.get("city", "") != node or war.roster.officers.get(id, {}).get("faction", "") != old_faction: continue
-		war.state["officer_fates"][id] = {"officer_id": id, "name": war.roster.officers[id]["name"], "faction": old_faction, "status": "captured", "tick": int(war.state["tick"]), "cause": "城池失守", "captor_id": army["officer_id"], "captor_faction": army["faction"], "city": node}
+		war.state[StateKeys.OFFICER_FATES][id] = {"officer_id": id, "name": war.roster.officers[id]["name"], "faction": old_faction, "status": "captured", "tick": int(war.state[StateKeys.TICK]), "cause": "城池失守", "captor_id": army["officer_id"], "captor_faction": army["faction"], "city": node}
 	Fate.restore(war)
 	city["prisoners"] = int(city.get("prisoners", 0)) + int(city["garrison"]) + int(city.get("wounded", 0))
 	city["wounded"] = 0
@@ -43,10 +44,10 @@ static func _capture_city(war, army: Dictionary, besiegers: Array, node: String,
 	city["faction"] = army["faction"]
 	war.roster.ensure_factions(war.store.scenario)
 	for id in war.roster.officers:
-		if war.roster.officers[id].get("generated", false): war.state["generated_officers"][id] = war.roster.officers[id].duplicate(true)
+		if war.roster.officers[id].get("generated", false): war.state[StateKeys.GENERATED_OFFICERS][id] = war.roster.officers[id].duplicate(true)
 	city["last_volley_tick"] = -10
 	city["governor_id"] = ""
-	city["occupied_at"] = int(war.state["tick"])
+	city["occupied_at"] = int(war.state[StateKeys.TICK])
 	var left := 0
 	for unit in besiegers:
 		var remaining := mini(Combat.strength(unit), maxi(1, int(Combat.strength(unit) * 0.15)))
@@ -67,8 +68,8 @@ static func _capture_city(war, army: Dictionary, besiegers: Array, node: String,
 	for victor in besiegers:
 		_battle_victory(war, victor)
 		winners[victor["id"]] = victor
-		var corps: Dictionary = war.state["corps"].get(victor.get("corps_id", ""), {})
-		for id in corps.get("units", []): winners[id] = war.state["armies"][id]
+		var corps: Dictionary = war.state[StateKeys.CORPS].get(victor.get("corps_id", ""), {})
+		for id in corps.get("units", []): winners[id] = war.state[StateKeys.ARMIES][id]
 	for unit in winners.values():
 		if unit["status"] == "ended": continue
 		unit["objective_complete"] = true
@@ -77,21 +78,21 @@ static func _capture_city(war, army: Dictionary, besiegers: Array, node: String,
 		if war.orders_for(unit)["after_battle"] == "withdraw": war._execute(unit, {"type": "withdraw"})
 		else: unit["action"] = {"type": "hold"}
 	war._report(army, "占领", "%s攻取%s，留下%d人驻防。" % [army["name"], war.graph.name_of(node), left], true)
-	if war.state.get("battlefield", {}).get("objectives", {}).has(node):
-		war.state["battlefield"]["winner"] = army["faction"]
-		war.state["battlefield"]["ended_at"] = war.state["tick"]
+	if war.state.get(StateKeys.BATTLEFIELD, {}).get("objectives", {}).has(node):
+		war.state[StateKeys.BATTLEFIELD]["winner"] = army["faction"]
+		war.state[StateKeys.BATTLEFIELD]["ended_at"] = war.state[StateKeys.TICK]
 
 
 ## 决定武将命运时面对的敌人：当日交手者、相邻敌军或守将。
 static func _fate_enemy(war, army: Dictionary) -> Dictionary:
-	var recent: Dictionary = war.state["armies"].get(army.get("last_enemy_id", ""), {})
-	if int(army.get("last_enemy_tick", -1)) == int(war.state["tick"]) and not recent.is_empty() and recent["faction"] != army["faction"]: return recent
+	var recent: Dictionary = war.state[StateKeys.ARMIES].get(army.get("last_enemy_id", ""), {})
+	if int(army.get("last_enemy_tick", -1)) == int(war.state[StateKeys.TICK]) and not recent.is_empty() and recent["faction"] != army["faction"]: return recent
 	for enemy in war.active_armies():
 		if not war.hostile(str(enemy["faction"]), str(army["faction"])) or enemy["returning"]: continue
 		if army.has("tactical") and enemy.has("tactical"):
 			if Tactical.distance(army, enemy) <= 1: return enemy
 		elif war._contact(army, enemy, {}): return enemy
-	var guard: Dictionary = war.state["garrison_commanders"].get(army["target"], {})
+	var guard: Dictionary = war.state[StateKeys.GARRISON_COMMANDERS].get(army["target"], {})
 	if not guard.is_empty() and guard["faction"] != army["faction"] and Siege.at_city(war, army, army["target"]):
 		var defender := guard.duplicate(true)
 		defender["units"] = war.store.city_state(army["target"]).get("units", {})
@@ -104,7 +105,7 @@ static func _check_rout(war, army: Dictionary) -> void:
 	if army["status"] == "ended": return
 	if Combat.strength(army) <= 0:
 		Fate.encounter(war, army, _fate_enemy(war, army), "destroyed", 1.0)
-		war.state["battle_victories"].erase(str(army["officer_id"]))
+		war.state[StateKeys.BATTLE_VICTORIES].erase(str(army["officer_id"]))
 		army["victory_chain"] = false
 		war._finish(army, "军队覆没")
 		return
@@ -115,7 +116,7 @@ static func _check_rout(war, army: Dictionary) -> void:
 	if morale >= 25.0 - aura_shift and organization >= 20:
 		army.erase("rout_crisis_since")
 		return
-	if not army.has("rout_crisis_since"): army["rout_crisis_since"] = int(war.state["tick"])
+	if not army.has("rout_crisis_since"): army["rout_crisis_since"] = int(war.state[StateKeys.TICK])
 	# A disordered but supplied force can rally behind nearby healthy allies.
 	# Hard panic still routs; manpower alone never makes a shattered army invincible.
 	var supported := false
@@ -125,17 +126,17 @@ static func _check_rout(war, army: Dictionary) -> void:
 				supported = true
 				break
 	var substantial := Combat.strength(army) >= maxf(500, float(army.get("initial_strength", 0)) * 0.4)
-	var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+	var corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	var can_regroup: bool = not corps.is_empty() and army["id"] != corps["root_id"]
-	var rally_window := int(war.state["tick"]) - int(army["rout_crisis_since"]) < 6
+	var rally_window := int(war.state[StateKeys.TICK]) - int(army["rout_crisis_since"]) < 6
 	if supported and substantial and can_regroup and rally_window and morale > 10 and organization > 8 and (not war.supply_enabled() or float(army.get("grain", 0)) >= war.daily_food(army)):
 		var reason := "友军掩护，主帅令本队归建整阵，仍留在战场"
 		var regroup_result := Corps.issue(war, corps, {"type": "assign_task", "unit": army["id"], "task": "regroup"}, reason)
 		if regroup_result.get("ok", false):
 			army["last_reason"] = reason
-			army["rally_requested"] = int(war.state["tick"])
+			army["rally_requested"] = int(war.state[StateKeys.TICK])
 			return
-	if supported and morale > 10 and organization > 8 and int(war.state["tick"]) == int(army["rout_crisis_since"]):
+	if supported and morale > 10 and organization > 8 and int(war.state[StateKeys.TICK]) == int(army["rout_crisis_since"]):
 		army["last_reason"] = "友军接应稳住阵线，等待主帅接替"
 		return
 	army["returning"] = true
@@ -143,7 +144,7 @@ static func _check_rout(war, army: Dictionary) -> void:
 	Fate.encounter(war, army, _fate_enemy(war, army), "rout", 1.0)
 	army["retreat_reason"] = "军心崩溃（士气%d）" % int(morale) if morale < 25 else "阵形崩溃（组织%d）" % int(organization)
 	army["last_reason"] = army["retreat_reason"]
-	war.state["battle_victories"].erase(str(army["officer_id"]))
+	war.state[StateKeys.BATTLE_VICTORIES].erase(str(army["officer_id"]))
 	army["victory_chain"] = false
 	war._report(army, "溃败", "%s所部%s，剩余%d人，正在有序脱离。" % [army["name"], army["retreat_reason"], Combat.strength(army)], true)
 	_remember_loss(war, army, "军心崩溃")
@@ -153,9 +154,9 @@ static func _check_rout(war, army: Dictionary) -> void:
 ## 军团主帅覆没或撤退时，其余各部士气与组织下降一次。
 static func _check_leader_lost(war) -> void:
 	var section: Dictionary = war.rules.get("officer", {})
-	for corps in war.state["corps"].values():
+	for corps in war.state[StateKeys.CORPS].values():
 		if corps.get("ended", false): continue
-		var root: Dictionary = war.state["armies"].get(str(corps.get("root_id", "")), {})
+		var root: Dictionary = war.state[StateKeys.ARMIES].get(str(corps.get("root_id", "")), {})
 		if root.is_empty(): continue
 		if not (str(root.get("status", "")) == "ended" or bool(root.get("returning", false))): continue
 		if str(corps.get("leader_lost_for", "")) == str(corps.get("commander_id", "")): continue
@@ -163,7 +164,7 @@ static func _check_leader_lost(war) -> void:
 		corps["leader_lost"] = true
 		var sample := {}
 		for id in corps.get("units", []):
-			var unit: Dictionary = war.state["armies"].get(str(id), {})
+			var unit: Dictionary = war.state[StateKeys.ARMIES].get(str(id), {})
 			if unit.is_empty() or str(unit["status"]) == "ended" or unit["id"] == root["id"]: continue
 			unit["morale"] = maxf(0.0, float(unit["morale"]) - float(section.get("leader_loss_morale", 8)))
 			unit["organization"] = maxf(0.0, float(unit["organization"]) - float(section.get("leader_loss_org", 4)))
@@ -176,20 +177,20 @@ static func _check_leader_lost(war) -> void:
 static func _battle_victory(war, army: Dictionary) -> void:
 	_remember_win(war, army, "交战取胜")
 	if not Traits.mechanism(army, "victory_chain").is_empty() and army.get("mission_type", "") == "capture" and not army.get("returning", false) and army.get("status", "") != "ended":
-		war.state["battle_victories"][str(army["officer_id"])] = int(war.state["tick"])
+		war.state[StateKeys.BATTLE_VICTORIES][str(army["officer_id"])] = int(war.state[StateKeys.TICK])
 
 
 ## 胜利写入经验，每日最多一次。
 static func _remember_win(war, army: Dictionary, cause: String) -> void:
-	if int(army.get("experience_tick", -1)) == int(war.state["tick"]): return
-	army["experience_tick"] = int(war.state["tick"])
+	if int(army.get("experience_tick", -1)) == int(war.state[StateKeys.TICK]): return
+	army["experience_tick"] = int(war.state[StateKeys.TICK])
 	Experience.record_win(war, army, _nearest_enemy_id(war, army), cause)
 
 
 ## 失利写入经验，每日最多一次。
 static func _remember_loss(war, army: Dictionary, cause: String) -> void:
-	if int(army.get("experience_tick", -1)) == int(war.state["tick"]): return
-	army["experience_tick"] = int(war.state["tick"])
+	if int(army.get("experience_tick", -1)) == int(war.state[StateKeys.TICK]): return
+	army["experience_tick"] = int(war.state[StateKeys.TICK])
 	Experience.record_loss(war, army, _nearest_enemy_id(war, army), cause)
 
 

@@ -6,28 +6,29 @@ extends RefCounted
 # 不另建战争通道。评分使用实时城池与军队信息。
 
 const Process = preload("res://scripts/officers/officer_process.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 
 static func plan(war, store) -> Array:
 	var section: Dictionary = war.rules.get("strategy", {})
 	if section.is_empty() or bool(store.get("battle_test")): return []
 	var interval := int(section.get("eval_interval", 10))
-	if interval < 1 or int(war.state["tick"]) % interval != 0: return []
+	if interval < 1 or int(war.state[StateKeys.TICK]) % interval != 0: return []
 	var factions := {}
 	for node in store.scenario.get("places", {}):
 		var name := str(store.city_state(str(node)).get("faction", ""))
-		if name != "" and name != str(war.state["player_faction"]): factions[name] = true
+		if name != "" and name != str(war.state[StateKeys.PLAYER_FACTION]): factions[name] = true
 	var decisions: Array = []
 	var faction_ids: Array = factions.keys()
 	faction_ids.sort()
 	for faction in faction_ids:
 		_govern(war, store, str(faction))
 		decisions.append_array(_plan_faction(war, store, str(faction), section))
-	_govern(war, store, str(war.state["player_faction"]))
+	_govern(war, store, str(war.state[StateKeys.PLAYER_FACTION]))
 	if not decisions.is_empty():
-		if not war.state.has("strategy_log"): war.state["strategy_log"] = []
-		for decision in decisions: war.state["strategy_log"].append(decision)
-		while war.state["strategy_log"].size() > 40: war.state["strategy_log"].pop_front()
+		if not war.state.has(StateKeys.STRATEGY_LOG): war.state[StateKeys.STRATEGY_LOG] = []
+		for decision in decisions: war.state[StateKeys.STRATEGY_LOG].append(decision)
+		while war.state[StateKeys.STRATEGY_LOG].size() > 40: war.state[StateKeys.STRATEGY_LOG].pop_front()
 	return decisions
 
 
@@ -62,7 +63,7 @@ static func _govern(war, store, faction: String) -> void:
 		for node in cities:
 			var city: Dictionary = store.city_state(node)
 			var policy: Dictionary = war.Operations.policy(war, node)
-			if faction == str(war.state["player_faction"]) and not policy["delegated"]: continue
+			if faction == str(war.state[StateKeys.PLAYER_FACTION]) and not policy["delegated"]: continue
 			var action := "develop"
 			var priority := 100.0 - float(city.get("economy", 0))
 			if int(city.get("order", 0)) < 55: action = "govern"; priority = 200.0 - float(city["order"])
@@ -117,7 +118,7 @@ static func _faction_cities(store, faction: String) -> Array:
 static func _front_count(war, faction: String) -> int:
 	var count := 0
 	for army in war.active_armies(faction):
-		if army.has("corps_id") and war.state["corps"][army["corps_id"]]["root_id"] != army["id"]: continue
+		if army.has("corps_id") and war.state[StateKeys.CORPS][army["corps_id"]]["root_id"] != army["id"]: continue
 		if str(army["mission_type"]) == "capture" and not bool(army["returning"]): count += 1
 	return count
 
@@ -155,7 +156,7 @@ static func _plan_faction(war, store, faction: String, section: Dictionary) -> A
 	var officers: Array = war.available_officers(faction).filter(func(officer): return not str(officer["id"]).begins_with("militia:"))
 	if officers.is_empty(): return decisions
 	officers.sort_custom(func(a, b): return float(a["skills"].get("带兵", 50)) + float(a["skills"].get("智计", 50)) + float(a["skills"].get("名望", 50)) > float(b["skills"].get("带兵", 50)) + float(b["skills"].get("智计", 50)) + float(b["skills"].get("名望", 50)))
-	var lord := lord_of(war.roster, faction, war.state["officer_states"])
+	var lord := lord_of(war.roster, faction, war.state[StateKeys.OFFICER_STATES])
 	var defense := _defend(war, store, faction, cities, officers, lord, section)
 	if not defense.is_empty(): decisions.append(defense)
 	if _front_count(war, faction) < int(section.get("front_limit", 2)):
@@ -209,7 +210,7 @@ static func _attack(war, store, faction: String, cities: Array, officers: Array,
 	_form_corps(war, army)
 	army["last_reason"] = "势力战略：攻取%s（守军%d，评分%.1f）" % [war.graph.name_of(str(best["target"])), int(best["estimate"]), float(best["score"])]
 	war._report(army, "势力出兵", "%s率兵%d出征%s。" % [army["name"], int(preview["strength"]), war.graph.name_of(str(best["target"]))], false)
-	return {"kind": "attack", "tick": int(war.state["tick"]), "faction": faction, "home": str(best["home"]), "target": str(best["target"]), "officer": str(best["officer"]["id"]), "estimate": int(best["estimate"]), "score": float(best["score"]), "army_id": str(army["id"])}
+	return {"kind": "attack", "tick": int(war.state[StateKeys.TICK]), "faction": faction, "home": str(best["home"]), "target": str(best["target"]), "officer": str(best["officer"]["id"]), "estimate": int(best["estimate"]), "score": float(best["score"]), "army_id": str(army["id"])}
 
 
 static func _defend(war, store, faction: String, cities: Array, officers: Array, lord: Dictionary, section: Dictionary) -> Dictionary:
@@ -243,7 +244,7 @@ static func _defend(war, store, faction: String, cities: Array, officers: Array,
 				_form_corps(war, army)
 				army["last_reason"] = "势力战略：增援%s" % graph.name_of(str(node))
 				war._report(army, "势力增援", "%s率兵%d增援%s。" % [army["name"], int(preview["strength"]), graph.name_of(str(node))], false)
-				return {"kind": "defend", "tick": int(war.state["tick"]), "faction": faction, "home": str(home), "target": str(node), "officer": str(officer["id"]), "estimate": 0, "score": 0.0, "army_id": str(army["id"])}
+				return {"kind": "defend", "tick": int(war.state[StateKeys.TICK]), "faction": faction, "home": str(home), "target": str(node), "officer": str(officer["id"]), "estimate": 0, "score": 0.0, "army_id": str(army["id"])}
 	return {}
 
 static func _form_corps(war, army: Dictionary) -> void:

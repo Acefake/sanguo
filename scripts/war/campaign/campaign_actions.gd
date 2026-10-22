@@ -8,6 +8,7 @@ const Process = preload("res://scripts/officers/officer_process.gd")
 const Fate = preload("res://scripts/war/campaign/officer_fate.gd")
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Corps = preload("res://scripts/war/campaign/army_corps.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 
 ## 执行一个行动并产生副作用（行军路线、撤退、补粮、求援军报）。
@@ -26,12 +27,12 @@ static func _execute(war, army: Dictionary, action: Dictionary) -> void:
 			location["to"] = action["target"]
 			location["edge"] = action["edge"]
 			location["progress"] = 0.0
-		"scout": army["scouted_at"] = int(war.state["tick"])
+		"scout": army["scouted_at"] = int(war.state[StateKeys.TICK])
 		"withdraw":
 			army["returning"] = true
 			if str(army["outcome"]) == "":
 				army["outcome"] = "撤退"
-			war.state["missions"][army["id"]]["status"] = "returning"
+			war.state[StateKeys.MISSIONS][army["id"]]["status"] = "returning"
 			_start_return(war, army)
 		"resupply":
 			var city: Dictionary = war.store.city_state(str(location["node"]))
@@ -41,7 +42,7 @@ static func _execute(war, army: Dictionary, action: Dictionary) -> void:
 			army["grain"] += take
 			war.store.city_changed.emit(str(location["node"]))
 		"request_support":
-			army["last_support"] = int(war.state["tick"])
+			army["last_support"] = int(war.state[StateKeys.TICK])
 			war._report(army, "求援", "%s请求增援，目前兵力%d。" % [army["name"], Combat.strength(army)], true)
 
 
@@ -76,9 +77,9 @@ static func _start_return(war, army: Dictionary) -> void:
 	if destination == "":
 		# 无可达友城时不能无限期滞留：逐日散亡、逐日衰退，逾期按溃散收束，
 		# 否则 returning 永远为真，月度推进被 active_armies 非空永久拒绝。
-		var since := int(army.get("return_stalled_since", war.state["tick"]))
+		var since := int(army.get("return_stalled_since", war.state[StateKeys.TICK]))
 		army["return_stalled_since"] = since
-		var stalled := int(war.state["tick"]) - since
+		var stalled := int(war.state[StateKeys.TICK]) - since
 		if stalled == 0:
 			war._report(army, "退路受阻", "%s没有可达的友城，暂时驻守并请求支援。" % army["name"], true)
 		Combat.apply_loss(army, maxi(1, int(ceil(Combat.strength(army) * 0.05))))
@@ -136,10 +137,10 @@ static func _finish(war, army: Dictionary, outcome: String) -> void:
 	army.erase("return_stalled_since")
 	army["status"] = "ended"
 	army["outcome"] = outcome
-	war.state["missions"][army["id"]]["status"] = "ended"
-	war.state["missions"][army["id"]]["result"] = outcome
-	war.state["officer_states"][army["officer_id"]] = {"status": "available" if outcome != "军队覆没" and not army.get("duel_wounded", false) else "recovering", "city": node, "available_after": int(war.state["tick"]) + (int(war.rules["duel"]["recover_days"]) if army.get("duel_wounded", false) else 10)}
-	if army.get("duel_wounded", false): war.state["officer_states"][army["officer_id"]]["duel_wounded"] = true
+	war.state[StateKeys.MISSIONS][army["id"]]["status"] = "ended"
+	war.state[StateKeys.MISSIONS][army["id"]]["result"] = outcome
+	war.state[StateKeys.OFFICER_STATES][army["officer_id"]] = {"status": "available" if outcome != "军队覆没" and not army.get("duel_wounded", false) else "recovering", "city": node, "available_after": int(war.state[StateKeys.TICK]) + (int(war.rules["duel"]["recover_days"]) if army.get("duel_wounded", false) else 10)}
+	if army.get("duel_wounded", false): war.state[StateKeys.OFFICER_STATES][army["officer_id"]]["duel_wounded"] = true
 	army.erase("pending_request")
 	army.erase("approved_action")
 	army["trust"] = float(army.get("trust", 0.0)) * 0.5

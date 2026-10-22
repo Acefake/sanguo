@@ -22,7 +22,7 @@ static var _target_cache: Dictionary = {}
 
 
 static func targets(war, army: Dictionary) -> Array:
-	var key := "%d:%d:%s" % [war.get_instance_id(), int(war.state["tick"]), str(army["id"])]
+	var key := "%d:%d:%s" % [war.get_instance_id(), int(war.state[StateKeys.TICK]), str(army["id"])]
 	if _target_cache.has(key):
 		return _target_cache[key].filter(func(enemy): return enemy.get("status", "") != "ended" and not enemy.get("tactical",{}).get("placement_invalid",false) and distance(army, enemy) < 10000 and _seen_now(war,army,enemy) and not shield_between(war,army,enemy))
 	var result: Array = []
@@ -38,11 +38,11 @@ static func targets(war, army: Dictionary) -> Array:
 
 
 static func _seen_now(war, army: Dictionary, enemy: Dictionary) -> bool:
-	return int(army.get("intel",{}).get("enemies",{}).get(enemy["id"],{}).get("observed_at",-1)) == int(war.state["tick"])
+	return int(army.get("intel",{}).get("enemies",{}).get(enemy["id"],{}).get("observed_at",-1)) == int(war.state[StateKeys.TICK])
 
 
 static func _is_commander(war, army: Dictionary) -> bool:
-	return war.state.get("corps",{}).get(army.get("corps_id",""),{}).get("root_id","") == army["id"]
+	return war.state.get(StateKeys.CORPS,{}).get(army.get("corps_id",""),{}).get("root_id","") == army["id"]
 
 
 static func _target_priority(war, army: Dictionary, enemy: Dictionary) -> float:
@@ -52,7 +52,7 @@ static func _target_priority(war, army: Dictionary, enemy: Dictionary) -> float:
 	var score := 1000.0 if gap == 1 else 500.0 if gap <= attack_range(army) else -float(gap)*10.0
 	if gap <= attack_range(army):
 		if _is_commander(war,enemy): score += 60
-		if army.get("last_enemy_id","") == enemy["id"] and int(war.state["tick"])-int(army.get("last_enemy_tick",-10)) <= 2: score += 18
+		if army.get("last_enemy_id","") == enemy["id"] and int(war.state[StateKeys.TICK])-int(army.get("last_enemy_tick",-10)) <= 2: score += 18
 		if army.get("tactical",{}).get("attack_target","") == enemy["id"]: score += 12
 		var known: Dictionary = army["intel"]["enemies"][enemy["id"]]
 		var estimate := float(known.get("strength_estimate",10000))
@@ -73,13 +73,13 @@ static func ordered_target(war, army: Dictionary) -> Dictionary:
 	var tactical: Dictionary = army["tactical"]
 	# Contact has priority; otherwise keep an observed target for a short order.
 	# Merely becoming one tile nearer does not justify crossing another unit's line.
-	var previous: Dictionary = war.state["armies"].get(tactical.get("attack_target", ""), {})
+	var previous: Dictionary = war.state[StateKeys.ARMIES].get(tactical.get("attack_target", ""), {})
 	if not previous.is_empty() and previous["status"] != "ended" and war.hostile(str(previous["faction"]), str(army["faction"])) and _seen_now(war,army,previous):
 		if distance(army, previous) <= attack_range(army) and _target_priority(war,army,previous) >= _target_priority(war,army,available[0]): return previous
-		if distance(army, available[0]) > attack_range(army) and int(war.state["tick"]) < int(tactical.get("target_until", 0)): return previous
+		if distance(army, available[0]) > attack_range(army) and int(war.state[StateKeys.TICK]) < int(tactical.get("target_until", 0)): return previous
 	var selected: Dictionary = available[0]
 	if selected["id"] != tactical.get("attack_target", ""):
-		tactical["target_until"] = int(war.state["tick"]) + 4
+		tactical["target_until"] = int(war.state[StateKeys.TICK]) + 4
 	return selected
 
 
@@ -97,7 +97,7 @@ static func contact_state(war, army: Dictionary) -> Dictionary:
 	var flanked := false
 	for first in attackers:
 		for second in attackers:
-			if first != second and distance(war.state["armies"][first], war.state["armies"][second]) >= 2: flanked = true
+			if first != second and distance(war.state[StateKeys.ARMIES][first], war.state[StateKeys.ARMIES][second]) >= 2: flanked = true
 	# One rear-guard cancelled the whole penalty regardless of how many attackers there
 	# were, so the second and third rear-guard units were dead weight. Cover now offsets
 	# one attacker each, capped so it can never make disengaging free.
@@ -105,7 +105,7 @@ static func contact_state(war, army: Dictionary) -> Dictionary:
 
 
 static func _enemy_control(war, army: Dictionary) -> Dictionary:
-	var key := "%d:%d:%s" % [war.get_instance_id(), int(war.state["tick"]), str(army["id"])]
+	var key := "%d:%d:%s" % [war.get_instance_id(), int(war.state[StateKeys.TICK]), str(army["id"])]
 	if _enemy_control_cache.has(key):
 		return _enemy_control_cache[key]
 	var result := _cached_enemy_control(war, army)

@@ -6,13 +6,14 @@ const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Fate = preload("res://scripts/war/campaign/officer_fate.gd")
 const Numeric = preload("res://scripts/war/duel/duel_rules_v2.gd")
 const Role = preload("res://scripts/war/duel/officer_role.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 static func config(war) -> Dictionary: return war.rules.get("duel", {})
 static func journal(war) -> Dictionary:
-	if not war.state.has("duels"): war.state["duels"] = {"pairs": {}, "counts": {}, "records": []}
-	if not war.state["duels"].has("road_scopes"): war.state["duels"]["road_scopes"] = {}
-	if not war.state["duels"].has("stamina"): war.state["duels"]["stamina"] = {}
-	var log: Dictionary = war.state["duels"]
+	if not war.state.has(StateKeys.DUELS): war.state[StateKeys.DUELS] = {"pairs": {}, "counts": {}, "records": []}
+	if not war.state[StateKeys.DUELS].has("road_scopes"): war.state[StateKeys.DUELS]["road_scopes"] = {}
+	if not war.state[StateKeys.DUELS].has("stamina"): war.state[StateKeys.DUELS]["stamina"] = {}
+	var log: Dictionary = war.state[StateKeys.DUELS]
 	if not log.has("officers"): log["officers"] = {}
 	log["version"] = 2
 	if not log.has("settlements"): log["settlements"] = {}
@@ -29,18 +30,18 @@ static func can_accept(war, army: Dictionary) -> bool:
 
 static func _healthy(war, army: Dictionary) -> bool:
 	var id := str(army.get("officer_id", ""))
-	var personal: Dictionary = war.state.get("officer_states", {}).get(id, {})
+	var personal: Dictionary = war.state.get(StateKeys.OFFICER_STATES, {}).get(id, {})
 	var injury: Variant = personal.get("injury", 0)
 	if str(injury) == "重伤" or ((injury is float or injury is int) and float(injury) >= 1.0): return false
 	return not id.is_empty() and not Fate.unavailable(war, id) and not army.get("duel_wounded", false) and not personal.get("duel_wounded", false) and personal.get("status", "") not in ["recovering", "dead", "captured"] and stamina(war, army) > 0
 
 static func battle_key(war, a: Dictionary, b: Dictionary) -> String:
-	if not war.state.get("battlefield",{}).is_empty(): return "field:" + str(war.state["battlefield"].get("battle_id", war.state["battlefield"].get("anchor",0)))
+	if not war.state.get(StateKeys.BATTLEFIELD,{}).is_empty(): return "field:" + str(war.state[StateKeys.BATTLEFIELD].get("battle_id", war.state[StateKeys.BATTLEFIELD].get("anchor",0)))
 	var location_key := _location_key(a,b)
 	# Pure read: eligible() is a predicate and must not advance the scope lifetime.
 	# enter_scope() is the only writer, and only challenge() calls it.
 	var scopes: Dictionary = journal(war)["road_scopes"]
-	var tick: int = int(war.state["tick"])
+	var tick: int = int(war.state[StateKeys.TICK])
 	if scopes.has(location_key) and int(scopes[location_key]["last_tick"]) >= tick - 1:
 		return str(scopes[location_key]["id"])
 	return "road:%s:%d" % [location_key,tick]
@@ -56,7 +57,7 @@ static func _location_key(a: Dictionary, b: Dictionary) -> String:
 # The single writer of road_scopes, so eligibility checks stay side-effect free.
 static func enter_scope(war, a: Dictionary, b: Dictionary) -> void:
 	var scopes: Dictionary = journal(war)["road_scopes"]
-	var tick: int = int(war.state["tick"])
+	var tick: int = int(war.state[StateKeys.TICK])
 	var key := _location_key(a,b)
 	if not scopes.has(key) or int(scopes[key]["last_tick"]) < tick - 1:
 		scopes[key] = {"id":"road:%s:%d" % [key,tick],"last_tick":tick}
@@ -88,7 +89,7 @@ static func eligible(war, a: Dictionary, b: Dictionary) -> bool:
 	if war.Terrain.entry_factor(a,war.rules) <= 0 or war.Terrain.entry_factor(b,war.rules) <= 0: return false
 	if a.has("tactical") and b.has("tactical") and war.Tactical.distance(a,b) != 1: return false
 	if a.get("tactical",{}).get("phase","") == "远射" or b.get("tactical",{}).get("phase","") == "远射": return false
-	if int(a.get("first_contact_effect_tick",-1)) == int(war.state["tick"]) or int(b.get("first_contact_effect_tick",-1)) == int(war.state["tick"]): return false
+	if int(a.get("first_contact_effect_tick",-1)) == int(war.state[StateKeys.TICK]) or int(b.get("first_contact_effect_tick",-1)) == int(war.state[StateKeys.TICK]): return false
 	var log := journal(war)
 	var scope := battle_key(war,a,b)
 	if log["pairs"].has(pair_key(war,a,b)): return false
@@ -142,7 +143,7 @@ static func apply_result(war, a: Dictionary, b: Dictionary, outcome: Dictionary)
 			var value := Numeric.state(war, army)
 			value["hp"] = clampf(float(outcome["final_hp"][index]), 0, float(value["max_hp"]))
 			value["fatigue"] = float(outcome.get("final_fatigue", [value["fatigue"], value["fatigue"]])[index])
-			value["last_duel_tick"] = int(war.state["tick"])
+			value["last_duel_tick"] = int(war.state[StateKeys.TICK])
 	var result: String = outcome["result"]
 	var effect: Dictionary = config(war)["effects"][result]
 	if result == "refused":
@@ -159,8 +160,8 @@ static func apply_result(war, a: Dictionary, b: Dictionary, outcome: Dictionary)
 		if result == "overwhelming":
 			loser["duel_wounded"] = true
 			var id := str(loser["officer_id"])
-			if not war.state["officer_states"].has(id): war.state["officer_states"][id] = {}
-			war.state["officer_states"][id]["duel_wounded"] = true
+			if not war.state[StateKeys.OFFICER_STATES].has(id): war.state[StateKeys.OFFICER_STATES][id] = {}
+			war.state[StateKeys.OFFICER_STATES][id]["duel_wounded"] = true
 			outcome["fate"] = Fate.encounter(war, loser, winner, "duel", 1.0)
 	outcome["settled"] = true
 	outcome["presentation_pending"] = true
@@ -168,14 +169,14 @@ static func apply_result(war, a: Dictionary, b: Dictionary, outcome: Dictionary)
 	if not duel_id.is_empty(): log["settlements"][duel_id] = true
 	if result == "refused": return
 	for army in [a,b]:
-		army["duel_tick"] = int(war.state["tick"])
+		army["duel_tick"] = int(war.state[StateKeys.TICK])
 		army["duel_opponent"] = b["id"] if army == a else a["id"]
 static func challenge(war, a: Dictionary, b: Dictionary, force_initiation: bool = false) -> Dictionary:
 	if not eligible(war,a,b): return {}
 	if not force_initiation and war.rng.randf() >= initiation(war,a,b): return {}
 	var log := journal(war)
 	enter_scope(war,a,b)
-	log["pairs"][pair_key(war,a,b)] = int(war.state["tick"])
+	log["pairs"][pair_key(war,a,b)] = int(war.state[StateKeys.TICK])
 	for army in [a,b]:
 		var key := battle_key(war,a,b)+":"+str(army["officer_id"])
 		log["counts"][key] = int(log["counts"].get(key,0))+1
@@ -184,14 +185,14 @@ static func challenge(war, a: Dictionary, b: Dictionary, force_initiation: bool 
 	var right_id: String = str(b["officer_id"])
 	var left_name: String = str(a["name"])
 	var right_name: String = str(b["name"])
-	outcome["duel_id"] = "%s:%d:%s:%s:%d" % [battle_key(war,a,b), int(war.state["tick"]), left_id, right_id, int(log.get("sequence", 0))]
+	outcome["duel_id"] = "%s:%d:%s:%s:%d" % [battle_key(war,a,b), int(war.state[StateKeys.TICK]), left_id, right_id, int(log.get("sequence", 0))]
 	log["sequence"] = int(log.get("sequence", 0)) + 1
 	outcome["factions"] = [a["faction"], b["faction"]]
 	apply_result(war,a,b,outcome)
 	var fate: Dictionary = outcome.get("fate", {})
 	var message := "%s向%s挑战，%s。" % [left_name,right_name,"避战回营，双方军心受挫" if outcome["result"] == "refused" else "交锋%d回合仍未分胜负" % outcome["rounds"].size() if outcome["result"] == "draw" else "败将被斩杀" if fate.get("status", "") == "dead" else "败将被擒" if fate.get("status", "") == "captured" else "败将重伤，所部军心动摇" if outcome["result"] == "overwhelming" else "对手退让，所部军心动摇"]
 	if int(outcome["winner"]) >= 0: message += " 胜者：" + (left_name if int(outcome["winner"]) == 0 else right_name)
-	outcome.merge({"tick":war.state["tick"],"a":left_id,"b":right_id,"message":message})
+	outcome.merge({"tick":war.state[StateKeys.TICK],"a":left_id,"b":right_id,"message":message})
 	log["records"].append(outcome)
 	while log["records"].size() > int(config(war).get("max_records", war.rules["feedback"]["max_log"])):
 		var removable := -1

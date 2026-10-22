@@ -4,6 +4,7 @@ extends RefCounted
 
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Corps = preload("res://scripts/war/campaign/army_corps.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 const LEGACY_ALIASES := {
 	"plains_clash": "guandu_clash",
@@ -39,9 +40,9 @@ static func setup(store: Node, id: String, seed: int, preformed: bool = false) -
 		for army in war.active_armies("liu_bei"):
 			army["location"] = {"node": "xiaopei", "edge": "", "progress": 0.0}
 			war._finish(army, "守军归城")
-		for corps_id in war.state["corps"].keys():
-			if war.state["corps"][corps_id]["faction"] == "liu_bei": war.state["corps"].erase(corps_id)
-		war.state["player_faction"] = "yuan_shao"
+		for corps_id in war.state[StateKeys.CORPS].keys():
+			if war.state[StateKeys.CORPS][corps_id]["faction"] == "liu_bei": war.state[StateKeys.CORPS].erase(corps_id)
+		war.state[StateKeys.PLAYER_FACTION] = "yuan_shao"
 	for army in war.active_armies():
 		army.erase("tactical")
 		army["mission_type"] = "capture" if city_battle and army["faction"] == "yuan_shao" else "defend"
@@ -51,7 +52,7 @@ static func setup(store: Node, id: String, seed: int, preformed: bool = false) -
 		for attribute in ["organization", "morale", "fatigue"]:
 			if condition.has(attribute): army[attribute] = float(condition[attribute])
 	Tactical.setup(war, int(spec["anchor"]))
-	var board: Dictionary = war.state["battlefield"]
+	var board: Dictionary = war.state[StateKeys.BATTLEFIELD]
 	board["scenario_id"] = str(spec["id"])
 	board["scenario_name"] = spec["name"]
 	board["scenario_category"] = spec.get("category", "")
@@ -70,7 +71,7 @@ static func setup(store: Node, id: String, seed: int, preformed: bool = false) -
 	Corps.deploy(war)
 	for army in war.active_armies(): army["intel"]["enemies"].clear()
 	war.rng.seed = seed
-	war.state["rng_state"] = str(war.rng.state)
+	war.state[StateKeys.RNG_STATE] = str(war.rng.state)
 	war._observe_all()
 	war._update_operations()
 
@@ -88,7 +89,7 @@ static func connected_cells(board: Dictionary, start: int) -> Array:
 	return queue
 
 static func compose(war, spec: Dictionary) -> void:
-	for corps in war.state["corps"].values():
+	for corps in war.state[StateKeys.CORPS].values():
 		corps["battle_troop_profile"] = spec.duplicate(true)
 		if corps["units"].size() > 1:
 			corps["deployed"] = true
@@ -99,7 +100,7 @@ static func compose_corps(war, corps: Dictionary, spec: Dictionary) -> void:
 	var front_index := 0
 	var guard_index := 0
 	for id in corps["units"]:
-		var army: Dictionary = war.state["armies"][id]
+		var army: Dictionary = war.state[StateKeys.ARMIES][id]
 		if army["status"] == "ended": continue
 		var role: String = corps["appointments"].get(army["officer_id"], "主帅")
 		var index := 0

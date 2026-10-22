@@ -36,7 +36,7 @@ static func setup(war, anchor_cell: int = -1) -> void:
 		column = column_of(anchor_cell)
 		row = row_of(anchor_cell)
 	var board := {
-		"grid": "global", "battle_id": "xiaopei:" + str(war.state["next_id"]), "started_at": war.state["tick"], "log": [],
+		"grid": "global", "battle_id": "xiaopei:" + str(war.state[StateKeys.NEXT_ID]), "started_at": war.state[StateKeys.TICK], "log": [],
 		"anchor": cell_at(column, row),
 		"center_column": column, "center_row": row,
 		"min_column": column - 7, "max_column": column + 7,
@@ -48,7 +48,7 @@ static func setup(war, anchor_cell: int = -1) -> void:
 			var cell := cell_at(column + q, row + r)
 			if not source_grid.walkable(cell):
 				board["blocked"].append(cell)
-	war.state["battlefield"] = board
+	war.state[StateKeys.BATTLEFIELD] = board
 	Fort.attach(war, board)
 	board["sides"] = {}
 	for army in war.active_armies():

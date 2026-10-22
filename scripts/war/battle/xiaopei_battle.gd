@@ -1,4 +1,5 @@
 extends RefCounted
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 static func setup(store: Node, preformed: bool = false, options: Dictionary = {}) -> void:
 	store._load_demo()
@@ -6,7 +7,7 @@ static func setup(store: Node, preformed: bool = false, options: Dictionary = {}
 	store.year = 191
 	store.month = 9
 	store.day = 1
-	store.war.state["player_faction"] = "liu_bei"
+	store.war.state[StateKeys.PLAYER_FACTION] = "liu_bei"
 	var sides := {"liu_bei": [], "yuan_shao": []}
 	for officer in store.war.roster.officers.values():
 		if str(officer["id"]).begins_with("militia:") or officer.get("generated", false): continue
@@ -41,7 +42,7 @@ static func setup(store: Node, preformed: bool = false, options: Dictionary = {}
 		var grid = preload("res://scripts/war/battle/tactical_battlefield.gd").grid()
 		var cities: Array = JSON.parse_string(FileAccess.get_file_as_string("res://assets/rtk14/cities_map.json"))
 		for city in cities:
-			if city["name"] == "小沛": store.war.state["battlefield"]["objectives"] = {"xiaopei": grid.pick(Vector2(city["x"], city["z"]))}
+			if city["name"] == "小沛": store.war.state[StateKeys.BATTLEFIELD]["objectives"] = {"xiaopei": grid.pick(Vector2(city["x"], city["z"]))}
 	for army in store.war.active_armies(): army["intel"]["enemies"].clear()
 	store.war._observe_all()
 	store.war._update_operations()

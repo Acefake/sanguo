@@ -1,6 +1,7 @@
 class_name OfficerDissent
 extends RefCounted
 ## 军令书与违令的规则层：将领关系、违令概率、主副搭配提示。
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 # 军令书与违令的规则层：将领关系（由人格轴推导）、违令概率与主副搭配提示。
 # 全部确定性，不消耗战斗随机数；概率最后记录进决策记录，随种子可复现。
@@ -50,7 +51,7 @@ static func _p(personality: Dictionary, name: String) -> float:
 # 否则任何一处战斗差异都会改写违令结果。war.state 持有这条独立随机流的状态，
 # 它既不消耗 battle rng，也随存档往返。
 static func roll(key: String, war_state: Dictionary = {}) -> float:
-	var carried := int(war_state.get("dissent_state", 0))
+	var carried := int(war_state.get(StateKeys.DISSENT_STATE, 0))
 	if carried == 0:
 		# 首次掷点：从 key 派生起点，之后按序推进，保证同一存档重放得到同一条序列。
 		carried = hash(key) & 0x7FFFFFFF
@@ -58,7 +59,7 @@ static func roll(key: String, war_state: Dictionary = {}) -> float:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = carried
 	var value := rng.randf()
-	war_state["dissent_state"] = int(rng.state)
+	war_state[StateKeys.DISSENT_STATE] = int(rng.state)
 	return value
 
 

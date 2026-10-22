@@ -5,6 +5,7 @@ extends RefCounted
 ##
 ## 链：TacticalBoard → TacticalTargeting → TacticalMovement → TacticalResolution → tactical_battlefield.gd，
 ## 全是静态函数，外部仍经 tactical_battlefield.gd（Tactical.xxx）调用。下层不能调用上层的函数。
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 
 const Process = preload("res://scripts/officers/officer_process.gd")
@@ -24,12 +25,12 @@ const Defense = preload("res://scripts/war/battle/city_defense.gd")
 ## 该军所在的战场（多战场时按 battlefield_id，否则为主战场）。
 static func board_for(war, army: Dictionary) -> Dictionary:
 	var id := str(army.get("battlefield_id", ""))
-	return war.state.get("battlefields", {}).get(id, war.state.get("battlefield", {}))
+	return war.state.get(StateKeys.BATTLEFIELDS, {}).get(id, war.state.get(StateKeys.BATTLEFIELD, {}))
 
 
 ## 某个战场上仍在行动的参战部队；不传 board 时为主战场。
 static func participants(war, board: Dictionary = {}) -> Array:
-	if board.is_empty(): board = war.state.get("battlefield", {})
+	if board.is_empty(): board = war.state.get(StateKeys.BATTLEFIELD, {})
 	var id := str(board.get("battle_id", ""))
 	return war.active_armies().filter(func(army): return army.has("tactical") and str(army.get("battlefield_id", id)) == id)
 
@@ -133,7 +134,7 @@ static func cell_text(cell: int) -> String:
 
 ## 整理主战场阻挡格并挂上城防；旧存档里停在不可通行格的部队就近挪到空格，找不到就标记 placement_invalid。
 static func migrate_positions(war) -> void:
-	var board: Dictionary = war.state.get("battlefield",{})
+	var board: Dictionary = war.state.get(StateKeys.BATTLEFIELD,{})
 	if board.is_empty(): return
 	var normalized: Array = []
 	for value in board.get("blocked", []):
@@ -183,5 +184,5 @@ static func migrate_positions(war) -> void:
 		army["tactical"]["blocked"] = false
 		army["combat_targets"] = []
 		for field in ["previous_cell","previous_goal","terrain_delay","flank_goal","attack_target"]: army["tactical"].erase(field)
-		army["tactical"]["terrain_migrated_at"] = war.state["tick"]
+		army["tactical"]["terrain_migrated_at"] = war.state[StateKeys.TICK]
 		army["last_reason"] = "通行规则更新，部队就近归岸"

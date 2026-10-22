@@ -24,8 +24,8 @@ static func _breakthrough_tuning(war) -> Dictionary:
 static func _resolve_breakthrough(war, melee_strikers: Dictionary, dealt: Dictionary) -> void:
 	var tuning := _breakthrough_tuning(war)
 	if not bool(tuning.get("enabled", true)): return
-	var board: Dictionary = war.state["battlefield"]
-	var tick := int(war.state["tick"])
+	var board: Dictionary = war.state[StateKeys.BATTLEFIELD]
+	var tick := int(war.state[StateKeys.TICK])
 	var occupied := {}
 	for army in participants(war):
 		if army.has("tactical") and not army["tactical"].get("placement_invalid",false): occupied[int(army["tactical"]["cell"])] = army["id"]
@@ -34,14 +34,14 @@ static func _resolve_breakthrough(war, melee_strikers: Dictionary, dealt: Dictio
 	var victims: Array = melee_strikers.keys()
 	victims.sort()
 	for defender_id in victims:
-		var defender: Dictionary = war.state["armies"].get(str(defender_id), {})
+		var defender: Dictionary = war.state[StateKeys.ARMIES].get(str(defender_id), {})
 		if defender.is_empty() or str(defender.get("status","")) != "ended": continue
 		if int(Combat.strength(defender)) > 0: continue
 		var cell := int(defender.get("tactical",{}).get("cell",-1))
 		if cell < 0 or occupied.has(cell): continue
 		var options: Array = []
 		for striker_id in melee_strikers[defender_id]:
-			var striker: Dictionary = war.state["armies"].get(str(striker_id), {})
+			var striker: Dictionary = war.state[StateKeys.ARMIES].get(str(striker_id), {})
 			if striker.is_empty() or str(striker.get("status","")) == "ended": continue
 			if bool(striker.get("returning",false)) or int(Combat.strength(striker)) <= 0: continue
 			if not striker.has("tactical") or attack_range(striker) != 1: continue
@@ -95,7 +95,7 @@ static func _resolve_breakthrough(war, melee_strikers: Dictionary, dealt: Dictio
 # unit holds say so; hidden squadrons must not veto a breakthrough through the
 # engine's private positions.
 static func _breakthrough_threat(war, mover: Dictionary, cell: int, defender_id: String) -> int:
-	var tick := int(war.state["tick"])
+	var tick := int(war.state[StateKeys.TICK])
 	var threat := 0
 	for enemy_id in mover.get("intel",{}).get("enemies",{}):
 		if str(enemy_id) == defender_id: continue
@@ -112,20 +112,20 @@ static func _compute_auras(war) -> void:
 	var strengths := {}
 	for army in participants(war):
 		army["aura"] = 0.0
-		var corps: Dictionary = war.state["corps"].get(str(army.get("corps_id", "")), {})
+		var corps: Dictionary = war.state[StateKeys.CORPS].get(str(army.get("corps_id", "")), {})
 		var leader: Dictionary = army
-		if not corps.is_empty(): leader = war.state["armies"].get(str(corps["root_id"]), army)
+		if not corps.is_empty(): leader = war.state[StateKeys.ARMIES].get(str(corps["root_id"]), army)
 		if leader.is_empty() or str(leader["status"]) == "ended" or bool(leader["returning"]): continue
 		var strength := Process.aura_strength(leader, war.rules)
 		if strength <= 0.0: continue
 		var radius := Process.aura_range(leader, war.rules)
 		var members: Array = [army] if corps.is_empty() else corps["units"]
 		for id in members:
-			var unit: Dictionary = war.state["armies"].get(str(id), {})
+			var unit: Dictionary = war.state[StateKeys.ARMIES].get(str(id), {})
 			if unit.is_empty() or str(unit["status"]) == "ended" or bool(unit["returning"]): continue
 			if unit["id"] != leader["id"] and distance(unit, leader) > radius: continue
 			strengths[unit["id"]] = maxf(float(strengths.get(unit["id"], 0.0)), strength)
-	for id in strengths: war.state["armies"][id]["aura"] = strengths[id]
+	for id in strengths: war.state[StateKeys.ARMIES][id]["aura"] = strengths[id]
 
 
 ## 战术结算阶段：结算本回合伤害、侧击、击破跟进与光环。
@@ -166,8 +166,8 @@ static func resolve(war) -> void:
 		if not can_engage(war, army): continue
 		var enemies := targets(war, army)
 		var selected: String = str(army["tactical"].get("attack_target", ""))
-		if war.state["armies"].has(selected):
-			var preferred: Dictionary = war.state["armies"][selected]
+		if war.state[StateKeys.ARMIES].has(selected):
+			var preferred: Dictionary = war.state[StateKeys.ARMIES][selected]
 			# Build a new ordering rather than mutating targets(), whose result is shared.
 			if enemies.has(preferred): enemies = [preferred] + enemies.filter(func(e): return e["id"] != preferred["id"])
 		# Share one army's attack budget across its adjacent contact sectors.
@@ -175,12 +175,12 @@ static func resolve(war) -> void:
 		if not adjacent.is_empty():
 			enemies = adjacent
 		else:
-			enemies = enemies.filter(func(e): return distance(army,e) <= attack_range(army) and Fort.line_of_sight(war.state["battlefield"],int(army["tactical"]["cell"]),int(e["tactical"]["cell"]))).slice(0,1)
+			enemies = enemies.filter(func(e): return distance(army,e) <= attack_range(army) and Fort.line_of_sight(war.state[StateKeys.BATTLEFIELD],int(army["tactical"]["cell"]),int(e["tactical"]["cell"]))).slice(0,1)
 		for enemy in enemies:
 			var separation := distance(army, enemy)
 			if separation < 1 or separation > attack_range(army): continue
 			if shield_between(war, army, enemy): continue
-			if separation > 1 and not Fort.line_of_sight(war.state["battlefield"], int(army["tactical"]["cell"]), int(enemy["tactical"]["cell"])): continue
+			if separation > 1 and not Fort.line_of_sight(war.state[StateKeys.BATTLEFIELD], int(army["tactical"]["cell"]), int(enemy["tactical"]["cell"])): continue
 			# Shallow copy: losses_detail/power_breakdown only read these fields, and a
 			# deep copy also cloned intel, experience and decision_history every attack.
 			var attacker: Dictionary = army.duplicate()
@@ -212,7 +212,7 @@ static func resolve(war) -> void:
 			if separation <= 1:
 				if not melee_strikers.has(enemy["id"]): melee_strikers[enemy["id"]] = {}
 				melee_strikers[enemy["id"]][army["id"]] = true
-			army["combat_tick"] = war.state["tick"]
+			army["combat_tick"] = war.state[StateKeys.TICK]
 			army["combat_targets"].append(enemy["id"])
 			army["tactical"]["attack_target"] = army["combat_targets"][0]
 			army["tactical"]["phase"] = "近战" if separation <= 1 else "远射"
@@ -220,7 +220,7 @@ static func resolve(war) -> void:
 	# A unit being hit in melee counters unless it is withdrawing or ordered to ignore.
 	# Contact may have moved into range after its order was chosen this morning.
 	for id in damages.keys():
-		var defender: Dictionary = war.state["armies"][id]
+		var defender: Dictionary = war.state[StateKeys.ARMIES][id]
 		if dealt.has(id) or defender["returning"] or not war.orders_for(defender)["engage"] or not can_attack(war, defender): continue
 		var melee_attackers: Array = attackers.get(id, []).filter(func(a): return distance(defender,a) == 1)
 		for attacker in melee_attackers:
@@ -246,13 +246,13 @@ static func resolve(war) -> void:
 			attackers[attacker["id"]].append(defender)
 			if not melee_strikers.has(attacker["id"]): melee_strikers[attacker["id"]] = {}
 			melee_strikers[attacker["id"]][defender["id"]] = true
-			defender["combat_tick"] = war.state["tick"]
+			defender["combat_tick"] = war.state[StateKeys.TICK]
 			defender["combat_targets"].append(attacker["id"])
 			defender["tactical"]["attack_target"] = defender["combat_targets"][0]
 			defender["tactical"]["phase"] = "近战反击"
 	# Commit losses after every attack has been calculated from the same state.
 	for id in damages:
-		var army: Dictionary = war.state["armies"][id]
+		var army: Dictionary = war.state[StateKeys.ARMIES][id]
 		var dead_before := int(army.get("dead", 0))
 		var loss := Combat.apply_loss(army, damages[id], false, 0.0, float(army.get("aura", 0.0)), aura_scale)
 		var weights := {}
@@ -265,20 +265,20 @@ static func resolve(war) -> void:
 			if float(weights[attacker_id]) > strongest:
 				strongest = float(weights[attacker_id])
 				army["last_enemy_id"] = attacker_id
-				army["last_enemy_tick"] = int(war.state["tick"])
+				army["last_enemy_tick"] = int(war.state[StateKeys.TICK])
 		preload("res://scripts/war/campaign/officer_fate.gd").credit(war, weights, int(army["dead"]) - dead_before, {}, personal)
 		Feedback.loss(war, army, loss)
 		army["fatigue"] = minf(100, army["fatigue"] + Process.fatigue_cost(army, 4, true))
 	# Send combat reports only after all simultaneous kill credits are committed.
 	for id in damages:
-		var army: Dictionary = war.state["armies"][id]
+		var army: Dictionary = war.state[StateKeys.ARMIES][id]
 		var loss: int = int(army.get("daily_loss", 0))
 		war._report(army, "战线交战", "%s在%s承受攻击，损失%d人。" % [army["name"], cell_text(int(army["tactical"]["cell"])) + "  " + Terrain.name_of(terrain_class(army["tactical"]["cell"])), loss], false)
 	# Resolve morale once per unit from BOTH sides' exchange, before testing for rout.
 	var participants := damages.duplicate()
 	participants.merge(dealt)
 	for id in participants:
-		var unit: Dictionary = war.state["armies"][id]
+		var unit: Dictionary = war.state[StateKeys.ARMIES][id]
 		var inflicted := 0.0
 		var opponent_before := 0.0
 		for enemy_id in dealt.get(id, {}):
@@ -290,9 +290,9 @@ static func resolve(war) -> void:
 			if other["id"] == id or other["returning"] or not other.has("tactical") or distance(unit, other) > 3: continue
 			if other["faction"] == unit["faction"]: friendly += before[other["id"]]
 			elif unit["intel"]["enemies"].has(other["id"]): hostile += before[other["id"]]
-		unit["combat_tick"] = war.state["tick"]
+		unit["combat_tick"] = war.state[StateKeys.TICK]
 		Combat.battle_morale(unit, mini(int(damages.get(id, 0)), int(before[id])), inflicted, int(before[id]), opponent_before, friendly, hostile, contact_state(war, unit)["flanked"], float(unit.get("aura", 0.0)), aura_scale)
-	for id in participants: war._check_rout(war.state["armies"][id])
+	for id in participants: war._check_rout(war.state[StateKeys.ARMIES][id])
 	# A melee break opens the defender's tile; one surviving striker may follow in
 	# on the map path. This happens after losses and routs are final, so the books
 	# and the casualty ledger cannot change here.
@@ -300,20 +300,20 @@ static func resolve(war) -> void:
 	for id in dealt:
 		var inflicted_day := 0.0
 		for enemy_id in dealt[id]: inflicted_day += float(dealt[id][enemy_id])
-		if inflicted_day > float(damages.get(id, 0)): war.state["armies"][id]["edge_advantage_tick"] = int(war.state["tick"])
+		if inflicted_day > float(damages.get(id, 0)): war.state[StateKeys.ARMIES][id]["edge_advantage_tick"] = int(war.state[StateKeys.TICK])
 	war._check_leader_lost()
 	for id in attackers:
-		if war.state["armies"][id]["returning"] or war.state["armies"][id]["status"] == "ended":
+		if war.state[StateKeys.ARMIES][id]["returning"] or war.state[StateKeys.ARMIES][id]["status"] == "ended":
 			for winner in attackers[id]: war._battle_victory(winner)
-	if not war.state["battlefield"].has("winner"):
+	if not war.state[StateKeys.BATTLEFIELD].has("winner"):
 		var camps := {}
-		for faction in war.state["battlefield"].get("sides", {}): camps[faction] = 0
+		for faction in war.state[StateKeys.BATTLEFIELD].get("sides", {}): camps[faction] = 0
 		for army in participants(war):
 			if not bool(army["returning"]): camps[army["faction"]] = int(camps.get(army["faction"], 0)) + Combat.strength(army)
 		var remaining: Array = camps.keys().filter(func(faction): return int(camps[faction]) > 0)
 		if remaining.size() <= 1:
 			var winner := "draw" if remaining.is_empty() else str(remaining[0])
-			var objectives: Dictionary = war.state["battlefield"].get("objectives", {})
+			var objectives: Dictionary = war.state[StateKeys.BATTLEFIELD].get("objectives", {})
 			if remaining.is_empty() and not objectives.is_empty():
 				var holders := {}
 				for node in objectives:
@@ -325,12 +325,12 @@ static func resolve(war) -> void:
 				# The field is decided but the objectives are not: record it so the report can
 				# say the field was won while the siege is still running, then wait for the
 				# attacker to take the city.
-				war.state["battlefield"]["field_winner"] = winner
-				war.state["battlefield"]["field_winner_at"] = int(war.state["tick"])
+				war.state[StateKeys.BATTLEFIELD]["field_winner"] = winner
+				war.state[StateKeys.BATTLEFIELD]["field_winner_at"] = int(war.state[StateKeys.TICK])
 				return
-			war.state["battlefield"]["winner"] = winner
-			war.state["battlefield"]["ended_at"] = war.state["tick"]
-			for army in war.state["armies"].values():
+			war.state[StateKeys.BATTLEFIELD]["winner"] = winner
+			war.state[StateKeys.BATTLEFIELD]["ended_at"] = war.state[StateKeys.TICK]
+			for army in war.state[StateKeys.ARMIES].values():
 				if army["faction"] == "liu_bei":
 					war._report(army, "战局结果", "双方均已脱离战场。" if winner == "draw" else "%s控制战场，对方部队已撤退或覆没。" % ("我军" if winner == "liu_bei" else "敌军"), true)
 					break

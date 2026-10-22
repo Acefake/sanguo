@@ -3,6 +3,7 @@ extends RefCounted
 ## 战况反馈：双方优势与因素拆解、伤亡账、事件与每日快照、战后总结。
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Terrain = preload("res://scripts/war/battle/battle_terrain.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 static func advantage(armies: Array, faction: String) -> float:
 	var total := 0.0
@@ -23,17 +24,17 @@ static func _estimate_weight() -> float:
 	return _condition_weight(ESTIMATE_MORALE, ESTIMATE_ORGANIZATION)
 
 static func visible_advantage(war) -> Dictionary:
-	var own: String = war.state["player_faction"]
+	var own: String = war.state[StateKeys.PLAYER_FACTION]
 	var ours := advantage(war.active_armies(own), own)
 	var theirs := 0.0
 	for army in war.active_armies():
 		if army["faction"] != own: theirs += advantage([army], army["faction"])
-	for node in war.state.get("battlefield", {}).get("objectives", {}):
+	for node in war.state.get(StateKeys.BATTLEFIELD, {}).get("objectives", {}):
 		var city: Dictionary = war.store.city_state(node)
 		if city.get("faction", "") == own:
 			ours += float(int(city.get("garrison", 0))) * _condition_weight(100.0, 100.0)
 		else:
-			var siege: Dictionary = war.state["sieges"].get(node, {})
+			var siege: Dictionary = war.state[StateKeys.SIEGES].get(node, {})
 			theirs += float(int(city.get("garrison", 0))) * _condition_weight(float(siege.get("morale", 100)), float(siege.get("organization", 100)))
 	return {"ours": ours, "theirs": theirs, "percent": 100 * ours / maxf(ours + theirs, 1), "estimated": false}
 
@@ -60,12 +61,12 @@ static func factors(attacker: Dictionary, defender: Dictionary, rules: Dictionar
 	for entry in entries.slice(0,int(rules.get("feedback",{}).get("max_factors",2))): output.append(entry["text"])
 	return output
 static func book(war) -> Dictionary:
-	if not war.state.get("battlefield", {}).is_empty(): return war.state["battlefield"]
-	if not war.state.has("battle_feedback"): war.state["battle_feedback"] = {}
-	return war.state["battle_feedback"]
+	if not war.state.get(StateKeys.BATTLEFIELD, {}).is_empty(): return war.state[StateKeys.BATTLEFIELD]
+	if not war.state.has(StateKeys.BATTLE_FEEDBACK): war.state[StateKeys.BATTLE_FEEDBACK] = {}
+	return war.state[StateKeys.BATTLE_FEEDBACK]
 static func loss(war, army: Dictionary, amount: int) -> void:
-	if int(army.get("daily_loss_tick", -1)) != int(war.state["tick"]): army["daily_loss"] = 0
-	army["daily_loss_tick"] = int(war.state["tick"])
+	if int(army.get("daily_loss_tick", -1)) != int(war.state[StateKeys.TICK]): army["daily_loss"] = 0
+	army["daily_loss_tick"] = int(war.state[StateKeys.TICK])
 	army["daily_loss"] += amount
 static func event(war, kind: String, message: String, faction: String = "") -> void:
 	var data := book(war)
@@ -74,8 +75,8 @@ static func event(war, kind: String, message: String, faction: String = "") -> v
 	if not entry in data["pending_events"]: data["pending_events"].append(entry)
 static func snapshot(war) -> Array:
 	var sides := {}
-	for army in war.state["armies"].values():
-		var board: Dictionary = war.state.get("battlefield",{})
+	for army in war.state[StateKeys.ARMIES].values():
+		var board: Dictionary = war.state.get(StateKeys.BATTLEFIELD,{})
 		if not board.is_empty() and army.get("battlefield_id","") != board.get("battle_id",""): continue
 		var faction: String = army["faction"]
 		if not sides.has(faction): sides[faction] = {"faction":faction,"initial":0,"strength":0,"dead":0,"wounded":0,"captured":0,"deposited":0,"dispersed":0,"morale":0.0,"org":0.0}
@@ -93,7 +94,7 @@ static func snapshot(war) -> Array:
 	return sides.values()
 static func record_day(war, before: Array) -> void:
 	var data := book(war)
-	if not data.has("started_at"): data["started_at"] = int(war.state["tick"]) - 1
+	if not data.has("started_at"): data["started_at"] = int(war.state[StateKeys.TICK]) - 1
 	if not data.has("log"): data["log"] = []
 	var losses := {}
 	var sides := snapshot(war)
@@ -104,8 +105,8 @@ static func record_day(war, before: Array) -> void:
 		losses[row["faction"]] = maxi(0,int(row["dead"])+int(row["wounded"])+int(row["captured"])-prior)
 	var events: Array = data.get("pending_events",[]).duplicate(true)
 	data["pending_events"] = []
-	var entry := {"tick":war.state["tick"],"sides":sides,"losses":losses,"events":events}
-	if not data["log"].is_empty() and int(data["log"][-1]["tick"]) == int(war.state["tick"]):
+	var entry := {"tick":war.state[StateKeys.TICK],"sides":sides,"losses":losses,"events":events}
+	if not data["log"].is_empty() and int(data["log"][-1]["tick"]) == int(war.state[StateKeys.TICK]):
 		for previous in data["log"][-1]["events"]:
 			if not previous in entry["events"]: entry["events"].push_front(previous)
 		for faction in losses: entry["losses"][faction] = maxi(losses[faction],data["log"][-1]["losses"].get(faction,0))
@@ -115,15 +116,15 @@ static func record_day(war, before: Array) -> void:
 static func summary(war) -> Dictionary:
 	var data := book(war)
 	var log: Array = data.get("log",[])
-	var duels: Array = war.state.get("duels",{}).get("records",[]).filter(func(d): return int(d["tick"]) >= int(data.get("started_at",0)))
+	var duels: Array = war.state.get(StateKeys.DUELS,{}).get("records",[]).filter(func(d): return int(d["tick"]) >= int(data.get("started_at",0)))
 	var events := []
 	for row in log: events.append_array(row["events"])
 	# The final milestone may occur after record_day; explicit review includes it immediately.
 	for pending in data.get("pending_events", []):
 		if not pending in events: events.append(pending)
 	var loot := {}
-	for corps in war.state["corps"].values():
-		var root: Dictionary = war.state["armies"].get(corps["root_id"],{})
+	for corps in war.state[StateKeys.CORPS].values():
+		var root: Dictionary = war.state[StateKeys.ARMIES].get(corps["root_id"],{})
 		if data.has("battle_id") and root.get("battlefield_id","") != data["battle_id"]: continue
 		loot[corps["faction"]] = float(loot.get(corps["faction"],0))+float(corps.get("looted_grain",0))
-	return {"days":int(data.get("ended_at",war.state["tick"]))-int(data.get("started_at",0)),"winner":data.get("winner","交战中"),"field_winner":data.get("field_winner",""),"field_winner_at":int(data.get("field_winner_at",0)),"sides":snapshot(war),"log":log,"duels":duels.filter(func(d):return d["result"] != "refused").size(),"challenges":duels.size(),"overwhelming":duels.filter(func(d):return d["result"] == "overwhelming").size(),"events":events,"loot":loot,"sieges":war.state.get("sieges",{}).values().filter(func(s):return int(s.get("started",0)) >= int(data.get("started_at",0)))}
+	return {"days":int(data.get("ended_at",war.state[StateKeys.TICK]))-int(data.get("started_at",0)),"winner":data.get("winner","交战中"),"field_winner":data.get("field_winner",""),"field_winner_at":int(data.get("field_winner_at",0)),"sides":snapshot(war),"log":log,"duels":duels.filter(func(d):return d["result"] != "refused").size(),"challenges":duels.size(),"overwhelming":duels.filter(func(d):return d["result"] == "overwhelming").size(),"events":events,"loot":loot,"sieges":war.state.get(StateKeys.SIEGES,{}).values().filter(func(s):return int(s.get("started",0)) >= int(data.get("started_at",0)))}

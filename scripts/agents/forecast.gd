@@ -8,6 +8,7 @@ extends RefCounted
 
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 const MELEE := ["engage", "flank", "pursue", "besiege"]
 const ESTIMATE := {"training": 50, "equipment": 50, "morale": 70.0, "organization": 70.0, "fatigue": 0.0, "skills": {}, "ranged_attack": false}
@@ -113,7 +114,7 @@ static func _nearest_observed(war, army: Dictionary, enemies: Dictionary) -> Dic
 	var best_distance := 1 << 30
 	for id in enemies.keys():
 		var sight: Dictionary = enemies[id]
-		if int(sight.get("observed_at",-1)) != int(war.state["tick"]): continue
+		if int(sight.get("observed_at",-1)) != int(war.state[StateKeys.TICK]): continue
 		var enemy: Dictionary = _estimate_from(sight)
 		if enemy.is_empty(): continue
 		var distance := 0
@@ -194,7 +195,7 @@ static func _flank_risk(war, army: Dictionary, target_id: String) -> float:
 		if str(other.get("id", "")) == str(target_id): continue
 		var record: Dictionary = observed.get(str(other["id"]), {})
 		if record.is_empty(): continue
-		if int(record.get("observed_at", -1)) < int(war.state["tick"]) - int(war.rules.get("intel_expiry_days", 4)): continue
+		if int(record.get("observed_at", -1)) < int(war.state[StateKeys.TICK]) - int(war.rules.get("intel_expiry_days", 4)): continue
 		enemies += 1
 	return clampf(float(enemies) / maxf(float(allies + enemies + 1), 1.0), 0.0, 1.0)
 
@@ -221,7 +222,7 @@ static func _travel_days(war, army: Dictionary, node: String = "") -> int:
 
 
 static func _cell_of(war, node: String) -> int:
-	var board: Dictionary = war.state.get("battlefield", {})
+	var board: Dictionary = war.state.get(StateKeys.BATTLEFIELD, {})
 	var objective := int(board.get("objectives", {}).get(node, -1))
 	return objective
 
@@ -229,7 +230,7 @@ static func _cell_of(war, node: String) -> int:
 static func _nearest_friendly(war, army: Dictionary) -> String:
 	if army.has("tactical"):
 		var cell := int(army["tactical"]["cell"])
-		var board: Dictionary = war.state.get("battlefield", {})
+		var board: Dictionary = war.state.get(StateKeys.BATTLEFIELD, {})
 		var best := ""
 		var best_distance := 1 << 30
 		for node in board.get("objectives", {}):

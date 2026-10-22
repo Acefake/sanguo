@@ -5,6 +5,7 @@ extends RefCounted
 const Grid = preload("res://scripts/world/rtk14_hex_grid.gd")
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Fate = preload("res://scripts/war/campaign/officer_fate.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 static var _native: Array = []
 static var _positions: Dictionary = {}
 static var _sites: Dictionary = {}
@@ -182,7 +183,7 @@ static func blocked_for(war, board: Dictionary, faction: String) -> Array:
 	for site in board.get("fortifications", {}).values():
 		var node := str(site["id"])
 		var friendly: bool = node != "" and war.store.city_state(node).get("faction", "") == faction
-		var siege: Dictionary = war.state.get("sieges", {}).get(node, {})
+		var siege: Dictionary = war.state.get(StateKeys.SIEGES, {}).get(node, {})
 		var breach: int = int(siege.get("breach_cell", -1))
 		# 破口状态：新档读 breach_open；旧档用 breach_cell / wall<=0 兜底。
 		var open: bool = bool(siege.get("breach_open", false)) or breach >= 0 or (not siege.is_empty() and float(siege.get("wall", 1.0)) <= 0.0)
@@ -324,22 +325,22 @@ static func breach(war, node: String, attackers: Array) -> void:
 		gate = int(candidates[0])
 	elif not candidates.has(gate):
 		gate = int(candidates[0])
-	war.state["sieges"][node]["breach_cell"] = gate
-	war.state["sieges"][node]["breach_open"] = true
+	war.state[StateKeys.SIEGES][node]["breach_cell"] = gate
+	war.state[StateKeys.SIEGES][node]["breach_open"] = true
 	for army in war.active_armies():
 		if army.has("tactical"):
 			army["tactical"].erase("previous_goal")
 			army["tactical"].erase("flank_goal")
 
 static func fire(war) -> void:
-	war.state["city_volleys"] = []
+	war.state[StateKeys.CITY_VOLLEYS] = []
 	var grid = Grid.shared()
 	var cities: Array = war.store.scenario.get("places", {}).keys()
 	cities.sort()
 	for node in cities:
 		var city: Dictionary = war.store.city_state(node)
 		if not city.has("garrison") or int(city.get("garrison", 0)) <= 0: continue
-		if int(city.get("last_volley_tick", -10)) + 2 > int(war.state["tick"]): continue
+		if int(city.get("last_volley_tick", -10)) + 2 > int(war.state[StateKeys.TICK]): continue
 		var site := for_city(war.store, node)
 		if site.is_empty(): continue
 		var targets: Array = []
@@ -364,7 +365,7 @@ static func fire(war) -> void:
 		var count := mini(targets.size(), archers)
 		var share := archers / count
 		var remainder := archers % count
-		city["last_volley_tick"] = int(war.state["tick"])
+		city["last_volley_tick"] = int(war.state[StateKeys.TICK])
 		for index in range(count):
 			var target: Dictionary = targets[index]
 			var shooters: int = share + (1 if index < remainder else 0)
@@ -376,5 +377,5 @@ static func fire(war) -> void:
 			Fate.credit_garrison(war, guard, int(target["dead"]) - dead_before, float(hit.get("personal_fraction", 0)))
 			war.Feedback.loss(war, target, loss)
 			war._check_rout(target)
-			war.state["city_volleys"].append({"id": "%s:%d:%s" % [node, int(war.state["tick"]), target["id"]], "city": node, "faction": city.get("faction", ""), "target": target["id"], "target_cell": target_cell, "source_cell": int(site["center"]), "wall_height": site["height"], "tick": int(war.state["tick"]), "loss": loss, "shooters": shooters, "target_count": count})
+			war.state[StateKeys.CITY_VOLLEYS].append({"id": "%s:%d:%s" % [node, int(war.state[StateKeys.TICK]), target["id"]], "city": node, "faction": city.get("faction", ""), "target": target["id"], "target_cell": target_cell, "source_cell": int(site["center"]), "wall_height": site["height"], "tick": int(war.state[StateKeys.TICK]), "loss": loss, "shooters": shooters, "target_count": count})
 			war._report(target, "城墙反击", "%s城防向%s齐射，损失%d人。" % [war.graph.name_of(node), target["name"], loss], false)

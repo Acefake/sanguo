@@ -9,6 +9,7 @@ const Fate = preload("res://scripts/war/campaign/officer_fate.gd")
 const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 const Defense = preload("res://scripts/war/battle/city_defense.gd")
 const Roles = preload("res://scripts/war/battle/troop_roles.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 static func at_city(war, army: Dictionary, node: String, radius: int = 2) -> bool:
 	if not war.ready(army): return false
@@ -26,7 +27,7 @@ static func resolve(war) -> void:
 		var bow_support: bool = Roles.kind(army) == "archers"
 		if war.Terrain.entry_factor(army,war.rules) <= 0 or army["returning"] or army["mission_type"] != "capture" or not war.hostile(str(city.get("faction", "")), str(army["faction"])) or not at_city(war, army, node, 3 if bow_support else 2): continue
 		if not war.orders_for(army)["engage"]: continue
-		var army_corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+		var army_corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 		if army.has("tactical") and army_corps.get("autonomous_deployment", false) and not army_corps.get("siege_approach", false): continue
 		if not army.has("tactical") and army["action"]["type"] != "besiege" and not army.has("corps_id"): continue
 		if army.has("tactical") and army.get("corps_task", {}).get("type", "main_attack") not in ["main_attack", "support", "command", "raid_rear", "flank"]: continue
@@ -41,17 +42,17 @@ static func resolve(war) -> void:
 		processed[node] = true
 		var city: Dictionary = war.store.city_state(node)
 		war._sync_inventory(city)
-		var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
-		if not corps.is_empty(): army = war.state["armies"][corps["root_id"]]
-		var siege: Dictionary = war.state["sieges"].get(node, {})
+		var corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
+		if not corps.is_empty(): army = war.state[StateKeys.ARMIES][corps["root_id"]]
+		var siege: Dictionary = war.state[StateKeys.SIEGES].get(node, {})
 		if siege.is_empty() or siege["attacker"] != army["faction"] or siege.get("phase", "") == "occupied":
 			if not siege.is_empty(): Defense.persist(war, node, siege)
 			siege = Defense.create(war, node, army)
-			war.state["sieges"][node] = siege
+			war.state[StateKeys.SIEGES][node] = siege
 		Defense.migrate(war, node, siege)
-		if siege["last_tick"] == int(war.state["tick"]): continue
-		siege["last_tick"] = int(war.state["tick"])
-		siege["active_tick"] = int(war.state["tick"])
+		if siege["last_tick"] == int(war.state[StateKeys.TICK]): continue
+		siege["last_tick"] = int(war.state[StateKeys.TICK])
+		siege["active_tick"] = int(war.state[StateKeys.TICK])
 		siege["mode"] = corps.get("siege_mode", "assault") if war.supply_enabled() else "assault"
 		siege["participants"] = group.map(func(unit): return unit["id"])
 		var relief := false
@@ -86,7 +87,7 @@ static func resolve(war) -> void:
 		if corps.get("siege_approach", false):
 			var expected := 0
 			for id in corps["units"]:
-				var unit: Dictionary = war.state["armies"][id]
+				var unit: Dictionary = war.state[StateKeys.ARMIES][id]
 				if unit["status"] != "ended" and not unit["returning"] and unit["corps_task"]["type"] in ["main_attack", "flank"]: expected += Combat.strength(unit)
 			assembling = strength < expected * 0.75
 		siege["assembling"] = assembling
@@ -132,7 +133,7 @@ static func resolve(war) -> void:
 			wall_loss = int(defense_hit["loss"])
 			for unit in wall_targets:
 				unit["action"] = {"type": "besiege"}
-				unit["combat_tick"] = int(war.state["tick"])
+				unit["combat_tick"] = int(war.state[StateKeys.TICK])
 				unit["fatigue"] = minf(100, float(unit["fatigue"]) + Process.fatigue_cost(unit, 3, true))
 				if unit.has("tactical"): unit["tactical"]["phase"] = "破墙攻城"
 		if not entered.is_empty():
@@ -143,7 +144,7 @@ static func resolve(war) -> void:
 			defender_personal += float(exchange["defender_personal"])
 			defender_combat = true
 			for unit in entered:
-				unit["combat_tick"] = int(war.state["tick"])
+				unit["combat_tick"] = int(war.state[StateKeys.TICK])
 				unit["action"] = {"type": "besiege"}
 				unit["fatigue"] = minf(100, float(unit["fatigue"]) + Process.fatigue_cost(unit, 3, true))
 				if unit.has("tactical"): unit["tactical"]["phase"] = "入城巷战"
@@ -224,10 +225,10 @@ static func resolve(war) -> void:
 				Fate.city_falls(war, guard, army)
 				siege["phase"] = "occupied"
 		war.store.city_changed.emit(node)
-	for node in war.state["sieges"]:
-		var siege: Dictionary = war.state["sieges"][node]
-		if siege.get("phase", "") != "occupied" and int(siege.get("active_tick", -10)) != int(war.state["tick"]):
+	for node in war.state[StateKeys.SIEGES]:
+		var siege: Dictionary = war.state[StateKeys.SIEGES][node]
+		if siege.get("phase", "") != "occupied" and int(siege.get("active_tick", -10)) != int(war.state[StateKeys.TICK]):
 			if siege.get("phase", "") != "解围": war.store.city_state(node)["defense"] = ceili(float(siege["wall"]) / 4.0)
 			siege["phase"] = "解围"
 			var officer: String = str(siege.get("commander_id", ""))
-			if not Fate.unavailable(war, officer) and war.state["officer_states"].get(officer, {}).get("status", "") == "guarding": war.state["officer_states"][officer] = {"status":"available", "city": node}
+			if not Fate.unavailable(war, officer) and war.state[StateKeys.OFFICER_STATES].get(officer, {}).get("status", "") == "guarding": war.state[StateKeys.OFFICER_STATES][officer] = {"status":"available", "city": node}

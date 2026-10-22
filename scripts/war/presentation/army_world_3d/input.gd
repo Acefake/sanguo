@@ -9,7 +9,7 @@ func _focus_battle() -> void:
 	center /= maxf(destinations.size(), 1)
 	map.camera_target = center
 	map.target_goal = center
-	map.distance = float(store.war.state.get("battlefield", {}).get("camera_distance", 180))
+	map.distance = float(store.war.state.get(StateKeys.BATTLEFIELD, {}).get("camera_distance", 180))
 	map.distance_goal = map.distance
 	map.pitch = deg_to_rad(58)
 	map._update_camera()
@@ -17,9 +17,9 @@ func _focus_battle() -> void:
 func _select_global_cell(cell: int, preview: bool) -> void:
 	if preview: return
 	for id in formations:
-		var army: Dictionary = store.war.state["armies"].get(id, {})
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 		if not army.has("tactical") or int(army["tactical"]["cell"]) != cell: continue
-		if army["faction"] == store.war.state["player_faction"]: ui.show_army(id)
+		if army["faction"] == store.war.state[StateKeys.PLAYER_FACTION]: ui.show_army(id)
 		elif observed_enemies.has(id): show_enemy(id)
 		return
 
@@ -48,7 +48,7 @@ func focus_army(id: String) -> void:
 		intent_overlay = preload("res://scripts/war/presentation/tactical_intent_overlay.gd").new()
 		intent_overlay.map = map
 		add_child(intent_overlay)
-	intent_overlay.show_plan(store.war,store.war.state["armies"][id])
+	intent_overlay.show_plan(store.war,store.war.state[StateKeys.ARMIES][id])
 	for item in badges:
 		badges[item].highlighted = item == id
 		badges[item].queue_redraw()
@@ -57,7 +57,7 @@ func focus_army(id: String) -> void:
 func deploy_city(city: String) -> void:
 	var target: String = str(city_aliases.get(city, ""))
 	if target != "":
-		if store.city_state(target).get("faction", "") == store.war.state["player_faction"]:
+		if store.city_state(target).get("faction", "") == store.war.state[StateKeys.PLAYER_FACTION]:
 			ui.show_dispatch_from(target)
 		else:
 			ui.dispatch_home = ""

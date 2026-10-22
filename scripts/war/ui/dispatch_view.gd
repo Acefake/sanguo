@@ -4,6 +4,7 @@ signal dispatched(id: String)
 const CitySkin = preload("res://scripts/ui/city_ui_skin.gd")
 const Corps = preload("res://scripts/war/campaign/army_corps.gd")
 const Structure = preload("res://scripts/war/campaign/corps_structure.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var store: Node
 var target := ""
 var home_hint := ""
@@ -95,7 +96,7 @@ func _ready() -> void:
 	sources = choice(left, "出发城")
 	targets = choice(left, "出征目标")
 	chiefs = choice(left, "部队长 / 主帅")
-	officers = store.war.available_officers(str(store.war.state["player_faction"]))
+	officers = store.war.available_officers(str(store.war.state[StateKeys.PLAYER_FACTION]))
 	officers.sort_custom(func(a, b): return Corps.suitability(a, "主帅") > Corps.suitability(b, "主帅"))
 	portrait_paths = JSON.parse_string(FileAccess.get_file_as_string("res://data/officer_portraits.json"))
 	for officer in officers:
@@ -107,7 +108,7 @@ func _ready() -> void:
 		targets.set_item_metadata(targets.item_count - 1, id)
 		if str(id) == target: targets.select(targets.item_count - 1)
 		var city: Dictionary = store.city_state(str(id))
-		if not city.has("garrison") or city.get("faction", "") != store.war.state["player_faction"]: continue
+		if not city.has("garrison") or city.get("faction", "") != store.war.state[StateKeys.PLAYER_FACTION]: continue
 		sources.add_item(store.war.graph.name_of(str(id)))
 		sources.set_item_metadata(sources.item_count - 1, id)
 		var path: Dictionary = store.war.graph.path(str(id), target)
@@ -391,12 +392,12 @@ func deploy() -> void:
 	var plan: Dictionary = current_plan()
 	var validation: Dictionary = Corps.validate_plan(store.war, chief, members(), plan, int(troops.value))
 	if not validation.get("ok", false): notice.text = str(validation.get("message", "编制无效")); return
-	store.war.state["pending_corps_plan"] = plan
+	store.war.state[StateKeys.PENDING_CORPS_PLAN] = plan
 	var result: Dictionary = store.war.dispatch(selection(sources), selection(targets), chief, members(), true, int(troops.value))
 	if result.get("ok", false):
 		dispatched.emit(result["army_id"]); queue_free()
 	else:
-		store.war.state.erase("pending_corps_plan")
+		store.war.state.erase(StateKeys.PENDING_CORPS_PLAN)
 		notice.text = result["message"]; refresh()
 
 func _unhandled_key_input(event: InputEvent) -> void:

@@ -6,6 +6,7 @@ signal reports_requested(id: String)
 const Explain = preload("res://scripts/officers/officer_explain.gd")
 const UISkin = preload("res://scripts/war/ui/war_ui_skin.gd")
 const CommandRoles = preload("res://scripts/war/campaign/army_command_roles.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var store: Node
 var army_id := ""
 var portrait: TextureRect
@@ -215,7 +216,7 @@ static func decision(war, army: Dictionary) -> Dictionary:
 		var phase := str({"approach":"接近","execute":"执行","wait_support":"等待正面配合","disengage":"准备脱离","reposition":"前往接应位置","recover":"整顿恢复","rejoin":"准备重新投入"}.get(plan.get("stage",""),"执行"))
 		var text := "%s · %s\n%s\n下一步：%s\n改判：%s" % [plan["label"],phase,army.get("last_reason",""),plan.get("next",""),plan.get("stop_condition","")]
 		return {"text":text,"source":ai.get("last_source","baseline"),"tick":int(ai.get("submitted_round",-1)),"pending":false,"applied":true,"thinking":war.planner.has_pending("unit:"+str(army["id"]))}
-	var corps: Dictionary = war.state["corps"].get(army.get("corps_id", ""), {})
+	var corps: Dictionary = war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	var key := "army:" + str(army["id"]) if corps.is_empty() else "corps:" + str(corps["id"])
 	if war.planner.ready.has(key):
 		var proposal: Dictionary = war.planner.ready[key]
@@ -236,7 +237,7 @@ static func decision(war, army: Dictionary) -> Dictionary:
 
 func update_info() -> void:
 	if not is_instance_valid(portrait): return
-	var army: Dictionary = store.war.state["armies"].get(army_id, {})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(army_id, {})
 	if army.is_empty(): return
 	var card: Dictionary = store.war.roster.officers.get(army["officer_id"], {})
 	var path := str(portrait_paths.get(card.get("name", ""), {}).get("portrait", ""))
@@ -267,7 +268,7 @@ func update_info() -> void:
 	var faction: Dictionary = store.scenario["factions"].get(army["faction"], {})
 	plaque.badge = str(faction.get("name", "军")).left(1)
 	plaque.queue_redraw()
-	wounded.text = "伤兵 %d\n主将杀敌 %d   部队杀敌 %d" % [int(army["wounded"]), int(store.war.state["officer_personal_kills"].get(army["officer_id"], 0)), int(army.get("enemy_killed", 0)) - int(army.get("personal_soldier_kills", 0))]
+	wounded.text = "伤兵 %d\n主将杀敌 %d   部队杀敌 %d" % [int(army["wounded"]), int(store.war.state[StateKeys.OFFICER_PERSONAL_KILLS].get(army["officer_id"], 0)), int(army.get("enemy_killed", 0)) - int(army.get("personal_soldier_kills", 0))]
 	grain.visible = store.war.supply_enabled()
 	grain.text = "余粮  约%d日" % int(float(army["grain"]) / maxf(store.war.daily_food(army), 0.001))
 	for key in bars:
@@ -276,7 +277,7 @@ func update_info() -> void:
 		var danger: bool = float(army[key]) > 80 if key == "fatigue" else float(army[key]) < 30
 		numbers[key].add_theme_color_override("font_color", UISkin.RED if danger else UISkin.INK)
 	target.text = "目标  " + store.war.graph.name_of(str(army["target"]))
-	var corps: Dictionary = store.war.state["corps"].get(army.get("corps_id", ""), {})
+	var corps: Dictionary = store.war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	wounded.tooltip_text = "战斗主将：%s\n军团主帅：%s\n主将杀敌：亲自击杀士兵或单挑斩将。\n部队杀敌：士兵造成的实际阵亡，不含主将击杀、伤兵和俘虏。" % [card.get("name", "无"), store.war.roster.officers.get(corps.get("commander_id", ""), {}).get("name", "无")]
 	wounded.mouse_filter = MOUSE_FILTER_PASS
 	var terrain: String = store.war.Terrain.name_of(store.war.Tactical.terrain_class(army["tactical"]["cell"])) if army.has("tactical") else "行军途中"

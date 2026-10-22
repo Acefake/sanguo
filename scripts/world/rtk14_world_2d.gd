@@ -7,6 +7,7 @@ const MAP_BOUNDS := Rect2(372, 128, 1548, 1792)
 const HexGrid = preload("res://scripts/world/rtk14_hex_grid.gd")
 const HexOverlay = preload("res://scripts/world/rtk14_hex_overlay.gd")
 const Fortifications = preload("res://scripts/war/battle/city_fortifications.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var hex_grid = HexGrid.shared()
 var hex_overlay: Node2D
 var hovered_cell := -1
@@ -240,7 +241,7 @@ func _preview_cell_path(goal: int) -> void:
 	else:
 		var bounds := {"min_column": 0, "max_column": 219, "min_row": 0, "max_row": 219, "blocked": []}
 		Fortifications.attach(GameState.war, bounds)
-		cell_path = hex_grid.find_path(selected_cell, goal, Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state["player_faction"])))
+		cell_path = hex_grid.find_path(selected_cell, goal, Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state[StateKeys.PLAYER_FACTION])))
 		path_message = "路径预览：%d 格" % cell_path.size() if not cell_path.is_empty() else "此地形不可通行，或两格之间无通路"
 	_refresh_cell_panel()
 	queue_redraw()

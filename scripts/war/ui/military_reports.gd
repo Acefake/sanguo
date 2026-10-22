@@ -4,6 +4,7 @@ signal army_requested(id: String)
 signal closed
 const UISkin = preload("res://scripts/war/ui/war_ui_skin.gd")
 const Feedback = preload("res://scripts/war/battle/battle_feedback.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var store: Node
 var window: PanelContainer
 var report_list: VBoxContainer
@@ -156,8 +157,8 @@ func _populate_filters() -> void:
 	army_filter.clear()
 	army_filter.add_item("全部部队")
 	army_filter.set_item_metadata(0, "")
-	for army in store.war.state["armies"].values():
-		if army["faction"] != store.war.state["player_faction"]: continue
+	for army in store.war.state[StateKeys.ARMIES].values():
+		if army["faction"] != store.war.state[StateKeys.PLAYER_FACTION]: continue
 		army_filter.add_item(str(army["name"]))
 		army_filter.set_item_metadata(army_filter.item_count - 1, army["id"])
 		if army["id"] == filter_army: army_filter.select(army_filter.item_count - 1)
@@ -168,7 +169,7 @@ func refresh() -> void:
 	# whole list for every intermediate day. The live inspector updates separately.
 	if store.busy: return
 	if mode == "review": return
-	var changed := JSON.stringify([store.war.state["tick"], store.war.state["reports"].size(), store.war.visible_reports().size(), store.war.state["armies"].size()])
+	var changed := JSON.stringify([store.war.state[StateKeys.TICK], store.war.state[StateKeys.REPORTS].size(), store.war.visible_reports().size(), store.war.state[StateKeys.ARMIES].size()])
 	if changed == signature: return
 	var previous_report := selected_report
 	var list_position := list_scroll.scroll_vertical
@@ -179,8 +180,8 @@ func refresh() -> void:
 	if previous_report == selected_report: detail_scroll.set_deferred("scroll_vertical", detail_position)
 
 func _matches(report: Dictionary) -> bool:
-	var army: Dictionary = store.war.state["armies"].get(report.get("army_id", ""), {})
-	if report.get("faction", army.get("faction", "")) != store.war.state["player_faction"]: return false
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(report.get("army_id", ""), {})
+	if report.get("faction", army.get("faction", "")) != store.war.state[StateKeys.PLAYER_FACTION]: return false
 	if filter_army != "" and report["army_id"] != filter_army: return false
 	var kind := str(report["kind"])
 	if kind_filter.selected == 1: return kind.contains("战") or kind.contains("城") or kind.contains("追击") or kind.contains("单挑")
@@ -189,8 +190,8 @@ func _matches(report: Dictionary) -> bool:
 	return true
 
 func rebuild() -> void:
-	signature = JSON.stringify([store.war.state["tick"], store.war.state["reports"].size(), store.war.visible_reports().size(), store.war.state["armies"].size()])
-	subtitle.text = "%s  %s  第%d日" % [store.scenario["factions"].get(store.war.state["player_faction"], {}).get("name", "本军"), store.date_text(), store.war.state["tick"]]
+	signature = JSON.stringify([store.war.state[StateKeys.TICK], store.war.state[StateKeys.REPORTS].size(), store.war.visible_reports().size(), store.war.state[StateKeys.ARMIES].size()])
+	subtitle.text = "%s  %s  第%d日" % [store.scenario["factions"].get(store.war.state[StateKeys.PLAYER_FACTION], {}).get("name", "本军"), store.date_text(), store.war.state[StateKeys.TICK]]
 	UISkin.style_button(report_tab, mode == "reports")
 	UISkin.style_button(summary_tab, mode == "summary")
 	army_filter.visible = mode == "reports"
@@ -211,7 +212,7 @@ func rebuild() -> void:
 	if not entries.any(func(item): return str(item["id"]) == selected_report): selected_report = str(entries[0]["id"])
 	for report in entries:
 		var id := str(report["id"])
-		var army: Dictionary = store.war.state["armies"].get(report["army_id"], {})
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(report["army_id"], {})
 		var button := UISkin.button("", func(): select_report(id))
 		var row_style := StyleBoxFlat.new()
 		row_style.bg_color = Color("e1d4b8") if selected_report == id else Color(0.9, 0.87, 0.78, 0.15)
@@ -269,7 +270,7 @@ func _show_report(id: String) -> void:
 	for item in entries:
 		if str(item["id"]) == id: report = item; break
 	if report.is_empty(): return
-	var army: Dictionary = store.war.state["armies"].get(report["army_id"], {})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(report["army_id"], {})
 	var snapshot: Dictionary = report.get("snapshot", {})
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 12)
@@ -313,7 +314,7 @@ func _show_report(id: String) -> void:
 	if not army.is_empty(): actions.add_child(UISkin.button("战役复盘" if snapshot.get("ended", false) else "当前复盘", func(): show_review(army_id)))
 
 func _visible_side(row: Dictionary, summary: Dictionary) -> bool:
-	return store.battle_test or summary["winner"] != "交战中" or row["faction"] == store.war.state["player_faction"]
+	return store.battle_test or summary["winner"] != "交战中" or row["faction"] == store.war.state[StateKeys.PLAYER_FACTION]
 
 func _build_summary() -> void:
 	UISkin.clear(detail)
@@ -329,23 +330,23 @@ func _build_summary() -> void:
 		_metric_row(box, [["初始兵力", side["initial"]], ["当前兵力", side["strength"]], ["阵亡", side["dead"]]])
 		box.add_child(UISkin.label("伤兵 %d    被俘 %d    溃散 %d    归队 / 留驻 %d\n截获粮草 %d    兵员核对：%s" % [side["wounded"], side["captured"], side.get("dispersed", 0), side["deposited"], summary["loot"].get(side["faction"], 0), "守恒" if side["initial"] == side["accounted"] else "需核对"], 13))
 	for siege in summary["sieges"]:
-		if not store.battle_test and summary["winner"] == "交战中" and siege["attacker"] != store.war.state["player_faction"]: continue
+		if not store.battle_test and summary["winner"] == "交战中" and siege["attacker"] != store.war.state[StateKeys.PLAYER_FACTION]: continue
 		_section(store.war.graph.name_of(siege["city"]) + "  城池攻防", "%s  城墙%d/%d\n守军累计损失%d  攻城部队累计损失%d" % [siege["phase"], siege["wall"], siege["wall_max"], siege["defender_losses"], siege["losses"]])
-		var guard: Dictionary = store.war.state["garrison_commanders"].get(siege["city"], {})
-		if not guard.is_empty(): detail.add_child(UISkin.label("守城主将 %s  主将杀敌 %d  部队杀敌 %d" % [guard["name"], store.war.state["officer_personal_kills"].get(guard["officer_id"], 0), int(guard.get("enemy_killed", 0)) - int(guard.get("personal_soldier_kills", 0))], 13))
+		var guard: Dictionary = store.war.state[StateKeys.GARRISON_COMMANDERS].get(siege["city"], {})
+		if not guard.is_empty(): detail.add_child(UISkin.label("守城主将 %s  主将杀敌 %d  部队杀敌 %d" % [guard["name"], store.war.state[StateKeys.OFFICER_PERSONAL_KILLS].get(guard["officer_id"], 0), int(guard.get("enemy_killed", 0)) - int(guard.get("personal_soldier_kills", 0))], 13))
 	var officers := UISkin.section(detail, "杀敌战绩  主将与部队")
-	var credited: Dictionary = store.war.state.get("officer_kills", {}).duplicate()
-	credited.merge(store.war.state["officer_personal_kills"])
+	var credited: Dictionary = store.war.state.get(StateKeys.OFFICER_KILLS, {}).duplicate()
+	credited.merge(store.war.state[StateKeys.OFFICER_PERSONAL_KILLS])
 	for officer_id in credited:
 		var card: Dictionary = store.war.roster.officers.get(officer_id, {})
-		if not store.battle_test and card.get("faction", "") != store.war.state["player_faction"] and summary["winner"] == "交战中": continue
-		officers.add_child(UISkin.label("%s    主将杀敌 %d    部队杀敌 %d" % [card.get("name", officer_id), store.war.state["officer_personal_kills"].get(officer_id, 0), int(store.war.state["officer_kills"].get(officer_id, 0)) - int(store.war.state["officer_personal_soldiers"].get(officer_id, 0))], 13))
+		if not store.battle_test and card.get("faction", "") != store.war.state[StateKeys.PLAYER_FACTION] and summary["winner"] == "交战中": continue
+		officers.add_child(UISkin.label("%s    主将杀敌 %d    部队杀敌 %d" % [card.get("name", officer_id), store.war.state[StateKeys.OFFICER_PERSONAL_KILLS].get(officer_id, 0), int(store.war.state[StateKeys.OFFICER_KILLS].get(officer_id, 0)) - int(store.war.state[StateKeys.OFFICER_PERSONAL_SOLDIERS].get(officer_id, 0))], 13))
 	var fates := UISkin.section(detail, "武将战死与俘虏")
-	for officer_id in store.war.state.get("officer_fates", {}):
-		var fate: Dictionary = store.war.state["officer_fates"][officer_id]
-		if not store.battle_test and fate["faction"] != store.war.state["player_faction"] and fate.get("captor_faction", "") != store.war.state["player_faction"] and summary["winner"] == "交战中": continue
+	for officer_id in store.war.state.get(StateKeys.OFFICER_FATES, {}):
+		var fate: Dictionary = store.war.state[StateKeys.OFFICER_FATES][officer_id]
+		if not store.battle_test and fate["faction"] != store.war.state[StateKeys.PLAYER_FACTION] and fate.get("captor_faction", "") != store.war.state[StateKeys.PLAYER_FACTION] and summary["winner"] == "交战中": continue
 		fates.add_child(UISkin.label("第%d日  %s  %s\n%s" % [fate["tick"], fate["name"], {"dead":"战死", "captured":"被俘", "released":"已释放"}.get(fate["status"], fate["status"]), fate["cause"]], 13, UISkin.RED if fate["status"] == "dead" else UISkin.INK))
-		if fate["status"] == "captured" and fate.get("captor_faction", "") == store.war.state["player_faction"]:
+		if fate["status"] == "captured" and fate.get("captor_faction", "") == store.war.state[StateKeys.PLAYER_FACTION]:
 			var prisoner_id: String = str(officer_id)
 			fates.add_child(UISkin.button("释放 " + str(fate["name"]), func(): preload("res://scripts/war/campaign/officer_fate.gd").release(store.war, prisoner_id); store._save(); rebuild()))
 	if fates.get_child_count() <= 1: fates.add_child(UISkin.label("暂无武将战死或被俘。", 13, UISkin.MUTED))
@@ -359,13 +360,13 @@ func _build_summary() -> void:
 			if not _visible_side(side, summary): continue
 			lines.append("%s  %d人  士气%.0f  组织%.0f  损失%d" % [store.scenario["factions"].get(side["faction"], {}).get("name", side["faction"]), side["strength"], side["morale"], side["org"], entry["losses"].get(side["faction"], 0)])
 		for event in entry["events"]:
-			if store.battle_test or event["faction"] in ["", store.war.state["player_faction"]] or summary["winner"] != "交战中": lines.append(event["kind"] + "  " + event["message"])
+			if store.battle_test or event["faction"] in ["", store.war.state[StateKeys.PLAYER_FACTION]] or summary["winner"] != "交战中": lines.append(event["kind"] + "  " + event["message"])
 		_section("第%d日" % entry["tick"], "\n".join(lines))
-	for army in store.war.active_armies(str(store.war.state["player_faction"])):
+	for army in store.war.active_armies(str(store.war.state[StateKeys.PLAYER_FACTION])):
 		var id := str(army["id"])
 		report_list.add_child(UISkin.button(str(army["name"]) + "  当前复盘", func(): show_review(id)))
-	for army in store.war.state["armies"].values():
-		if army["faction"] != store.war.state["player_faction"] or army["status"] != "ended": continue
+	for army in store.war.state[StateKeys.ARMIES].values():
+		if army["faction"] != store.war.state[StateKeys.PLAYER_FACTION] or army["status"] != "ended": continue
 		var id := str(army["id"])
 		report_list.add_child(UISkin.button(str(army["name"]) + "  复盘", func(): show_review(id)))
 
@@ -383,7 +384,7 @@ func show_review(id: String) -> void:
 	count_label.text = "战役复盘" if army["status"] == "ended" else "当前复盘"
 	detail.add_child(UISkin.label(str(army["name"]) + "  " + str(army.get("outcome", "")), 22))
 	_metric_row(detail, [["出征", army["initial_strength"]], ["阵亡", army["dead"]], ["伤兵", army["wounded"]]])
-	_metric_row(detail, [["主将杀敌", store.war.state["officer_personal_kills"].get(army["officer_id"], 0)], ["部队杀敌", int(army.get("enemy_killed", 0)) - int(army.get("personal_soldier_kills", 0))]])
+	_metric_row(detail, [["主将杀敌", store.war.state[StateKeys.OFFICER_PERSONAL_KILLS].get(army["officer_id"], 0)], ["部队杀敌", int(army.get("enemy_killed", 0)) - int(army.get("personal_soldier_kills", 0))]])
 	detail.add_child(UISkin.label("被俘 %d  归队 %d" % [army["captured"], army.get("returned_strength", 0)], 13))
 	for item in army.get("decision_history", []):
 		var observation: Dictionary = item.get("observation", {})
@@ -393,7 +394,7 @@ func show_review(id: String) -> void:
 		for enemy in enemies: estimates.append("约%d人" % int(enemy.get("strength_estimate", 0)))
 		var description := "当时情报：%s\n士气%d\n行动：%s\n依据：%s" % ["未发现敌军" if estimates.is_empty() else "；".join(estimates), observed_army.get("morale", 0), {"march":"行军", "continue":"继续行军", "hold":"驻守整顿", "engage":"接战", "withdraw":"撤退", "scout":"侦察", "resupply":"补给", "besiege":"围城", "pursue":"追击", "flank":"侧翼绕行", "support":"协同支援", "request_support":"求援"}.get(item.get("action", {}).get("type", ""), "临机行动"), item.get("reason_summary", "")]
 		_section("第%d日  %s" % [item["tick"], "智能体" if item["source"] == "model" else "本地策略"], description)
-	var corps: Dictionary = store.war.state["corps"].get(army.get("corps_id", ""), {})
+	var corps: Dictionary = store.war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	for order in corps.get("orders", []):
 		_section("第%d日  主帅%s" % [order["tick"], "智能体判断" if order["source"] == "model" else "军令"], "%s\n%s" % [order.get("reason", ""), "已下达" if order.get("applied", {}).get("ok", false) else "执行条件不满足"])
 	if army.get("decision_history", []).is_empty() and corps.get("orders", []).is_empty(): detail.add_child(UISkin.label("暂无决策记录。", 13, UISkin.MUTED))

@@ -247,7 +247,7 @@ func _wall_contact_point(army: Dictionary, center: Vector3) -> Vector3:
 
 ## 按当前战役状态重建或同步全部军队节点、补给标记、徽章、城墙破口、敌情与战况面板。
 func refresh() -> void:
-	if is_instance_valid(intent_overlay) and store.war.state["armies"].has(selected_plan_army): intent_overlay.show_plan(store.war,store.war.state["armies"][selected_plan_army])
+	if is_instance_valid(intent_overlay) and store.war.state[StateKeys.ARMIES].has(selected_plan_army): intent_overlay.show_plan(store.war,store.war.state[StateKeys.ARMIES][selected_plan_army])
 	_update_city_breaches()
 	_refresh_battle_feedback()
 	_refresh_supplies()
@@ -259,16 +259,16 @@ func refresh() -> void:
 	var squad_numbers := {}
 	for original in store.war.active_armies():
 		var entry: Dictionary = original.duplicate(false)
-		if original["faction"] != store.war.state["player_faction"]:
+		if original["faction"] != store.war.state[StateKeys.PLAYER_FACTION]:
 			entry["faction"] = "observed_enemy"
 			entry["strength_estimate"] = store.war.Combat.strength(original)
 			observed_enemies[original["id"]] = store.war.enemy_intel(original)
 		entries.append(entry)
-	if not store.war.state.has("battlefield"):
+	if not store.war.state.has(StateKeys.BATTLEFIELD):
 		var grouped: Array = []
 		for entry in entries:
 			if entry.has("tactical"): grouped.append(entry); continue
-			var corps: Dictionary = store.war.state["corps"].get(entry.get("corps_id", ""), {})
+			var corps: Dictionary = store.war.state[StateKeys.CORPS].get(entry.get("corps_id", ""), {})
 			if not corps.is_empty():
 				if entry["id"] != corps["root_id"]: continue
 				entry = entry.duplicate(false)
@@ -333,7 +333,7 @@ func refresh() -> void:
 		var badge_side := str(army["faction"])
 		squad_numbers[badge_side] = int(squad_numbers.get(badge_side, 0)) + 1
 		badge.squad_number = int(squad_numbers[badge_side])
-		badge.hostile = enemy or store.war.hostile(str(store.war.state["player_faction"]), badge_side)
+		badge.hostile = enemy or store.war.hostile(str(store.war.state[StateKeys.PLAYER_FACTION]), badge_side)
 		badge.faction_color = Color("c86650") if enemy else Color(str(store.scenario["factions"].get(army["faction"], {}).get("color", "#8ac56b")))
 		badge.queue_redraw()
 		var batch: MultiMeshInstance3D = formations[id].get_node_or_null("Soldiers")
@@ -358,7 +358,7 @@ func refresh() -> void:
 			_layout_formation(formations[id], count)
 			_update_special_troops(group, bows, horses)
 			var flag_faction := str(army["faction"])
-			if enemy: flag_faction = str(store.war.state["armies"][id]["faction"])
+			if enemy: flag_faction = str(store.war.state[StateKeys.ARMIES][id]["faction"])
 			var flag_color := Color(str(store.scenario["factions"].get(flag_faction, {}).get("color", "#c86650")))
 			_set_flag(group, flag_faction, flag_color)
 			_update_siege_engines(group, army)
@@ -368,7 +368,7 @@ func refresh() -> void:
 	for id in formations.keys():
 		if not active.has(id):
 			if presenting:
-				var ended: Dictionary = store.war.state["armies"].get(id, {})
+				var ended: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 				if not ended.is_empty(): destinations[id] = _battle_point(int(ended["tactical"]["cell"])) if ended.has("tactical") else world_position(ended["location"])
 				continue
 			formations[id].queue_free()
@@ -507,7 +507,7 @@ func _set_flag(group: Node3D, faction: String, color: Color) -> void:
 	cloth.set_shader_parameter("faction_color",color)
 
 func _build_march_route(id: String) -> void:
-	var army: Dictionary = store.war.state["armies"].get(id,{})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 	if not army.has("tactical") or not motion_start.has(id): return
 	var path: Array = army["tactical"].get("move_path",[])
 	if path.size() < 2 or motion_start[id].distance_squared_to(destinations[id]) < 0.01:
@@ -639,11 +639,11 @@ func _layout_formation(group: Node3D, count: int) -> void:
 
 func _update_city_breaches() -> void:
 	for node in city_breaches:
-		var active: bool = int(store.war.state.get("sieges", {}).get(node, {}).get("breach_cell", -1)) >= 0
+		var active: bool = int(store.war.state.get(StateKeys.SIEGES, {}).get(node, {}).get("breach_cell", -1)) >= 0
 		city_breaches[node]["root"].visible = active
 		for material in city_breaches[node].get("materials", []): material.set_shader_parameter("breach_open", active)
-	for node in store.war.state.get("sieges", {}):
-		var siege: Dictionary = store.war.state["sieges"][node]
+	for node in store.war.state.get(StateKeys.SIEGES, {}):
+		var siege: Dictionary = store.war.state[StateKeys.SIEGES][node]
 		var cell := int(siege.get("breach_cell", -1))
 		if cell < 0: continue
 		var site := Fortifications.for_city(store, node)

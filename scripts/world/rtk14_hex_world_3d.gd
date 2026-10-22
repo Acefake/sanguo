@@ -5,6 +5,7 @@ signal cell_selected(cell: int, preview: bool)
 const Grid = preload("res://scripts/world/rtk14_hex_grid.gd")
 const MapSkin = preload("res://scripts/ui/city_ui_skin.gd")
 const Fortifications = preload("res://scripts/war/battle/city_fortifications.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var map: Node3D
 var grid = Grid.shared()
 var materials: Array[ShaderMaterial] = []
@@ -147,7 +148,7 @@ func select_screen(screen: Vector2, preview := false) -> void:
 	if preview and grid.valid(selected_cell) and grid.valid(cell):
 		var bounds := {"min_column": 0, "max_column": 219, "min_row": 0, "max_row": 219, "blocked": []}
 		Fortifications.attach(GameState.war, bounds)
-		path = grid.find_path(selected_cell, cell, Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state["player_faction"])))
+		path = grid.find_path(selected_cell, cell, Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state[StateKeys.PLAYER_FACTION])))
 		path_message = "路径预览：%d 格" % path.size() if not path.is_empty() else "两格之间无地面通路"
 		_build_path_mesh()
 	else:
@@ -215,7 +216,7 @@ func _refresh_panel() -> void:
 	var info: Dictionary = grid.info(cell)
 	var bounds := {"min_column": 0, "max_column": 219, "min_row": 0, "max_row": 219, "blocked": []}
 	Fortifications.attach(GameState.war, bounds)
-	info["walkable"] = info["walkable"] and not Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state["player_faction"])).has(cell)
+	info["walkable"] = info["walkable"] and not Fortifications.blocked_for(GameState.war, bounds, str(GameState.war.state[StateKeys.PLAYER_FACTION])).has(cell)
 	var city_id: String = grid.controller(cell)
 	var city_name := "未归属城市"
 	for city in map.city_data:

@@ -3,6 +3,7 @@ extends CanvasLayer
 signal army_dispatched(id: String)
 
 const CitySkin = preload("res://scripts/ui/city_ui_skin.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 const ACTION_NAMES := {"march": "行军", "continue": "继续行军", "hold": "驻守整顿", "scout": "侦察", "resupply": "补給", "engage": "接战", "besiege": "围城", "pursue": "追击", "withdraw": "撤退", "request_support": "求援", "flank": "侧翼绕行", "support": "协同支援", "reposition":"战术换位", "local_disengage":"准备局部脱离"}
 var store: Node
 var drawer: PanelContainer
@@ -47,7 +48,7 @@ func _ready() -> void:
 	toolbar.add_theme_constant_override("separation", 8)
 	canvas.add_child(toolbar)
 	if store.battle_test:
-		var scenario_button := _button("战场：" + str(store.war.state.get("battlefield", {}).get("scenario_name", "官渡列阵决战")) + "  ▾", store.open_battle_scenarios)
+		var scenario_button := _button("战场：" + str(store.war.state.get(StateKeys.BATTLEFIELD, {}).get("scenario_name", "官渡列阵决战")) + "  ▾", store.open_battle_scenarios)
 		scenario_picker = scenario_button
 		scenario_button.name = "BattleScenarioPicker"
 		scenario_button.position = Vector2(470, 112)
@@ -192,17 +193,17 @@ func refresh() -> void:
 
 
 func _refresh_status() -> void:
-	if is_instance_valid(scenario_picker): scenario_picker.text = "战场：" + str(store.war.state.get("battlefield",{}).get("scenario_name","平原会战")) + "  ▾"
-	if not store.war.state.get("campaign_result", {}).is_empty():
-		status_label.text = str(store.war.state["campaign_result"]["message"])
+	if is_instance_valid(scenario_picker): scenario_picker.text = "战场：" + str(store.war.state.get(StateKeys.BATTLEFIELD,{}).get("scenario_name","平原会战")) + "  ▾"
+	if not store.war.state.get(StateKeys.CAMPAIGN_RESULT, {}).is_empty():
+		status_label.text = str(store.war.state[StateKeys.CAMPAIGN_RESULT]["message"])
 		next_button.disabled = true
 		if is_instance_valid(flow_button): flow_button.disabled = true
 		if not is_instance_valid(result_dialog):
 			result_dialog = AcceptDialog.new()
 			CitySkin.theme_window(result_dialog)
 			result_dialog.theme.set_color("title_color", "Window", Color("f4ebd5"))
-			result_dialog.title = "战役胜利" if store.war.state["campaign_result"]["status"] == "victory" else "战役结束"
-			result_dialog.dialog_text = str(store.war.state["campaign_result"]["message"])
+			result_dialog.title = "战役胜利" if store.war.state[StateKeys.CAMPAIGN_RESULT]["status"] == "victory" else "战役结束"
+			result_dialog.dialog_text = str(store.war.state[StateKeys.CAMPAIGN_RESULT]["message"])
 			result_dialog.ok_button_text = "检视战役"
 			result_dialog.add_button("返回开始页", false, "restart")
 			result_dialog.custom_action.connect(func(action):
@@ -260,9 +261,9 @@ func _show_dispatch_legacy(target: String) -> void:
 	for faction in factions:
 		faction_choice.add_item(str(store.scenario["factions"][faction]["name"]))
 		faction_choice.set_item_metadata(faction_choice.item_count - 1, faction)
-		if faction == store.war.state["player_faction"]:
+		if faction == store.war.state[StateKeys.PLAYER_FACTION]:
 			faction_choice.select(faction_choice.item_count - 1)
-	faction_choice.disabled = store.war.state.get("campaign_started", false) or not store.war.active_armies(str(store.war.state["player_faction"])).is_empty()
+	faction_choice.disabled = store.war.state.get(StateKeys.CAMPAIGN_STARTED, false) or not store.war.active_armies(str(store.war.state[StateKeys.PLAYER_FACTION])).is_empty()
 	faction_choice.item_selected.connect(func(index):
 		if store.war.set_player_faction(str(faction_choice.get_item_metadata(index))):
 			store._save()
@@ -276,7 +277,7 @@ func _show_dispatch_legacy(target: String) -> void:
 	var best_index: int = -1
 	for id in store.war.graph.places:
 		var city: Dictionary = store.city_state(str(id))
-		if not city.has("population") or str(city.get("faction", "")) != str(store.war.state["player_faction"]):
+		if not city.has("population") or str(city.get("faction", "")) != str(store.war.state[StateKeys.PLAYER_FACTION]):
 			continue
 		source_choice.add_item("%s  驻军%d" % [store.war.graph.name_of(str(id)), int(city.get("garrison", 0))])
 		source_choice.set_item_metadata(source_choice.item_count - 1, id)
@@ -292,17 +293,17 @@ func _show_dispatch_legacy(target: String) -> void:
 	body.add_child(_label("主将", 14))
 	officer_choice = OptionButton.new()
 	_style_field(officer_choice)
-	for officer in store.war.available_officers(str(store.war.state["player_faction"])):
+	for officer in store.war.available_officers(str(store.war.state[StateKeys.PLAYER_FACTION])):
 		officer_choice.add_item("%s  带兵%d" % [officer["name"], int(officer["skills"].get("带兵", 50))])
 		officer_choice.set_item_metadata(officer_choice.item_count - 1, officer["id"])
 	officer_choice.item_selected.connect(func(_index): _update_preview())
 	body.add_child(officer_choice)
 	body.add_child(_label("随军人员  最多选五人，按职位能力任命", 16))
 	companion_checks.clear()
-	for officer in store.war.available_officers(str(store.war.state["player_faction"])):
+	for officer in store.war.available_officers(str(store.war.state[StateKeys.PLAYER_FACTION])):
 		var check := CheckButton.new()
 		check.text = officer["name"] + "  " + str(officer.get("positions", "")).split("\n")[0]
-		check.button_pressed = store.war.Corps.select_members(store.war, str(officer_choice.get_item_metadata(officer_choice.selected)), store.war.available_officers(str(store.war.state["player_faction"])).map(func(o): return o["id"])).has(officer["id"])
+		check.button_pressed = store.war.Corps.select_members(store.war, str(officer_choice.get_item_metadata(officer_choice.selected)), store.war.available_officers(str(store.war.state[StateKeys.PLAYER_FACTION])).map(func(o): return o["id"])).has(officer["id"])
 		check.tooltip_text = officer.get("positions", "")
 		check.add_theme_font_override("font", CitySkin.font())
 		check.add_theme_color_override("font_color", CitySkin.INK)
@@ -366,7 +367,7 @@ func show_dispatch_from(home: String) -> void:
 		if str(id) == home: continue
 		var path: Dictionary = store.war.graph.path(home, str(id))
 		if not path["found"]: continue
-		var value: float = float(path["cost"]) + (1000 if store.city_state(str(id)).get("faction", "") == store.war.state["player_faction"] else 0)
+		var value: float = float(path["cost"]) + (1000 if store.city_state(str(id)).get("faction", "") == store.war.state[StateKeys.PLAYER_FACTION] else 0)
 		if value < cost:
 			target = str(id)
 			cost = value
@@ -396,7 +397,7 @@ func _prepare_drawer(kind: String) -> void:
 
 
 func show_army(id: String) -> void:
-	var army: Dictionary = store.war.state["armies"].get(id, {})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 	if army.is_empty(): return
 	if is_instance_valid(dispatch_view):
 		dispatch_view.queue_free()
@@ -422,7 +423,7 @@ func show_army(id: String) -> void:
 
 
 func show_army_orders(id: String) -> void:
-	var army: Dictionary = store.war.state["armies"].get(id, {})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 	if army.is_empty(): return
 	selected_army = id
 	page = "army_orders"
@@ -432,7 +433,7 @@ func show_army_orders(id: String) -> void:
 	heading.text = "军令  " + str(army["name"])
 	body.add_child(_button("返回部队信息", func(): show_army(id)))
 	var ended: bool = army["status"] == "ended"
-	var corps: Dictionary = store.war.state["corps"].get(army.get("corps_id", ""), {})
+	var corps: Dictionary = store.war.state[StateKeys.CORPS].get(army.get("corps_id", ""), {})
 	if not corps.is_empty():
 		body.add_child(_label("军团编制\n" + preload("res://scripts/war/ui/army_inspector.gd").personnel_text(store.war, corps), 13))
 	var withdraw_button := _button("全军撤退" if not corps.is_empty() and corps["root_id"] == id else "本队撤退", func():
@@ -537,7 +538,7 @@ func show_city_policy(selected: String = "") -> void:
 	heading.text = "城务与人事"
 	drawer.show()
 	_clear()
-	var owned: Array = store.war.Operations.cities(store.war, str(store.war.state["player_faction"]))
+	var owned: Array = store.war.Operations.cities(store.war, str(store.war.state[StateKeys.PLAYER_FACTION]))
 	if owned.is_empty(): body.add_child(_label("本方暂无城池", 16)); return
 	if not owned.has(selected): selected = str(owned[0])
 	var cities := OptionButton.new()
@@ -572,11 +573,11 @@ func show_city_policy(selected: String = "") -> void:
 		notice_label.text = result["message"]
 	))
 	var governor: Dictionary = store.war.roster.officers.get(store.city_state(selected).get("governor_id", ""), {})
-	var guard: Dictionary = store.war.state["garrison_commanders"].get(selected, {})
+	var guard: Dictionary = store.war.state[StateKeys.GARRISON_COMMANDERS].get(selected, {})
 	body.add_child(_label("太守：%s\n守将：%s" % [governor.get("name", "地方吏员代管"), guard.get("name", "临战任命")], 15))
 	var officers := OptionButton.new()
-	for officer in store.war.available_officers(str(store.war.state["player_faction"])):
-		var home: String = str(store.war.state["officer_states"].get(officer["id"], {}).get("city", ""))
+	for officer in store.war.available_officers(str(store.war.state[StateKeys.PLAYER_FACTION])):
+		var home: String = str(store.war.state[StateKeys.OFFICER_STATES].get(officer["id"], {}).get("city", ""))
 		officers.add_item("%s · %s" % [officer["name"], store.war.graph.name_of(home)])
 		officers.set_item_metadata(officers.item_count - 1, officer["id"])
 	_style_field(officers)
@@ -589,10 +590,10 @@ func show_city_policy(selected: String = "") -> void:
 		)
 		button.disabled = officers.item_count == 0
 		body.add_child(button)
-	for id in store.war.state["officer_states"]:
-		var status: Dictionary = store.war.state["officer_states"][id]
+	for id in store.war.state[StateKeys.OFFICER_STATES]:
+		var status: Dictionary = store.war.state[StateKeys.OFFICER_STATES][id]
 		if status.get("status", "") == "transferring" and status.get("destination", "") == selected:
-			body.add_child(_label("%s 正在调任，剩余%d日" % [store.war.roster.officers[id]["name"], maxi(0, int(status["arrives_at"]) - int(store.war.state["tick"]))], 14))
+			body.add_child(_label("%s 正在调任，剩余%d日" % [store.war.roster.officers[id]["name"], maxi(0, int(status["arrives_at"]) - int(store.war.state[StateKeys.TICK]))], 14))
 	notice_label = _label("异地任命需要实际调任时间；在役、负伤和被俘武将不可重复任命。", 13)
 	body.add_child(notice_label)
 
@@ -650,9 +651,9 @@ func _process(_delta: float) -> void:
 		if is_instance_valid(reports_view): reports_view.refresh()
 	if is_instance_valid(date_label) and store.busy: _refresh_time_label()
 	if store.busy and store.agent != null and is_instance_valid(status_label): status_label.text = str(store.agent.last_status)
-	if is_instance_valid(battle_label) and store.agent != null and store.war.state.has("battlefield"):
+	if is_instance_valid(battle_label) and store.agent != null and store.war.state.has(StateKeys.BATTLEFIELD):
 		var metrics: Dictionary = store.agent.metrics
-		battle_label.text = "%s  种子%d\n%s  累计请求%d / 失败%d / 回退%d" % [store.war.state["battlefield"].get("scenario_name", "小沛攻防"), store.war.state["battlefield"].get("seed", 1910901), "当前模型：" + str(store.agent.model) if store.agent.enabled else "本地策略（请在设置中启用模型）", metrics.get("calls", 0), metrics.get("failures", 0), metrics.get("fallbacks", 0)]
+		battle_label.text = "%s  种子%d\n%s  累计请求%d / 失败%d / 回退%d" % [store.war.state[StateKeys.BATTLEFIELD].get("scenario_name", "小沛攻防"), store.war.state[StateKeys.BATTLEFIELD].get("seed", 1910901), "当前模型：" + str(store.agent.model) if store.agent.enabled else "本地策略（请在设置中启用模型）", metrics.get("calls", 0), metrics.get("failures", 0), metrics.get("fallbacks", 0)]
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not is_instance_valid(flow_button): return

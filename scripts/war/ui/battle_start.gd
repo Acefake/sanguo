@@ -1,6 +1,7 @@
 extends Control
 
 const UISkin = preload("res://scripts/war/ui/war_ui_skin.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var faction_choice: OptionButton
 
 func _ready() -> void:
@@ -34,7 +35,7 @@ func _ready() -> void:
 	for faction in store.scenario["factions"]:
 		faction_choice.add_item(str(store.scenario["factions"][faction]["name"]))
 		faction_choice.set_item_metadata(faction_choice.item_count - 1, faction)
-		if faction == store.war.state["player_faction"]: faction_choice.select(faction_choice.item_count - 1)
+		if faction == store.war.state[StateKeys.PLAYER_FACTION]: faction_choice.select(faction_choice.item_count - 1)
 	column.add_child(faction_choice)
 	column.add_child(UISkin.button("以所选势力开始新战役", func():
 		if store.agent != null: store.agent.cancel_pending()

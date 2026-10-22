@@ -2,6 +2,7 @@ extends Control
 
 const HudSkin = preload("res://scripts/ui/city_ui_skin.gd")
 const Layout = preload("res://scripts/ui/ui_layout.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 const DIR := "res://assets/ui/world_hud/"
 # Right-hand furniture is authored against the design canvas and then anchored,
 # so it stays flush against the window edge at any width.
@@ -163,7 +164,7 @@ func _resize() -> void:
 
 func _process(_delta: float) -> void:
 	var store = get_node("/root/GameState")
-	var faction_id: String = str(store.war.state.get("player_faction", "liu_bei"))
+	var faction_id: String = str(store.war.state.get(StateKeys.PLAYER_FACTION, "liu_bei"))
 	var faction: Dictionary = store.scenario.get("factions", {}).get(faction_id, {})
 	var name: String = str(faction.get("name", ""))
 	if name != last_ruler:

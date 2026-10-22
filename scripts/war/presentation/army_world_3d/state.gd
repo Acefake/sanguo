@@ -5,6 +5,7 @@ extends Node3D
 ##
 ## 链：ArmyWorld3DState → ArmyWorld3DHud → ArmyWorld3DBuilder → ArmyWorld3DInput → ArmyWorld3DAnimation → army_world_3d.gd。
 ## 分层继承链（每层 extends 上一层），同一实例、同一组成员；下层不能调用上层的函数。
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 const CampaignUI = preload("res://scripts/war/ui/campaign_ui.gd")
 const Badge = preload("res://scripts/war/presentation/army_badge.gd")
@@ -92,7 +93,7 @@ func _march_seconds(id: String) -> float:
 	return float(motion_durations.get(id,_base_march_seconds(id)))
 
 func _base_march_seconds(id: String) -> float:
-	var army: Dictionary = store.war.state["armies"].get(id,{})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 	return TACTICAL_MOVE_SECONDS if army.has("tactical") else DAY_SECONDS
 
 ## 战役位置（节点或道路上的进度）对应的地表坐标，抬高 0.2。
@@ -157,7 +158,7 @@ static func density_for_strength(base: int, ratio: float) -> int:
 	return clampi(roundi(scaled),maxi(4,base/8),base)
 
 func _density_ratio(id: String) -> float:
-	var army: Dictionary = store.war.state["armies"].get(id,{})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 	if army.is_empty(): return 1.0
 	# The campaign publishes live enemy state board-wide (live_state), so casualty
 	# thinning is no longer a faction-private read.
@@ -207,7 +208,7 @@ func _city_wall(site: Dictionary, target: Vector3) -> Vector3:
 
 func _at_display_destination(id: String) -> bool:
 	if not formations.has(id): return false
-	var army: Dictionary = store.war.state["armies"].get(id,{})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 	if army.has("tactical") and HexPresentation.cell_at(formations[id].global_position) != int(army["tactical"]["cell"]): return false
 	if not destinations.has(id): return true
 	var delta: Vector3 = (formations[id].position-destinations[id])*Vector3(1,0,1)

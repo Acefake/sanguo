@@ -2,6 +2,7 @@ extends CanvasLayer
 
 const UISkin = preload("res://scripts/war/ui/war_ui_skin.gd")
 const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var store: Node
 var surface: Control
 var selected := "guandu_clash"
@@ -132,7 +133,7 @@ func open(from_startup: bool = false) -> void:
 	close_button.text = "退出" if startup_mode else "关闭"
 	return_button.visible = not startup_mode
 	launch.text = "开始战斗" if startup_mode else "开始 / 重置此场景"
-	var board: Dictionary = store.war.state.get("battlefield", {})
+	var board: Dictionary = store.war.state.get(StateKeys.BATTLEFIELD, {})
 	choose(str(board.get("scenario_id", "guandu_clash")))
 	seed.value = int(board.get("seed", 1910901))
 	notice.text = "请先完成当前推进，再切换场景。" if store.busy else ""

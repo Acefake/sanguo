@@ -7,6 +7,7 @@ signal campaign_progress
 
 const WarCampaign = preload("res://scripts/war/campaign/campaign_state.gd")
 const AgentAdapter = preload("res://scripts/agents/agent_adapter.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 const DEMO_PATH := "res://data/scenario_world_demo.json"
 const SAVE_PATH := "user://city_campaign.json"
@@ -252,7 +253,7 @@ func action_error(city_id: String, action_id: String) -> String:
 		return "日期正在推进，请稍候"
 	if not war.player_has_city_access(city_id):
 		return "无法在敌方城池执行城务命令"
-	return faction_action_error(city_id, action_id, str(war.state["player_faction"]))
+	return faction_action_error(city_id, action_id, str(war.state[StateKeys.PLAYER_FACTION]))
 
 func faction_action_error(city_id: String, action_id: String, faction: String) -> String:
 	if war.campaign_finished(): return "战役已经结束，请开始新的战役"
@@ -263,8 +264,8 @@ func faction_action_error(city_id: String, action_id: String, faction: String) -
 	var state := city_state(city_id)
 	if state.is_empty() or not state.has("population"):
 		return "这里不能执行城内命令"
-	var siege: Dictionary = war.state.get("sieges", {}).get(canonical_city_id(city_id), {})
-	if int(siege.get("active_tick", -100)) >= int(war.state["tick"]) - 1 and siege.get("phase", "") not in ["occupied", "解围"] and action_id in ["recruit", "fortify"]:
+	var siege: Dictionary = war.state.get(StateKeys.SIEGES, {}).get(canonical_city_id(city_id), {})
+	if int(siege.get("active_tick", -100)) >= int(war.state[StateKeys.TICK]) - 1 and siege.get("phase", "") not in ["occupied", "解围"] and action_id in ["recruit", "fortify"]:
 		return "围城期间无法征募或修筑城防"
 	if faction_action_points(faction) <= 0:
 		return "本月行动力已用尽"
@@ -292,7 +293,7 @@ func faction_action_error(city_id: String, action_id: String, faction: String) -
 	return ""
 
 func faction_action_points(faction: String) -> int:
-	return action_points if faction == str(war.state["player_faction"]) else int(war.state.get("faction_action_points", {}).get(faction, 3))
+	return action_points if faction == str(war.state[StateKeys.PLAYER_FACTION]) else int(war.state.get(StateKeys.FACTION_ACTION_POINTS, {}).get(faction, 3))
 
 # AI and player use the same costs, limits and effects. AI execution stays internal
 # so the public city command never grants authority over another faction.
@@ -302,8 +303,8 @@ func apply_faction_action(city_id: String, action_id: String, faction: String) -
 	_apply_effects(city_state(city_id), action_id)
 	if action_id == "fortify":
 		preload("res://scripts/war/battle/city_defense.gd").repair(war, canonical_city_id(city_id), 20.0)
-	if faction == str(war.state["player_faction"]): action_points -= 1
-	else: war.state["faction_action_points"][faction] = faction_action_points(faction) - 1
+	if faction == str(war.state[StateKeys.PLAYER_FACTION]): action_points -= 1
+	else: war.state[StateKeys.FACTION_ACTION_POINTS][faction] = faction_action_points(faction) - 1
 	_record(canonical_city_id(city_id), str(ACTIONS[action_id]["title"]))
 	city_changed.emit(canonical_city_id(city_id))
 	return {"ok": true, "message": "%s已执行。" % str(ACTIONS[action_id]["title"])}
@@ -313,7 +314,7 @@ func apply_action(city_id: String, action_id: String) -> Dictionary:
 	var error := action_error(city_id, action_id)
 	if error != "":
 		return {"ok": false, "message": error}
-	var result := apply_faction_action(city_id, action_id, str(war.state["player_faction"]))
+	var result := apply_faction_action(city_id, action_id, str(war.state[StateKeys.PLAYER_FACTION]))
 	_save()
 	return result
 
@@ -379,7 +380,7 @@ func _monthly_settlement() -> void:
 		month = 1
 		year += 1
 	action_points = 3
-	war.state["faction_action_points"].clear()
+	war.state[StateKeys.FACTION_ACTION_POINTS].clear()
 	var states: Dictionary = scenario.get("places", {})
 	for city_id in states:
 		var state: Dictionary = states[city_id]
@@ -442,7 +443,7 @@ func _finish_advance() -> void:
 func _advance_one_day() -> String:
 	while is_instance_valid(war_presentation) and war_presentation.duel_active():
 		await get_tree().process_frame
-	if not war.state.get("campaign_result", {}).is_empty(): return str(war.state["campaign_result"]["message"])
+	if not war.state.get(StateKeys.CAMPAIGN_RESULT, {}).is_empty(): return str(war.state[StateKeys.CAMPAIGN_RESULT]["message"])
 	var before: Dictionary = {}
 	if is_instance_valid(war_presentation):
 		for army in war.active_armies(): before[army["id"]] = army["location"].duplicate(true)

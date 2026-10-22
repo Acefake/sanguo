@@ -5,12 +5,12 @@ extends "res://scripts/war/presentation/army_world_3d/input.gd"
 ## 以及 begin_day() 为一日演出准备的运动起止。热路径都在本层，调用下层函数仍是对 self 的直接调用。
 
 func _speech_event(id: String) -> String:
-	var army: Dictionary = store.war.state["armies"].get(id,{})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 	if army.is_empty() or army.get("commander_unavailable",false): return ""
 	if army.get("returning",false): return "retreat"
 	if army.get("action",{}).get("type","") == "evade": return "evade"
 	if float(army.get("morale",100)) < 35: return "rally"
-	if int(army.get("combat_tick",-1)) == int(store.war.state["tick"]):
+	if int(army.get("combat_tick",-1)) == int(store.war.state[StateKeys.TICK]):
 		var front: Dictionary = _combat_visual(id)
 		if front.get("siege",false): return "siege"
 		return "ranged" if front.get("ranged",false) else "attack"
@@ -32,7 +32,7 @@ func _update_chatter(force: bool = false) -> void:
 		if speaking.has(id) or float(chatter_cooldowns.get(id,-100.0)) > chatter_time: continue
 		if speaking.any(func(other): return badges[other].position.distance_to(badge.position) < 155): continue
 		var event := _speech_event(id)
-		if not event.is_empty(): candidates.append({"id":id,"event":event,"priority":0 if event not in ["hold","march"] else 1,"order":absi(hash(str(id)+str(store.war.state["tick"])+str(floori(chatter_time/3.2))))})
+		if not event.is_empty(): candidates.append({"id":id,"event":event,"priority":0 if event not in ["hold","march"] else 1,"order":absi(hash(str(id)+str(store.war.state[StateKeys.TICK])+str(floori(chatter_time/3.2))))})
 	candidates.sort_custom(func(a,b): return a["priority"] < b["priority"] if a["priority"] != b["priority"] else a["order"] < b["order"])
 	next_chatter_at = chatter_time + (3.2 if not candidates.is_empty() else 0.8)
 	if candidates.is_empty(): return
@@ -52,7 +52,7 @@ func _march_position(id: String, progress: float) -> Vector3:
 				return points[i-1].lerp(points[i],(distance-lengths[i-1])/maxf(lengths[i]-lengths[i-1],0.0001))
 		return points[points.size()-1]
 	var before: Dictionary = motion_locations.get(id, {})
-	var army: Dictionary = store.war.state["armies"].get(id, {})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 	var sight: Dictionary = {}
 	var tactical: bool = int(sight.get("tactical_cell", -1)) >= 0 if not sight.is_empty() else army.has("tactical")
 	if tactical and sight.is_empty():
@@ -120,17 +120,17 @@ func _process(delta: float) -> void:
 		var visual := _combat_visual(id)
 		combat_visuals[id] = visual
 		if not presenting or store.time_paused or visual.is_empty() or visual["siege"] or visual["ranged"]: continue
-		var opponent: Dictionary = store.war.state["armies"].get(visual.get("target_id",""),{})
+		var opponent: Dictionary = store.war.state[StateKeys.ARMIES].get(visual.get("target_id",""),{})
 		if opponent.get("returning",false): continue
 		# A unit that stepped into a broken tile must walk in on the map; freezing
 		# it here would leave it rendered on the defender's old cell.
-		var mover: Dictionary = store.war.state["armies"].get(id,{})
-		if int(mover.get("tactical",{}).get("breakthrough_marker",-1)) == int(store.war.state["tick"]): continue
+		var mover: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
+		if int(mover.get("tactical",{}).get("breakthrough_marker",-1)) == int(store.war.state[StateKeys.TICK]): continue
 		melee_positions[id] = formations[id].position
 	var hidden_members: Dictionary = _update_corps_badges()
 	for id in formations:
 		var group: Node3D = formations[id]
-		var unit: Dictionary = store.war.state["armies"].get(id, {})
+		var unit: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 		var engaged: Dictionary = combat_visuals[id]
 		var detail_changed := _apply_troop_detail(group)
 		group.visible = map.camera.global_position.distance_to(group.global_position) < 550
@@ -165,7 +165,7 @@ func _process(delta: float) -> void:
 			group.set_meta("combat_pose",fighting)
 			var batch: MultiMeshInstance3D = group.get_node_or_null("Soldiers")
 			if batch != null:
-				var army: Dictionary = store.war.state["armies"].get(id, {})
+				var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 				var marching: bool = str(army.get("location", {}).get("edge", "")) != "" and str(army.get("action", {}).get("type", "")) in ["march", "continue", "withdraw"]
 				if army.has("tactical") and motion_start.has(id):
 					marching = _formation_moving(group)
@@ -250,7 +250,7 @@ func _process(delta: float) -> void:
 
 func _on_presented_route(id: String) -> bool:
 	if not formations.has(id): return false
-	var army: Dictionary = store.war.state["armies"].get(id,{})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 	if not army.has("tactical"): return _at_display_destination(id)
 	var cell := HexPresentation.cell_at(formations[id].global_position)
 	if cell == int(army["tactical"]["cell"]) or army["tactical"].get("move_path",[]).has(cell): return true
@@ -270,8 +270,8 @@ func _melee_contact_ready(id: String, enemy: String) -> bool:
 
 func _melee_visual(id: String, enemy: String) -> Dictionary:
 	if not formations.has(enemy): return {}
-	var army: Dictionary = store.war.state["armies"].get(id,{})
-	var other: Dictionary = store.war.state["armies"].get(enemy,{})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
+	var other: Dictionary = store.war.state[StateKeys.ARMIES].get(enemy,{})
 	if other.is_empty() or not army.has("tactical") or not other.has("tactical"): return {}
 	# A destroyed formation cannot trade blows. Its empty tile may already have
 	# been entered by the breakthrough step; no melee pose may freeze that walk.
@@ -279,11 +279,11 @@ func _melee_visual(id: String, enemy: String) -> Dictionary:
 	if int(store.war.Combat.strength(other)) <= 0: return {}
 	if army["tactical"].get("phase","") == "远射": return {}
 	if not store.war.hostile(str(army["faction"]),str(other["faction"])) or store.war.Tactical.distance(army,other) != 1: return {}
-	if not store.battle_test and other["faction"] != store.war.state["player_faction"]:
+	if not store.battle_test and other["faction"] != store.war.state[StateKeys.PLAYER_FACTION]:
 		var sight: Dictionary = observed_enemies.get(enemy,{})
-		if int(sight.get("observed_at",-1)) != int(store.war.state["tick"]) or not sight.get("fighting",false): return {}
+		if int(sight.get("observed_at",-1)) != int(store.war.state[StateKeys.TICK]) or not sight.get("fighting",false): return {}
 	if not _melee_contact_ready(id,enemy): return {}
-	return {"target":formations[enemy].global_position,"target_id":enemy,"target_cell":HexPresentation.cell_at(formations[enemy].global_position),"siege":false,"ranged":false,"duel":int(army.get("duel_tick",-1)) == int(store.war.state["tick"]) and army.get("duel_opponent","") == enemy}
+	return {"target":formations[enemy].global_position,"target_id":enemy,"target_cell":HexPresentation.cell_at(formations[enemy].global_position),"siege":false,"ranged":false,"duel":int(army.get("duel_tick",-1)) == int(store.war.state[StateKeys.TICK]) and army.get("duel_opponent","") == enemy}
 
 func _combat_fronts(id: String) -> Array:
 	var primary: Dictionary = _combat_visual(id)
@@ -291,16 +291,16 @@ func _combat_fronts(id: String) -> Array:
 	var fronts: Array = [primary.duplicate()]
 	fronts[0]["key"] = id
 	if primary["siege"] or primary["ranged"]: return fronts
-	var army: Dictionary = store.war.state["armies"].get(id, {})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 	if not army.has("tactical"): return fronts
 	for enemy_id in formations:
-		var enemy: Dictionary = store.war.state["armies"].get(enemy_id, {})
+		var enemy: Dictionary = store.war.state[StateKeys.ARMIES].get(enemy_id, {})
 		if enemy.is_empty() or enemy["faction"] == army["faction"] or not enemy.has("tactical"): continue
 		if str(enemy.get("status","")) == "ended" or int(store.war.Combat.strength(enemy)) <= 0: continue
-		if not store.battle_test and enemy["faction"] != store.war.state["player_faction"]:
+		if not store.battle_test and enemy["faction"] != store.war.state[StateKeys.PLAYER_FACTION]:
 			var seen: Dictionary = observed_enemies.get(enemy_id, {})
-			if int(seen.get("observed_at", -1)) != int(store.war.state["tick"]) or not seen.get("fighting", false): continue
-		if int(enemy.get("combat_tick", -1)) != int(store.war.state["tick"]): continue
+			if int(seen.get("observed_at", -1)) != int(store.war.state[StateKeys.TICK]) or not seen.get("fighting", false): continue
+		if int(enemy.get("combat_tick", -1)) != int(store.war.state[StateKeys.TICK]): continue
 		if enemy["tactical"].get("attack_target", "") != id and not army.get("combat_targets",[]).has(enemy_id) and not enemy.get("combat_targets",[]).has(id): continue
 		if not _melee_contact_ready(id,enemy_id): continue
 		if store.war.Tactical.distance(army, enemy) > 1: continue
@@ -347,13 +347,13 @@ func _face_contact_sectors(group: Node3D, fronts: Array, delta: float = 1.0 / 60
 	if changed: group.set_meta("facing_revision",int(group.get_meta("facing_revision",0))+1)
 
 func _combat_visual(id: String) -> Dictionary:
-	var army: Dictionary = store.war.state["armies"].get(id, {})
+	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 	if army.is_empty() or not formations.has(id) or army.get("returning",false) or army.get("tactical",{}).get("placement_invalid",false): return {}
 	var observed: bool = observed_enemies.has(id) and not store.battle_test
 	if observed:
 		var sight: Dictionary = observed_enemies[id]
-		if not sight.get("fighting", false) or int(sight.get("observed_at", -1)) != int(store.war.state["tick"]): return {}
-	elif int(army.get("combat_tick", -1)) != int(store.war.state["tick"]): return {}
+		if not sight.get("fighting", false) or int(sight.get("observed_at", -1)) != int(store.war.state[StateKeys.TICK]): return {}
+	elif int(army.get("combat_tick", -1)) != int(store.war.state[StateKeys.TICK]): return {}
 	if store.war.Terrain.entry_factor(army,store.war.rules) <= 0: return {}
 	var candidates: Array = army.get("combat_targets",[]).duplicate()
 	var preferred: String = army.get("tactical",{}).get("attack_target",army.get("action",{}).get("enemy",""))
@@ -364,15 +364,15 @@ func _combat_visual(id: String) -> Dictionary:
 	# A resolved ranged attack may fire while either formation is interpolating.
 	# The displayed range below remains authoritative for the visible shot.
 	if army.get("tactical", {}).get("phase", "") != "远射" and presenting and motion_start.has(id) and not _at_display_destination(id): return {}
-	if int(army.get("duel_tick",-1)) == int(store.war.state["tick"]) and formations.has(army.get("duel_opponent","")):
+	if int(army.get("duel_tick",-1)) == int(store.war.state[StateKeys.TICK]) and formations.has(army.get("duel_opponent","")):
 		var opponent: String = army["duel_opponent"]
 		var source: Vector3 = formations[id].global_position
 		var destination: Vector3 = formations[opponent].global_position
 		var shown_gap: int = store.war.Tactical.grid().distance(store.war.Tactical.grid().pick(Vector2(source.x,source.z)),store.war.Tactical.grid().pick(Vector2(destination.x,destination.z)))
 		if shown_gap != 1: return {}
 		return {"target":formations[army["duel_opponent"]].global_position,"siege":false,"ranged":false,"duel":true}
-	var siege: Dictionary = store.war.state.get("sieges", {}).get(army["target"], {})
-	if siege.get("phase", "") == "强攻" and int(siege.get("active_tick", -1)) == int(store.war.state["tick"]) and siege.get("participants", []).has(id):
+	var siege: Dictionary = store.war.state.get(StateKeys.SIEGES, {}).get(army["target"], {})
+	if siege.get("phase", "") == "强攻" and int(siege.get("active_tick", -1)) == int(store.war.state[StateKeys.TICK]) and siege.get("participants", []).has(id):
 		var board: Dictionary = store.war.Tactical.board_for(store.war,army)
 		var visible_cell: int = store.war.Tactical.grid().pick(Vector2(formations[id].position.x,formations[id].position.z))
 		if Fortifications.distance_to_wall(board,str(army["target"]),visible_cell) > store.war.Tactical.attack_range(army): return {}
@@ -394,7 +394,7 @@ func _combat_visual(id: String) -> Dictionary:
 		return {"target": target,"target_cell":HexPresentation.cell_at(target), "siege": true, "ranged": preload("res://scripts/war/battle/troop_roles.gd").kind(army) == "archers"}
 	var enemy: String = army.get("tactical", {}).get("attack_target", army.get("action", {}).get("enemy", ""))
 	if formations.has(enemy):
-		var target_army: Dictionary = store.war.state["armies"][enemy]
+		var target_army: Dictionary = store.war.state[StateKeys.ARMIES][enemy]
 		# Received damage is not proof that this unit fired.
 		if not army.get("combat_targets",[]).has(enemy) or not store.war.Tactical.can_engage(store.war,army): return {}
 		if target_army.get("status", "") == "ended" or store.war.Combat.strength(target_army) <= 0: return {}
@@ -413,8 +413,8 @@ func _combat_visual(id: String) -> Dictionary:
 
 func _show_city_volleys() -> void:
 	if not presenting: return
-	for event in store.war.state.get("city_volleys", []):
-		if int(event["tick"]) != int(store.war.state["tick"]) or not formations.has(event["target"]): continue
+	for event in store.war.state.get(StateKeys.CITY_VOLLEYS, []):
+		if int(event["tick"]) != int(store.war.state[StateKeys.TICK]) or not formations.has(event["target"]): continue
 		var target: Node3D = formations[event["target"]]
 		if not target.visible: continue
 		var city: Dictionary = store.city_state(str(event["city"]))
@@ -423,7 +423,7 @@ func _show_city_volleys() -> void:
 		if site.is_empty(): continue
 		var source := _city_wall(site, target.global_position) + Vector3.UP * 0.65
 		var target_cell := HexPresentation.cell_at(target.global_position)
-		var target_army: Dictionary = store.war.state["armies"].get(event["target"],{})
+		var target_army: Dictionary = store.war.state[StateKeys.ARMIES].get(event["target"],{})
 		if target_army.has("tactical") and target_cell != int(target_army["tactical"]["cell"]): continue
 		combat_effects.show_city_volley(str(event["id"]), source, target.global_position, presentation_elapsed,target_cell)
 
@@ -453,22 +453,22 @@ func begin_day(before: Dictionary) -> void:
 		if not destinations.has(id): destinations[id] = formations[id].position
 		var moving: bool = motion_start[id].distance_squared_to(destinations[id]) > 0.01
 		var duration := _base_march_seconds(id) if moving else 0.0
-		var army: Dictionary = store.war.state["armies"].get(id,{})
-		if int(army.get("daily_loss_tick",-1)) == int(store.war.state["tick"]) and int(army.get("daily_loss",0)) > 0: duration += CONTACT_SECONDS
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
+		if int(army.get("daily_loss_tick",-1)) == int(store.war.state[StateKeys.TICK]) and int(army.get("daily_loss",0)) > 0: duration += CONTACT_SECONDS
 		presentation_duration = maxf(presentation_duration,duration)
 	for id in formations:
-		var army: Dictionary = store.war.state["armies"].get(id,{})
-		var fighting: bool = int(army.get("combat_tick",-1)) == int(store.war.state["tick"]) or (int(army.get("daily_loss_tick",-1)) == int(store.war.state["tick"]) and int(army.get("daily_loss",0)) > 0)
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
+		var fighting: bool = int(army.get("combat_tick",-1)) == int(store.war.state[StateKeys.TICK]) or (int(army.get("daily_loss_tick",-1)) == int(store.war.state[StateKeys.TICK]) and int(army.get("daily_loss",0)) > 0)
 		motion_durations[id] = _base_march_seconds(id) if fighting else presentation_duration
 		_build_march_route(id)
 	# Existing contact survives a calendar boundary without one more walking step.
 	if not store.time_paused:
 		for id in formations:
-			var mover: Dictionary = store.war.state["armies"].get(id,{})
-			if int(mover.get("tactical",{}).get("breakthrough_marker",-1)) == int(store.war.state["tick"]): continue
+			var mover: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
+			if int(mover.get("tactical",{}).get("breakthrough_marker",-1)) == int(store.war.state[StateKeys.TICK]): continue
 			var visual := _combat_visual(id)
 			if visual.is_empty() or visual["siege"] or visual["ranged"]: continue
-			var opponent: Dictionary = store.war.state["armies"].get(visual.get("target_id",""),{})
+			var opponent: Dictionary = store.war.state[StateKeys.ARMIES].get(visual.get("target_id",""),{})
 			if not opponent.is_empty() and not opponent.get("returning",false): melee_positions[id] = formations[id].position
 	_present_new_duel()
 	_update_display_stats()
@@ -477,8 +477,8 @@ func _update_display_stats() -> void:
 	if not presenting: return
 	for id in presentation_stats:
 		if not badges.has(id): continue
-		var army: Dictionary = store.war.state["armies"].get(id,{})
-		if army.is_empty() or not army.has("tactical") or int(army.get("daily_loss_tick",-1)) != int(store.war.state["tick"]) or int(army.get("daily_loss",0)) <= 0: continue
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
+		if army.is_empty() or not army.has("tactical") or int(army.get("daily_loss_tick",-1)) != int(store.war.state[StateKeys.TICK]) or int(army.get("daily_loss",0)) <= 0: continue
 		var blend := _loss_display_blend(id)
 		var initial_strength := int(presentation_stats[id]["strength"])
 		var strength := initial_strength - roundi((initial_strength - store.war.Combat.strength(army)) * blend)
@@ -493,11 +493,11 @@ func _update_display_stats() -> void:
 
 func _loss_contact_mode(id: String) -> String:
 	if not presenting or not formations.has(id): return ""
-	var tick: int = store.war.state["tick"]
+	var tick: int = store.war.state[StateKeys.TICK]
 	# A defender can take ranged damage without having a legal attack of its own.
 	for source in formations:
 		if source == id: continue
-		var army: Dictionary = store.war.state["armies"].get(source,{})
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(source,{})
 		if int(army.get("combat_tick",-1)) != tick: continue
 		if str(army.get("tactical",{}).get("attack_target",army.get("action",{}).get("enemy",""))) != id and not army.get("combat_targets",[]).has(id): continue
 		var visual := _combat_visual(source)
@@ -505,16 +505,16 @@ func _loss_contact_mode(id: String) -> String:
 		if not visual["ranged"] and not _melee_contact_ready(source,id): continue
 		if not army.get("combat_targets",[]).has(id) and visual["target"].distance_squared_to(formations[id].global_position) > 0.01: continue
 		return "ranged" if visual["ranged"] else "melee"
-	for event in store.war.state.get("city_volleys",[]):
+	for event in store.war.state.get(StateKeys.CITY_VOLLEYS,[]):
 		if not _at_display_destination(id): continue
 		if int(event["tick"]) != tick or str(event["target"]) != id: continue
-		var army: Dictionary = store.war.state["armies"].get(id,{})
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 		var board: Dictionary = store.war.Tactical.board_for(store.war,army)
 		if Fortifications.distance_to_wall(board,str(event["city"]),HexPresentation.cell_at(formations[id].global_position)) <= 2: return "ranged"
 	var visual := _combat_visual(id)
 	if visual.is_empty(): return ""
 	if visual["siege"]: return "melee"
-	var target: String = store.war.state["armies"].get(id,{}).get("tactical",{}).get("attack_target","")
+	var target: String = store.war.state[StateKeys.ARMIES].get(id,{}).get("tactical",{}).get("attack_target","")
 	return "ranged" if visual["ranged"] else "melee"
 
 func _loss_display_blend(id: String) -> float:
@@ -523,7 +523,7 @@ func _loss_display_blend(id: String) -> float:
 	return clampf((presentation_elapsed-float(loss_contact_since[id])-delay)/LOSS_COUNT_SECONDS,0.0,1.0)
 
 func _spawn_loss_floaters() -> void:
-	var tick: int = store.war.state["tick"]
+	var tick: int = store.war.state[StateKeys.TICK]
 	if floated_tick != tick:
 		floated_tick = tick
 		floated_armies.clear()
@@ -531,9 +531,9 @@ func _spawn_loss_floaters() -> void:
 	var maximum := int(store.war.rules.get("feedback",{}).get("max_floaters_per_day",6))
 	for id in formations:
 		if floated_armies.has(id): continue
-		var army: Dictionary = store.war.state["armies"].get(id,{})
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 		if int(army.get("daily_loss_tick",-1)) != tick or int(army.get("daily_loss",0)) <= 0: continue
-		if army["faction"] != store.war.state["player_faction"] and not store.battle_test:
+		if army["faction"] != store.war.state[StateKeys.PLAYER_FACTION] and not store.battle_test:
 			var sight: Dictionary = observed_enemies.get(id,{})
 			if int(sight.get("observed_at",-1)) != tick or not sight.get("fighting",false): continue
 		var mode := _loss_contact_mode(id)

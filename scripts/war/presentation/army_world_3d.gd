@@ -25,7 +25,7 @@ func _ready() -> void:
 	layer.layer = 3
 	add_child(layer)
 	duel_presentation = DuelPresentation.new()
-	for record in store.war.state.get("duels", {}).get("records", []):
+	for record in store.war.state.get(StateKeys.DUELS, {}).get("records", []):
 		if not record.get("presentation_pending", false): seen_duel_records[_duel_record_key(record)] = true
 	layer.add_child(duel_presentation)
 	duel_presentation.finished.connect(_confirm_duel)
@@ -53,7 +53,7 @@ func _ready() -> void:
 	)
 	refresh()
 	if is_instance_valid(map.hex_world): map.hex_world.cell_selected.connect(_select_global_cell)
-	if store.war.state.has("battlefield"): _create_supply_markers()
+	if store.war.state.has(StateKeys.BATTLEFIELD): _create_supply_markers()
 	if store.battle_test: call_deferred("_focus_battle")
 
 func _exit_tree() -> void:
@@ -64,7 +64,7 @@ func _exit_tree() -> void:
 func _confirm_duel() -> void:
 	if duel_presentation.demo: return
 	var key := _duel_record_key(duel_presentation.active_record)
-	for record in store.war.state.get("duels", {}).get("records", []):
+	for record in store.war.state.get(StateKeys.DUELS, {}).get("records", []):
 		if _duel_record_key(record) == key:
 			record["presentation_pending"] = false
 			record["presentation_confirmed"] = true

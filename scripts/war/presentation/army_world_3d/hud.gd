@@ -5,7 +5,7 @@ extends "res://scripts/war/presentation/army_world_3d/state.gd"
 
 func _create_supply_markers() -> void:
 	if not store.war.supply_enabled(): return
-	for corps in store.war.state["corps"].values():
+	for corps in store.war.state[StateKeys.CORPS].values():
 		if int(corps["supply"]["cell"]) < 0: continue
 		var marker := Label.new()
 		marker.add_theme_font_override("font", preload("res://scripts/ui/city_ui_skin.gd").font())
@@ -22,28 +22,28 @@ func _create_supply_markers() -> void:
 
 func _refresh_supplies() -> void:
 	for id in supply_markers:
-		var corps: Dictionary = store.war.state["corps"].get(id, {})
+		var corps: Dictionary = store.war.state[StateKeys.CORPS].get(id, {})
 		if corps.is_empty(): supply_markers[id].hide(); continue
 		var known: bool = true
-		for own in store.war.state["corps"].values():
-			if own["faction"] == store.war.state["player_faction"] and own["known_supplies"].has(id): known = true
+		for own in store.war.state[StateKeys.CORPS].values():
+			if own["faction"] == store.war.state[StateKeys.PLAYER_FACTION] and own["known_supplies"].has(id): known = true
 		supply_markers[id].set_meta("known", known and not corps.get("ended", false))
 		supply_markers[id].visible = known and not corps.get("ended", false)
-		var blocked: bool = int(corps["supply"]["blocked_until"]) > int(store.war.state["tick"])
+		var blocked: bool = int(corps["supply"]["blocked_until"]) > int(store.war.state[StateKeys.TICK])
 		supply_markers[id].text = "%s粮道\n%s" % [corps["name"], "截断" if blocked else "畅通"]
 		supply_markers[id].modulate = Color("ed7354") if blocked else Color("f1d888")
 
 func _present_new_duel() -> void:
 	if not is_instance_valid(duel_presentation) or store == null or store.war == null: return
 	if duel_presentation.visible: return
-	var records: Array = store.war.state.get("duels", {}).get("records", [])
+	var records: Array = store.war.state.get(StateKeys.DUELS, {}).get("records", [])
 	for record in records:
 		var key := _duel_record_key(record)
 		if seen_duel_records.has(key): continue
 		seen_duel_records[key] = true
-		var player_involved: bool = store.battle_test or store.war.state["player_faction"] in record.get("factions", [])
-		for army in store.war.state.get("armies", {}).values():
-			if army.get("officer_id", "") in [record.get("a", ""), record.get("b", "")] and army.get("faction", "") == store.war.state["player_faction"]:
+		var player_involved: bool = store.battle_test or store.war.state[StateKeys.PLAYER_FACTION] in record.get("factions", [])
+		for army in store.war.state.get(StateKeys.ARMIES, {}).values():
+			if army.get("officer_id", "") in [record.get("a", ""), record.get("b", "")] and army.get("faction", "") == store.war.state[StateKeys.PLAYER_FACTION]:
 				player_involved = true
 		if not player_involved:
 			record["presentation_pending"] = false
@@ -76,7 +76,7 @@ func duel_active() -> bool:
 func _bind_duel_positions(record: Dictionary) -> void:
 	var anchors: Array[Vector3] = []
 	for officer_id in [record.get("a", ""), record.get("b", "")]:
-		for army in store.war.state.get("armies", {}).values():
+		for army in store.war.state.get(StateKeys.ARMIES, {}).values():
 			if army.get("officer_id", "") == officer_id:
 				anchors.append(formations[army["id"]].global_position if formations.has(army["id"]) else world_position(army["location"]))
 				break
@@ -101,11 +101,11 @@ func show_enemy(id: String) -> void:
 	ui.drawer.show()
 	ui._clear()
 	if store.battle_test:
-		var army: Dictionary = store.war.state["armies"].get(id, {})
+		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 		ui.heading.text = str(army.get("name", "敌军")) + "队  测试观察"
 		var operation: Dictionary = army.get("operation", {})
 		var roles := preload("res://scripts/war/battle/tactical_battlefield.gd").ROLES
-		ui.body.add_child(ui._label("职责：%s  阶段：%s\n协同对象：%s  攻击目标：%s" % [roles.get(operation.get("role", ""), "自主行动"), army.get("tactical", {}).get("phase", ""), store.war.state["armies"].get(operation.get("support_id", ""), {}).get("name", "无"), store.war.state["armies"].get(army.get("tactical", {}).get("attack_target", ""), {}).get("name", "未接敌")], 13))
+		ui.body.add_child(ui._label("职责：%s  阶段：%s\n协同对象：%s  攻击目标：%s" % [roles.get(operation.get("role", ""), "自主行动"), army.get("tactical", {}).get("phase", ""), store.war.state[StateKeys.ARMIES].get(operation.get("support_id", ""), {}).get("name", "无"), store.war.state[StateKeys.ARMIES].get(army.get("tactical", {}).get("attack_target", ""), {}).get("name", "未接敌")], 13))
 		ui.body.add_child(ui._label("主将判断：" + str(army.get("last_reason", "")), 14))
 		for record in army.get("decision_history", []).slice(-5):
 			ui.body.add_child(ui._label("第%d日  %s  %s" % [record["tick"], record["source"], record["candidate_id"]], 12))
@@ -166,7 +166,7 @@ func _refresh_battle_feedback() -> void:
 	_refresh_control_marker()
 
 func _refresh_control_marker() -> void:
-	var point: Dictionary = store.war.state.get("battlefield", {}).get("control_point", {})
+	var point: Dictionary = store.war.state.get(StateKeys.BATTLEFIELD, {}).get("control_point", {})
 	var marker: Node3D = get_node_or_null("ControlPointMarker")
 	if point.is_empty():
 		if is_instance_valid(marker): marker.hide()
@@ -201,12 +201,12 @@ func _refresh_control_marker() -> void:
 	marker.show()
 	var label: Label3D = marker.get_node("ControlPointName")
 	label.text = "%s\n%d/%d日" % [point["name"], point["progress"], point["hold_days"]]
-	label.modulate = Color("f4d183") if point["owner"] == "" else Color("9ac676") if point["owner"] == store.war.state["player_faction"] else Color("e98570")
+	label.modulate = Color("f4d183") if point["owner"] == "" else Color("9ac676") if point["owner"] == store.war.state[StateKeys.PLAYER_FACTION] else Color("e98570")
 
 func _update_corps_badges() -> Dictionary:
 	var hidden_members: Dictionary = {}
 	if store == null or store.war == null or not is_instance_valid(map) or not is_instance_valid(map.camera): return hidden_members
-	var corps_map: Dictionary = store.war.state.get("corps", {})
+	var corps_map: Dictionary = store.war.state.get(StateKeys.CORPS, {})
 	if corps_map.is_empty(): return hidden_members
 	for corps_id in corps_map:
 		_sync_corps_badge_aggregation(corps_map[corps_id], hidden_members)
@@ -242,7 +242,7 @@ func _collect_corps_active_members(corps: Dictionary) -> Array:
 	var active: Array = []
 	for uid in corps.get("units", []):
 		if not badges.has(uid): continue
-		var army: Dictionary = store.war.state.get("armies", {}).get(uid, {})
+		var army: Dictionary = store.war.state.get(StateKeys.ARMIES, {}).get(uid, {})
 		if army.get("status", "") == "ended": continue
 		active.append(uid)
 	return active

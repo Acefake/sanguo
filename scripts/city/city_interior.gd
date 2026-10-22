@@ -10,6 +10,7 @@ const CouncilView = preload("res://scripts/city/council_view.gd")
 const ActionView = preload("res://scripts/city/city_action_view.gd")
 const CouncilLettering = preload("res://scripts/ui/council_label_atlas.gd")
 const SceneCatalog = preload("res://scripts/city/city_scene_catalog.gd")
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 const CITY_ART := "res://assets/city/han/panorama.png"
 const LUOYANG_ART := "res://assets/city/luoyang/preview-perspective.png"
 const LUOYANG_LOCATIONS := {
@@ -829,7 +830,7 @@ func _fill_report() -> void:
 		"personnel":
 			report_heading.text = city_name + "  人事"
 			var governor: Dictionary = store.war.roster.officers.get(str(state.get("governor_id", "")), {})
-			var guard: Dictionary = store.war.state["garrison_commanders"].get(city_id, {})
+			var guard: Dictionary = store.war.state[StateKeys.GARRISON_COMMANDERS].get(city_id, {})
 			report_text.text = "所属势力：%s\n\n主政：%s\n守城主将：%s\n\n可在军情面板派遣本方可用武将。" % [str(store.faction_for(city_id).get("name", "无主")), str(governor.get("name", "地方吏员代管")), str(guard.get("name", "尚未任命"))]
 		"faction":
 			report_heading.text = "势力情报"

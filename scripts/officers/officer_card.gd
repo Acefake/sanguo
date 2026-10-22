@@ -1,3 +1,4 @@
+class_name OfficerCard
 extends RefCounted
 ## 人物卡（OfficerRepository，schema 6）到运行时人物字典的唯一换算点。
 ##

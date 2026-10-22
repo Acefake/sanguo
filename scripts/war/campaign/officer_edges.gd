@@ -1,4 +1,6 @@
+class_name OfficerEdges
 extends RefCounted
+## 将领专长：按技能与十四项人格轴给每名将领至多一项规则生成的专长。
 
 # Rule-generated officer specialties (将领专长). Every officer gets at most one
 # edge, scored from the same skills and 14 personality axes used elsewhere.

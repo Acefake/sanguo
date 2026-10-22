@@ -1,4 +1,6 @@
+class_name BattleFeedback
 extends RefCounted
+## 战况反馈：双方优势与因素拆解、伤亡账、事件与每日快照、战后总结。
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Terrain = preload("res://scripts/war/battle/battle_terrain.gd")
 

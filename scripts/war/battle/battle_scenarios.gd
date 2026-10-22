@@ -1,4 +1,6 @@
+class_name BattleScenarios
 extends RefCounted
+## 战斗测试场景：读取场景定义，建立战场并编组参战军与军团。
 
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Corps = preload("res://scripts/war/campaign/army_corps.gd")

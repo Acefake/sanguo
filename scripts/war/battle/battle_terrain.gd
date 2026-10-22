@@ -1,4 +1,6 @@
+class_name BattleTerrain
 extends RefCounted
+## 战斗地形规则：地形代码到类别与名称、兵种地形系数、进入系数。
 
 static var _rules: Dictionary = {}
 static var _table: Dictionary = {}

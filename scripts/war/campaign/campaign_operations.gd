@@ -1,4 +1,6 @@
+class_name CampaignOperations
 extends RefCounted
+## 战役行动：侦察、城池与行程、集结天数、驻防调派与任命结果。
 
 const Fate = preload("res://scripts/war/campaign/officer_fate.gd")
 

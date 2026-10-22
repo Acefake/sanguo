@@ -1,4 +1,6 @@
+class_name MapGraph
 extends RefCounted
+## 战役路网：城池与道路、邻接、带缓存的最短路径、封锁、可见节点与坐标。
 
 var places: Dictionary = {}
 var edges: Dictionary = {}

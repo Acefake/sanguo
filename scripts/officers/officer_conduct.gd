@@ -1,3 +1,4 @@
+class_name OfficerConduct
 extends RefCounted
 ## 决策侧的倾向与失败模式：什么时候投入、追多深、何时脱离、听不听参军。
 ##

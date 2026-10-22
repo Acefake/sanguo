@@ -1,4 +1,6 @@
+class_name CombatSystem
 extends RefCounted
+## 交战数值：兵力与战力拆解、兵种克制、伤亡与士气，系数来自 campaign_rules.json。
 
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Terrain = preload("res://scripts/war/battle/battle_terrain.gd")

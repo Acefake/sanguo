@@ -1,4 +1,6 @@
+class_name FactionLifecycle
 extends RefCounted
+## 势力维护：补足各势力武将、登记生成将、校正各城太守任命。
 
 const Fate = preload("res://scripts/war/campaign/officer_fate.gd")
 

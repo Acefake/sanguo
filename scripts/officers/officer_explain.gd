@@ -1,3 +1,4 @@
+class_name OfficerExplain
 extends RefCounted
 ## 让人物特色看得见：部队面板的意图与理由、军报署名、人物卡“适合/吃亏”摘要、给模型的人物上下文。
 ##

@@ -1,4 +1,6 @@
+class_name RangedPressure
 extends RefCounted
+## 远程压制：受到仍可见的远程打击后，部队的即时应对。
 
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Combat = preload("res://scripts/war/battle/combat_system.gd")

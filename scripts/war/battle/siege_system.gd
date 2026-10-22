@@ -1,4 +1,6 @@
+class_name SiegeSystem
 extends RefCounted
+## 攻城：判定部队是否已抵城下，结算各城的围攻。
 
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Process = preload("res://scripts/officers/officer_process.gd")

@@ -1,4 +1,6 @@
+class_name TroopRoles
 extends RefCounted
+## 兵种特性：机动、交换系数、兵种判定（含情报估计的兵种构成）、攻城器械与破城。
 
 static func traits(config: Dictionary = {}) -> Dictionary:
 	return config.get("troop_traits",preload("res://scripts/war/battle/battle_terrain.gd").rules().get("troop_traits",{}))

@@ -1,4 +1,6 @@
+class_name ArmyCorps
 extends RefCounted
+## 军团：按职责挑选成员、预览任命、编组与拆分、主帅部署与军团计划下达。
 
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")

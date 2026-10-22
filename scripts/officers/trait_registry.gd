@@ -1,3 +1,4 @@
+class_name TraitRegistry
 extends RefCounted
 ## 战斗特性注册表。
 ##

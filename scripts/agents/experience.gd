@@ -1,4 +1,6 @@
+class_name OfficerExperience
 extends RefCounted
+## 将领的结构化军事经验：敌情笔记、近期战斗记录、有上限的性格漂移。
 
 # Structured military experience: bounded notes about enemies, a short battle log
 # and a bounded personality drift that only changes the *effective* personality

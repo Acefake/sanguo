@@ -1,4 +1,6 @@
+class_name OfficerFate
 extends RefCounted
+## 武将去向：阵亡、被俘、溃散、归还与释放，个人与守城战功记录，城破后的处置。
 
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 

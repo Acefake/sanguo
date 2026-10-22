@@ -1,4 +1,6 @@
+class_name LegacyFormationMigration
 extends RefCounted
+## 读档迁移：清除已废弃阵形指令残留的移动与攻击锁定。
 
 # Retired commands must not retain a hidden movement/attack lock after loading.
 static func apply(state: Dictionary) -> void:

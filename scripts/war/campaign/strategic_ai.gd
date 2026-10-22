@@ -1,4 +1,6 @@
+class_name StrategicAI
 extends RefCounted
+## 势力战略 AI：非玩家势力每旬评估出兵与增援，复用 preview_dispatch/_mobilize。
 
 # 势力战略 AI：非玩家势力每旬评估一次出兵与增援，复用 preview_dispatch/_mobilize，
 # 不另建战争通道。评分使用实时城池与军队信息。

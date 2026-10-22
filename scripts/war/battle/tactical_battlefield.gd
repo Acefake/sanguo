@@ -1,3 +1,4 @@
+class_name TacticalBattlefield
 extends "res://scripts/war/battle/tactical_battlefield/resolution.gd"
 ## 战术战场：六角格上的布阵、移动与结算，全部是以 war（CampaignState）为第一个参数的静态函数。
 ##

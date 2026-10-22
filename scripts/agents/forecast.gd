@@ -1,4 +1,6 @@
+class_name BattleForecast
 extends RefCounted
+## 候选行动的只读后果估计：不改战局，不消耗随机数。
 
 # Read-only consequence estimation for candidate actions. Never mutates the war,
 # never consumes random numbers (random factor uses the 1.0 expectation), and only

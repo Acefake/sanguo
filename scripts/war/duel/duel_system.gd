@@ -1,4 +1,6 @@
+class_name DuelSystem
 extends RefCounted
+## 单挑：配置、发起与接受条件、体力与勇武比拼、结果记入战局。
 const Process = preload("res://scripts/officers/officer_process.gd")
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Fate = preload("res://scripts/war/campaign/officer_fate.gd")

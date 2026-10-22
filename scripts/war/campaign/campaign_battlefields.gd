@@ -1,4 +1,6 @@
+class_name CampaignBattlefields
 extends RefCounted
+## 正式战役中的多个独立战场：建棋盘、道路、加入与运行、收尾清理。
 
 const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")

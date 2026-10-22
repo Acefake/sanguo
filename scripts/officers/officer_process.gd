@@ -1,3 +1,4 @@
+class_name OfficerProcess
 extends RefCounted
 ## 属性→战斗流程。
 ##

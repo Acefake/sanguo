@@ -1,3 +1,4 @@
+class_name CareerTemplates
 extends RefCounted
 ## 生成将的职业模板。
 ##

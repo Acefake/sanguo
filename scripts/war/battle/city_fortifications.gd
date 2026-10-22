@@ -1,4 +1,6 @@
+class_name CityFortifications
 extends RefCounted
+## 城防地理：城池道路与据点、城墙轮廓、破口通道、按势力的通行棋盘、城内外判定与视线。
 
 const Grid = preload("res://scripts/world/rtk14_hex_grid.gd")
 const Combat = preload("res://scripts/war/battle/combat_system.gd")

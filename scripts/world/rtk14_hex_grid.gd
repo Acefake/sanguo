@@ -1,4 +1,6 @@
+class_name Rtk14HexGrid
 extends RefCounted
+## 全局六角格：坐标与格号换算、邻接、拾取、地形与区域、可通行与距离，主地图与战术规则共用。
 
 const WIDTH := 220
 const DEPTH := 220

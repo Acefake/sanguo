@@ -1,3 +1,4 @@
+class_name CampaignState
 extends RefCounted
 ## 战役状态：军队、军团、城防、军报等全部存档数据都在 state 里，step() 推进一日。
 ##

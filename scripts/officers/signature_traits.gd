@@ -1,3 +1,4 @@
+class_name SignatureTraits
 extends RefCounted
 ## 专属特性的执行：武圣首次威压、小霸王连胜冲击。
 ##

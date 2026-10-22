@@ -1,4 +1,6 @@
+class_name BaselinePolicy
 extends RefCounted
+## 本地决策策略：按 data/agents/policy_weights.json 给每个已授权候选打分，入口 choose(context)。
 
 # Data-driven local decision policy. Keeps the historical `choose(context)` entry
 # point; internals read data/agents/policy_weights.json and score every authorized

@@ -52,3 +52,4 @@ func _ready() -> void:
 		get_tree().change_scene_to_file("res://scenes/rtk14_world_3d.tscn")
 	))
 	column.add_child(UISkin.button("进入独立战场验证", func(): store.open_battle_scenarios(false)))
+	column.add_child(UISkin.button("人物 AI 检验战场", func(): get_tree().change_scene_to_file("res://scenes/war/proving_ground.tscn")))

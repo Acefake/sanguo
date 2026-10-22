@@ -46,7 +46,9 @@ static func perceive(own: Dictionary, truth: Dictionary, ctx: Dictionary, rng: R
 	# 未接战的近处敌军：风险承受高的人只算一部分（冒进者低估援军），谨慎者全算。
 	var nearby_weight := clampf(1.0 - maxf(0.0, _axis(own, "风险承受")) * float(tuning["nearby_discount"]), 0.0, 1.0)
 	var nearby_est := maxf(0.0, float(truth.get("nearby_strength", 0)) * (1.0 + sigma * _z(own, "nearby:strength", rng))) * nearby_weight
-	if enemy_true > 0.0: enemy_est += nearby_est
+	if enemy_true > 0.0:
+		enemy_est += nearby_est
+		enemy_true += float(truth.get("nearby_strength", 0)) * nearby_weight
 	var ratio := friendly / maxf(enemy_est, 1.0) if enemy_true > 0.0 else 9.0
 	var depot: Dictionary = truth.get("depot", {})
 	var guard_est := maxf(0.0, float(depot.get("guard", 0)) * (1.0 + sigma * _z(own, "depot:guard", rng))) if not depot.is_empty() else 0.0

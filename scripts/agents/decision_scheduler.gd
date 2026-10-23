@@ -7,20 +7,19 @@ extends RefCounted
 ##    （默认下一日 step）交给 ModelQueue，立即返回。
 ## 2. 模型答案一到就进 ready（界面与测试可见），但只在 commit_tick 那一回合可取。
 ## 3. begin_round 到达 commit_tick：答案没到的请求作废，记“默认”；答案到了但当回合没被取走的，下一回合丢弃。
-## 4. take：调用方给出今日上下文时，先复查合法性（同一行动仍在今日候选里）再跑 POLICY.veto，
-##    过关才采用，否则返回 {} 让调用方沿用默认。
+## 4. take：调用方给出今日上下文时，先复查合法性（同一行动仍在今日候选里），再请适配器按今日上下文
+##    否决（AgentAdapter.veto 即 POLICY.veto），过关才采用，否则返回 {} 让调用方沿用默认。
 ## 每个结算过的请求都向 ModelQueue 写一行决策日志，记录最终采用值。
 ##
 ## 对外接口（submit / take / has_pending / invalidate / begin_round / clear / ready / requested /
 ## running / discarded / queued_requests / key_for）与旧版保持一致，只在本地的 unit_brain 等脚本照常可用。
 
-const POLICY = preload("res://scripts/agents/baseline_policy.gd")
 const Runtime = preload("res://scripts/agents/ai_runtime.gd")
 const Request = preload("res://scripts/agents/decision_request.gd")
 
 var epoch := 0
 var running := false
-## key -> 已到的提案 {"context", "result", "signature", "tick", "commit_tick", "request_id", "entry"}
+## key -> 已到的提案 {"context", "result", "signature", "tick", "commit_tick", "request_id", "entry", "adapter"}
 var ready: Dictionary = {}
 ## key -> 在等的 Request
 var requested: Dictionary = {}
@@ -80,7 +79,7 @@ func has_pending(key: String) -> bool:
 	return requested.has(key) or ready.has(key)
 
 
-## 在提交点取提案。context_now 非空时复查：同一行动须仍在今日候选里，再过 POLICY.veto；
+## 在提交点取提案。context_now 非空时复查：同一行动须仍在今日候选里，再过适配器的 veto；
 ## 复查后的提案 context 换成今日上下文、candidate_id 换成今日候选的 id。不过关返回 {}。
 ## context_now 为空（旧调用方）时沿用旧规则：情境指纹不一致即丢弃。
 func take(key: String, signature: String, _tick: int, context_now: Dictionary = {}) -> Dictionary:
@@ -148,7 +147,7 @@ func _on_settled(request_id: String) -> void:
 		return
 	var answer: Dictionary = _models().take(request_id)
 	if is_instance_valid(adapter) and adapter.has_method("resolve"): answer = adapter.resolve(waiting["context"], answer)
-	ready[key] = {"context": waiting["context"], "result": answer, "signature": request.context_hash, "tick": request.commit_tick - int(Runtime.config()["commit_delay_ticks"]), "commit_tick": request.commit_tick, "request_id": request_id, "entry": _entry(request)}
+	ready[key] = {"context": waiting["context"], "result": answer, "signature": request.context_hash, "tick": request.commit_tick - int(Runtime.config()["commit_delay_ticks"]), "commit_tick": request.commit_tick, "request_id": request_id, "entry": _entry(request), "adapter": adapter}
 	requested.erase(key)
 	_refresh()
 
@@ -169,18 +168,18 @@ func _fixture_request(adapter: Node, context: Dictionary) -> Request:
 	return request
 
 
-## 复查：模型选的行动必须仍在今日候选里，并通过 POLICY.veto。
+## 复查：模型选的行动必须仍在今日候选里；模型给出的答案再交适配器按今日上下文否决（适配器没有 veto 时不否决）。
 func _admit(proposal: Dictionary, context_now: Dictionary) -> Dictionary:
-	if context_now.is_empty(): return {"ok": true}
 	var chosen := str(proposal["result"].get("candidate_id", ""))
 	var action: Variant = null
 	for candidate in proposal["context"].get("candidates", []):
 		if str(candidate["id"]) == chosen: action = candidate["action"]
 	if action == null: return {"ok": false, "reason": "illegal"}
+	var adapter: Variant = proposal["adapter"]
+	var judge: bool = str(proposal["result"].get("source", "")) == "model" and is_instance_valid(adapter) and adapter.has_method("veto")
 	for candidate in context_now.get("candidates", []):
 		if candidate["action"] != action: continue
-		if str(proposal["result"].get("source", "")) == "model" and not POLICY.veto(context_now, str(candidate["id"])).get("ok", true):
-			return {"ok": false, "reason": "vetoed"}
+		if judge and not adapter.veto(context_now, str(candidate["id"])).get("ok", true): return {"ok": false, "reason": "vetoed"}
 		return {"ok": true, "candidate_id": str(candidate["id"])}
 	return {"ok": false, "reason": "illegal"}
 

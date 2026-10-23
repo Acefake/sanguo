@@ -153,7 +153,7 @@ func resolve(context: Dictionary, answer: Dictionary) -> Dictionary:
 		fallback["fallback_reason"] = reason
 		return fallback
 	if str(answer.get("source", "")) != "model": return answer
-	var verdict: Dictionary = POLICY.veto(context, str(answer.get("candidate_id", "")))
+	var verdict: Dictionary = veto(context, str(answer.get("candidate_id", "")))
 	if verdict.get("ok", true):
 		last_status = "智能体决策完成"
 		return answer
@@ -164,6 +164,11 @@ func resolve(context: Dictionary, answer: Dictionary) -> Dictionary:
 	metrics["vetoes"] += 1
 	last_status = "模型建议被守门否决  本地策略接管"
 	return local
+
+
+## 守门：评分落后最高分过多或越权的选择不采用。答案到达时与提交点各用一次（提交点用当日上下文）。
+func veto(context: Dictionary, candidate_id: String) -> Dictionary:
+	return POLICY.veto(context, candidate_id)
 
 
 ## 记一次模型失败（连接失败、超时、无效响应），由本地策略接管。

@@ -3,7 +3,7 @@ extends SceneTree
 ##
 ##   godot --headless --path . --script res://tests/agents/model_queue_validation.gd
 ##
-## 覆盖 08b §9 的 2–4 条：提交点（早到用模型、晚到用默认）、情境失效丢弃不报错、同人同类顶替且队列不增长；
+## 覆盖 08b §9 的 2–4 条：提交点（早到用模型、晚到用默认、复查与否决）、情境失效丢弃不报错、同人同类顶替且队列不增长；
 ## 另有优先级、超时、统计、决策日志与传输层解码。
 
 const Client = preload("res://scripts/agents/model_client.gd")
@@ -20,6 +20,7 @@ class MockAdapter extends Node:
 	var concurrency := 6
 	var calls := 0
 	func supports_background_decisions() -> bool: return true
+	func veto(_context: Dictionary, candidate_id: String) -> Dictionary: return {"ok": candidate_id != "reckless"}
 	func choose_batch(contexts: Array) -> Dictionary:
 		calls += contexts.size()
 		await get_tree().create_timer(delay).timeout
@@ -163,14 +164,19 @@ func _commit_checks() -> void:
 	await create_timer(0.1).timeout
 	scheduler.begin_round(4)
 	check(scheduler.take("army:army-x", "h4", 4, _context("r4-now", ["hold", "engage"])).is_empty(), "非法答案通过了提交点复查")
+	# 否决：答案合法但按今日上下文被适配器否决 → 不采用。
+	scheduler.submit([_context("r45", ["hold", "reckless"])], adapter, {"army:army-x": "h45"})
+	await create_timer(0.1).timeout
+	scheduler.begin_round(5)
+	check(scheduler.take("army:army-x", "h45", 5, _context("r45-now", ["hold", "reckless"])).is_empty(), "被否决的答案仍被采用")
 	# 情境失效：答案已到但军队溃散 → 丢弃，不报错。
 	var routed := {"value": false}
 	scheduler.alive = func(_key: String) -> bool: return not routed["value"]
 	scheduler.submit([_context("r5", ["hold", "engage"])], adapter, {"army:army-x": "h5"})
 	await create_timer(0.1).timeout
 	routed["value"] = true
-	scheduler.begin_round(5)
-	check(scheduler.take("army:army-x", "h5", 5, _context("r5-now", ["hold", "engage"])).is_empty(), "溃散后的答案没有丢弃")
+	scheduler.begin_round(6)
+	check(scheduler.take("army:army-x", "h5", 6, _context("r5-now", ["hold", "engage"])).is_empty(), "溃散后的答案没有丢弃")
 	# 顶替：同一 key 连续提交，只留最新一个。
 	scheduler.alive = Callable()
 	adapter.delay = 0.05
@@ -181,7 +187,7 @@ func _commit_checks() -> void:
 	check(scheduler.ready.is_empty(), "clear 之后旧答案仍落地")
 	var lines := _log_lines().slice(lines_before.size())
 	var outcomes: Array = lines.map(func(line): return JSON.parse_string(line)["outcome"])
-	check(outcomes.has("adopted") and outcomes.has("late") and outcomes.has("illegal") and outcomes.has("stale"), "决策日志缺少结论：%s" % str(outcomes))
+	check(outcomes.has("adopted") and outcomes.has("late") and outcomes.has("illegal") and outcomes.has("vetoed") and outcomes.has("stale"), "决策日志缺少结论：%s" % str(outcomes))
 	var adopted: Dictionary = JSON.parse_string(lines[outcomes.find("adopted")])
 	check(adopted["final"] == "engage" and adopted["default"] == "hold", "决策日志的最终采用值错误")
 	adapter.queue_free()

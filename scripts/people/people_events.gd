@@ -38,6 +38,12 @@ func drain() -> Array:
 	return events
 
 
+## Autoload「PeopleEvents」节点。与 PersonStore.autoload() 同理：经测试 preload 链编译的脚本不写全局名，
+## 也不能从不在场景树里的节点用 /root 路径取。
+static func autoload() -> PeopleEventBus:
+	return (Engine.get_main_loop() as SceneTree).root.get_node("PeopleEvents")
+
+
 ## 可发的事件 kind（读一次 memory_rules.json 后缓存）。
 static func catalog() -> Array:
 	if _catalog.is_empty():

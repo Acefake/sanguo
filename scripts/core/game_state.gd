@@ -8,6 +8,8 @@ signal campaign_progress
 const WarCampaign = preload("res://scripts/war/campaign/campaign_state.gd")
 const AgentAdapter = preload("res://scripts/agents/agent_adapter.gd")
 const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
+const PeopleStore = preload("res://scripts/people/person_store.gd")
+const EventBus = preload("res://scripts/people/people_events.gd")
 
 const DEMO_PATH := "res://data/scenario_world_demo.json"
 const SAVE_PATH := "user://city_campaign.json"
@@ -238,15 +240,15 @@ func _save() -> void:
 
 ## 人物系统存档：People 的状态加上 PeopleEvents 未结算的事件队列，存在 people 键（people_version 见 PersonStore.VERSION）。
 func _export_people() -> Dictionary:
-	var state: Dictionary = People.export_state()
-	state["events"] = PeopleEvents.export_state()
+	var state: Dictionary = PeopleStore.autoload().export_state()
+	state["events"] = EventBus.autoload().export_state()
 	return state
 
 
 ## 旧档没有 people 键时保持人物系统现状。
 func _import_people(state: Variant) -> void:
 	if not state is Dictionary or state.is_empty(): return
-	if People.import_state(state): PeopleEvents.import_state(state.get("events", {}))
+	if PeopleStore.autoload().import_state(state): EventBus.autoload().import_state(state.get("events", {}))
 
 
 func city_state(city_id: String) -> Dictionary:

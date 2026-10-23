@@ -43,6 +43,14 @@ static func seed(store: Store, events_doc: Dictionary, rules: Dictionary) -> voi
 				})
 
 
+## 事件目录里可发的全部 kind：各阶段加 bio_only，不含 memory_only。
+static func catalog_kinds(rules: Dictionary) -> Array:
+	var catalog: Dictionary = rules["event_catalog"]
+	var out: Array = catalog["P1_war_hooks"].keys()
+	for stage in ["P2_P3", "P5_P7", "bio_only"]: out.append_array(catalog[stage])
+	return out
+
+
 ## 经过 elapsed 旬后的强度：线性衰减，不低于该档保底。r_mult 是关口事件的衰减倍率。
 static func decayed(base: float, weight_class: String, elapsed: int, rules: Dictionary, r_mult: float = 1.0) -> float:
 	var r := float(rules["decay_r"][weight_class]) * r_mult

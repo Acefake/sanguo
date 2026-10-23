@@ -10,6 +10,7 @@ extends RefCounted
 
 const Circles = preload("res://scripts/people/circles.gd")
 const Migrate = preload("res://scripts/people/card_migrate.gd")
+const Memory = preload("res://scripts/people/memory.gd")
 
 const DATA_DIR := "res://data/people/"
 const WORLD_SCENARIO := "res://data/scenario_world_demo.json"
@@ -66,12 +67,9 @@ static func check_seed_events(events: Array, people_ids: Array, cities: Array, c
 	return report
 
 
-## 事件目录里可 emit 的全部 kind（各阶段 + bio_only，不含 memory_only）。
+## 事件目录里可发的全部 kind（PeopleMemory.catalog_kinds）。
 static func catalog_kinds(memory_rules: Dictionary) -> Array:
-	var catalog: Dictionary = memory_rules["event_catalog"]
-	var out: Array = catalog["P1_war_hooks"].keys()
-	for stage in ["P2_P3", "P5_P7", "bio_only"]: out.append_array(catalog[stage])
-	return out
+	return Memory.catalog_kinds(memory_rules)
 
 
 ## 规则表互相覆盖：事件目录 ↔ 记忆规则一一对应；memory_only 不可 emit；会写出的记忆都有衰减档、

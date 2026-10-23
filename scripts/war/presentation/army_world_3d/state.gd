@@ -26,7 +26,7 @@ const SOLDIER_TURN_RATE := 3.5
 # reach) close on it, every lunge stopping CONTACT_GAP m short. Fallen soldiers stay drawn FALL_SECONDS.
 const CONTACT_PUSH_BAND := 2.2
 const CONTACT_GAP := 0.2
-const FALL_SECONDS := 1.35
+const FALL_SECONDS := 2.6
 # Per-kind visible counts by LOD level (near, mid, far). The near step is the
 # baseline density; casualties and LOD thin the whole hex evenly, never grow it.
 const DENSITY_LEVELS := {"infantry":[240,150,75], "archers":[240,150,75], "cavalry":[80,50,26]}

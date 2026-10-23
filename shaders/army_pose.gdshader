@@ -44,6 +44,7 @@ uniform float under_attack = 0.0;
 // Fallen soldiers carry INSTANCE_CUSTOM.w = -(death time - death_epoch) - 10; alive ones a value >= 0.
 uniform float death_epoch = 0.0;
 varying float fade;
+varying float fallen;
 
 // Integer `%` and `/` by a uniform divisor are avoided throughout: llvmpipe's JIT emits an illegal
 // instruction for them on CPUs without AVX, which takes down the GL compatibility renderer.
@@ -111,11 +112,13 @@ void vertex() {
  float fall = 0.0;
  float sink = 0.0;
  if (INSTANCE_CUSTOM.w < 0.0) {
+  // Topple by 0.5 s, lie still until 1.7 s, then sink and fade out by 2.5 s (state.gd FALL_SECONDS).
   float age = animation_clock - (death_epoch - INSTANCE_CUSTOM.w - 10.0);
-  fall = smoothstep(0.0, 0.45, age);
-  sink = smoothstep(0.55, 1.3, age);
+  fall = smoothstep(0.0, 0.5, age);
+  sink = smoothstep(1.7, 2.5, age);
   fade = 1.0 - sink;
  }
+ fallen = fall;
  // Melee strikes are staggered: each soldier its own phase (x) and rate (y), front ranks (z) faster.
  // Archers keep the plain rate: their arrows are timed to it (combat_effects_3d.gd show_archer_volley).
  float rate = pose_start == 9 && !reference_archer ? (0.8 + INSTANCE_CUSTOM.y * 0.4) * mix(0.82, 1.18, INSTANCE_CUSTOM.z) : 0.92 + INSTANCE_CUSTOM.y * 0.16;
@@ -167,15 +170,17 @@ void vertex() {
  vec3 normal = NORMAL;
  local = turn_x(local, -hit * 0.14);
  normal = turn_x(normal, -hit * 0.14);
+ // Each soldier falls to its own side (phase x): cavalry sideways, infantry backwards with a twist.
+ float side = INSTANCE_CUSTOM.x < 0.5 ? 1.0 : -1.0;
  if (mounted_palette) {
-  local = turn_z(local, fall * 1.35);
-  normal = turn_z(normal, fall * 1.35);
+  local = turn_z(local, fall * 1.35 * side);
+  normal = turn_z(normal, fall * 1.35 * side);
  } else {
-  local = turn_x(local, -fall * 1.45);
-  normal = turn_x(normal, -fall * 1.45);
+  local = turn_z(turn_x(local, -fall * 1.5), fall * 0.45 * side);
+  normal = turn_z(turn_x(normal, -fall * 1.5), fall * 0.45 * side);
  }
  vec3 forward = vec3(sin(local_yaw), 0.0, cos(local_yaw));
- VERTEX = turn_y(local, local_yaw) + pivot + (forward * (advance - hit * 0.14) - vec3(0.0, sink * 0.7, 0.0)) / model_scale;
+ VERTEX = turn_y(local, local_yaw) + pivot + (forward * (advance - hit * 0.14) - vec3(0.0, fall * 0.05 + sink * 0.7, 0.0)) / model_scale;
  NORMAL = turn_y(normal, local_yaw);
 }
 void fragment() {
@@ -201,6 +206,9 @@ void fragment() {
   float sash = smoothstep(0.93,0.97,uniform_height) * (1.0 - smoothstep(1.10,1.14,uniform_height));
   ALBEDO = mix(ALBEDO,vec3(0.40,0.065,0.033)*(0.7+light),sash*0.35);
  }
+ // The fallen turn a dark blood red: they lie scattered among the standing ranks (the LOD order spreads
+ // every prefix evenly), and a darker grey would vanish into the formation's own shadows.
+ ALBEDO = mix(ALBEDO, ALBEDO * 0.35 + vec3(0.34, 0.05, 0.03), fallen * 0.75);
  ROUGHNESS = 0.82;
  METALLIC = 0.08;
 }

@@ -94,12 +94,8 @@ func show_enemy(id: String) -> void:
 	var observed: Dictionary = observed_enemies.get(id, {})
 	if observed.is_empty(): return
 	selected_enemy = id
-	ui.reports_view.hide()
-	ui._prepare_drawer("enemy")
+	ui.open_body("敌军信息")
 	ui.page = "enemy"
-	ui.heading.text = "敌军信息"
-	ui.drawer.show()
-	ui._clear()
 	if store.battle_test:
 		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
 		ui.heading.text = str(army.get("name", "敌军")) + "队  测试观察"
@@ -115,42 +111,48 @@ func _refresh_enemy_panel() -> void:
 	# Refresh live enemy information after each campaign update.
 	if selected_enemy == "" or not is_instance_valid(ui) or ui.page != "enemy" or not ui.drawer.visible: return
 	if observed_enemies.get(selected_enemy, {}).is_empty():
-		ui._clear()
-		ui.heading.text = "敌军信息"
-		ui.drawer.show()
+		ui.open_body("敌军信息")
 		ui.body.add_child(ui._label("该部队已结束行动。", 14))
 		return
 	show_enemy(selected_enemy)
 
+## 战况细条：顶栏下方居中一条「我军 ▬▬ 敌军」，独立战场时下面一行目标进度。
 func _build_battle_feedback() -> void:
+	var Widgets := preload("res://scripts/ui/theme/ui_widgets.gd")
+	var Tokens := preload("res://scripts/ui/theme/ui_tokens.gd")
 	advantage_panel = PanelContainer.new()
 	advantage_panel.name = "BattleAdvantage"
-	advantage_panel.position = Vector2(490, 18)
-	advantage_panel.custom_minimum_size = Vector2(430, 58)
+	Widgets.adopt_theme(advantage_panel)
+	advantage_panel.theme_type_variation = "BarPanel"
+	advantage_panel.anchor_left = 0.5
+	advantage_panel.anchor_right = 0.5
+	advantage_panel.offset_left = -220
+	advantage_panel.offset_right = 220
+	advantage_panel.offset_top = 72
 	advantage_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.08,0.10,0.07,0.88)
-	style.set_content_margin_all(8)
-	advantage_panel.add_theme_stylebox_override("panel",style)
-	var box := VBoxContainer.new()
+	var box := Widgets.vbox(0)
 	advantage_panel.add_child(box)
-	advantage_label = preload("res://scripts/ui/city_ui_skin.gd").label("",16)
-	advantage_label.add_theme_color_override("font_color", Color("f3e6bf"))
-	box.add_child(advantage_label)
-	var objective_label := preload("res://scripts/ui/city_ui_skin.gd").label("", 14)
-	objective_label.name = "BattleObjectiveLabel"
-	objective_label.add_theme_color_override("font_color", Color("f3e6bf"))
-	objective_label.custom_minimum_size.x = 410
-	objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(objective_label)
+	var row := Widgets.hbox(1)
+	box.add_child(row)
+	row.add_child(Widgets.label("我军", "NoteLabel"))
 	advantage_bar = ProgressBar.new()
-	advantage_bar.custom_minimum_size = Vector2(410,12)
+	advantage_bar.custom_minimum_size = Vector2(0, 6)
+	advantage_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	advantage_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	advantage_bar.show_percentage = false
-	for setting in [["background",Color("9e4837")],["fill",Color("73904c")]]:
-		var bar_style := StyleBoxFlat.new()
-		bar_style.bg_color = setting[1]
-		advantage_bar.add_theme_stylebox_override(setting[0],bar_style)
-	box.add_child(advantage_bar)
+	var enemy_side := StyleBoxFlat.new()
+	enemy_side.bg_color = Tokens.color("accent")
+	enemy_side.set_corner_radius_all(Tokens.radius("pill"))
+	advantage_bar.add_theme_stylebox_override("background", enemy_side)
+	row.add_child(advantage_bar)
+	row.add_child(Widgets.label("敌军", "NoteLabel"))
+	advantage_label = Widgets.label("", "DimLabel")
+	advantage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(advantage_label)
+	var objective_label := Widgets.label("", "DimLabel", true)
+	objective_label.name = "BattleObjectiveLabel"
+	objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(objective_label)
 	layer.add_child(advantage_panel)
 	_refresh_battle_feedback()
 
@@ -159,7 +161,7 @@ func _refresh_battle_feedback() -> void:
 	advantage_panel.visible = not store.war.active_armies().is_empty()
 	var balance := Feedback.visible_advantage(store.war)
 	advantage_bar.value = balance["percent"]
-	advantage_label.text = "我军 %.0f%%　|　敌军 %.0f%%　%s" % [balance["percent"],100-balance["percent"],"战况优势"]
+	advantage_label.text = "战况  %.0f%% : %.0f%%" % [balance["percent"], 100 - balance["percent"]]
 	var objective_label: Label = advantage_panel.find_child("BattleObjectiveLabel", true, false)
 	objective_label.text = preload("res://scripts/war/battle/battle_objectives.gd").status_text(store.war)
 	objective_label.visible = store.battle_test

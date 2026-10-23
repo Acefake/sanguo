@@ -32,14 +32,10 @@ func _ready() -> void:
 	duel_presentation.effects = combat_effects
 	ui = CampaignUI.new()
 	ui.store = store
-	ui.toolbar_offset = Vector2(16, 72)
 	add_child(ui)
-	ui.drawer.offset_top = 112
 	ui.army_dispatched.connect(focus_army)
 	army_choice = OptionButton.new()
-	army_choice.position = Vector2(16, 208)
 	army_choice.custom_minimum_size = Vector2(200, 32)
-	army_choice.add_theme_font_override("font", preload("res://scripts/ui/city_ui_skin.gd").font())
 	army_choice.item_selected.connect(func(index):
 		if index > 0: focus_army(str(army_choice.get_item_metadata(index)))
 	)

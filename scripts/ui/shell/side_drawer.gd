@@ -39,7 +39,7 @@ func _init() -> void:
 	title_label = Widgets.title("")
 	title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	titles.add_child(title_label)
-	subtitle_label = Widgets.label("", "DimLabel")
+	subtitle_label = Widgets.label("", "MutedLabel")
 	subtitle_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	titles.add_child(subtitle_label)
 	var close_button := Widgets.text_button("关闭", close)

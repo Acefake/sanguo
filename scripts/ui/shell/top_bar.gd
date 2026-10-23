@@ -88,7 +88,7 @@ func _faction_block() -> Control:
 	block.add_child(text)
 	_ruler = Widgets.label("")
 	text.add_child(_ruler)
-	_summary = Widgets.label("", "DimLabel")
+	_summary = Widgets.label("", "MutedLabel")
 	text.add_child(_summary)
 	return block
 

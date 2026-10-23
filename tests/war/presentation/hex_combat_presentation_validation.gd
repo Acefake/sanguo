@@ -58,12 +58,13 @@ func run() -> void:
 			world._fit_formation_to_hex(group)
 			for spec in [["Soldiers","infantry"],["Archers","archers"],["Mounted/Cavalry","cavalry"]]:
 				var batch: MultiMeshInstance3D = group.get_node(spec[0])
-				var bounds: AABB = world.troop_pose_bounds[spec[1]]
+				# Standing and marching poses stay in the hex; combat lunges may reach about 0.5 m into the attacked neighbor.
+				var bounds: AABB = world.troop_rest_bounds[spec[1]]
 				var standing_center := Vector3.ZERO
 				for i in range(batch.multimesh.visible_instance_count):
 					standing_center += batch.global_transform*(batch.multimesh.get_instance_transform(i)*world.troop_ground_centers[spec[1]])
 					for corner in range(8):
-						inside(batch.global_transform*(batch.multimesh.get_instance_transform(i)*bounds.get_endpoint(corner)),cell,"Soldier attack envelope crosses assigned hex: "+kind)
+						inside(batch.global_transform*(batch.multimesh.get_instance_transform(i)*bounds.get_endpoint(corner)),cell,"Soldier pose envelope crosses assigned hex: "+kind)
 						checked += 1
 				if batch.multimesh.visible_instance_count > 0:
 					standing_center /= batch.multimesh.visible_instance_count

@@ -40,3 +40,16 @@ static func fit_scale(cell: int, anchor: Vector2, offsets: PackedVector2Array, m
 			var projection := outward.dot(offset)
 			if projection > 0.001: result = minf(result,available/projection)
 	return clampf(result,0.0,1.0)
+
+## Largest scale (<= 1) keeping a circle of `radius` around `anchor` inside the hex, `margin` short of every edge.
+static func fit_radius(cell: int, anchor: Vector2, radius: float, margin: float = 0.18) -> float:
+	var grid = Grid.shared()
+	var center: Vector2 = grid.center(cell)
+	var polygon: PackedVector2Array = grid.polygon(cell)
+	var result := 1.0
+	for i in range(polygon.size()):
+		var edge := polygon[(i+1)%polygon.size()]-polygon[i]
+		var outward := Vector2(edge.y,-edge.x).normalized()
+		if outward.dot(polygon[i]-center) < 0: outward = -outward
+		result = minf(result,(outward.dot(polygon[i]-anchor)-margin)/radius)
+	return clampf(result,0.0,1.0)

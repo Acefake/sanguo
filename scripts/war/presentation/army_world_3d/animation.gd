@@ -211,7 +211,6 @@ func _process(delta: float) -> void:
 				if not store.time_paused: _face_contact_sectors(group, fronts, delta * minf(store.time_scale, 2.0))
 			elif not store.time_paused and _formation_moving(group):
 				_face_contact_sectors(group, [{"target": group.global_position + Vector3(sin(float(group.get_meta("march_heading",0.0))),0,cos(float(group.get_meta("march_heading",0.0)))) * 100}], delta * minf(store.time_scale, 2.0))
-		if update_ground: OfficerVisual.ground(self, group)
 		var toward_camera: Vector3 = ((map.camera.global_position-group.global_position)*Vector3(1,0,1)).normalized()
 		var anchor: Vector3 = group.global_position + toward_camera * 2.7 + Vector3.UP * 0.3
 		var badge: Control = badges[id]
@@ -321,16 +320,20 @@ func _face_contact_sectors(group: Node3D, fronts: Array, delta: float = 1.0 / 60
 	group.set_meta("facing_elapsed",0.0)
 	delta = elapsed
 	var changed := false
+	# Front directions in formation space, once per call rather than per soldier.
+	var towards := PackedVector3Array()
+	var inverse := group.basis.inverse()
+	for front in fronts:
+		var toward: Vector3 = inverse * (front["target"] - group.global_position)
+		toward.y = 0
+		towards.append(toward.normalized())
 	for i in range(batch.multimesh.visible_instance_count):
 		var transform := batch.multimesh.get_instance_transform(i)
-		var offset := Vector3(transform.origin.x, 0, transform.origin.z)
+		var offset := Vector3(transform.origin.x, 0, transform.origin.z).normalized()
 		var best := -INF
 		var heading := Vector3.BACK
-		for front in fronts:
-			var toward: Vector3 = group.basis.inverse() * (front["target"] - group.global_position)
-			toward.y = 0
-			toward = toward.normalized()
-			var score := offset.normalized().dot(toward)
+		for toward in towards:
+			var score := offset.dot(toward)
 			if score > best: best = score; heading = toward
 		var current := atan2(transform.basis.z.x, transform.basis.z.z)
 		var goal := atan2(heading.x, heading.z)

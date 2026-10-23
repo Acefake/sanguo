@@ -112,8 +112,13 @@ func _remember_pose_bounds(kind: String, frames: Array) -> void:
 			if not found: ground_bounds = AABB(vertex,Vector3.ZERO); found = true
 			else: ground_bounds = ground_bounds.expand(vertex)
 	troop_ground_centers[kind] = ground_bounds.get_center()*Vector3(1,0,1) if found else Vector3.ZERO
-	for frame in frames: bounds = bounds.merge(frame.get_aabb())
+	var standing := bounds
+	for i in range(frames.size()):
+		bounds = bounds.merge(frames[i].get_aabb())
+		# Frames 9-20 are the combat lunges (see _set_pose); the rest stand or march.
+		if i < 9 or i > 20: standing = standing.merge(frames[i].get_aabb())
 	troop_pose_bounds[kind] = bounds
+	troop_rest_bounds[kind] = standing
 
 func _fit_formation_to_hex(group: Node3D, moving: bool = false) -> void:
 	moving = moving or melee_positions.has(str(group.get_meta("army_id","")))
@@ -127,98 +132,94 @@ func _fit_formation_to_hex(group: Node3D, moving: bool = false) -> void:
 		group.get_meta("facing_revision",0), group.get_meta("siege_layout_revision",0),
 		group.get_meta("march_layout_scale",1.0),group.get_meta("wall_contact",false)]
 	var engines: Node3D = group.get_node_or_null("SiegeEngines")
-	var officers: Node3D = group.get_node_or_null("CommandOfficers")
-	if officers != null:
-		for actor in officers.get_children(): signature.append(actor.name)
 	if engines != null:
 		for engine in engines.get_children(): signature.append(roundi(atan2(engine.basis.z.x,engine.basis.z.z)*1000.0))
 	if group.get_meta("fit_signature",[]) == signature: return
 	group.set_meta("fit_signature",signature)
-	var records: Array = []
+	# Troops: every layout keeps its standing and marching poses within a circle of
+	# radius `extent` at any heading, so the hex fit needs no per-soldier envelope.
+	var extent := 0.0
+	for kind in TROOP_KINDS:
+		var batch: MultiMeshInstance3D = group.get_node_or_null(TROOP_KINDS[kind]["batch"])
+		if batch == null or not troop_pose_bounds.has(kind) or batch.multimesh.visible_instance_count == 0: continue
+		_troop_offset(group,0,kind,mode)
+		extent = maxf(extent,float(_troop_layout(kind)["extent"])+float(group.get_meta("layout_slack_"+kind,0.0)))
 	var envelope := PackedVector2Array()
-	for spec in [["Soldiers","infantry",8,0.5,0.5,1.18],["Archers","archers",8,0.5,0.5,1.2],["Mounted/Cavalry","cavalry",6,0.85,1.25,0.72]]:
-		var batch: MultiMeshInstance3D = group.get_node_or_null(spec[0])
-		if batch == null or not troop_pose_bounds.has(spec[1]): continue
-		var count := batch.multimesh.visible_instance_count
-		if count < 0: count = batch.multimesh.instance_count
-		var bounds: AABB = troop_pose_bounds[spec[1]]
-		# Reserve the full footprint at every distance so LOD cannot resize the army.
-		for i in range(batch.multimesh.instance_count if count > 0 else 0):
-			var basis := batch.multimesh.get_instance_transform(i).basis.orthonormalized().scaled(Vector3.ONE*float(spec[5]))
-			var raw := _troop_offset(group,i,str(spec[1]),mode)
-			var middle: Vector3 = troop_ground_centers.get(spec[1],Vector3.ZERO)
-			var offset := raw-basis*middle
-			if i < count: records.append({"batch":batch,"index":i,"basis":basis,"offset":offset,"bounds":bounds})
-			for corner in range(8):
-				var point: Vector3 = group.basis*(offset+basis*bounds.get_endpoint(corner))
-				envelope.append(Vector2(point.x,point.z))
-	if officers != null:
-		for actor in officers.get_children():
-			var raw := Vector3(-1.0 if actor.name == "commander" else 1.0, 0, -4.0)
-			for corner in actor.get_meta("pose_bounds", PackedVector3Array()):
-				var point: Vector3 = group.basis * (raw + corner)
-				envelope.append(Vector2(point.x, point.z))
 	var equipment: Node3D = group.get_node_or_null("SiegeEngines")
-	if equipment != null:
-		var count := equipment.get_child_count()
-		for engine in equipment.get_children():
-			var i: int = engine.get_index()
-			var basis: Basis = engine.basis.orthonormalized().scaled(Vector3.ONE*float(engine.get_meta("native_scale",1.0)))
-			var bounds := SiegeVisual.pose_bounds(str(engine.get_meta("kind","catapult")))
-			var raw := Vector3((i%2-(min(count,2)-1)*0.5)*3.0,0,(i/2-(ceili(float(count)/2)-1)*0.5)*3.0)
-			var offset := raw
-			records.append({"engine":engine,"basis":basis,"offset":offset})
-			var radius := 0.0
-			for corner in range(8):
-				var point: Vector3 = basis*bounds.get_endpoint(corner)
-				radius = maxf(radius,Vector2(point.x,point.z).length())
-			# Engines aim independently from their final fitted positions; reserve
-			# an orientation-independent envelope for every native mechanism pose.
-			for corner in range(16):
-				var angle := TAU*float(corner)/16
-				var point: Vector3 = group.basis*(offset+Vector3(cos(angle),0,sin(angle))*radius*1.02)
-				envelope.append(Vector2(point.x,point.z))
-	if envelope.is_empty(): return
+	var engine_count := equipment.get_child_count() if equipment != null else 0
+	for engine in (equipment.get_children() if equipment != null else []):
+		var basis: Basis = engine.basis.orthonormalized().scaled(Vector3.ONE*float(engine.get_meta("native_scale",1.0)))
+		var bounds := SiegeVisual.pose_bounds(str(engine.get_meta("kind","catapult")))
+		var radius := 0.0
+		for corner in range(8):
+			var point: Vector3 = basis*bounds.get_endpoint(corner)
+			radius = maxf(radius,Vector2(point.x,point.z).length())
+		# Engines aim independently from their final fitted positions; reserve
+		# an orientation-independent envelope for every native mechanism pose.
+		var offset := _engine_offset(engine.get_index(),engine_count)
+		for corner in range(16):
+			var angle := TAU*float(corner)/16
+			var point: Vector3 = group.basis*(offset+Vector3(cos(angle),0,sin(angle))*radius*1.02)
+			envelope.append(Vector2(point.x,point.z))
+	if extent <= 0.0 and envelope.is_empty(): return
 	var grid = store.war.Tactical.grid()
 	var original := Vector2(group.global_position.x,group.global_position.z)
 	var center: Vector2 = grid.center(cell)
 	var anchor := original if moving or bool(group.get_meta("wall_contact",false)) else center
-	# Keep the complete soldier and weapon footprint inside its assigned hex.
-	var margin := FORMATION_MARGIN
-	var centered := HexPresentation.fit_scale(cell,center,envelope,margin)
-	var size := HexPresentation.fit_scale(cell,anchor,envelope,margin)
-	# Keep every model and its attack poses together. Move an off-center layout
-	# inward before it would collapse near a wall or during a hex transition.
+	var centered := _hex_fit(cell,center,extent,envelope)
+	var size := _hex_fit(cell,anchor,extent,envelope)
+	# Keep every model together. Move an off-center layout inward before it would
+	# collapse near a wall or during a hex transition.
 	for attempt in range(8):
 		if size >= centered*0.85: break
 		anchor = anchor.lerp(center,0.4)
-		size = HexPresentation.fit_scale(cell,anchor,envelope,margin)
+		size = _hex_fit(cell,anchor,extent,envelope)
 	if moving:
 		# A moving formation traverses its route continuously. Re-centering on
 		# each picked hex snapped every model at the boundary and shrank them.
 		anchor = original
 		size = float(group.get_meta("march_layout_scale",group.get_meta("formation_scale",centered)))
 	var shift := group.basis.inverse()*Vector3(anchor.x-original.x,0,anchor.y-original.y)
-	var render_bounds := {}
-	for record in records:
-		var offset: Vector3 = record["offset"]*size+shift
+	for kind in TROOP_KINDS:
+		var batch: MultiMeshInstance3D = group.get_node_or_null(TROOP_KINDS[kind]["batch"])
+		if batch == null or not troop_pose_bounds.has(kind): continue
+		var count := batch.multimesh.visible_instance_count
+		if count < 0: count = batch.multimesh.instance_count
+		if count == 0: continue
+		var bounds: AABB = troop_pose_bounds[kind]
+		var middle: Vector3 = troop_ground_centers.get(kind,Vector3.ZERO)
+		var model_scale := float(TROOP_KINDS[kind]["scale"])*size
+		var render_bounds := AABB()
+		for i in range(count):
+			var basis := batch.multimesh.get_instance_transform(i).basis.orthonormalized().scaled(Vector3.ONE*model_scale)
+			var offset := _troop_offset(group,i,kind,mode)*size+shift-basis*middle
+			var point: Vector3 = group.global_position+group.basis*offset
+			offset.y = map.height_at(point.x,point.z)-group.global_position.y+0.2
+			var transform := Transform3D(basis,offset)
+			batch.multimesh.set_instance_transform(i,transform)
+			render_bounds = transform*bounds if i == 0 else render_bounds.merge(transform*bounds)
+		# GPU pose interpolation can extend beyond the static rest mesh bounds.
+		batch.multimesh.custom_aabb = render_bounds.grow(0.20)
+	for engine in (equipment.get_children() if equipment != null else []):
+		var basis: Basis = engine.basis.orthonormalized().scaled(Vector3.ONE*float(engine.get_meta("native_scale",1.0))*size)
+		var offset := _engine_offset(engine.get_index(),engine_count)*size+shift
 		var point: Vector3 = group.global_position+group.basis*offset
 		offset.y = map.height_at(point.x,point.z)-group.global_position.y+0.2
-		var transform := Transform3D(record["basis"].scaled(Vector3.ONE*size),offset)
-		if record.has("batch"):
-			var batch: MultiMeshInstance3D = record["batch"]
-			batch.multimesh.set_instance_transform(record["index"],transform)
-			var bounds: AABB = transform*record["bounds"]
-			render_bounds[batch] = render_bounds[batch].merge(bounds) if render_bounds.has(batch) else bounds
-		else: record["engine"].transform = transform
-	for batch in render_bounds:
-		# GPU pose interpolation can extend beyond the static rest mesh bounds.
-		batch.multimesh.custom_aabb = render_bounds[batch].grow(0.20)
+		engine.transform = Transform3D(basis,offset)
 	group.set_meta("formation_cell",cell)
 	group.set_meta("formation_scale",size)
 	group.set_meta("formation_shift", shift)
-	OfficerVisual.ground(self, group)
 	group.set_meta("fit_updates",int(group.get_meta("fit_updates",0))+1)
+
+func _engine_offset(index: int, count: int) -> Vector3:
+	return Vector3((index%2-(mini(count,2)-1)*0.5)*3.0,0,(index/2-(ceili(float(count)/2)-1)*0.5)*3.0)
+
+# Largest scale (<= 1) keeping a troop circle of radius `extent` and the engine
+# envelope inside the hex around `anchor`.
+func _hex_fit(cell: int, anchor: Vector2, extent: float, envelope: PackedVector2Array) -> float:
+	var size := HexPresentation.fit_scale(cell,anchor,envelope,FORMATION_MARGIN) if not envelope.is_empty() else 1.0
+	if extent > 0.0: size = minf(size,HexPresentation.fit_radius(cell,anchor,extent,FORMATION_MARGIN))
+	return size
 
 func _wall_contact_point(army: Dictionary, center: Vector3) -> Vector3:
 	var board: Dictionary = store.war.Tactical.board_for(store.war,army)
@@ -363,7 +364,6 @@ func refresh() -> void:
 			_set_flag(group, flag_faction, flag_color)
 			_update_siege_engines(group, army)
 			_apply_troop_detail(group)
-			OfficerVisual.sync(self, group, army, false)
 			_fit_formation_to_hex(group,_formation_moving(group))
 	for id in formations.keys():
 		if not active.has(id):
@@ -560,14 +560,14 @@ func _update_special_troops(group: Node3D, bows: int, horses: int) -> void:
 		archers.multimesh.visible_instance_count = bows
 		for i in range(bows):
 			var offset := _troop_offset(group,i,"archers","idle")
-			archers.multimesh.set_instance_transform(i,Transform3D(Basis.IDENTITY.scaled(Vector3.ONE*1.2),offset))
+			archers.multimesh.set_instance_transform(i,Transform3D(Basis.IDENTITY.scaled(Vector3.ONE*float(TROOP_KINDS["archers"]["scale"])),offset))
 			archers.multimesh.set_instance_color(i,Color.WHITE)
 			archers.multimesh.set_instance_custom_data(i,Color(float(i%12)/12,0.5,1,1))
 	var cavalry: MultiMeshInstance3D = group.get_node_or_null("Mounted/Cavalry")
 	if cavalry != null:
 		cavalry.multimesh.visible_instance_count = horses
 		for i in range(horses):
-			cavalry.multimesh.set_instance_transform(i,Transform3D(Basis.IDENTITY.scaled(Vector3.ONE*.72),_troop_offset(group,i,"cavalry","idle")))
+			cavalry.multimesh.set_instance_transform(i,Transform3D(Basis.IDENTITY.scaled(Vector3.ONE*float(TROOP_KINDS["cavalry"]["scale"])),_troop_offset(group,i,"cavalry","idle")))
 			cavalry.multimesh.set_instance_color(i,Color.WHITE)
 			cavalry.multimesh.set_instance_custom_data(i,Color(float(i%6)/6,0.5,1,1))
 
@@ -621,11 +621,10 @@ func _layout_formation(group: Node3D, count: int) -> void:
 	var base_offsets: Array = []
 	var random := RandomNumberGenerator.new()
 	random.seed = hash(group.name)
-	var radius := 2.7
+	var radius: float = _troop_layout("infantry")["b"]
 	for i in range(count):
 		var offset := _troop_offset(group,i,"infantry","idle")
-		var size_value := 1.18
-		var basis := Basis.IDENTITY.scaled(Vector3.ONE * size_value)
+		var basis := Basis.IDENTITY.scaled(Vector3.ONE * float(TROOP_KINDS["infantry"]["scale"]))
 		if i < previous_count: basis = batch.multimesh.get_instance_transform(i).basis
 		var world_offset := group.basis * offset
 		offset.y = map.height_at(group.position.x + world_offset.x, group.position.z + world_offset.z) - group.position.y + 0.2

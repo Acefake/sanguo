@@ -14,13 +14,22 @@ var chatter_time := 0.0
 var next_chatter_at := 0.8
 var chatter_cooldowns := {}
 var flag_symbols := {}
-const MAX_SOLDIERS := 128
-const CAVALRY_MODELS := 48
+const MAX_SOLDIERS := 240
+const CAVALRY_MODELS := 80
 const CORPS_AGGREGATE_DISTANCE := 135.0
 const FORMATION_MARGIN := 0.18
 # Per-kind visible counts by LOD level (near, mid, far). The near step is the
-# baseline density; casualties thin the rank from the back, never grow it.
-const DENSITY_LEVELS := {"infantry":[128,80,40], "archers":[128,80,40], "cavalry":[48,30,16]}
+# baseline density; casualties and LOD thin the whole hex evenly, never grow it.
+const DENSITY_LEVELS := {"infantry":[240,150,75], "archers":[240,150,75], "cavalry":[80,50,26]}
+# Batch path, model scale and lattice aspect (row / column spacing) per troop kind.
+# Model scale includes MODEL_SIZE, the on-map soldier size (about the size the old
+# rank block was shrunk to); the layout fills the hex around it.
+const MODEL_SIZE := 0.62
+const TROOP_KINDS := {
+	"infantry": {"batch": "Soldiers", "count": MAX_SOLDIERS, "scale": 1.18 * MODEL_SIZE, "aspect": 1.29},
+	"archers": {"batch": "Archers", "count": MAX_SOLDIERS, "scale": 1.2 * MODEL_SIZE, "aspect": 1.29},
+	"cavalry": {"batch": "Mounted/Cavalry", "count": CAVALRY_MODELS, "scale": 0.72 * MODEL_SIZE, "aspect": 1.39},
+}
 const Feedback = preload("res://scripts/war/battle/battle_feedback.gd")
 const DuelPresentation = preload("res://scripts/war/presentation/duel_gold_presentation.gd")
 var advantage_panel: PanelContainer
@@ -79,8 +88,12 @@ var presentation_duration := DAY_SECONDS
 const Fortifications = preload("res://scripts/war/battle/city_fortifications.gd")
 const HexPresentation = preload("res://scripts/war/presentation/hex_presentation.gd")
 const SiegeVisual = preload("res://scripts/war/presentation/siege_visual.gd")
-const OfficerVisual = preload("res://scripts/war/presentation/army_officer_visual.gd")
 var troop_pose_bounds: Dictionary = {}
+# Standing and marching poses only (combat lunges excluded); sizes the hex layout.
+var troop_rest_bounds: Dictionary = {}
+# kind -> {"points": ordered base offsets, "a", "b": ellipse semi-axes, "spacing", "radius": farthest point,
+# "extent": farthest pose corner at any heading}; shared by all formations.
+var troop_layouts: Dictionary = {}
 
 var troop_ground_centers: Dictionary = {}
 
@@ -113,41 +126,116 @@ func _battle_point(cell: int) -> Vector3:
 
 func _troop_offset(group: Node3D, index: int, kind: String, mode: String) -> Vector3:
 	var key := "offsets_"+kind+"_"+mode
-	if not group.has_meta(key):
-		var widths: Array = [6,8,10,10,8,6] if kind == "cavalry" else [12,16,18,18,18,18,16,12]
-		var spacing := Vector2(0.84,1.17) if kind == "cavalry" else Vector2(0.48,0.62)
-		var random := RandomNumberGenerator.new()
-		random.seed = hash(str(group.name)+kind)
-		var offsets := PackedVector3Array()
-		var row_spans: Array = []
-		for row in range(widths.size()):
-			var start := offsets.size()
-			for column in range(int(widths[row])):
-				var x := (float(column)-(int(widths[row])-1)*0.5)*spacing.x
-				var z := (float(row)-(widths.size()-1)*0.5)*spacing.y
-				x += (0.12 if row%2 else -0.12)*spacing.x+random.randf_range(-0.09,0.09)*spacing.x
-				z += random.randf_range(-0.14,0.14)*spacing.y
-				if mode == "march": x *= 0.82; z *= 1.18
-				elif mode == "combat": z += maxf(z,0.0)*0.2*(1.0-pow(x/2.5,2.0))
-				offsets.append(Vector3(x,0,z))
-			row_spans.append([start,offsets.size()])
-		var mean := Vector3.ZERO
-		for offset in offsets: mean += offset
-		mean /= offsets.size()
-		for i in range(offsets.size()): offsets[i] -= mean
-		# Fill from the front rank backwards, center-out per rank: a thinned unit
-		# keeps its contact line and leaves the gaps behind it (rear ranks fill in
-		# as fresh models return). The +Z side is the formation's facing edge.
-		var distributed := PackedVector3Array()
-		for row in range(row_spans.size()-1,-1,-1):
-			var span: Array = row_spans[row]
-			var order: Array = []
-			for i in range(int(span[0]),int(span[1])): order.append(i)
-			order.sort_custom(func(a,b): return absf(offsets[a].x) < absf(offsets[b].x) if not is_equal_approx(absf(offsets[a].x),absf(offsets[b].x)) else a < b)
-			for i in order: distributed.append(offsets[i])
-		group.set_meta(key,distributed)
+	if not group.has_meta(key): group.set_meta(key,_formation_offsets(group,kind,mode))
 	var cached: PackedVector3Array = group.get_meta(key)
 	return cached[index]
+
+# This formation's offsets: the shared hex layout plus a small per-formation jitter
+# (seeded by the node name, so stable across frames and reloads), recentred so the
+# full formation stands on the hex center. March narrows the column; combat packs
+# each file toward the +Z front. Both stay inside the layout ellipse.
+func _formation_offsets(group: Node3D, kind: String, mode: String) -> PackedVector3Array:
+	var layout := _troop_layout(kind)
+	var a: float = layout["a"]
+	var b: float = layout["b"]
+	var spacing: Vector2 = layout["spacing"]
+	var random := RandomNumberGenerator.new()
+	random.seed = hash(str(group.name)+kind)
+	var offsets := PackedVector3Array()
+	var mean := Vector3.ZERO
+	for base in layout["points"]:
+		var p := Vector2(base.x+random.randf_range(-0.12,0.12)*spacing.x, base.z+random.randf_range(-0.14,0.14)*spacing.y)
+		var reach := sqrt(pow(p.x/a,2.0)+pow(p.y/b,2.0))
+		if reach > 1.0: p /= reach
+		offsets.append(Vector3(p.x,0,p.y))
+		mean += offsets[offsets.size()-1]
+	mean /= maxi(offsets.size(),1)
+	# Recentring can move a rim soldier out of the ellipse by at most |mean|.
+	group.set_meta("layout_slack_"+kind,mean.length())
+	for i in range(offsets.size()):
+		var p := offsets[i]-mean
+		if mode == "march": p.x *= 0.82
+		elif mode == "combat":
+			var half := b*sqrt(maxf(1.0-pow(p.x/a,2.0),0.0))
+			if half > 0.001:
+				var t := clampf(p.z/half,-1.0,1.0)
+				p.z = half*(t+0.25*(1.0-t*t))
+		offsets[i] = p
+	return offsets
+
+# The shared layout for a troop kind, built once: a staggered lattice clipped to the
+# largest ellipse whose soldiers (standing and marching poses) stay inside the hex's
+# inscribed circle at any heading, minus FORMATION_MARGIN. Ordered by farthest-point
+# sampling, so the first n points cover the whole ellipse evenly: casualties and LOD
+# thin the formation everywhere instead of emptying the rear.
+func _troop_layout(kind: String) -> Dictionary:
+	if troop_layouts.has(kind): return troop_layouts[kind]
+	var spec: Dictionary = TROOP_KINDS[kind]
+	var count: int = spec["count"]
+	var limit := HexPresentation.inset_radius(0)-FORMATION_MARGIN
+	var bounds: AABB = troop_rest_bounds.get(kind, AABB(Vector3(-0.35,0,-0.6),Vector3(0.7,2,1.9)))
+	var middle: Vector3 = troop_ground_centers.get(kind,Vector3.ZERO)
+	var corners: Array[Vector2] = []
+	for i in range(8):
+		var corner := (bounds.get_endpoint(i)-middle)*float(spec["scale"])
+		corners.append(Vector2(corner.x,corner.z))
+	var side := 0.0
+	var front := 0.0
+	for corner in corners:
+		side = maxf(side,absf(corner.x))
+		front = maxf(front,absf(corner.y))
+	# Shrink the axis-fitted ellipse until every rim point plus every pose corner fits.
+	var a := limit-side
+	var b := limit-front
+	var worst := 0.0
+	for attempt in range(40):
+		worst = 0.0
+		for step in range(72):
+			var angle := TAU*step/72.0
+			var rim := Vector2(cos(angle)*a,sin(angle)*b)
+			for corner in corners: worst = maxf(worst,(rim+corner).length())
+		if worst <= limit: break
+		a *= 0.98
+		b *= 0.98
+	var aspect: float = spec["aspect"]
+	var column := sqrt(PI*a*b/(count*aspect))
+	var lattice := PackedVector2Array()
+	while true:
+		lattice.clear()
+		var row_step := column*aspect
+		var rows := ceili(b/row_step)
+		var columns := ceili(a/column)+1
+		for row in range(-rows,rows+1):
+			for col in range(-columns,columns+1):
+				var p := Vector2((col+(0.5 if absi(row)%2 else 0.0))*column,row*row_step)
+				if pow(p.x/a,2.0)+pow(p.y/b,2.0) <= 1.0: lattice.append(p)
+		if lattice.size() >= count: break
+		column *= 0.98
+	# Drop the outermost extras so the rim stays even.
+	var by_reach: Array = range(lattice.size())
+	by_reach.sort_custom(func(i,j): return pow(lattice[i].x/a,2.0)+pow(lattice[i].y/b,2.0) < pow(lattice[j].x/a,2.0)+pow(lattice[j].y/b,2.0))
+	var kept := PackedVector2Array()
+	for i in range(count): kept.append(lattice[by_reach[i]])
+	var points := PackedVector3Array()
+	var nearest := PackedFloat32Array()
+	nearest.resize(count)
+	nearest.fill(INF)
+	var current := 0
+	var radius := 0.0
+	for picked in range(count):
+		var p := kept[current]
+		points.append(Vector3(p.x,0,p.y))
+		radius = maxf(radius,p.length())
+		nearest[current] = -1.0
+		var farthest := -1
+		for i in range(count):
+			if nearest[i] < 0.0: continue
+			nearest[i] = minf(nearest[i],kept[i].distance_squared_to(p))
+			if farthest < 0 or nearest[i] > nearest[farthest]: farthest = i
+		current = farthest
+	var layout := {"points":points,"a":a,"b":b,"radius":radius,"spacing":Vector2(column,column*aspect),"extent":worst}
+	troop_layouts[kind] = layout
+	return layout
 
 # Pure mapping helpers so headless probes can verify density without a viewport.
 static func density_counts(kind: String) -> Array:
@@ -191,7 +279,7 @@ func _yaw_between(from: Vector3, to: Vector3) -> float:
 	return INF if direction.length_squared() < 0.01 else atan2(direction.x, direction.z)
 
 func _formation_radius(group: Node3D) -> float:
-	var radius := 3.3 if str(group.get_meta("troop_kind","infantry")) == "cavalry" else 2.7
+	var radius: float = _troop_layout(str(group.get_meta("troop_kind","infantry")))["radius"]
 	return radius*float(group.get_meta("formation_scale",1.0))
 
 func _city_wall(site: Dictionary, target: Vector3) -> Vector3:

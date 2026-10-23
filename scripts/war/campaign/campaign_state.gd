@@ -49,6 +49,7 @@ const Actions = preload("res://scripts/war/campaign/campaign_actions.gd")
 const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var store: Node
 var graph = Graph.new()
+var routes = preload("res://scripts/war/campaign/route_memo.gd").new()
 var roster = Roster.new()
 var rules: Dictionary = {}
 var state: Dictionary = {}
@@ -221,11 +222,9 @@ static func _relation_key(first: String, second: String) -> String:
 	return first + "|" + second if first < second else second + "|" + first
 
 
+## 势力从起点到终点的通路：不能穿越非友方城池（起终点除外）。按通行状态记忆，见 route_memo.gd。
 func route(faction: String, start: String, finish: String) -> Dictionary:
-	var excluded: Array = []
-	for node in graph.places:
-		if node != start and node != finish and not can_cross(faction, str(node)): excluded.append(node)
-	return graph.path(start, finish, excluded)
+	return routes.route(self, faction, start, finish)
 
 
 func campaign_finished() -> bool:

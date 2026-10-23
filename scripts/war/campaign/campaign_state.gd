@@ -61,6 +61,7 @@ var rng := RandomNumberGenerator.new()
 func setup(owner: Node, saved: Dictionary = {}) -> void:
 	generation += 1
 	planner.clear()
+	planner.alive = Context.decision_alive.bind(weakref(self))
 	store = owner
 	rules = _json("res://data/war/campaign_rules.json")
 	graph.setup(_json("res://data/world_map.json"))
@@ -291,7 +292,8 @@ func step(adapter: Node = null) -> void:
 		if Combat.strength(army) > 0:
 			var context: Dictionary = context_for(army)
 			var key: String = _decision_key(context)
-			if _should_reconsider(army, context, adapter, key):
+			# 模型答案在提交点到达时，即使态势未变也要在今天落地或作废。
+			if _should_reconsider(army, context, adapter, key) or planner.ready.has("army:" + str(army["id"])):
 				# decision_key 只在决策真正落地时写入（见下方提交段）。提前写入会让
 				# 被丢弃的请求连续数日不再重判，部队连续数日只吃本地策略。
 				context["decision_key"] = key
@@ -303,13 +305,13 @@ func step(adapter: Node = null) -> void:
 		for context in contexts:
 			var key: String = "army:" + str(context["army_id"])
 			var signature: String = _decision_key(context) + str(adapter.model) + str(adapter.endpoint)
-			var proposal: Dictionary = planner.take(key, signature, int(state[StateKeys.TICK]))
+			var proposal: Dictionary = planner.take(key, signature, int(state[StateKeys.TICK]), context)
 			outputs[str(context["request_id"])] = proposal["result"] if not proposal.is_empty() else Policy.choose(context)
 			if str(context["officer"]["id"]).begins_with("militia:") or planner.has_pending(key): continue
 			requests.append(context)
 			signatures[key] = signature
 		# 批次槽位被军团占住时 submit 会排队而不是丢弃；此处只兜住真正的失败。
-		if not planner.submit(requests, adapter, signatures):
+		if not planner.submit(requests, adapter, signatures, outputs):
 			adapter.metrics["dropped_batches"] = int(adapter.metrics.get("dropped_batches", 0)) + 1
 	elif adapter != null and not contexts.is_empty():
 		outputs = await adapter.choose_batch(contexts)

@@ -309,6 +309,22 @@ static func validate_decision(war, context: Dictionary, result: Dictionary) -> D
 	return {"ok": false, "message": "选择了授权范围之外的行动。"}
 
 
+## 某个决策 key（army:/unit:/corps: 开头）的情境是否仍有效：部队覆没或溃退、军团撤退后不再需要模型答案。
+## war_ref 是弱引用，避免 DecisionScheduler 与 CampaignState 互相持有。其他前缀一律视为有效。
+static func decision_alive(key: String, war_ref: WeakRef) -> bool:
+	var war = war_ref.get_ref()
+	if war == null: return false
+	var id := key.get_slice(":", 1)
+	if key.begins_with("corps:"):
+		var corps: Dictionary = war.state[StateKeys.CORPS].get(id, {})
+		if corps.is_empty() or corps.get("withdrawing", false): return false
+		id = str(corps["root_id"])
+	elif not (key.begins_with("army:") or key.begins_with("unit:")):
+		return true
+	var army: Dictionary = war.state[StateKeys.ARMIES].get(id, {})
+	return not army.is_empty() and str(army.get("status", "active")) != "ended" and not bool(army.get("returning", false))
+
+
 ## 今日是否需要重新决策。
 static func _should_reconsider(war, army: Dictionary, context: Dictionary, adapter, key: String) -> bool:
 	var age := int(war.state[StateKeys.TICK]) - int(army["last_decision"])

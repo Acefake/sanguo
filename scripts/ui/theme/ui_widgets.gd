@@ -6,6 +6,13 @@ extends RefCounted
 
 const Tokens = preload("res://scripts/ui/theme/ui_tokens.gd")
 const Text = preload("res://scripts/ui/ui_text.gd")
+const Builder = preload("res://scripts/ui/theme/ui_theme_builder.gd")
+
+
+## 给挂在 CanvasLayer 下的界面根节点挂统一主题。CanvasLayer 截断了 Control 的主题继承链，
+## 它下面的控件拿不到根窗口的主题，所以每个 CanvasLayer 界面在自己的根 Control 上挂一次（同一个 Theme 实例）。
+static func adopt_theme(root: Control) -> void:
+	root.theme = Builder.build()
 
 
 ## 文字。variant 为空时是正文；可选 TitleLabel、DisplayLabel、MutedLabel、NoteLabel、CaptionLabel、DimLabel、AccentLabel。
@@ -179,8 +186,12 @@ static func scroll(content: Control) -> ScrollContainer:
 	var area := ScrollContainer.new()
 	area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	area.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var gutter := MarginContainer.new()
+	gutter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	gutter.add_theme_constant_override("margin_right", Tokens.space(2))
+	area.add_child(gutter)
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	area.add_child(content)
+	gutter.add_child(content)
 	return area
 
 

@@ -1,7 +1,6 @@
 extends SceneTree
 
 const Inspector = preload("res://scripts/war/ui/army_inspector.gd")
-const UISkin = preload("res://scripts/war/ui/war_ui_skin.gd")
 var failures: Array[String] = []
 var checks := 0
 var output := "res://docs/validation/war-ui/"
@@ -85,7 +84,10 @@ func run() -> void:
 	await capture("army-orders.png")
 	ui.show_army(own["id"])
 	await click(ui.inspector.report_button)
-	check(ui.reports_view.visible and not ui.drawer.visible, "Reports not shown in their separate window")
+	# 军报簿不再是独立窗口：它是右侧唯一抽屉里的一页，与部队概况/军令同一块面板，按「战报」分页切换。
+	check(ui.drawer.visible and ui.reports_view.visible and ui.page == "army_reports", "Army reports not shown as the drawer's 战报 page")
+	check(ui.reports_view.get_parent() == ui.drawer.pages, "Reports opened outside the single side drawer")
+	check(not ui._body_page.visible, "Drawer shows two pages at once")
 	check(ui.reports_view.filter_army == own["id"], "Army report button lost army filter")
 	check(ui.reports_view.entries.all(func(r): return r["army_id"] == own["id"] and r["received"]), "Wrong army or undelivered report exposed")
 	await capture("military-reports.png")
@@ -110,8 +112,22 @@ func run() -> void:
 	await click(ui.reports_view.summary_tab)
 	check(ui.reports_view.mode == "summary", "Summary tab does not switch")
 	await capture("battle-ledger.png")
-	await click(ui.reports_view.find_child("CloseReports", true, false))
-	check(not ui.reports_view.visible, "Report window did not close")
+	# 关闭走抽屉自身（Tween 淡出，不阻塞推进）；关闭期间抽屉仍可见，动画结束后隐藏。
+	ui.drawer.close()
+	check(ui.drawer.visible, "Drawer close blocked instead of animating")
+	await create_timer(0.4).timeout
+	check(not ui.drawer.visible, "Drawer did not close")
+	# 底部浮条：本方最新一份送达军报，点击打开抽屉的军情页。
+	var mine: Array = store.war.visible_reports().filter(func(r): return r.get("faction", store.war.state["armies"].get(r.get("army_id", ""), {}).get("faction", "")) == "liu_bei")
+	check(ui.toast.visible == not mine.is_empty(), "Report toast visibility does not follow delivered reports")
+	ui.toast.open_requested.emit()
+	check(ui.drawer.visible and ui.page == "reports" and ui.reports_view.visible, "Toast does not open the reports drawer page")
+	# 开抽屉在同一帧内返回（Tween 只改 position/modulate），推进中的 step 不等待布局。
+	ui.drawer.hide()
+	var opened_at := Time.get_ticks_msec()
+	ui.show_reports()
+	check(ui.drawer.visible and Time.get_ticks_msec() - opened_at < 200, "Opening the drawer blocks")
+	await capture("reports-drawer.png")
 	ui.show_reports()
 	ui.reports_view.filter_army = "nonexistent"
 	ui.reports_view.rebuild()

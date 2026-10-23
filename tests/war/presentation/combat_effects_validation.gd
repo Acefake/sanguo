@@ -53,16 +53,20 @@ func run() -> void:
 		world._layout_formation(own_group, 24)
 		var batch: MultiMeshInstance3D = own_group.get_node("Soldiers")
 		batch.multimesh.visible_instance_count = 24
+		# Headings are drawn by army_pose.gdshader; _soldier_transform mirrors it at animation_time.
 		world._face_contact_sectors(own_group, world._combat_fronts(own["id"]))
+		world.animation_time += 1.0
 		var headings := {}
 		for i in range(24):
-			var direction := batch.multimesh.get_instance_transform(i).basis * Vector3.BACK
+			var direction: Vector3 = batch.global_basis * world._soldier_transform(own_group, batch, i).basis * Vector3.BACK
 			headings[snappedf(atan2(direction.x,direction.z),0.01)] = true
 		check(headings.size() >= 2, "多面接敌时小兵仍只朝一个方向攻击")
 		# Facing now converges smoothly rather than snapping in one frame.
-		for frame in range(60): world._face_contact_sectors(own_group, [{"target": own_group.position + Vector3.BACK * 10}], 1.0 / 60.0)
+		for frame in range(60):
+			world.animation_time += 1.0 / 60.0
+			world._face_contact_sectors(own_group, [{"target": own_group.position + Vector3.BACK * 10}], 1.0 / 60.0)
 		for i in range(24):
-			check((batch.multimesh.get_instance_transform(i).basis * Vector3.BACK).normalized().dot(Vector3.BACK) > 0.99, "单面接敌后仍残留旧方向")
+			check((batch.global_basis * world._soldier_transform(own_group, batch, i).basis * Vector3.BACK).normalized().dot(Vector3.BACK) > 0.99, "单面接敌后仍残留旧方向")
 	var effects = preload("res://scripts/war/presentation/combat_effects_3d.gd").new()
 	root.add_child(effects)
 	effects.height_at = map.height_at

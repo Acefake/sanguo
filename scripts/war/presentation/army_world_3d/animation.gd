@@ -11,7 +11,7 @@ func _speech_event(id: String) -> String:
 	if army.get("action",{}).get("type","") == "evade": return "evade"
 	if float(army.get("morale",100)) < 35: return "rally"
 	if int(army.get("combat_tick",-1)) == int(store.war.state[StateKeys.TICK]):
-		var front: Dictionary = _combat_visual(id)
+		var front := _cached_visual(id)
 		if front.get("siege",false): return "siege"
 		return "ranged" if front.get("ranged",false) else "attack"
 	if str(army.get("location",{}).get("edge","")) != "" or (presenting and motion_start.has(id) and motion_start[id].distance_squared_to(destinations.get(id,motion_start[id])) > 0.01): return "march"
@@ -115,10 +115,9 @@ func _process(delta: float) -> void:
 		if presenting and motion_start.has(id):
 			group.position = melee_positions[id] if melee_positions.has(id) else _march_position(id,clampf(presentation_elapsed/_march_seconds(id),0,1))
 		group.position.y = map.height_at(group.position.x,group.position.z)+0.2
-	var combat_visuals := {}
+	_refresh_combat_cache()
 	for id in formations:
-		var visual := _combat_visual(id)
-		combat_visuals[id] = visual
+		var visual: Dictionary = combat_cache[id]
 		if not presenting or store.time_paused or visual.is_empty() or visual["siege"] or visual["ranged"]: continue
 		var opponent: Dictionary = store.war.state[StateKeys.ARMIES].get(visual.get("target_id",""),{})
 		if opponent.get("returning",false): continue
@@ -131,7 +130,7 @@ func _process(delta: float) -> void:
 	for id in formations:
 		var group: Node3D = formations[id]
 		var unit: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
-		var engaged: Dictionary = combat_visuals[id]
+		var engaged: Dictionary = combat_cache[id]
 		var detail_changed := _apply_troop_detail(group)
 		group.visible = map.camera.global_position.distance_to(group.global_position) < 550
 		var on_screen: bool = _formation_on_screen(group.global_position)
@@ -151,14 +150,17 @@ func _process(delta: float) -> void:
 		if afloat: group.position.y = maxf(group.position.y, map.WATER_LEVEL + 0.45)
 		var pose_batch: MultiMeshInstance3D = group.get_node_or_null("Soldiers")
 		if pose_batch != null: pose_batch.visible = not afloat
-		if pose_batch != null: pose_batch.material_override.set_shader_parameter("animation_clock", animation_time)
 		var bow_batch: MultiMeshInstance3D = group.get_node_or_null("Archers")
 		if bow_batch != null: bow_batch.visible = not afloat
 		var cavalry: Node3D = group.get_node_or_null("Mounted")
 		if cavalry != null: cavalry.visible = not afloat
 		var cavalry_batch: MultiMeshInstance3D = group.get_node_or_null("Mounted/Cavalry")
-		if cavalry_batch != null: cavalry_batch.material_override.set_shader_parameter("animation_clock", animation_time)
-		if bow_batch != null: bow_batch.material_override.set_shader_parameter("animation_clock", animation_time)
+		# The clock only moves while time runs; a paused frame sends nothing.
+		if float(group.get_meta("clock_sent",-1.0)) != animation_time:
+			group.set_meta("clock_sent",animation_time)
+			if pose_batch != null: pose_batch.material_override.set_shader_parameter("animation_clock", animation_time)
+			if bow_batch != null: bow_batch.material_override.set_shader_parameter("animation_clock", animation_time)
+			if cavalry_batch != null: cavalry_batch.material_override.set_shader_parameter("animation_clock", animation_time)
 		var fighting: bool = not engaged.is_empty()
 		var contact_changed: bool = fighting != bool(group.get_meta("combat_pose",false))
 		if (update_ground or contact_changed) and not store.time_paused:
@@ -199,18 +201,18 @@ func _process(delta: float) -> void:
 			if not on_screen:
 				pass
 			elif not visual.is_empty():
-				var fronts: Array = _combat_fronts(id)
+				var fronts := _cached_fronts(id)
 				for front in fronts:
-					var target_cell: int = front.get("target_cell",HexPresentation.cell_at(front["target"]))
+					var target_cell: int = front["target_cell"] if front.has("target_cell") else HexPresentation.cell_at(front["target"])
 					if front["ranged"] and group.get_node("Archers").multimesh.visible_instance_count > 0:
 						combat_effects.show_archer_volley(front["key"],group,front["target"],animation_time,target_cell)
 					else:
 						combat_effects.show_contact(front["key"], group.global_position, front["target"], animation_time, front["siege"], front["ranged"], _formation_radius(group), front.get("duel",false),1.55,target_cell)
 					if group.get_node_or_null("SiegeEngines") != null:
 						combat_effects.show_siege_projectiles(front["key"],group.get_node_or_null("SiegeEngines"),front["target"],animation_time,target_cell)
-				if not store.time_paused: _face_contact_sectors(group, fronts, delta * minf(store.time_scale, 2.0))
+				if not store.time_paused: _face_contact_sectors(group, fronts)
 			elif not store.time_paused and _formation_moving(group):
-				_face_contact_sectors(group, [{"target": group.global_position + Vector3(sin(float(group.get_meta("march_heading",0.0))),0,cos(float(group.get_meta("march_heading",0.0)))) * 100}], delta * minf(store.time_scale, 2.0))
+				_publish_facing(group, Vector4(float(group.get_meta("march_heading",group.rotation.y)),0,0,0), 1)
 		var toward_camera: Vector3 = ((map.camera.global_position-group.global_position)*Vector3(1,0,1)).normalized()
 		var anchor: Vector3 = group.global_position + toward_camera * 2.7 + Vector3.UP * 0.3
 		var badge: Control = badges[id]
@@ -284,8 +286,11 @@ func _melee_visual(id: String, enemy: String) -> Dictionary:
 	if not _melee_contact_ready(id,enemy): return {}
 	return {"target":formations[enemy].global_position,"target_id":enemy,"target_cell":HexPresentation.cell_at(formations[enemy].global_position),"siege":false,"ranged":false,"duel":int(army.get("duel_tick",-1)) == int(store.war.state[StateKeys.TICK]) and army.get("duel_opponent","") == enemy}
 
+## Every contact front of `id`: its _combat_visual first, then each other enemy in melee contact with it.
 func _combat_fronts(id: String) -> Array:
-	var primary: Dictionary = _combat_visual(id)
+	return _fronts_for(id,_combat_visual(id))
+
+func _fronts_for(id: String, primary: Dictionary) -> Array:
 	if primary.is_empty(): return []
 	var fronts: Array = [primary.duplicate()]
 	fronts[0]["key"] = id
@@ -310,44 +315,100 @@ func _combat_fronts(id: String) -> Array:
 		fronts.append({"key": id + ":contact:" + enemy_id, "target": target, "target_id":enemy_id, "siege": false, "ranged": false})
 	return fronts
 
-func _face_contact_sectors(group: Node3D, fronts: Array, delta: float = 1.0 / 60.0) -> void:
+## Points the soldiers of `group` at the nearest of `fronts` (world targets, at most MAX_FRONTS are used).
+## The per-soldier turn runs in army_pose.gdshader; this only publishes the front set when it changes.
+func _face_contact_sectors(group: Node3D, fronts: Array, _delta: float = 0.0) -> void:
+	var yaws := Vector4.ZERO
+	var count := 0
+	for front in fronts:
+		if count == MAX_FRONTS: break
+		var yaw := _yaw_between(group.global_position,front["target"])
+		if is_inf(yaw): continue
+		yaws[count] = yaw
+		count += 1
+	if count == 0: return
+	_publish_facing(group,yaws,count)
+	# Front choice and swing strength read each soldier's offset from where the formation stands now.
+	var batch: MultiMeshInstance3D = group.get_node_or_null("Soldiers")
+	var origin := Vector2(group.global_position.x,group.global_position.z)
+	if batch != null and group.get_meta("facing_origin",origin) != origin:
+		batch.material_override.set_shader_parameter("formation_origin",origin)
+		group.set_meta("facing_origin",origin)
+
+func _publish_facing(group: Node3D, yaws: Vector4, count: int) -> void:
 	var batch: MultiMeshInstance3D = group.get_node_or_null("Soldiers")
 	if batch == null: return
-	var elapsed := float(group.get_meta("facing_elapsed",0.0))+delta
-	if elapsed < 0.05:
-		group.set_meta("facing_elapsed",elapsed)
-		return
-	group.set_meta("facing_elapsed",0.0)
-	delta = elapsed
-	var changed := false
-	# Front directions in formation space, once per call rather than per soldier.
-	var towards := PackedVector3Array()
-	var inverse := group.basis.inverse()
-	for front in fronts:
-		var toward: Vector3 = inverse * (front["target"] - group.global_position)
-		toward.y = 0
-		towards.append(toward.normalized())
-	for i in range(batch.multimesh.visible_instance_count):
-		var transform := batch.multimesh.get_instance_transform(i)
-		var offset := Vector3(transform.origin.x, 0, transform.origin.z).normalized()
-		var best := -INF
-		var heading := Vector3.BACK
-		for toward in towards:
-			var score := offset.dot(toward)
-			if score > best: best = score; heading = toward
-		var current := atan2(transform.basis.z.x, transform.basis.z.z)
-		var goal := atan2(heading.x, heading.z)
-		var turn := clampf(wrapf(goal - current, -PI, PI), -3.5 * delta, 3.5 * delta)
-		if absf(turn) >= 0.001:
-			changed = true
-			transform.basis = Basis(Vector3.UP, current + turn).scaled(transform.basis.get_scale())
-			batch.multimesh.set_instance_transform(i, transform)
-		var data := batch.multimesh.get_instance_custom_data(i)
-		var weight := clampf(best, 0.0, 1.0)
-		if not is_equal_approx(data.b,weight):
-			data.b = weight
-			batch.multimesh.set_instance_custom_data(i, data)
-	if changed: group.set_meta("facing_revision",int(group.get_meta("facing_revision",0))+1)
+	var goal: Vector4 = group.get_meta("facing_goal",Vector4.ZERO)
+	var goal_count: int = group.get_meta("facing_goal_count",0)
+	if count == goal_count and _same_yaws(yaws,goal,count): return
+	var from: Vector4 = group.get_meta("facing_from",Vector4.ZERO)
+	var from_count: int = group.get_meta("facing_from_count",0)
+	var at: float = group.get_meta("facing_at",-100.0)
+	if from_count > 1 or goal_count > 1:
+		# Soldiers of a multi-front turn each have their own heading. Restarting mid-turn would snap
+		# them, so the new set waits until the turn has had time to finish; callers publish every frame.
+		if (animation_time-at)*SOLDIER_TURN_RATE < PI: return
+		from = goal
+		from_count = goal_count
+	else:
+		# One shared heading: restart the turn from where every soldier is now.
+		from = Vector4(_turned_yaw(group,Vector2.ZERO,animation_time),0,0,0)
+		from_count = 1
+	var origin := Vector2(group.global_position.x,group.global_position.z)
+	var material: ShaderMaterial = batch.material_override
+	material.set_shader_parameter("facing_from",from)
+	material.set_shader_parameter("facing_from_count",from_count)
+	material.set_shader_parameter("facing_goal",yaws)
+	material.set_shader_parameter("facing_goal_count",count)
+	material.set_shader_parameter("facing_at",animation_time)
+	material.set_shader_parameter("formation_origin",origin)
+	group.set_meta("facing_from",from)
+	group.set_meta("facing_from_count",from_count)
+	group.set_meta("facing_goal",yaws)
+	group.set_meta("facing_goal_count",count)
+	group.set_meta("facing_at",animation_time)
+	group.set_meta("facing_origin",origin)
+	group.set_meta("facing_revision",int(group.get_meta("facing_revision",0))+1)
+
+static func _same_yaws(a: Vector4, b: Vector4, count: int) -> bool:
+	for k in range(count):
+		if absf(wrapf(a[k]-b[k],-PI,PI)) > 0.02: return false
+	return true
+
+# The front-set yaw nearest `offset` (unit or zero), or `fallback` for an empty set; mirrors nearest_front().
+static func _nearest_front(yaws: Vector4, count: int, offset: Vector2, fallback: float) -> Vector2:
+	var score := -2.0
+	var yaw := fallback
+	for k in range(count):
+		var s := offset.dot(Vector2(sin(yaws[k]),cos(yaws[k])))
+		if s > score:
+			score = s
+			yaw = yaws[k]
+	return Vector2(yaw,score)
+
+## World yaw army_pose.gdshader gives a soldier of `group` whose feet are at `offset` (unit direction from the
+## formation origin) at `clock`. CPU mirror of the shader for tests and for restarting a shared turn.
+func _turned_yaw(group: Node3D, offset: Vector2, clock: float) -> float:
+	var formation_yaw := atan2(group.global_basis.z.x,group.global_basis.z.z)
+	var goal := _nearest_front(group.get_meta("facing_goal",Vector4.ZERO),group.get_meta("facing_goal_count",0),offset,formation_yaw).x
+	var start := _nearest_front(group.get_meta("facing_from",Vector4.ZERO),group.get_meta("facing_from_count",0),offset,formation_yaw).x
+	var limit := SOLDIER_TURN_RATE*maxf(clock-float(group.get_meta("facing_at",-100.0)),0.0)
+	return start+clampf(wrapf(goal-start,-PI,PI),-limit,limit)
+
+## Where soldier `index` of `batch` is drawn at animation_time: its instance transform turned around the feet
+## to the shader's heading. Tests read headings and envelopes through this.
+func _soldier_transform(group: Node3D, batch: MultiMeshInstance3D, index: int, kind: String = "infantry") -> Transform3D:
+	var instance := batch.multimesh.get_instance_transform(index)
+	var feet: Vector3 = instance*troop_ground_centers.get(kind,Vector3.ZERO)
+	if batch.name != "Soldiers": return instance
+	var world_feet := batch.global_transform*feet
+	var origin: Vector2 = group.get_meta("facing_origin",Vector2(group.global_position.x,group.global_position.z))
+	var offset := Vector2(world_feet.x,world_feet.z)-origin
+	offset = offset.normalized() if offset.length_squared() > 1e-8 else Vector2.ZERO
+	var formation_basis := batch.global_basis*instance.basis
+	var turn := Basis(Vector3.UP,_turned_yaw(group,offset,animation_time)-atan2(formation_basis.z.x,formation_basis.z.z))
+	var basis := instance.basis*turn
+	return Transform3D(basis,feet-basis*troop_ground_centers.get(kind,Vector3.ZERO))
 
 func _combat_visual(id: String) -> Dictionary:
 	var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
@@ -414,6 +475,38 @@ func _combat_visual(id: String) -> Dictionary:
 		return {"target": formations[enemy].global_position,"target_cell":target_cell, "siege": false, "ranged": army.get("tactical", {}).get("phase", "") == "远射"}
 	return {}
 
+# Recomputes combat_cache only when something it reads changed: the tick, presenting, battle_test or any
+# formation's position (formations stand still through most of a day, so most frames reuse it).
+func _refresh_combat_cache() -> void:
+	var tick: int = store.war.state[StateKeys.TICK]
+	var flags := int(presenting) | int(store.battle_test) << 1
+	var same := tick == combat_cache_tick and flags == combat_cache_flags and combat_cache_positions.size() == formations.size()
+	if combat_cache_positions.size() != formations.size(): combat_cache_positions.resize(formations.size())
+	var index := 0
+	for id in formations:
+		var position: Vector3 = formations[id].global_position
+		if combat_cache_positions[index] != position:
+			combat_cache_positions[index] = position
+			same = false
+		index += 1
+	if same: return
+	combat_cache_tick = tick
+	combat_cache_flags = flags
+	combat_cache.clear()
+	combat_fronts_cache.clear()
+	combat_attacked.clear()
+	for id in formations:
+		var visual := _combat_visual(id)
+		combat_cache[id] = visual
+		if not visual.is_empty() and not visual["siege"] and not visual["ranged"]: combat_attacked[visual.get("target_id","")] = true
+
+func _cached_visual(id: String) -> Dictionary:
+	return combat_cache[id] if combat_cache.has(id) else _combat_visual(id)
+
+func _cached_fronts(id: String) -> Array:
+	if not combat_fronts_cache.has(id): combat_fronts_cache[id] = _fronts_for(id,_cached_visual(id))
+	return combat_fronts_cache[id]
+
 func _show_city_volleys() -> void:
 	if not presenting: return
 	for event in store.war.state.get(StateKeys.CITY_VOLLEYS, []):
@@ -473,6 +566,7 @@ func begin_day(before: Dictionary) -> void:
 			if visual.is_empty() or visual["siege"] or visual["ranged"]: continue
 			var opponent: Dictionary = store.war.state[StateKeys.ARMIES].get(visual.get("target_id",""),{})
 			if not opponent.is_empty() and not opponent.get("returning",false): melee_positions[id] = formations[id].position
+	_drop_combat_cache()
 	_present_new_duel()
 	_update_display_stats()
 
@@ -503,7 +597,7 @@ func _loss_contact_mode(id: String) -> String:
 		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(source,{})
 		if int(army.get("combat_tick",-1)) != tick: continue
 		if str(army.get("tactical",{}).get("attack_target",army.get("action",{}).get("enemy",""))) != id and not army.get("combat_targets",[]).has(id): continue
-		var visual := _combat_visual(source)
+		var visual := _cached_visual(source)
 		if visual.is_empty() or visual.get("siege",false): continue
 		if not visual["ranged"] and not _melee_contact_ready(source,id): continue
 		if not army.get("combat_targets",[]).has(id) and visual["target"].distance_squared_to(formations[id].global_position) > 0.01: continue
@@ -514,7 +608,7 @@ func _loss_contact_mode(id: String) -> String:
 		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id,{})
 		var board: Dictionary = store.war.Tactical.board_for(store.war,army)
 		if Fortifications.distance_to_wall(board,str(event["city"]),HexPresentation.cell_at(formations[id].global_position)) <= 2: return "ranged"
-	var visual := _combat_visual(id)
+	var visual := _cached_visual(id)
 	if visual.is_empty(): return ""
 	if visual["siege"]: return "melee"
 	var target: String = store.war.state[StateKeys.ARMIES].get(id,{}).get("tactical",{}).get("attack_target","")

@@ -18,6 +18,10 @@ const MAX_SOLDIERS := 240
 const CAVALRY_MODELS := 80
 const CORPS_AGGREGATE_DISTANCE := 135.0
 const FORMATION_MARGIN := 0.18
+# Contact facing runs in army_pose.gdshader: up to MAX_FRONTS fronts per formation, each soldier turning
+# toward the nearest one at SOLDIER_TURN_RATE rad/s of animation_time.
+const MAX_FRONTS := 4
+const SOLDIER_TURN_RATE := 3.5
 # Per-kind visible counts by LOD level (near, mid, far). The near step is the
 # baseline density; casualties and LOD thin the whole hex evenly, never grow it.
 const DENSITY_LEVELS := {"infantry":[240,150,75], "archers":[240,150,75], "cavalry":[80,50,26]}
@@ -96,6 +100,21 @@ var troop_rest_bounds: Dictionary = {}
 var troop_layouts: Dictionary = {}
 
 var troop_ground_centers: Dictionary = {}
+# Combat reads for _process (animation.gd _refresh_combat_cache): id -> _combat_visual, id -> fronts (filled on
+# demand), ids an enemy melee front points at. Valid while the tick, presenting, battle_test and every formation
+# position stay the same; refresh() and begin_day() drop them.
+var combat_cache: Dictionary = {}
+var combat_fronts_cache: Dictionary = {}
+var combat_attacked: Dictionary = {}
+var combat_cache_tick := -1
+var combat_cache_flags := -1
+var combat_cache_positions := PackedVector3Array()
+
+func _drop_combat_cache() -> void:
+	combat_cache_tick = -1
+	combat_cache.clear()
+	combat_fronts_cache.clear()
+	combat_attacked.clear()
 
 func _formation_moving(group: Node3D) -> bool:
 	var id := str(group.get_meta("army_id",""))

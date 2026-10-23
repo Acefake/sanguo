@@ -43,14 +43,16 @@ func run():
 	store.time_scale = 1.0
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://docs/validation/army-assets/smooth-duel"))
 	var max_turn := 0.0
+	# Soldier 0's drawn heading in world space; the turn itself runs in army_pose.gdshader.
+	var heading := func() -> Basis: return batch.global_basis*world._soldier_transform(group,batch,0).basis.orthonormalized()
 	for frame in range(60):
-		var before: Basis = batch.multimesh.get_instance_transform(0).basis
+		var before: Basis = heading.call()
 		world._process(1.0/30.0)
-		var after: Basis = batch.multimesh.get_instance_transform(0).basis
+		var after: Basis = heading.call()
 		max_turn = maxf(max_turn,before.z.angle_to(after.z))
 		if frame == 15:
 			world.refresh()
-			check(after.is_equal_approx(batch.multimesh.get_instance_transform(0).basis), "Refresh reset soldier heading")
+			check(after.is_equal_approx(heading.call()), "Refresh reset soldier heading")
 			check(world.combat_effects.duels.size() == 1,"Duel missing or duplicated")
 			check(world.combat_effects.contacts.size() >= 2,"Mutual combat contacts missing")
 			var duel: Dictionary = world.combat_effects.duels.values()[0]
@@ -59,7 +61,7 @@ func run():
 			store.time_paused = true
 			var time: float = world.animation_time
 			world._process(0.2)
-			check(world.animation_time == time and after.is_equal_approx(batch.multimesh.get_instance_transform(0).basis),"Pause advanced pose or heading")
+			check(world.animation_time == time and after.is_equal_approx(heading.call()),"Pause advanced pose or heading")
 			store.time_paused = false
 		await process_frame
 		await RenderingServer.frame_post_draw
@@ -73,13 +75,14 @@ func run():
 	# Target reversal and two fronts must stay bounded, never snap 180 degrees.
 	var fronts := [{"target":group.position+Vector3(10,0,0)},{"target":group.position+Vector3(-10,0,0)}]
 	for i in range(30):
-		var before: Basis = batch.multimesh.get_instance_transform(0).basis
+		var before: Basis = heading.call()
+		world.animation_time += 1.0/60
 		world._face_contact_sectors(group,fronts,1.0/60)
-		check(before.z.angle_to(batch.multimesh.get_instance_transform(0).basis.z) <= 3.5/60+0.001,"Multi-front soldier snapped")
-	var facing: Basis = batch.multimesh.get_instance_transform(0).basis
+		check(before.z.angle_to(heading.call().z) <= 3.5/60+0.001,"Multi-front soldier snapped")
+	var facing: Basis = heading.call()
 	var phase: Color = batch.multimesh.get_instance_custom_data(0)
 	world._layout_formation(group, batch.multimesh.visible_instance_count - 1)
-	check(facing.is_equal_approx(batch.multimesh.get_instance_transform(0).basis) and phase.is_equal_approx(batch.multimesh.get_instance_custom_data(0)), "Casualty relayout reset heading or animation phase")
+	check(facing.is_equal_approx(heading.call()) and phase.is_equal_approx(batch.multimesh.get_instance_custom_data(0)), "Casualty relayout reset heading or animation phase")
 	scene.queue_free()
 	await process_frame
 	store.restore_battle_test()

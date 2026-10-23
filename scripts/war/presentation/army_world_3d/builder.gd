@@ -47,6 +47,7 @@ func _load_mesh() -> void:
 	pose_material.set_shader_parameter("pose_positions", ImageTexture.create_from_image(positions))
 	pose_material.set_shader_parameter("pose_normals", ImageTexture.create_from_image(normals))
 	pose_material.set_shader_parameter("albedo_texture", mesh.surface_get_material(0).albedo_texture)
+	_configure_pose_material(pose_material,"infantry")
 	model.free()
 	var archer_state := GLTFState.new()
 	if document.append_from_file("res://assets/armies/rtk14/models/archer-poses.glb", archer_state) == OK:
@@ -70,6 +71,7 @@ func _load_mesh() -> void:
 		archer_material.set_shader_parameter("pose_positions", ImageTexture.create_from_image(p))
 		archer_material.set_shader_parameter("pose_normals", ImageTexture.create_from_image(n))
 		archer_material.set_shader_parameter("albedo_texture", archer_mesh.surface_get_material(0).albedo_texture)
+		_configure_pose_material(archer_material,"archers")
 		archer_model.free()
 	var cavalry_state := GLTFState.new()
 	if document.append_from_file("res://assets/armies/rtk14/models/cavalry-poses.glb",cavalry_state) == OK:
@@ -96,7 +98,13 @@ func _load_mesh() -> void:
 		cavalry_material.set_shader_parameter("pose_positions",ImageTexture.create_from_image(positions_cavalry))
 		cavalry_material.set_shader_parameter("pose_normals",ImageTexture.create_from_image(normals_cavalry))
 		cavalry_material.set_shader_parameter("albedo_texture",cavalry_mesh.surface_get_material(0).albedo_texture)
+		_configure_pose_material(cavalry_material,"cavalry")
 		model_cavalry.free()
+
+# Per-kind constants of the contact motion in army_pose.gdshader; formation copies inherit them.
+func _configure_pose_material(material: ShaderMaterial, kind: String) -> void:
+	material.set_shader_parameter("pivot",troop_ground_centers.get(kind,Vector3.ZERO))
+	material.set_shader_parameter("turn_rate",SOLDIER_TURN_RATE)
 
 func _remember_pose_bounds(kind: String, frames: Array) -> void:
 	var bounds: AABB = frames[0].get_aabb()
@@ -129,7 +137,7 @@ func _fit_formation_to_hex(group: Node3D, moving: bool = false) -> void:
 		group.get_node("Soldiers").multimesh.visible_instance_count,
 		group.get_node("Archers").multimesh.visible_instance_count if group.has_node("Archers") else 0,
 		group.get_node("Mounted/Cavalry").multimesh.visible_instance_count if group.has_node("Mounted/Cavalry") else 0,
-		group.get_meta("facing_revision",0), group.get_meta("siege_layout_revision",0),
+		group.get_meta("siege_layout_revision",0),
 		group.get_meta("march_layout_scale",1.0),group.get_meta("wall_contact",false)]
 	var engines: Node3D = group.get_node_or_null("SiegeEngines")
 	if engines != null:
@@ -186,20 +194,18 @@ func _fit_formation_to_hex(group: Node3D, moving: bool = false) -> void:
 		var count := batch.multimesh.visible_instance_count
 		if count < 0: count = batch.multimesh.instance_count
 		if count == 0: continue
-		var bounds: AABB = troop_pose_bounds[kind]
 		var middle: Vector3 = troop_ground_centers.get(kind,Vector3.ZERO)
 		var model_scale := float(TROOP_KINDS[kind]["scale"])*size
-		var render_bounds := AABB()
+		# Heading is applied in the shader around the feet, so instances carry no rotation.
+		var basis := Basis.IDENTITY.scaled(Vector3.ONE*model_scale)
+		var feet := AABB()
 		for i in range(count):
-			var basis := batch.multimesh.get_instance_transform(i).basis.orthonormalized().scaled(Vector3.ONE*model_scale)
 			var offset := _troop_offset(group,i,kind,mode)*size+shift-basis*middle
 			var point: Vector3 = group.global_position+group.basis*offset
 			offset.y = map.height_at(point.x,point.z)-group.global_position.y+0.2
-			var transform := Transform3D(basis,offset)
-			batch.multimesh.set_instance_transform(i,transform)
-			render_bounds = transform*bounds if i == 0 else render_bounds.merge(transform*bounds)
-		# GPU pose interpolation can extend beyond the static rest mesh bounds.
-		batch.multimesh.custom_aabb = render_bounds.grow(0.20)
+			batch.multimesh.set_instance_transform(i,Transform3D(basis,offset))
+			feet = AABB(offset+basis*middle,Vector3.ZERO) if i == 0 else feet.expand(offset+basis*middle)
+		batch.multimesh.custom_aabb = _turning_bounds(kind,model_scale,feet)
 	for engine in (equipment.get_children() if equipment != null else []):
 		var basis: Basis = engine.basis.orthonormalized().scaled(Vector3.ONE*float(engine.get_meta("native_scale",1.0))*size)
 		var offset := _engine_offset(engine.get_index(),engine_count)*size+shift
@@ -210,6 +216,19 @@ func _fit_formation_to_hex(group: Node3D, moving: bool = false) -> void:
 	group.set_meta("formation_scale",size)
 	group.set_meta("formation_shift", shift)
 	group.set_meta("fit_updates",int(group.get_meta("fit_updates",0))+1)
+
+# Render bounds of soldiers standing on `feet` while the shader turns them to any heading
+# and plays every pose (combat lunges included); 0.2 m covers pose interpolation.
+func _turning_bounds(kind: String, model_scale: float, feet: AABB) -> AABB:
+	var bounds: AABB = troop_pose_bounds[kind]
+	var middle: Vector3 = troop_ground_centers.get(kind,Vector3.ZERO)
+	var reach := 0.0
+	for corner in range(8):
+		var point := bounds.get_endpoint(corner)-middle
+		reach = maxf(reach,Vector2(point.x,point.z).length())
+	reach *= model_scale
+	return AABB(feet.position+Vector3(-reach,(bounds.position.y-middle.y)*model_scale,-reach),
+		feet.size+Vector3(2*reach,bounds.size.y*model_scale,2*reach)).grow(0.20)
 
 func _engine_offset(index: int, count: int) -> Vector3:
 	return Vector3((index%2-(mini(count,2)-1)*0.5)*3.0,0,(index/2-(ceili(float(count)/2)-1)*0.5)*3.0)
@@ -248,6 +267,7 @@ func _wall_contact_point(army: Dictionary, center: Vector3) -> Vector3:
 
 ## 按当前战役状态重建或同步全部军队节点、补给标记、徽章、城墙破口、敌情与战况面板。
 func refresh() -> void:
+	_drop_combat_cache()
 	if is_instance_valid(intent_overlay) and store.war.state[StateKeys.ARMIES].has(selected_plan_army): intent_overlay.show_plan(store.war,store.war.state[StateKeys.ARMIES][selected_plan_army])
 	_update_city_breaches()
 	_refresh_battle_feedback()

@@ -165,6 +165,7 @@ func _process(delta: float) -> void:
 		var contact_changed: bool = fighting != bool(group.get_meta("combat_pose",false))
 		if (update_ground or contact_changed) and not store.time_paused:
 			group.set_meta("combat_pose",fighting)
+			_sync_contact(group,id,engaged)
 			var batch: MultiMeshInstance3D = group.get_node_or_null("Soldiers")
 			if batch != null:
 				var army: Dictionary = store.war.state[StateKeys.ARMIES].get(id, {})
@@ -370,6 +371,60 @@ func _publish_facing(group: Node3D, yaws: Vector4, count: int) -> void:
 	group.set_meta("facing_origin",origin)
 	group.set_meta("facing_revision",int(group.get_meta("facing_revision",0))+1)
 
+# Melee-contact uniforms of army_pose.gdshader for every troop batch of `group`, written only when they change:
+# the contact window (melee start/end on animation_time), the hex the formation fights from, and whether an
+# enemy melee front strikes it.
+func _sync_contact(group: Node3D, id: String, engaged: Dictionary) -> void:
+	var melee: bool = not engaged.is_empty() and not engaged["ranged"]
+	var old_window: Vector2 = group.get_meta("contact_window",Vector2(-100.0,-99.0))
+	var window := old_window
+	if melee and window.y < 1e8: window = Vector2(animation_time,1e9)
+	elif not melee and window.y >= 1e8: window = Vector2(window.x,animation_time)
+	var old_cell: Vector3 = group.get_meta("contact_cell",Vector3.ZERO)
+	var cell_shape := old_cell
+	var cell := HexPresentation.cell_at(group.global_position)
+	if not engaged.is_empty() and cell >= 0 and cell != int(group.get_meta("contact_cell_id",-1)):
+		var center: Vector2 = HexPresentation.Grid.shared().center(cell)
+		cell_shape = Vector3(center.x,center.y,HexPresentation.inset_radius(cell))
+		group.set_meta("contact_cell_id",cell)
+	var attacked := 1.0 if melee and combat_attacked.has(id) else 0.0
+	if window == old_window and cell_shape == old_cell and attacked == float(group.get_meta("under_attack",0.0)): return
+	group.set_meta("contact_window",window)
+	group.set_meta("contact_cell",cell_shape)
+	group.set_meta("under_attack",attacked)
+	for kind in TROOP_KINDS:
+		var batch: MultiMeshInstance3D = group.get_node_or_null(TROOP_KINDS[kind]["batch"])
+		if batch == null: continue
+		var material: ShaderMaterial = batch.material_override
+		material.set_shader_parameter("contact_window",window)
+		material.set_shader_parameter("contact_cell",cell_shape)
+		material.set_shader_parameter("under_attack",attacked)
+
+# How far army_pose.gdshader moves a soldier along its heading in melee (front ranks closing on the hex edge,
+# lunges held inside it); CPU mirror, without the struck rock-back and the fall.
+func _contact_advance(group: Node3D, batch: MultiMeshInstance3D, feet: Vector3, yaw: float, model_scale: float, kind: String) -> float:
+	var cell_shape: Vector3 = group.get_meta("contact_cell",Vector3.ZERO)
+	if cell_shape.z <= 0.0: return 0.0
+	var window: Vector2 = group.get_meta("contact_window",Vector2(-100.0,-99.0))
+	var lunging := int(batch.get_meta("pose_start",0)) == 9
+	var engage := smoothstep(window.x,window.x+0.5,animation_time)*(1.0-smoothstep(window.y,window.y+0.6,animation_time))
+	if not lunging and engage <= 0.0: return 0.0
+	var heading := Vector2(sin(yaw),cos(yaw))
+	var rel := Vector2(feet.x,feet.z)-Vector2(cell_shape.x,cell_shape.y)
+	var side := Vector2(heading.y,-heading.x)*_lunge_width(kind)*model_scale
+	var to_edge := minf(_edge_distance(rel+side,heading,cell_shape.z),_edge_distance(rel-side,heading,cell_shape.z))
+	if to_edge < 0.0: return 0.0
+	var reach := _lunge_reach(kind)*model_scale
+	var front := 1.0-smoothstep(reach+0.3,reach+CONTACT_PUSH_BAND,to_edge)
+	var room := (to_edge-reach-CONTACT_GAP)*front
+	return minf(room,0.0)*(1.0 if lunging else engage)+maxf(room,0.0)*engage
+
+# Mirrors edge_distance() in army_pose.gdshader.
+static func _edge_distance(rel: Vector2, direction: Vector2, radius: float) -> float:
+	var along := rel.dot(direction)
+	var inside := rel.dot(rel)-radius*radius
+	return sqrt(along*along-inside)-along if inside < 0.0 else -1.0
+
 static func _same_yaws(a: Vector4, b: Vector4, count: int) -> bool:
 	for k in range(count):
 		if absf(wrapf(a[k]-b[k],-PI,PI)) > 0.02: return false
@@ -396,18 +451,21 @@ func _turned_yaw(group: Node3D, offset: Vector2, clock: float) -> float:
 	return start+clampf(wrapf(goal-start,-PI,PI),-limit,limit)
 
 ## Where soldier `index` of `batch` is drawn at animation_time: its instance transform turned around the feet
-## to the shader's heading. Tests read headings and envelopes through this.
+## to the shader's heading and moved by the melee advance. Tests read headings and envelopes through this.
 func _soldier_transform(group: Node3D, batch: MultiMeshInstance3D, index: int, kind: String = "infantry") -> Transform3D:
 	var instance := batch.multimesh.get_instance_transform(index)
 	var feet: Vector3 = instance*troop_ground_centers.get(kind,Vector3.ZERO)
-	if batch.name != "Soldiers": return instance
 	var world_feet := batch.global_transform*feet
 	var origin: Vector2 = group.get_meta("facing_origin",Vector2(group.global_position.x,group.global_position.z))
 	var offset := Vector2(world_feet.x,world_feet.z)-origin
 	offset = offset.normalized() if offset.length_squared() > 1e-8 else Vector2.ZERO
 	var formation_basis := batch.global_basis*instance.basis
-	var turn := Basis(Vector3.UP,_turned_yaw(group,offset,animation_time)-atan2(formation_basis.z.x,formation_basis.z.z))
+	# Only the Soldiers batch takes contact fronts; the others face the formation's +Z.
+	var yaw := _turned_yaw(group,offset,animation_time) if batch.name == "Soldiers" else atan2(formation_basis.z.x,formation_basis.z.z)
+	var turn := Basis(Vector3.UP,yaw-atan2(formation_basis.z.x,formation_basis.z.z))
 	var basis := instance.basis*turn
+	var advance := _contact_advance(group,batch,world_feet,yaw,formation_basis.x.length(),kind)
+	feet += batch.global_basis.inverse()*(Vector3(sin(yaw),0,cos(yaw))*advance)
 	return Transform3D(basis,feet-basis*troop_ground_centers.get(kind,Vector3.ZERO))
 
 func _combat_visual(id: String) -> Dictionary:

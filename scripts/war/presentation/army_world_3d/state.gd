@@ -22,6 +22,11 @@ const FORMATION_MARGIN := 0.18
 # toward the nearest one at SOLDIER_TURN_RATE rad/s of animation_time.
 const MAX_FRONTS := 4
 const SOLDIER_TURN_RATE := 3.5
+# Melee contact in army_pose.gdshader: front ranks within CONTACT_PUSH_BAND m of the hex edge (beyond their lunge
+# reach) close on it, every lunge stopping CONTACT_GAP m short. Fallen soldiers stay drawn FALL_SECONDS.
+const CONTACT_PUSH_BAND := 2.2
+const CONTACT_GAP := 0.2
+const FALL_SECONDS := 1.35
 # Per-kind visible counts by LOD level (near, mid, far). The near step is the
 # baseline density; casualties and LOD thin the whole hex evenly, never grow it.
 const DENSITY_LEVELS := {"infantry":[240,150,75], "archers":[240,150,75], "cavalry":[80,50,26]}

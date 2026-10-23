@@ -202,7 +202,7 @@ func _refresh_toast() -> void:
 	toast.show_latest(text, mine.size(), bool(latest.get("urgent", false)))
 
 
-## 出阵编组页：常驻在抽屉里，派出或返回后释放。
+## 抽屉的「派将」页（出阵编组）：派出或返回后释放，抽屉随之关闭。
 func show_dispatch(target: String) -> void:
 	if store.busy: return
 	if is_instance_valid(dispatch_view): dispatch_view.queue_free()
@@ -215,7 +215,7 @@ func show_dispatch(target: String) -> void:
 	view.tree_exiting.connect(func() -> void:
 		if dispatch_view == view and page == "dispatch": drawer.hide())
 	page = "dispatch"
-	drawer.present("出阵", "目标  " + store.war.graph.name_of(target))
+	drawer.present("派将", "出征目标  " + store.war.graph.name_of(target))
 	drawer.host(view)
 
 

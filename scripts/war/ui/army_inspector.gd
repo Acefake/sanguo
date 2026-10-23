@@ -49,10 +49,7 @@ func _ready() -> void:
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hero.add_child(portrait)
-	var close := UISkin.button("×", func(): close_requested.emit(), true)
-	close.position = Vector2(297, 0)
-	close.size = Vector2(26, 26)
-	hero.add_child(close)
+	# 关闭由所在抽屉的抬头负责（「关闭」文字钮）；名牌上不再叠第二个关闭钮。close_requested 保留给其他宿主。
 	plaque = preload("res://scripts/war/ui/army_card_plaque.gd").new()
 	plaque.position = Vector2(0, 160)
 	plaque.size = Vector2(334, 90)

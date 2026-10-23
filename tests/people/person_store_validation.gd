@@ -61,7 +61,10 @@ func _initialize() -> void:
 	check(specs.size() == 7, "独立战场 + 6 个检验战场，实际 %d" % specs.size())
 	for spec in specs:
 		check(declared.load_declared(spec) and declared.scenario == "guandu" and declared.persons.size() == 20, "%s 应载入官渡人物包" % spec.get("id", "独立战场"))
+	var pack_start: Dictionary = Store.read_json("res://data/people/guandu/seed_events.json")["start"]
+	check(Store.declared_start(specs[0]) == pack_start, "独立战场未声明 people_start，开局应取人物包默认开局")
 	var too_early := {"people_pack": "guandu", "people_start": {"year": 191, "month": 9, "xun": 1}}
+	check(Store.declared_start(too_early) == too_early["people_start"], "剧本声明的 people_start 优先于包的默认开局")
 	check(not declared.load_declared(too_early) and declared.persons.size() == 20, "开局早于 min_start 应拒绝且不动已有人物")
 	declared.free()
 

@@ -47,11 +47,18 @@ static func read_json(path: String) -> Variant:
 	return parsed
 
 
-## 剧本声明了人物包（people_pack）时载入它，开局日期取剧本的 people_start，没有时用包的默认开局。
+## 声明了人物包的剧本的开局日期 {year, month, xun}：剧本的 people_start，没有时用包的默认开局。
+## 剧本据此设游戏日期，load_declared 用同一个日期建人物状态。
+static func declared_start(scenario_spec: Dictionary) -> Dictionary:
+	if scenario_spec.has("people_start"): return scenario_spec["people_start"]
+	return read_json(DATA_DIR + str(scenario_spec["people_pack"]) + "/seed_events.json")["start"]
+
+
+## 剧本声明了人物包（people_pack）时按 declared_start 的开局载入它。
 ## 在 war.setup 之后调用；没有声明时什么都不做并返回 false。
 func load_declared(scenario_spec: Dictionary) -> bool:
 	if not scenario_spec.has("people_pack"): return false
-	return load_scenario(str(scenario_spec["people_pack"]), scenario_spec.get("people_start", {}))
+	return load_scenario(str(scenario_spec["people_pack"]), declared_start(scenario_spec))
 
 
 ## 开新局：读当前剧本人物卡与人物包 data/people/<pack_id>/ 的补丁、前史事件，生成全部人物并写开局记忆。

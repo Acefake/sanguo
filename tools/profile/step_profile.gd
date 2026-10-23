@@ -2,6 +2,7 @@ extends SceneTree
 ## 战役 step() 分段剖析（只用于测量，不进游戏代码路径）。
 ##
 ##   godot --headless --path . --script res://tools/profile/step_profile.gd -- [--days=30] [--rounds=3] [--modes=rules,mock]
+##       [--scenario=res://data/war/perf_scenarios/contact_demo.json]
 ##
 ## 每一轮、每种模式各开两局演示剧本：先用原版 CampaignState 跑 DAYS 日记每日哈希和总耗时，再用 ProfiledCampaign
 ## 跑同样的日数，逐日比对 export_state 的哈希。ProfiledCampaign.step() 是 campaign_state.gd 里 step() 的逐行副本，
@@ -9,14 +10,18 @@ extends SceneTree
 ## 每日一行 `PROFILE {...}`：阶段耗时（微秒，独占、相加等于 step 总耗时）、跨阶段累计（包含式，和阶段有重叠）、
 ## 当日规模（部队数、军团数、战场、接敌、军报等），以及 step 之外 _save 同款序列化的耗时。tools/profile/summarize.py 汇总。
 ## mock 模式用与 tests/agents/step_latency_validation.gd 相同的 30 秒替身。
+## --scenario 在演示剧本上追加剖析剧本的开局动作（见 scenario_setup.gd），日数默认取剧本的 days；
+## PLAIN 行带每日 export_state 哈希，可作该剧本的回归基线。
 
 const Store = preload("res://scripts/core/game_state.gd")
 const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
+const ScenarioSetup = preload("res://tools/profile/scenario_setup.gd")
 
 var days := 30
 var rounds := 3
 var modes: Array = ["rules", "mock"]
 var drifted := false
+var scenario: Dictionary = {}
 
 
 ## 分阶段计时的 CampaignState。step() 与原版逐行一致，只多了 _lap()。
@@ -333,6 +338,10 @@ func _run() -> void:
 		if arg.begins_with("--days="): days = int(arg.get_slice("=", 1))
 		elif arg.begins_with("--rounds="): rounds = int(arg.get_slice("=", 1))
 		elif arg.begins_with("--modes="): modes = Array(arg.get_slice("=", 1).split(","))
+		elif arg.begins_with("--scenario="):
+			scenario = ScenarioSetup.load_spec(arg.get_slice("=", 1))
+			if scenario.is_empty(): quit(1); return
+			days = int(scenario.get("days", days))
 	root.get_node("ModelQueue").set_log_path("user://step_profile_decisions.jsonl")
 	for round_index in rounds:
 		for mode in modes:
@@ -356,6 +365,7 @@ func _sandbox(war) -> Node:
 	sandbox.persist_enabled = false
 	if war != null: sandbox.war = war
 	sandbox._load_demo()
+	if not scenario.is_empty() and not ScenarioSetup.apply(sandbox, scenario): drifted = true
 	return sandbox
 
 
@@ -377,7 +387,7 @@ func _plain(adapter: Node, round_index: int, mode: String) -> Array:
 		await war.step(adapter)
 		var elapsed := Time.get_ticks_usec() - started
 		hashes.append(JSON.stringify(war.export_state()).sha256_text())
-		print("PLAIN ", JSON.stringify({"round": round_index, "mode": mode, "day": day + 1, "step_us": elapsed}))
+		print("PLAIN ", JSON.stringify({"round": round_index, "mode": mode, "day": day + 1, "step_us": elapsed, "hash": hashes[-1]}))
 	timed.clear()
 	sandbox.free()
 	return hashes

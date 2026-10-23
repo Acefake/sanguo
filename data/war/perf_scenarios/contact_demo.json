@@ -1,0 +1,35 @@
+{
+  "id": "contact_demo",
+  "summary": "演示剧本开局即派出四支独立部队（军令不许撤退）：陶谦与吕布在广陵—下邳道上相向而行（野战接敌），孙坚攻武陵、曹操攻河内（围城）。只用于 step 耗时剖析与回归，不进游戏流程。",
+  "days": 30,
+  "mobilize": [
+    {
+      "home": "guangling",
+      "target": "xiapi",
+      "orders": {
+        "retreat": false
+      }
+    },
+    {
+      "home": "xiapi",
+      "target": "guangling",
+      "orders": {
+        "retreat": false
+      }
+    },
+    {
+      "home": "changsha",
+      "target": "wuling",
+      "orders": {
+        "retreat": false
+      }
+    },
+    {
+      "home": "xuchang",
+      "target": "henei",
+      "orders": {
+        "retreat": false
+      }
+    }
+  ]
+}

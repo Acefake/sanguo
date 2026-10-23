@@ -20,7 +20,13 @@ func setup(cards: Array, mapping: Dictionary) -> void:
 		var personality := Card.personality_axes(card, AXES)
 		var sources := {"skills": skills["sources"], "personality": personality["sources"]}
 		parsing_audit.append({"id": card["id"], "sources": sources.duplicate(true)})
-		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": str(mapping.get(str(card.get("faction", "")), "")), "stats": Card.dimensions(card), "skills": skills["skills"], "personality": personality["personality"], "trait_ids": Card.trait_ids(card), "portrait": str(card.get("thumbnail", "")), "positions": Card.positions_text(card), "profile_note": str(card.get("summary", "")).left(350), "relations": card.get("relations", []).duplicate(true), "failure_modes": card.get("failure_modes", []).duplicate(true), "data_sources": sources}
+		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": faction_id(card, mapping), "stats": Card.dimensions(card), "skills": skills["skills"], "personality": personality["personality"], "trait_ids": Card.trait_ids(card), "portrait": str(card.get("thumbnail", "")), "positions": Card.positions_text(card), "profile_note": str(card.get("summary", "")).left(350), "relations": card.get("relations", []).duplicate(true), "failure_modes": card.get("failure_modes", []).duplicate(true), "data_sources": sources}
+
+
+## 人物卡的势力 id：卡上有 faction_id 时直接用，否则把显示名 faction 经剧本的 faction_mapping 换算；都没有为 ""。
+static func faction_id(card: Dictionary, mapping: Dictionary) -> String:
+	if card.has("faction_id"): return str(card["faction_id"])
+	return str(mapping.get(str(card.get("faction", "")), ""))
 
 
 func militia(faction: String, city: String) -> String:

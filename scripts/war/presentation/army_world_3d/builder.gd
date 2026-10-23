@@ -105,6 +105,21 @@ func _load_mesh() -> void:
 func _configure_pose_material(material: ShaderMaterial, kind: String) -> void:
 	material.set_shader_parameter("pivot",troop_ground_centers.get(kind,Vector3.ZERO))
 	material.set_shader_parameter("turn_rate",SOLDIER_TURN_RATE)
+	material.set_shader_parameter("lunge_reach",_lunge_reach(kind))
+	material.set_shader_parameter("lunge_width",_lunge_width(kind))
+	material.set_shader_parameter("push_band",CONTACT_PUSH_BAND)
+	material.set_shader_parameter("contact_gap",CONTACT_GAP)
+
+# Half the widest pose of `kind` across its heading, measured from the feet, in model units.
+func _lunge_width(kind: String) -> float:
+	var bounds: AABB = troop_pose_bounds.get(kind,AABB())
+	var feet := float(troop_ground_centers.get(kind,Vector3.ZERO).x)
+	return maxf(feet-bounds.position.x,bounds.end.x-feet)
+
+# How far ahead of the feet any pose of `kind` reaches, in model units.
+func _lunge_reach(kind: String) -> float:
+	var bounds: AABB = troop_pose_bounds.get(kind,AABB())
+	return bounds.end.z-float(troop_ground_centers.get(kind,Vector3.ZERO).z)
 
 func _remember_pose_bounds(kind: String, frames: Array) -> void:
 	var bounds: AABB = frames[0].get_aabb()
@@ -217,8 +232,8 @@ func _fit_formation_to_hex(group: Node3D, moving: bool = false) -> void:
 	group.set_meta("formation_shift", shift)
 	group.set_meta("fit_updates",int(group.get_meta("fit_updates",0))+1)
 
-# Render bounds of soldiers standing on `feet` while the shader turns them to any heading
-# and plays every pose (combat lunges included); 0.2 m covers pose interpolation.
+# Render bounds of soldiers standing on `feet` while the shader turns them to any heading, plays every pose
+# (combat lunges included) and pushes the front ranks forward; 0.2 m covers pose interpolation.
 func _turning_bounds(kind: String, model_scale: float, feet: AABB) -> AABB:
 	var bounds: AABB = troop_pose_bounds[kind]
 	var middle: Vector3 = troop_ground_centers.get(kind,Vector3.ZERO)
@@ -226,7 +241,7 @@ func _turning_bounds(kind: String, model_scale: float, feet: AABB) -> AABB:
 	for corner in range(8):
 		var point := bounds.get_endpoint(corner)-middle
 		reach = maxf(reach,Vector2(point.x,point.z).length())
-	reach *= model_scale
+	reach = reach*model_scale+CONTACT_PUSH_BAND
 	return AABB(feet.position+Vector3(-reach,(bounds.position.y-middle.y)*model_scale,-reach),
 		feet.size+Vector3(2*reach,bounds.size.y*model_scale,2*reach)).grow(0.20)
 
@@ -383,7 +398,7 @@ func refresh() -> void:
 			var flag_color := Color(str(store.scenario["factions"].get(flag_faction, {}).get("color", "#c86650")))
 			_set_flag(group, flag_faction, flag_color)
 			_update_siege_engines(group, army)
-			_apply_troop_detail(group)
+			_apply_troop_detail(group, true)
 			_fit_formation_to_hex(group,_formation_moving(group))
 	for id in formations.keys():
 		if not active.has(id):
@@ -602,7 +617,7 @@ func _constrain_offset(group: Node3D, offset: Vector3, board: Dictionary) -> Vec
 		offset.z *= 0.8
 	return Vector3(0, offset.y, 0)
 
-func _apply_troop_detail(group: Node3D) -> bool:
+func _apply_troop_detail(group: Node3D, force: bool = false) -> bool:
 	var distance: float = map.camera.global_position.distance_to(group.global_position)
 	# Off-screen formations refresh on a slower cadence; on-screen ones react at once.
 	if not _formation_on_screen(group.global_position) and animation_time-float(group.get_meta("detail_check_at",-100.0)) < 0.5 and absf(distance-float(group.get_meta("detail_distance",-1.0))) < 6.0:
@@ -619,19 +634,71 @@ func _apply_troop_detail(group: Node3D) -> bool:
 	var kind := str(group.get_meta("troop_kind","infantry"))
 	var ratio := _density_ratio(str(group.get_meta("army_id","")))
 	var levels: Array = density_counts(kind)
+	# Nothing to redo while the LOD level and strength hold and no casualty is still on the ground.
+	if not force and level == old and ratio == float(group.get_meta("density_ratio",-1.0)) and not group.get_meta("falling",false):
+		return false
 	group.set_meta("detail_level",level)
 	group.set_meta("density_ratio",ratio)
 	var targets := {"Soldiers":0,"Archers":0,"Mounted/Cavalry":0}
 	var batch_name := "Soldiers" if kind == "infantry" else "Archers" if kind == "archers" else "Mounted/Cavalry"
 	targets[batch_name] = density_for_strength(int(levels[level]),ratio)
 	var changed := false
+	var falling := false
 	for name in targets:
 		var batch: MultiMeshInstance3D = group.get_node_or_null(name)
 		if batch == null: continue
-		if batch.multimesh.visible_instance_count != int(targets[name]):
-			changed = true
-			batch.multimesh.visible_instance_count = int(targets[name])
+		if _show_troops(group,batch,int(targets[name]),level == old and group.visible): changed = true
+		falling = falling or animation_time < float(batch.get_meta("fallen_until",-1.0))
+	group.set_meta("falling",falling)
 	return changed
+
+# Shows `count` soldiers of `batch`; true when the drawn count changed. Casualties (`fall`) keep the lost soldiers
+# drawn while army_pose.gdshader tips them over and fades them out, timed to when the loss lands in the day's
+# presentation; a LOD change cuts at once. Instances [alive_count, fallen_end) may carry a death mark:
+# custom_data.a = -(death time - death_epoch) - 10 (negative while the soldier counts as fallen).
+func _show_troops(group: Node3D, batch: MultiMeshInstance3D, count: int, fall: bool) -> bool:
+	var multimesh := batch.multimesh
+	var first := not batch.has_meta("alive_count")
+	var alive: int = batch.get_meta("alive_count",count)
+	var marked: int = batch.get_meta("fallen_end",0)
+	var until: float = batch.get_meta("fallen_until",-1.0)
+	if count > alive:
+		for i in range(alive,mini(count,marked)):
+			var custom := multimesh.get_instance_custom_data(i)
+			custom.a = 1.0
+			multimesh.set_instance_custom_data(i,custom)
+	elif count < alive and fall and not first:
+		var epoch: float = batch.get_meta("death_epoch",0.0)
+		if animation_time >= until or animation_time-epoch > 20.0:
+			# Keep stored times small (custom data may be half precision); shift the marks still drawn.
+			# Marks older than 5 s are long faded and stay clamped there.
+			for i in range(count,marked):
+				var custom := multimesh.get_instance_custom_data(i)
+				if custom.a < 0.0:
+					custom.a = minf(custom.a+animation_time-epoch,-5.0)
+					multimesh.set_instance_custom_data(i,custom)
+			epoch = animation_time
+			batch.material_override.set_shader_parameter("death_epoch",epoch)
+			batch.set_meta("death_epoch",epoch)
+		var id := str(group.get_meta("army_id",""))
+		# Losses land when the day's contact does and tick down over LOSS_COUNT_SECONDS, like the badge count.
+		var delay := 0.25+(maxf(_march_seconds(id)-presentation_elapsed,0.0) if _formation_moving(group) else 0.0)
+		var spread := LOSS_COUNT_SECONDS if presenting else 0.6
+		for i in range(count,alive):
+			var custom := multimesh.get_instance_custom_data(i)
+			custom.a = -(animation_time-epoch+delay+spread*float(i-count)/float(alive-count))-10.0
+			multimesh.set_instance_custom_data(i,custom)
+		marked = maxi(marked,alive)
+		until = maxf(until,animation_time+delay+spread+FALL_SECONDS)
+	elif count < alive:
+		until = -1.0
+	batch.set_meta("alive_count",count)
+	batch.set_meta("fallen_end",marked)
+	batch.set_meta("fallen_until",until)
+	var shown := maxi(count,marked) if animation_time < until else count
+	if multimesh.visible_instance_count == shown: return false
+	multimesh.visible_instance_count = shown
+	return true
 
 func _layout_formation(group: Node3D, count: int) -> void:
 	var batch: MultiMeshInstance3D = group.get_node("Soldiers")

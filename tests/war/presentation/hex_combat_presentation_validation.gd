@@ -58,7 +58,7 @@ func run() -> void:
 			world._fit_formation_to_hex(group)
 			for spec in [["Soldiers","infantry"],["Archers","archers"],["Mounted/Cavalry","cavalry"]]:
 				var batch: MultiMeshInstance3D = group.get_node(spec[0])
-				# Standing and marching poses stay in the hex; combat lunges may reach about 0.5 m into the attacked neighbor.
+				# Standing and marching poses stay in the hex at any heading; combat poses are checked below.
 				var bounds: AABB = world.troop_rest_bounds[spec[1]]
 				var standing_center := Vector3.ZERO
 				for i in range(batch.multimesh.visible_instance_count):
@@ -81,6 +81,29 @@ func run() -> void:
 				var bounds := Siege.pose_bounds(str(engine.get_meta("kind")))
 				for corner in range(8):
 					inside(engine.to_global(bounds.get_endpoint(corner)),cell,"Aimed engine crosses hex")
+		# Melee: soldiers face each neighbor in turn, front ranks closed on the edge, every combat pose
+		# (lunges included) drawn where army_pose.gdshader puts it, all inside the hex.
+		for spec in [["Soldiers","infantry"],["Archers","archers"],["Mounted/Cavalry","cavalry"]]:
+			var batch: MultiMeshInstance3D = group.get_node(spec[0])
+			if batch.multimesh.visible_instance_count == 0: continue
+			for neighbor in grid.neighbors(cell):
+				var toward: Vector2 = grid.center(neighbor)
+				group.position = Vector3(center.x,0,center.y)
+				group.basis = Basis(Vector3.UP,atan2(toward.x-center.x,toward.y-center.y))
+				group.set_meta("combat_pose",true)
+				world._fit_formation_to_hex(group)
+				world._set_pose(batch,9,12,6.5,true)
+				world._face_contact_sectors(group,[{"target":Vector3(toward.x,0,toward.y)}])
+				world._sync_contact(group,"",{"target":Vector3(toward.x,0,toward.y),"ranged":false})
+				world.animation_time += 2.0
+				for i in range(batch.multimesh.visible_instance_count):
+					var drawn: Transform3D = batch.global_transform*world._soldier_transform(group,batch,i,spec[1])
+					for corner in range(8):
+						inside(drawn*world.troop_pose_bounds[spec[1]].get_endpoint(corner),cell,"Combat pose crosses assigned hex: "+kind)
+						checked += 1
+				world._sync_contact(group,"",{})
+				world.animation_time += 2.0
+			group.set_meta("combat_pose",false)
 		print("HEX_ENVELOPE_OK ",kind," fit=",group.get_meta("formation_scale"))
 		if failed: quit(1); return
 	group.get_node("Soldiers").multimesh.visible_instance_count = 64

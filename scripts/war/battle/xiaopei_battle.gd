@@ -7,7 +7,7 @@ const Corps = preload("res://scripts/war/campaign/army_corps.gd")
 const CONFIG := "res://data/war/xiaopei_battle.json"
 
 ## 参战势力与主帅读自 data/war/xiaopei_battle.json，人物按名册势力归边（BattleSides）；
-## 某方连生成将都没有时报错并不开战。
+## 某方连生成将都没有时报错并不开战。配置声明了 people_pack 时，war.setup 之后载入人物包（只建人物状态，不碰战场）。
 static func setup(store: Node, preformed: bool = false, options: Dictionary = {}) -> void:
 	store._load_demo()
 	store.war.setup(store, {})
@@ -15,6 +15,7 @@ static func setup(store: Node, preformed: bool = false, options: Dictionary = {}
 	store.month = 9
 	store.day = 1
 	var config: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(CONFIG))
+	People.load_declared(config)
 	var plan := Sides.plan(store.war.roster.officers, config["sides"], func(members): return Corps.best_member(store.war, members, "主帅"))
 	for warning in plan["warnings"]: push_warning("小沛战场：" + warning)
 	if not str(plan["error"]).is_empty():

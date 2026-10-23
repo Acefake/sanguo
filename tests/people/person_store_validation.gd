@@ -1,6 +1,7 @@
 extends SceneTree
 ## People 存储：官渡开局 20 人可查；export_state → JSON 文本 → import_state 往返后状态一致、类型还原；
-## 版本不认识的存档不动当前状态；亲族、圈子查询。
+## 版本不认识的存档不动当前状态；亲族、圈子查询；剧本声明 people_pack 才载入（独立战场与 6 个检验战场载入官渡包，
+## 191 年世界剧本不声明、不载入；声明了但开局早于 min_start 的拒绝并保留当前状态）。
 ##
 ##   godot --headless --path . --script res://tests/people/person_store_validation.gd
 
@@ -51,6 +52,18 @@ func _initialize() -> void:
 
 	check(not restored.import_state({"people_version": 99}), "未知版本应拒绝")
 	check(restored.persons.size() == 20, "拒绝读档时不动当前状态")
+
+	var declared := Store.new()
+	check(not declared.load_declared(Store.read_json("res://data/scenario_world_demo.json")) and declared.persons.is_empty(), "世界剧本没有声明人物包，不应载入")
+	var specs: Array = [Store.read_json("res://data/war/xiaopei_battle.json")]
+	for file in DirAccess.get_files_at("res://data/scenarios/battlefields"):
+		if file.ends_with(".json"): specs.append(Store.read_json("res://data/scenarios/battlefields/" + file))
+	check(specs.size() == 7, "独立战场 + 6 个检验战场，实际 %d" % specs.size())
+	for spec in specs:
+		check(declared.load_declared(spec) and declared.scenario == "guandu" and declared.persons.size() == 20, "%s 应载入官渡人物包" % spec.get("id", "独立战场"))
+	var too_early := {"people_pack": "guandu", "people_start": {"year": 191, "month": 9, "xun": 1}}
+	check(not declared.load_declared(too_early) and declared.persons.size() == 20, "开局早于 min_start 应拒绝且不动已有人物")
+	declared.free()
 
 	store.free()
 	restored.free()

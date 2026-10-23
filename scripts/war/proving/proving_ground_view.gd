@@ -2,8 +2,9 @@ extends Control
 ## 检验战场观看界面：选战场、试验、种子，逐刻播放 ProvingGroundSim，地图上看部队位置与姿态，
 ## 右侧看每个决策点的“看到的态势 → 选择 → 理由（带来源）→ 生效增益”，以及战报。
 ## 点地图上的部队，下方显示该部主将最近一次决策与增益拆解。
+## 战场数据声明了 people_pack 时，选中战场即载入人物包；推演本身不读人物系统。
 ##
-## 只依赖 scripts/war/proving 与 scripts/officers，不读 GameState，可单独打开：
+## 只依赖 scripts/war/proving、scripts/officers 与 Autoload People，不读 GameState，可单独打开：
 ##   godot --path . res://scenes/war/proving_ground.tscn
 
 const Data = preload("res://scripts/war/proving/battlefield_data.gd")
@@ -120,6 +121,7 @@ func _button(text: String, action: Callable) -> Button:
 
 func _load_field() -> void:
 	field = Data.load_field(str(field_choice.get_item_metadata(field_choice.selected)))
+	People.load_declared(field)
 	trial_choice.clear()
 	for trial in field["trials"]:
 		trial_choice.add_item(str(trial["label"]))

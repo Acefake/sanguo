@@ -12,6 +12,7 @@ const Dissent = preload("res://scripts/agents/officer_dissent.gd")
 const Forecast = preload("res://scripts/agents/forecast.gd")
 const Experience = preload("res://scripts/agents/experience.gd")
 const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
+const ObservationReuse = preload("res://scripts/war/campaign/observation_reuse.gd")
 
 
 ## 城池情报（全图实时可见）。
@@ -44,7 +45,7 @@ static func player_has_city_access(war, node: String) -> bool:
 	return not war.store.city_state(node).is_empty() and str(war.store.city_state(node).get("faction", "")) == str(war.state[StateKeys.PLAYER_FACTION])
 
 
-## 刷新每支在役军队的城池与敌军情报。
+## 刷新每支在役军队的城池与敌军情报。城池情报没变时沿用上一份（见 observation_reuse.gd）。
 static func _observe_all(war) -> void:
 	Tactical.clear_target_cache()
 	var cities := {}
@@ -53,7 +54,7 @@ static func _observe_all(war) -> void:
 	var armies: Array = war.active_armies()
 	for army in armies:
 		# Keep the intelligence schema for saves and decision snapshots, with no sight limits.
-		army["intel"] = {"cities": cities.duplicate(true), "enemies": {}}
+		army["intel"] = {"cities": ObservationReuse.cities_for(army.get("intel"), cities), "enemies": {}}
 		for enemy in armies:
 			if war.hostile(str(enemy["faction"]), str(army["faction"])):
 				army["intel"]["enemies"][enemy["id"]] = enemy_intel(war, enemy)

@@ -398,7 +398,7 @@ func refresh() -> void:
 			var flag_color := Color(str(store.scenario["factions"].get(flag_faction, {}).get("color", "#c86650")))
 			_set_flag(group, flag_faction, flag_color)
 			_update_siege_engines(group, army)
-			_apply_troop_detail(group)
+			_apply_troop_detail(group, true)
 			_fit_formation_to_hex(group,_formation_moving(group))
 	for id in formations.keys():
 		if not active.has(id):
@@ -617,7 +617,7 @@ func _constrain_offset(group: Node3D, offset: Vector3, board: Dictionary) -> Vec
 		offset.z *= 0.8
 	return Vector3(0, offset.y, 0)
 
-func _apply_troop_detail(group: Node3D) -> bool:
+func _apply_troop_detail(group: Node3D, force: bool = false) -> bool:
 	var distance: float = map.camera.global_position.distance_to(group.global_position)
 	# Off-screen formations refresh on a slower cadence; on-screen ones react at once.
 	if not _formation_on_screen(group.global_position) and animation_time-float(group.get_meta("detail_check_at",-100.0)) < 0.5 and absf(distance-float(group.get_meta("detail_distance",-1.0))) < 6.0:
@@ -634,16 +634,22 @@ func _apply_troop_detail(group: Node3D) -> bool:
 	var kind := str(group.get_meta("troop_kind","infantry"))
 	var ratio := _density_ratio(str(group.get_meta("army_id","")))
 	var levels: Array = density_counts(kind)
+	# Nothing to redo while the LOD level and strength hold and no casualty is still on the ground.
+	if not force and level == old and ratio == float(group.get_meta("density_ratio",-1.0)) and not group.get_meta("falling",false):
+		return false
 	group.set_meta("detail_level",level)
 	group.set_meta("density_ratio",ratio)
 	var targets := {"Soldiers":0,"Archers":0,"Mounted/Cavalry":0}
 	var batch_name := "Soldiers" if kind == "infantry" else "Archers" if kind == "archers" else "Mounted/Cavalry"
 	targets[batch_name] = density_for_strength(int(levels[level]),ratio)
 	var changed := false
+	var falling := false
 	for name in targets:
 		var batch: MultiMeshInstance3D = group.get_node_or_null(name)
 		if batch == null: continue
 		if _show_troops(group,batch,int(targets[name]),level == old and group.visible): changed = true
+		falling = falling or animation_time < float(batch.get_meta("fallen_until",-1.0))
+	group.set_meta("falling",falling)
 	return changed
 
 # Shows `count` soldiers of `batch`; true when the drawn count changed. Casualties (`fall`) keep the lost soldiers

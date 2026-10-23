@@ -143,7 +143,7 @@ func _process(delta: float) -> void:
 			if tangent.length_squared() > 0.01: group.set_meta("march_heading",atan2(tangent.x,tangent.z))
 			var facing := float(group.get_meta("march_heading",group.rotation.y))
 			group.rotation.y = lerp_angle(group.rotation.y,facing,minf(delta*store.time_scale*8.0,1.0))
-		var cell: int = store.war.Tactical.grid().pick(Vector2(group.position.x, group.position.z))
+		var cell := _formation_cell(group)
 		var afloat: bool = not unit.has("tactical") and store.war.Tactical.grid().terrain(cell) in Fortifications.WATER_CODES
 		var boats: Node3D = group.get_node_or_null("RiverTransport")
 		if boats != null: boats.visible = afloat
@@ -249,6 +249,14 @@ func _process(delta: float) -> void:
 		presenting = false
 		motion_start.clear()
 		refresh()
+
+# The hex under `group`, picked again only after it moves.
+func _formation_cell(group: Node3D) -> int:
+	var at := Vector2(group.position.x, group.position.z)
+	if group.get_meta("cell_at",Vector2.INF) != at:
+		group.set_meta("cell_at",at)
+		group.set_meta("cell",store.war.Tactical.grid().pick(at))
+	return group.get_meta("cell")
 
 func _on_presented_route(id: String) -> bool:
 	if not formations.has(id): return false

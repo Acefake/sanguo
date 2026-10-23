@@ -104,6 +104,7 @@ func _ready() -> void:
 	card_morale_number.position = Vector2(178, 224)
 	card_morale_number.size = Vector2(24, 18)
 	hero.add_child(card_morale_number)
+	_ink_plaque_labels(hero, mission)
 	var sheet := UISkin.framed_panel(16)
 	add_child(sheet)
 	var body := VBoxContainer.new()
@@ -309,3 +310,12 @@ func update_info() -> void:
 	source.text = "%s%s  %s" % [origin, "  第%d日" % int(result["tick"]) if int(result["tick"]) >= 0 else "", state]
 	if result.get("thinking", false): source.text += "  正在推演"
 	expand_button.visible = judgment.text.length() > 52
+
+
+## 名牌仍画在羊皮纸贴图上，而界面主题的文字是浅色：名牌上的字改用墨色（小字用淡墨），保证对比度。
+## 任务标签坐在深色底条上，保持浅色。
+static func _ink_plaque_labels(hero: Control, keep: Label) -> void:
+	for child in hero.get_children():
+		if not child is Label or child == keep: continue
+		var small: bool = child.theme_type_variation in ["MutedLabel", "NoteLabel", "CaptionLabel"]
+		child.add_theme_color_override("font_color", Color(UISkin.CitySkin.INK, 0.72) if small else UISkin.CitySkin.INK)

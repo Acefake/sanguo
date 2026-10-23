@@ -10,7 +10,8 @@ signal closed
 
 const Tokens = preload("res://scripts/ui/theme/ui_tokens.gd")
 const Widgets = preload("res://scripts/ui/theme/ui_widgets.gd")
-const WIDTH := 360
+## 内容区宽 = WIDTH − 面板两侧内边距（各 24）；部队名牌固定 334 宽，所以至少 384。
+const WIDTH := 384
 const SLIDE := 24.0
 
 var title_label: Label

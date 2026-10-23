@@ -146,10 +146,10 @@ func _build_battle_feedback() -> void:
 	advantage_bar.add_theme_stylebox_override("background", enemy_side)
 	row.add_child(advantage_bar)
 	row.add_child(Widgets.label("敌军", "NoteLabel"))
-	advantage_label = Widgets.label("", "DimLabel")
+	advantage_label = Widgets.muted("")
 	advantage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(advantage_label)
-	var objective_label := Widgets.label("", "DimLabel", true)
+	var objective_label := Widgets.muted("", true)
 	objective_label.name = "BattleObjectiveLabel"
 	objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(objective_label)

@@ -37,6 +37,7 @@ const SUITE := [
 	"war/battle/battle_feedback_validation",
 	"war/battle/encirclement_validation",
 	"war/battle/siege_corps_validation",
+	"war/battle/battle_sides_validation",
 	"war/battle/city_defense_separation_validation",
 	"war/battle/city_defense_edge_validation",
 	"war/battle/battle_balance_validation",

@@ -17,6 +17,9 @@ var duel_started: Dictionary = {}
 var duels: Dictionary = {}
 var duel_touched: Dictionary = {}
 var contacts := {}
+# Hidden contact effects kept for reuse instead of freed: a fight flickering in and out of view, or a new day's
+# contacts, take one of these rather than building nodes and materials again.
+var contact_pool: Array[Dictionary] = []
 var touched := {}
 var height_at: Callable
 var camera: Camera3D
@@ -294,7 +297,7 @@ func show_contact(id: String, source: Vector3, target: Vector3, time: float, sie
 		for key in contacts:
 			if str(key).begins_with("city:") == city_contact: allocated += 1
 		if allocated >= (MAX_CITY_CONTACTS if city_contact else MAX_CONTACTS): return
-		contacts[id] = {"slash": _quad("slash", 4.6) if ranged else _front_arc(), "ranged": ranged, "spark": _quad("spark", 1.8), "dust": _quad("dust", 3.2), "phase": float(absi(hash(id + ":impact")) % 100) / 100.0}
+		contacts[id] = _take_contact(id, ranged)
 	touched[id] = true
 	var item: Dictionary = contacts[id]
 	if ranged:
@@ -339,6 +342,8 @@ func show_contact(id: String, source: Vector3, target: Vector3, time: float, sie
 		item["slash"].queue_free()
 		item["slash"] = _quad("slash", 4.6) if ranged else _front_arc()
 		item["ranged"] = ranged
+		item["sent"] = {}
+		item.erase("terrain_patch")
 	var phase := fposmod(time / 1.85 + float(item["phase"]), 1.0)
 	var direction := ((target - source) * Vector3(1, 0, 1)).normalized()
 	var side := Vector3(-direction.z, 0, direction.x)
@@ -353,8 +358,8 @@ func show_contact(id: String, source: Vector3, target: Vector3, time: float, sie
 	slash.position = source
 	slash.rotation.y = atan2(direction.x, direction.z)
 	slash.scale = Vector3(radius * 1.15, 1, radius * 1.15)
-	slash.mesh.material.set_shader_parameter("phase", phase)
-	slash.mesh.material.set_shader_parameter("tint", Color(0.95, 0.98, 1, 0.32 + strike * 0.6))
+	_set_param(item, slash.mesh.material, &"phase", phase)
+	_set_param(item, slash.mesh.material, &"tint", Color(0.95, 0.98, 1, 0.32 + strike * 0.6))
 	# Cache terrain sampling until the formation's position or heading changes.
 	var patch := Transform3D(slash.basis, slash.position)
 	if height_at.is_valid() and item.get("terrain_patch", Transform3D()) != patch:
@@ -367,10 +372,12 @@ func show_contact(id: String, source: Vector3, target: Vector3, time: float, sie
 		item["terrain_patch"] = patch
 	spark.position = impact + side * sin(time * 7 + float(item["phase"])) * radius * 0.45
 	spark.scale = Vector3.ONE * (0.6 + flash * 0.7) * (1.45 if duel else 1.0)
-	spark.mesh.material.albedo_color = Color(1, 0.92, 0.65, flash) if duel else Color(0.94, 0.98, 1, flash)
+	var spark_color := Color(1, 0.92, 0.65, flash) if duel else Color(0.94, 0.98, 1, flash)
+	if spark.mesh.material.albedo_color != spark_color: spark.mesh.material.albedo_color = spark_color
 	dust.position = impact + Vector3(0, phase, 0)
 	dust.scale = Vector3.ONE * (0.7 + phase * 0.5)
-	dust.mesh.material.albedo_color = Color(0.76, 0.69, 0.53, (1 - phase) * 0.18)
+	var dust_color := Color(0.76, 0.69, 0.53, (1 - phase) * 0.18)
+	if dust.mesh.material.albedo_color != dust_color: dust.mesh.material.albedo_color = dust_color
 	for kind in ["slash", "spark", "dust"]: item[kind].visible = true
 
 func show_city_volley(id: String, wall_anchor: Vector3, target: Vector3, elapsed: float, target_cell: int = -1) -> void:
@@ -393,9 +400,32 @@ func end_frame() -> void:
 	# Clear stale contacts, including casualties, fog changes and idle days.
 	for id in contacts.keys():
 		if touched.has(id): continue
-		for kind in ["slash", "spark", "dust"]: contacts[id][kind].queue_free()
-		for arrow in contacts[id].get("arrows",[]): arrow.queue_free()
+		var item: Dictionary = contacts[id]
+		for kind in ["slash", "spark", "dust"]: item[kind].hide()
+		for arrow in item.get("arrows",[]): arrow.hide()
+		contact_pool.append(item)
 		contacts.erase(id)
+
+# A pooled contact of the same shape (melee/ranged, field/city), or a new one.
+func _take_contact(id: String, ranged: bool) -> Dictionary:
+	var city := id.begins_with("city:")
+	var phase := float(absi(hash(id + ":impact")) % 100) / 100.0
+	for index in range(contact_pool.size()):
+		var item: Dictionary = contact_pool[index]
+		if bool(item["ranged"]) != ranged or bool(item["city"]) != city: continue
+		contact_pool.remove_at(index)
+		item["phase"] = phase
+		item.erase("terrain_patch")
+		return item
+	return {"slash": _quad("slash", 4.6) if ranged else _front_arc(), "ranged": ranged, "city": city, "spark": _quad("spark", 1.8), "dust": _quad("dust", 3.2), "phase": phase, "sent": {}}
+
+# set_shader_parameter only when the value differs from what this contact last sent (a paused or
+# repeated frame sends nothing).
+func _set_param(item: Dictionary, material: ShaderMaterial, name: StringName, value: Variant) -> void:
+	var sent: Dictionary = item["sent"]
+	if sent.has(name) and sent[name] == value: return
+	sent[name] = value
+	material.set_shader_parameter(name, value)
 
 # Map-local presentation only; authoritative duel outcomes remain in duel_system.
 func show_duel(key: String, source: Vector3, target: Vector3, time: float, left: String, right: String, left_portrait: Texture2D, right_portrait: Texture2D, duration: float = 11.0, outcome: Dictionary = {}, result_at: float = 8.0) -> void:

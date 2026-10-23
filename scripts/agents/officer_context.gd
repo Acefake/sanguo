@@ -43,7 +43,9 @@ func ensure_factions(scenario: Dictionary) -> void:
 	var keys: Array = []
 	for row in SKILLS: keys.append_array(row)
 	keys.append_array(EXTRA_SKILLS)
-	var medians := Careers.medians(officers, keys)
+	# 中位数只在需要补生成武将时才算：每日两次的势力维护里几乎从不生成，却每次都要对全部武将逐项排序。
+	# 第一次用到时还没有新增武将，所以与在函数开头计算的结果相同。
+	var medians := {}
 	for faction in scenario.get("factions", {}):
 		var cities: Array = []
 		for city in scenario.get("places", {}):
@@ -59,6 +61,7 @@ func ensure_factions(scenario: Dictionary) -> void:
 			var id := "local:%s:%d" % [faction, index]
 			if officers.has(id): continue
 			count += 1
+			if medians.is_empty(): medians = Careers.medians(officers, keys)
 			var template := Careers.pick(faction, index)
 			var officer := Careers.generate(id, template, keys, AXES, medians)
 			var name := str(scenario["factions"][faction].get("name", faction))

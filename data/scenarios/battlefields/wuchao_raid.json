@@ -1,0 +1,69 @@
+{
+  "id": "wuchao_raid",
+  "name": "乌巢夜袭（奇袭补给）",
+  "summary": "两军相持官渡，曹军粮少。乌巢屯袁军粮车，淳于琼守。曹操可率精兵走夜道袭乌巢，曹洪守营。检验袭粮方是否选择奇袭、守粮方能否及早察觉，以及袁营主帅在乌巢告急时是救粮还是攻营（参军不同，进言不同）。",
+  "history": "许攸来奔，言淳于琼屯乌巢。公留曹洪守，自将步骑五千，夜从间道出，人抱束薪，所历道有问者，语之曰：袁公恐曹操钞略后军，遣兵以益备。至，围屯，大放火。张郃说绍救琼，郭图请攻曹营，绍遣轻骑救琼，以重兵攻营，不能下。",
+  "checks": [
+    "袭粮方：奇袭/机动高、风险承受够者选奇袭乌巢；稳重者守营待变",
+    "守粮方：料敌高者更早识破夜道来兵（隐蔽暴露后全军警戒）",
+    "袁营主帅：乌巢告急时，参军沮授（料敌 94、多源研判）进言救援；郭图进言更易被采纳与否取决于主帅采纳概率"
+  ],
+  "ticks": 20,
+  "tick_hours": 6,
+  "review_ticks": 3,
+  "intensity": 5.0,
+  "rout": {"morale": 35, "organization": 25},
+  "ambush_org": 20,
+  "burnt_morale": 18,
+  "zones": [
+    {"id": "cao_camp", "name": "曹营", "terrain": "plains", "x": 0.2, "y": 0.8, "fort": 0.5, "fortifiable": 0.6, "cover": 0.1},
+    {"id": "front", "name": "官渡前沿", "terrain": "plains", "x": 0.4, "y": 0.55, "cover": 0.1},
+    {"id": "yuan_camp", "name": "袁营", "terrain": "plains", "x": 0.6, "y": 0.3, "fort": 0.4, "cover": 0.1},
+    {"id": "night_road", "name": "间道", "terrain": "marsh", "x": 0.55, "y": 0.85, "cover": 0.75},
+    {"id": "wuchao", "name": "乌巢", "terrain": "marsh", "x": 0.88, "y": 0.6, "fort": 0.15, "fortifiable": 0.3, "cover": 0.3},
+    {"id": "yuan_road", "name": "袁营东道", "terrain": "plains", "x": 0.8, "y": 0.3, "cover": 0.1},
+    {"id": "yangwu", "name": "阳武", "terrain": "plains", "x": 0.7, "y": 0.05, "cover": 0.1},
+    {"id": "xu_road", "name": "许都道", "terrain": "plains", "x": 0.05, "y": 0.95, "cover": 0.2}
+  ],
+  "links": [
+    ["cao_camp", "front", 6], ["front", "yuan_camp", 6], ["cao_camp", "night_road", 10], ["night_road", "wuchao", 8],
+    ["yuan_camp", "yuan_road", 6], ["yuan_road", "wuchao", 6], ["yuan_camp", "yangwu", 8], ["cao_camp", "xu_road", 8]
+  ],
+  "sides": {
+    "yuan": {
+      "name": "袁军", "supply_days": 20, "retreat": "yangwu",
+      "depot": {"zone": "wuchao"},
+      "intel": {"independent_groups": 2, "cross_checked": false},
+      "objectives": [{"type": "protect"}, {"type": "take", "zone": "cao_camp"}],
+      "units": [
+        {"id": "depot_guard", "officer": "ys_006", "zone": "wuchao", "role": "guard", "objectives": [{"type": "protect"}], "troops": {"infantry": 4000, "archers": 1000, "cavalry": 0}, "morale": 85, "organization": 85},
+        {"id": "yuan_main", "officer": "ys_001", "adviser": "ys_020", "zone": "yuan_camp", "role": "main", "troops": {"infantry": 9000, "archers": 3000, "cavalry": 3000}, "morale": 88, "organization": 88},
+        {"id": "yuan_horse", "officer": "ys_004", "zone": "yuan_camp", "role": "wing", "troops": {"infantry": 1000, "archers": 0, "cavalry": 4000}, "morale": 90, "organization": 90}
+      ]
+    },
+    "cao": {
+      "name": "曹军", "supply_days": 4, "retreat": "xu_road",
+      "intel": {"independent_groups": 3, "cross_checked": true},
+      "flags": {"route_surveyed": true, "enemy_pattern_received": true},
+      "objectives": [{"type": "burn"}, {"type": "hold", "zone": "cao_camp"}],
+      "units": [
+        {"id": "raiders", "officer": "cc_001", "adviser": "ys_017", "zone": "cao_camp", "role": "main", "objectives": [{"type": "burn"}], "troops": {"infantry": 2000, "archers": 0, "cavalry": 3000}, "morale": 90, "organization": 92},
+        {"id": "camp_guard", "officer": "cc_010", "zone": "cao_camp", "role": "garrison", "troops": {"infantry": 7000, "archers": 3000, "cavalry": 0}, "morale": 85, "organization": 88}
+      ]
+    }
+  },
+  "subject": "raiders",
+  "trials": [
+    {"id": "cao_cao", "label": "曹操袭粮 · 淳于琼守 · 袁绍（郭图参军）", "assign": {}},
+    {"id": "raid_yujin", "label": "于禁袭粮 · 淳于琼守 · 袁绍（郭图参军）", "assign": {"raiders": "cc_008"}},
+    {"id": "raid_zhangliao", "label": "张辽袭粮 · 淳于琼守 · 袁绍（郭图参军）", "assign": {"raiders": "cc_006"}},
+    {"id": "guard_shenpei", "label": "曹操袭粮 · 审配守 · 袁绍（郭图参军）", "assign": {"depot_guard": "ys_018"}, "subject": "depot_guard"},
+    {"id": "main_jushou", "label": "曹操袭粮 · 淳于琼守 · 袁绍（沮授参军）", "assign": {}, "adviser_assign": {"yuan_main": "ys_016"}, "subject": "yuan_main"},
+    {"id": "main_guotu_alone", "label": "曹操袭粮 · 淳于琼守 · 郭图为帅", "assign": {"yuan_main": "ys_020"}, "adviser_assign": {"yuan_main": ""}, "subject": "yuan_main"}
+  ],
+  "compare": [["cao_cao", "raid_yujin"], ["raid_zhangliao", "raid_yujin"], ["cao_cao", "main_guotu_alone", "yuan_main"], ["cao_cao", "main_jushou", "yuan_main"]],
+  "expect": [
+    {"trial": "cao_cao", "unit": "raiders", "more_than": {"trial": "raid_yujin", "postures": ["raid"]}, "why": "曹操奇袭 92、风险承受 68，比于禁（奇袭 66、风险承受 40）更多奇袭乌巢"},
+    {"trial": "cao_cao", "unit": "raiders", "metric_more": {"trial": "raid_yujin", "metric": "burn"}, "why": "焚粮率曹操高于于禁"}
+  ]
+}

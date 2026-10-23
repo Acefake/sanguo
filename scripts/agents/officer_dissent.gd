@@ -1,4 +1,7 @@
+class_name OfficerDissent
 extends RefCounted
+## 军令书与违令的规则层：将领关系、违令概率、主副搭配提示。
+const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 
 # 军令书与违令的规则层：将领关系（由人格轴推导）、违令概率与主副搭配提示。
 # 全部确定性，不消耗战斗随机数；概率最后记录进决策记录，随种子可复现。
@@ -8,8 +11,16 @@ static func axis(officer: Dictionary, name: String) -> float:
 	return float(officer.get("personality", {}).get(name, 50))
 
 
+## a 对 b 的关系类别。人物卡写了 a→b 有向边时按边定（怨恨≥40 宿怨、怨恨≥20 或信任<35 猜忌、
+## 信任≥70 且怨恨<10 同袍）；没写边的（生成将、守备将、卡外人物）按人格轴推导。
 static func relation(a: Dictionary, b: Dictionary) -> String:
 	if a.is_empty() or b.is_empty() or str(a.get("id", "")) == str(b.get("id", "")): return "中立"
+	for edge in a.get("relations", []):
+		if str(edge.get("to", "")) != str(b.get("name", "")): continue
+		if float(edge["怨恨"]) >= 40.0: return "宿怨"
+		if float(edge["怨恨"]) >= 20.0 or float(edge["信任"]) < 35.0: return "猜忌"
+		if float(edge["信任"]) >= 70.0 and float(edge["怨恨"]) < 10.0: return "同袍"
+		return "中立"
 	var score := (axis(a, "记仇") - 50.0) * 0.45 + (axis(a, "猜疑") - 50.0) * 0.25 - (axis(a, "容人") - 50.0) * 0.3 - (axis(b, "容人") - 50.0) * 0.2 - (axis(b, "忠义") - 50.0) * 0.15
 	if score >= 18.0: return "宿怨"
 	if score >= 8.0: return "猜忌"
@@ -40,7 +51,7 @@ static func _p(personality: Dictionary, name: String) -> float:
 # 否则任何一处战斗差异都会改写违令结果。war.state 持有这条独立随机流的状态，
 # 它既不消耗 battle rng，也随存档往返。
 static func roll(key: String, war_state: Dictionary = {}) -> float:
-	var carried := int(war_state.get("dissent_state", 0))
+	var carried := int(war_state.get(StateKeys.DISSENT_STATE, 0))
 	if carried == 0:
 		# 首次掷点：从 key 派生起点，之后按序推进，保证同一存档重放得到同一条序列。
 		carried = hash(key) & 0x7FFFFFFF
@@ -48,7 +59,7 @@ static func roll(key: String, war_state: Dictionary = {}) -> float:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = carried
 	var value := rng.randf()
-	war_state["dissent_state"] = int(rng.state)
+	war_state[StateKeys.DISSENT_STATE] = int(rng.state)
 	return value
 
 

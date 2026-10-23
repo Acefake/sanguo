@@ -15,6 +15,6 @@ Current accuracy and fixes: [remake status](rtk14-remake-status.md). Earlier cou
 
 地格坐标仍是近似换算，城市样式及植被、道路、聚落为重建配置。河岸和地表质感仍与参考图有差异，尚非原版一比一还原。
 
-重建数据：依次运行 `tools/build_world_landscape.py` 和 `tools/build_autumn_vegetation.py`，再在 Godot 导入。原始高度文件不修改。
+重建数据：依次运行 `tools/assets/build_world_landscape.py` 和 `tools/assets/build_autumn_vegetation.py`，再在 Godot 导入。原始高度文件不修改。
 
-验证：`scripts/rtk14_world_validation.gd` 检查全国地形、46 城覆盖、河流、植被及镜头；`tools/validate_rtk14_models.py` 核对源网格和贴图。建业和成都实际截图约 76、50 帧，视角不同会影响性能。
+验证：`tests/world/rtk14_world_validation.gd` 检查全国地形、46 城覆盖、河流、植被及镜头；`tools/validate/validate_rtk14_models.py` 核对源网格和贴图。建业和成都实际截图约 76、50 帧，视角不同会影响性能。

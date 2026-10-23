@@ -1,0 +1,72 @@
+{
+  "id": "baima_relief",
+  "name": "白马解围（声东击西）",
+  "summary": "颜良围白马。曹军一路（荀攸）公开西进延津、作势渡河袭黎阳粮囤，另一路轻兵（张辽）可走濮阳林道隐蔽东来，也可直奔白马。检验围城主将对隐蔽来援的识破与应对，以及解围主将选直救还是绕袭。",
+  "history": "建安五年四月，荀攸献策：引兵至延津，若将渡河向其后，绍必西应；然后轻兵袭白马，掩其不备。颜良不备，为张辽、关羽所破。",
+  "checks": [
+    "围城主将：识破隐蔽来援（料敌、参军进言）后转入坚守或迎击；冒进者（风险承受高、料敌低）继续攻城并遭突袭",
+    "解围主将：奇袭/机动高者选侧击（濮阳林道隐蔽绕行），统兵高而奇袭平平者直接救援",
+    "佯动：荀攸一路公开行军，延津方向的威胁让黎阳一侧感到粮囤告急（ally_danger）"
+  ],
+  "ticks": 24,
+  "tick_hours": 6,
+  "review_ticks": 4,
+  "intensity": 4.0,
+  "rout": {"morale": 35, "organization": 25},
+  "ambush_org": 18,
+  "zones": [
+    {"id": "liyang", "name": "黎阳", "terrain": "plains", "x": 0.45, "y": 0.08, "fort": 0.3, "cover": 0.1},
+    {"id": "yanjin", "name": "延津渡", "terrain": "ford", "x": 0.18, "y": 0.32, "cover": 0.2},
+    {"id": "baima_ford", "name": "白马津", "terrain": "ford", "x": 0.68, "y": 0.28, "cover": 0.2},
+    {"id": "baima", "name": "白马城", "terrain": "plains", "x": 0.72, "y": 0.5, "fort": 1.5, "fortifiable": 1.5, "cover": 0.1},
+    {"id": "puyang_wood", "name": "濮阳林道", "terrain": "forest", "x": 0.9, "y": 0.68, "cover": 0.7},
+    {"id": "south_plain", "name": "白马南野", "terrain": "plains", "x": 0.6, "y": 0.72, "cover": 0.1},
+    {"id": "yanjin_south", "name": "延津南道", "terrain": "hills", "x": 0.28, "y": 0.6, "cover": 0.4},
+    {"id": "cao_camp", "name": "曹营", "terrain": "plains", "x": 0.45, "y": 0.92, "fort": 0.3, "cover": 0.1}
+  ],
+  "links": [
+    ["liyang", "yanjin", 10], ["liyang", "baima_ford", 10], ["baima_ford", "baima", 4],
+    ["yanjin", "yanjin_south", 8], ["yanjin_south", "cao_camp", 10], ["yanjin_south", "south_plain", 10],
+    ["baima", "south_plain", 6], ["south_plain", "cao_camp", 12], ["cao_camp", "puyang_wood", 13], ["puyang_wood", "baima", 6]
+  ],
+  "sides": {
+    "yuan": {
+      "name": "袁军", "supply_days": 12, "retreat": "liyang",
+      "depot": {"zone": "liyang"},
+      "intel": {"independent_groups": 1, "cross_checked": false},
+      "flags": {"attack_point_surveyed": true},
+      "objectives": [{"type": "take", "zone": "baima"}, {"type": "protect"}],
+      "units": [
+        {"id": "vanguard", "officer": "ys_002", "zone": "baima", "role": "main", "troops": {"infantry": 6000, "archers": 1000, "cavalry": 3000}, "morale": 92, "organization": 88},
+        {"id": "liyang_guard", "officer": "ys_001", "zone": "liyang", "role": "reserve", "objectives": [{"type": "protect"}], "troops": {"infantry": 5000, "archers": 2000, "cavalry": 1000}, "morale": 90, "organization": 90}
+      ]
+    },
+    "cao": {
+      "name": "曹军", "supply_days": 8, "retreat": "cao_camp",
+      "intel": {"independent_groups": 2, "cross_checked": true},
+      "flags": {"route_surveyed": true, "enemy_pattern_received": true},
+      "objectives": [{"type": "relieve", "zone": "baima", "deadline": 16}],
+      "units": [
+        {"id": "garrison", "officer": "neutral", "zone": "baima", "role": "garrison", "troops": {"infantry": 2500, "archers": 1500, "cavalry": 0}, "morale": 88, "organization": 85},
+        {"id": "strike", "officer": "cc_006", "zone": "cao_camp", "role": "main", "troops": {"infantry": 1000, "archers": 0, "cavalry": 5000}, "morale": 92, "organization": 92},
+        {"id": "decoy", "officer": "cc_002", "zone": "cao_camp", "role": "decoy", "open_march": true, "objectives": [{"type": "feint", "zone": "yanjin"}], "troops": {"infantry": 3000, "archers": 1000, "cavalry": 0}, "morale": 85, "organization": 88}
+      ]
+    }
+  },
+  "subject": "vanguard",
+  "trials": [
+    {"id": "yan_liang", "label": "颜良围城 · 张辽解围", "assign": {}},
+    {"id": "zhang_he", "label": "张郃围城 · 张辽解围", "assign": {"vanguard": "ys_004"}},
+    {"id": "wen_chou", "label": "文丑围城 · 张辽解围", "assign": {"vanguard": "ys_003"}},
+    {"id": "yu_jin", "label": "于禁围城（假设对照） · 张辽解围", "assign": {"vanguard": "cc_008"}},
+    {"id": "yan_liang_jushou", "label": "颜良围城（沮授参军） · 张辽解围", "assign": {}, "adviser_assign": {"vanguard": "ys_016"}},
+    {"id": "strike_yujin", "label": "颜良围城 · 于禁解围", "assign": {"strike": "cc_008"}, "subject": "strike"},
+    {"id": "strike_xuhuang", "label": "颜良围城 · 徐晃解围", "assign": {"strike": "cc_007"}, "subject": "strike"}
+  ],
+  "compare": [["yan_liang", "yu_jin"], ["yan_liang", "yan_liang_jushou"], ["yan_liang", "strike_yujin", "strike"], ["strike_xuhuang", "strike_yujin", "strike"]],
+  "expect": [
+    {"trial": "zhang_he", "unit": "vanguard", "first_more": {"trial": "yan_liang", "postures": ["hold"]}, "why": "开局第一个决定：张郃顾忌两程内的曹军援兵（风险承受 52，按九成计），多选坚守；颜良（82）只按六成计，多选强攻"},
+    {"trial": "zhang_he", "unit": "vanguard", "more_than": {"trial": "yan_liang", "postures": ["hold", "withdraw"]}, "why": "张郃料敌 86、风险承受 52，比颜良（料敌 57、风险承受 82）更多转入坚守/后撤"},
+    {"trial": "yan_liang", "unit": "strike", "first_more": {"trial": "strike_yujin", "postures": ["flank"]}, "why": "开局第一个决定：张辽奇袭 90、机动 92，比于禁更常选隐蔽侧击"}
+  ]
+}

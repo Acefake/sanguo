@@ -51,7 +51,7 @@ Displayset、纹理状态、KTID 绑定、来源纹理的追踪记录为 `model-
 
 读取 G1T 标志并记录到 `native-recovery/terrain-color-space.json`。按 [gust_tools 的 G1T 实现](https://github.com/VitaSmith/gust_tools/blob/master/gust_g1t.c) 解码，颜色纹理未标记 sRGB；但原游戏运行时纹理格式覆盖及输出转换尚不明确。不能仅凭资源标志决定 Godot 采样方式。
 
-`tools/rtk14_terrain_color_probe.gd` 在独立进程对照两种采样方式；`--linear` 使用专用诊断着色器，不修改主场景。线性对照图 `validation/terrain-color-linear.png` 显著泛白，因此当前正式地形设置保留。完整原作色调仍需恢复运行时材质和光照，而非继续手工染色。
+`tools/capture/rtk14_terrain_color_probe.gd` 在独立进程对照两种采样方式；`--linear` 使用专用诊断着色器，不修改主场景。线性对照图 `validation/terrain-color-linear.png` 显著泛白，因此当前正式地形设置保留。完整原作色调仍需恢复运行时材质和光照，而非继续手工染色。
 
 ## 原版地形细节位移（尚未接入）
 
@@ -63,9 +63,9 @@ Displayset、纹理状态、KTID 绑定、来源纹理的追踪记录为 `model-
 
 ## 验证和性能
 
-`tools/validate_rtk14_native_maps.py` 独立核对原始高度 4198401 个样本、地表控制字节及 1048576 单元植被分布/密度，全部与来源二进制一致。生成植被均处于来源绘制生境。纹理周期与原版烘焙图独立对应，五类材质正确周期相关系数约 0.766～0.925，错误的十分之一或十倍周期接近无相关。
+`tools/validate/validate_rtk14_native_maps.py` 独立核对原始高度 4198401 个样本、地表控制字节及 1048576 单元植被分布/密度，全部与来源二进制一致。生成植被均处于来源绘制生境。纹理周期与原版烘焙图独立对应，五类材质正确周期相关系数约 0.766～0.925，错误的十分之一或十倍周期接近无相关。
 
-`tools/validate_rtk14_models.py` 检查 58 个模型的来源绘制范围及颜色贴图绑定。Godot 场景检查覆盖 64 个地形块、1120 条来源摆放、46 城、10 关、来源切线和近远植被数量。实际 Vulkan 截图为 `docs/validation/native-world-{hanzhong,luoyang,gate,overview}.png`。
+`tools/validate/validate_rtk14_models.py` 检查 58 个模型的来源绘制范围及颜色贴图绑定。Godot 场景检查覆盖 64 个地形块、1120 条来源摆放、46 城、10 关、来源切线和近远植被数量。实际 Vulkan 截图为 `docs/validation/native-world-{hanzhong,luoyang,gate,overview}.png`。
 
 性能报告 `docs/validation/performance-native-world.json` 开启正常地图更新，使用 RTX 3060 Laptop、Vulkan Forward+、1260×710、流畅模式、0.67 渲染比例、FSR、TAA、关闭垂直同步。每视角预热 12 帧、采样 45 帧并报告中位数/P95。城市标记增加屏幕裁剪，仅在内容变化时重绘。数据不是最高画质或全部设备的性能保证。
 
@@ -79,7 +79,7 @@ Displayset、纹理状态、KTID 绑定、来源纹理的追踪记录为 `model-
 | 近远切换流畅 | 2.881 | 347 | 3.477 | 356 |
 | 返回洛阳流畅 | 3.213 | 311 | 4.494 | 268 |
 
-`tools/validate_rtk14_water.py` 独立读取 G1T BGRA8 像素，确认导出两张法线全部 524288 个像素相同；检查全部水面顶点与缓存高度、索引范围、一米三角形面积及文件哈希。结果见 `validation/native-water-check.json`。这不验证重建水位的原作准确性。最终场景检查 `validation/native-water-validation.log` 通过；新水面汉中/洛阳截图为 `validation/native-water-{hanzhong,luoyang}.png`。
+`tools/validate/validate_rtk14_water.py` 独立读取 G1T BGRA8 像素，确认导出两张法线全部 524288 个像素相同；检查全部水面顶点与缓存高度、索引范围、一米三角形面积及文件哈希。结果见 `validation/native-water-check.json`。这不验证重建水位的原作准确性。最终场景检查 `validation/native-water-validation.log` 通过；新水面汉中/洛阳截图为 `validation/native-water-{hanzhong,luoyang}.png`。
 
 以下是一米地形阶段的历史测量。该版本把 105 条显式可见清单误当作全部静态摆放，因此漏画了 1015 个继承默认可见状态的原版山体/峭壁对象；这些帧率不代表当前完整静态摆件场景：
 

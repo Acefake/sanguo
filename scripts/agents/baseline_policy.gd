@@ -1,11 +1,14 @@
+class_name BaselinePolicy
 extends RefCounted
+## 本地决策策略：按 data/agents/policy_weights.json 给每个已授权候选打分，入口 choose(context)。
 
 # Data-driven local decision policy. Keeps the historical `choose(context)` entry
 # point; internals read data/agents/policy_weights.json and score every authorized
 # candidate so the best option is explainable and personality-driven.
 
-const Combat = preload("res://scripts/war/combat_system.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
+const Conduct = preload("res://scripts/officers/officer_conduct.gd")
 const WEIGHTS_PATH := "res://data/agents/policy_weights.json"
 const MELEE := ["engage", "flank", "pursue", "besiege"]
 const TARGETED := ["engage", "flank", "pursue"]
@@ -145,7 +148,7 @@ static func order_bias(context: Dictionary, candidate: Dictionary, category: Str
 	var bonus := float(w.get("intents", {}).get(intent, {}).get(category, 0.0))
 	if not is_zero_approx(bonus): out["军令·" + intent] = bonus
 	if category == "support":
-		var relation_bonus: float = float({"同袍": 4.0, "猜忌": -2.0, "宿怨": -4.0}.get(str(candidate.get("relation", "中立")), 0.0))
+		var relation_bonus: float = float(w.get("support", {}).get("relation", {}).get(str(candidate.get("relation", "中立")), 0.0))
 		if not is_zero_approx(relation_bonus): out["同袍关系"] = relation_bonus
 	var line: Dictionary = orders.get("retreat_line", {})
 	var own: Dictionary = context.get("army", {})
@@ -175,7 +178,6 @@ static func effective_personality(context: Dictionary) -> Dictionary:
 
 static func risk_of(context: Dictionary, personality: Dictionary) -> float:
 	var value: float = float(personality.get("风险承受", 50)) / 100.0
-	if "冒进" in context.get("officer", {}).get("battle_traits", []): value = minf(1.0, value + 0.12)
 	return value
 
 
@@ -214,13 +216,23 @@ static func explicit_score(context: Dictionary, candidate: Dictionary, kind: Str
 		"engage":
 			out["接战勇气"] = risk * float(w.get("engage", {}).get("risk", 14)) - maxf(0.0, danger - 1.0) * float(w.get("engage", {}).get("danger", 40))
 			out["决断"] = decisiveness * float(w.get("engage", {}).get("decisive", 6))
+			var officer: Dictionary = context.get("officer", {})
 			if str(candidate.get("action", {}).get("enemy", "")) != "" and str(candidate.get("action", {}).get("enemy", "")) == str(context.get("operation", {}).get("suggested_target", "")):
-				out["接战勇气"] = float(out["接战勇气"]) + float(w.get("engage", {}).get("suggested", 8))
+				# 建议目标的加分按主将采纳倾向缩放：刚愎者对参军/主帅的建议打折。
+				var adoption := Conduct.advice_adoption(officer, {}) / maxf(Conduct.advice_adoption({}, {}), 0.01)
+				out["接战勇气"] = float(out["接战勇气"]) + float(w.get("engage", {}).get("suggested", 8)) * adoption
+			# 协同友军未就位时，按主将要求的就位度扣分；急躁者要求低，更早投入。
+			if str(context.get("operation", {}).get("support_id", "")) != "" and not bool(context.get("operation", {}).get("support_ready", false)):
+				out["等待协同"] = -Conduct.commit_readiness(officer) * float(w.get("engage", {}).get("wait_support", 20))
 		"flank":
 			out["职责"] = (float(w.get("flank", {}).get("role", 58)) - float(w.get("base_score", {}).get("flank", 18))) if str(context.get("operation", {}).get("role", "")) == "flank" else 0.0
 			out["决断"] = decisiveness * float(w.get("flank", {}).get("decisive", 6))
 		"pursue":
 			out["追击勇气"] = risk * float(w.get("pursue", {}).get("risk", 28)) + decisiveness * float(w.get("pursue", {}).get("decisive", 6))
+			# 越过本人的追击深度上限才扣分；贪功、追击疏算的上限更深，于是追得更远。
+			var steps := int(context.get("army", {}).get("pursuit_steps", 0)) + 1
+			var overreach := maxi(0, steps - Conduct.pursuit_limit(context.get("officer", {})))
+			if overreach > 0: out["追击过深"] = -float(overreach) * float(w.get("pursue", {}).get("overreach", 30))
 		"besiege":
 			var prior := maxf(0.0, float(candidate.get("defender_ratio", 0)) - float(w.get("besiege", {}).get("defender_floor", 0.6)))
 			out["攻城勇气"] = risk * float(w.get("besiege", {}).get("risk", 10)) - prior * (float(w.get("besiege", {}).get("defender", 38)) - risk * float(w.get("besiege", {}).get("defender_risk", 16)))
@@ -230,7 +242,7 @@ static func explicit_score(context: Dictionary, candidate: Dictionary, kind: Str
 			out["求援"] = maxf(0.0, danger - float(w.get("request_support", {}).get("danger_floor", 0.8))) * float(w.get("request_support", {}).get("danger", 15))
 		"withdraw":
 			var wd: Dictionary = w.get("withdraw", {})
-			var crisis: bool = float(context.get("army", {}).get("grain_days", 99)) < float(wd.get("grain_days", 4)) or float(context.get("army", {}).get("morale", 100)) < float(wd.get("morale", 30)) or float(context.get("army", {}).get("organization", 100)) < float(wd.get("organization", 25))
+			var crisis: bool = float(context.get("army", {}).get("grain_days", 99)) < float(wd.get("grain_days", 4)) or float(context.get("army", {}).get("morale", 100)) < float(wd.get("morale", 30)) or float(context.get("army", {}).get("organization", 100)) < float(wd.get("organization", 25)) + Conduct.disengage_shift(context.get("officer", {}))
 			var total: float = float(wd.get("crisis", 95)) if crisis else float(wd.get("base", 5))
 			var ordered: bool = not context.get("operation", {}).is_empty()
 			var threshold: float = (float(wd.get("ordered_threshold", 1.35)) + risk * float(wd.get("ordered_risk_scale", 0.65))) if ordered else (float(wd.get("threshold", 0.8)) + risk * float(wd.get("risk_scale", 0.8)))
@@ -619,7 +631,7 @@ static func commander_explicit(context: Dictionary, candidate: Dictionary, kind:
 	if kind == "assign_task":
 		for unit in units:
 			if str(unit.get("id","")) == str(candidate.get("action",{}).get("unit","")):
-				var fit := preload("res://scripts/war/troop_roles.gd").role_fit(unit,task)
+				var fit := preload("res://scripts/war/battle/troop_roles.gd").role_fit(unit,task)
 				if not is_zero_approx(fit): out["兵种职责适配"] = fit
 
 	return out

@@ -20,7 +20,7 @@
 
 1260×710 洛阳视角，本次初始测试约 14–21 帧，优化后较高负载时约 28–45 帧，建业截图约 54 帧。最终重复性能测试近景约 143 帧（GPU 6.4 ms、175 次可见绘制），全国总览约 165 帧（GPU 2.1 ms），距离 700 的远景切换视角约 165 帧（GPU 3.1 ms）。总览实际截图时约 121 帧。测试期间显卡时钟与其他窗口负载存在明显波动，因此不能把不同时间的帧率直接作为固定倍数提升，也不是稳定帧率保证。精细模式仍会更耗性能。
 
-详细数据：`validation/performance-before.json`、`validation/performance-optimized.json`、最终重复测量 `validation/performance-current.json`。`tools/rtk14_performance_check.gd` 可重测近景、总览、远景切换及重复近景的帧时间、CPU/GPU 渲染时间、绘制提交和阴影几何数量。175 次提交仅指洛阳近景；总览同时显示更多地形、山石和建筑，提交数不同。
+详细数据：`validation/performance-before.json`、`validation/performance-optimized.json`、最终重复测量 `validation/performance-current.json`。`tools/validate/rtk14_performance_check.gd` 可重测近景、总览、远景切换及重复近景的帧时间、CPU/GPU 渲染时间、绘制提交和阴影几何数量。175 次提交仅指洛阳近景；总览同时显示更多地形、山石和建筑，提交数不同。
 
 验证通过：55 模型源网格及贴图检查；46 城、10 关口；植被缩放数量固定；合并前后顶点/索引数量及 13 层贴图绑定检查；山石变换无额外剪切；两档画质切换。
 

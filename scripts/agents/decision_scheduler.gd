@@ -1,4 +1,6 @@
+class_name DecisionScheduler
 extends RefCounted
+## 决策调度：各将领决策独立完成，排队有上限且公平；回调不执行行动。
 
 # Independent completion and bounded fair queue. Callbacks never execute actions.
 var epoch := 0

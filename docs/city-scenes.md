@@ -30,15 +30,15 @@
 
 - 中原背景继续使用 `assets/city/luoyang/preview-perspective.png`。
 - 其余四套背景位于 `assets/city/regional/{north,south,shu,nanman}/preview-perspective.png`。
-- `scripts/city_scene_catalog.gd` 根据城市 ID 提供背景与建筑入口。
+- `scripts/city/city_scene_catalog.gd` 根据城市 ID 提供背景与建筑入口。
 - `data/city_scene_reference.json` 是原 51 城的城市→州→场景表，已逐条对照解码后的 `fixdata` 二进制字段，并保存该文件 SHA256 和表偏移。
 - `data/city_scene_extensions.json` 的 `overrides` 配置逐城外观覆盖，当前包含长安；`aliases` 和 `extensions` 明确配置建业别名及 26 座扩展城。这些外观覆盖和扩展城对应是本项目的配置选择，不是原版独立城市条目。
-- `tools/build_city_scene_catalog.py` 可离线生成运行配置及核对表。新增城池必须配置明确参照，缺配置会报错；不再根据大地图区域或默认中原场景兜底。已校准的入口坐标会保留。
-- `tools/import_regional_city_scenes.py` 根据原始 G1MG 材质采样槽、CSV 绑定表与春季纹理节点导入模型和颜色贴图。`--profile` 可指定区域；`--catalog-only` 调用离线配置生成器，跳过资源导入。
-- `scripts/luoyang_scene.gd` 可读取不同区域的 `scene_manifest`。每套 `scene.json` 保留摆放及镜头配置，`material-bindings.json` 记录具体贴图来源。
+- `tools/assets/build_city_scene_catalog.py` 可离线生成运行配置及核对表。新增城池必须配置明确参照，缺配置会报错；不再根据大地图区域或默认中原场景兜底。已校准的入口坐标会保留。
+- `tools/assets/import_regional_city_scenes.py` 根据原始 G1MG 材质采样槽、CSV 绑定表与春季纹理节点导入模型和颜色贴图。`--profile` 可指定区域；`--catalog-only` 调用离线配置生成器，跳过资源导入。
+- `scripts/city/luoyang_scene.gd` 可读取不同区域的 `scene_manifest`。每套 `scene.json` 保留摆放及镜头配置，`material-bindings.json` 记录具体贴图来源。
 - 原始模型和贴图放在 `models/` 下，并用 `.gdignore` 避免自动导入；它们是离线渲染源文件，游戏运行直接显示已渲染的背景。
-- `tests/capture_regional_city.gd -- north --ui` 可重新渲染北方背景和带菜单的预览。渲染命令使用 `--rendering-method gl_compatibility`，避免批量模型读取时的显存压力。
-- `tests/capture_regional_city.gd -- --city changan --ui-only` 可直接实拍指定城市。`--output res://.../file.png` 可指定输出；默认保存到 `assets/city/comparisons/{城市ID}.png`。
+- `tools/capture/capture_regional_city.gd -- north --ui` 可重新渲染北方背景和带菜单的预览。渲染命令使用 `--rendering-method gl_compatibility`，避免批量模型读取时的显存压力。
+- `tools/capture/capture_regional_city.gd -- --city changan --ui-only` 可直接实拍指定城市。`--output res://.../file.png` 可指定输出；默认保存到 `assets/city/comparisons/{城市ID}.png`。
 
 ## 尚未完全还原
 
@@ -48,4 +48,4 @@
 
 ## 验证
 
-`tests/regional_city_validation.gd` 检查全部 70 城的原场景来源和实际外观配置，特别断言长安使用都城背景且与武威不同，并检查此前六座修正城市和跨州边界；同时检查五套高清背景、420 个建筑入口、市场及官府切换，并确认浏览未修改剧本状态。长安修正后重新实拍；检查只验证布局、背景切换和入口对应，不代表原版材质与效果已完全还原。
+`tests/city/regional_city_validation.gd` 检查全部 70 城的原场景来源和实际外观配置，特别断言长安使用都城背景且与武威不同，并检查此前六座修正城市和跨州边界；同时检查五套高清背景、420 个建筑入口、市场及官府切换，并确认浏览未修改剧本状态。长安修正后重新实拍；检查只验证布局、背景切换和入口对应，不代表原版材质与效果已完全还原。

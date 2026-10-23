@@ -8,6 +8,7 @@ signal campaign_progress
 const WarCampaign = preload("res://scripts/war/campaign/campaign_state.gd")
 const AgentAdapter = preload("res://scripts/agents/agent_adapter.gd")
 const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
+const SaveWriter = preload("res://scripts/core/save_writer.gd")
 
 const DEMO_PATH := "res://data/scenario_world_demo.json"
 const SAVE_PATH := "user://city_campaign.json"
@@ -159,6 +160,11 @@ func _ready() -> void:
 		if arg.begins_with("--battle-scenario="): prepare_battle_test(false, arg.trim_prefix("--battle-scenario="), battle_seed)
 
 
+## 退出前等后台写盘结束，存档不会只写了一半。
+func _exit_tree() -> void:
+	SaveWriter.wait()
+
+
 func _load_demo() -> void:
 	var file := FileAccess.open(DEMO_PATH, FileAccess.READ)
 	if file == null:
@@ -178,6 +184,7 @@ func _load_demo() -> void:
 
 
 func _load_save() -> void:
+	SaveWriter.wait()
 	if not FileAccess.file_exists(save_path):
 		return
 	var file := FileAccess.open(save_path, FileAccess.READ)
@@ -209,9 +216,11 @@ func _load_save() -> void:
 	war.setup(self, parsed.get("war", {}) if parsed.get("war", {}) is Dictionary else {})
 
 
+## 写存档：主线程打开文件并做快照，序列化与写盘交给 SaveWriter 的后台线程。
 func _save() -> void:
 	if not persist_enabled:
 		return
+	SaveWriter.wait()
 	var pending_path: String = save_path + ".pending"
 	var file := FileAccess.open(pending_path, FileAccess.WRITE)
 	if file == null:
@@ -223,15 +232,11 @@ func _save() -> void:
 		"month": month,
 		"day": day,
 		"action_points": action_points,
-		"places": scenario.get("places", {}),
-		"chronicles": chronicles,
+		"places": scenario.get("places", {}).duplicate(true),
+		"chronicles": chronicles.duplicate(true),
 		"war": war.export_state()
 	}
-	file.store_string(JSON.stringify(payload, "\t"))
-	file.flush()
-	file.close()
-	if DirAccess.rename_absolute(ProjectSettings.globalize_path(pending_path), ProjectSettings.globalize_path(save_path)) != OK:
-		push_warning("无法替换进度文件，原存档已保留。")
+	SaveWriter.write(file, ProjectSettings.globalize_path(pending_path), ProjectSettings.globalize_path(save_path), payload)
 
 
 func city_state(city_id: String) -> Dictionary:

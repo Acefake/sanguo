@@ -63,6 +63,7 @@ const SUITE := [
 	"war/campaign/strategic_ai_validation",
 	"agents/experience_validation",
 	"war/campaign/war_validation",
+	"war/campaign/save_format_validation",
 	"war/campaign/retreat_route_replay_validation",
 	"war/campaign/war_month_performance_validation",
 	"agents/agent_settings_validation",

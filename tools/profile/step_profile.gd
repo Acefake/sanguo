@@ -26,6 +26,8 @@ class ProfiledCampaign extends "res://scripts/war/campaign/campaign_state.gd":
 	## 本次 step 内被包住的函数累计耗时（微秒，包含式）与调用次数。
 	var inclusive := {}
 	var calls := {}
+	## 本次 step 里 route() 的不同（势力，起点，终点）组合，衡量同日重复寻路有多少。
+	var route_keys := {}
 	var _mark := 0
 	var _depth := {}
 
@@ -100,6 +102,7 @@ class ProfiledCampaign extends "res://scripts/war/campaign/campaign_state.gd":
 		return out
 
 	func route(faction: String, start: String, finish: String) -> Dictionary:
+		route_keys[faction + ">" + start + ">" + finish] = true
 		var t := _enter("route")
 		var out := super.route(faction, start, finish)
 		_leave("route", t)
@@ -116,6 +119,7 @@ class ProfiledCampaign extends "res://scripts/war/campaign/campaign_state.gd":
 		inclusive = {}
 		calls = {}
 		_depth = {}
+		route_keys = {}
 		_mark = Time.get_ticks_usec()
 		var feedback_before := Feedback.snapshot(self)
 		_lap("feedback_snapshot")
@@ -412,7 +416,7 @@ func _profiled(adapter: Node, round_index: int, mode: String, hashes: Array) -> 
 		phases.erase("decision_contexts_n")
 		print("PROFILE ", JSON.stringify({
 			"round": round_index, "mode": mode, "day": day + 1, "step_us": elapsed, "suspended": suspended,
-			"phases": phases, "inclusive": war.inclusive, "calls": war.calls, "scheduler_us": timed.usec - scheduler_before,
+			"phases": phases, "inclusive": war.inclusive, "calls": war.calls, "scheduler_us": timed.usec - scheduler_before, "route_unique": war.route_keys.size(),
 			"save_export_us": t1 - t0, "save_stringify_us": t2 - t1, "save_bytes": text.length(),
 			"armies": war.active_armies().size(), "corps": war.state[StateKeys.CORPS].size(), "tactical": tactical, "engaged": engaged,
 			"battlefield": war.state.has(StateKeys.BATTLEFIELD), "battlefields": war.state.get(StateKeys.BATTLEFIELDS, {}).size(),

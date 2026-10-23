@@ -76,7 +76,8 @@ func _ready() -> void:
 	unit_type.position = Vector2(99, 195)
 	unit_type.size = Vector2(95, 20)
 	hero.add_child(unit_type)
-	for spec in [["武艺", Vector2(237, 165), Vector2(58, 18)], ["智计", Vector2(202, 198), Vector2(43, 18)], ["带兵", Vector2(281, 198), Vector2(43, 18)], ["布阵", Vector2(237, 229), Vector2(58, 18)]]:
+	# 四项属性围着名牌右侧的菱形；布阵上提、带兵左收，离开名牌底边与右侧斜边。
+	for spec in [["武艺", Vector2(237, 165), Vector2(58, 18)], ["智计", Vector2(202, 198), Vector2(43, 18)], ["带兵", Vector2(278, 198), Vector2(43, 18)], ["布阵", Vector2(237, 225), Vector2(58, 18)]]:
 		var item := UISkin.label("", 11, UISkin.MUTED)
 		item.autowrap_mode = TextServer.AUTOWRAP_OFF
 		item.position = spec[1]

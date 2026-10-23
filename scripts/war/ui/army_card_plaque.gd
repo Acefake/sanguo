@@ -11,7 +11,8 @@ func _draw() -> void:
 	var edge := outline.duplicate()
 	edge.append(outline[0])
 	draw_polyline(edge, Color("8c795a"), 1.0, true)
-	draw_line(Vector2(8, 85), Vector2(296, 85), Color("c8b797"), 1.0)
+	# 底部细线止于属性菱形左侧，不从「布阵」字下穿过。
+	draw_line(Vector2(8, 85), Vector2(228, 85), Color("c8b797"), 1.0)
 	var flag := PackedVector2Array([Vector2(10, 8), Vector2(26, 8), Vector2(26, 29), Vector2(18, 35), Vector2(10, 29)])
 	draw_colored_polygon(flag, badge_color)
 	draw_string(preload("res://scripts/ui/city_ui_skin.gd").font(), Vector2(12, 24), badge, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("f3e8c8"))

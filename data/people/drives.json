@@ -80,9 +80,10 @@
   },
   {
    "drive": "忠义",
-   "on": "entrusted",
+   "on": "appointed",
    "delta": 15,
-   "role": "actor"
+   "role": "actor",
+   "if": "data.entrusted == true"
   },
   {
    "drive": "忠义",
@@ -123,9 +124,10 @@
   },
   {
    "drive": "财货",
-   "on": "fined",
+   "on": "punished",
    "delta": -15,
-   "role": "actor"
+   "role": "actor",
+   "if": "data.kind == 'fine'"
   },
   {
    "drive": "财货",
@@ -136,13 +138,13 @@
   },
   {
    "drive": "家族",
-   "on": "kin_appointed",
+   "on": "appointed",
    "delta": 12,
    "role": "kin_of_actor"
   },
   {
    "drive": "家族",
-   "on": "kin_rewarded",
+   "on": "rewarded",
    "delta": 8,
    "role": "kin_of_actor"
   },
@@ -160,7 +162,7 @@
   },
   {
    "drive": "家族",
-   "on": "kin_captured",
+   "on": "captured",
    "delta": -30,
    "role": "kin_of_actor"
   },
@@ -255,9 +257,16 @@
   },
   {
    "drive": "报仇",
-   "on": "enemy_harmed",
+   "on": "captured",
    "delta": 20,
-   "role": "actor",
+   "role": "faction_all",
+   "if": "actor == knot.报仇.object"
+  },
+  {
+   "drive": "报仇",
+   "on": "kin_killed",
+   "delta": 20,
+   "role": "faction_all",
    "if": "target == knot.报仇.object"
   },
   {
@@ -326,14 +335,74 @@
   ]
  },
  "infer_from_card": {
-  "功名": "values.功业*0.6 + decision_weights.个人功业*0.4",
-  "忠义": "loyalty.承诺坚持*0.5 + values.承诺*0.5",
-  "财货": "values.个人利益*0.7 + axis.贪欲/100*0.3",
-  "家族": "loyalty.私人依附*0.4 + (kin.size()>0 ? 0.3 : 0)",
-  "天下": "values.群体利益*0.6 + values.秩序*0.2 + axis.野心/100*0.2",
-  "安身": "decision_weights.损失厌恶*0.6 + (1-risk_preference)*0.4",
-  "学问": "attr.智计/100*0.4 + (has_learning_habit ? 0.4 : 0)",
-  "报仇": "knot_object_intensity>=60 ? 0.8 : 0",
-  "keep_second_if_ge": 0.15
+  "note": "仅在人物卡/补丁没有写 drives 时兜底（生成将、新登场人物）。补丁里的 drives 永远优先。只用 schema 6 卡上已有字段。v1.1 对官渡 20 人：首位一致 11/20，补丁首位落在推定前二 16/20。",
+  "gong": "personality.decision_weights.个人功业，缺省取 功业偏好，再缺省取 values.功业",
+  "score": {
+   "功名": "0.5*values.功业 + 0.3*gong + 0.2*risk_preference + (attr.武艺>=85 ? 0.1 : 0)",
+   "忠义": "0.4*loyalty.承诺坚持 + 0.35*loyalty.私人依附 + 0.25*attr.信义/100 - 0.15",
+   "财货": "0.8*values.个人利益 + 0.2*(1-attr.信义/100) - 0.15",
+   "家族": "0.4*loyalty.私人依附 + (kin.size()>0 ? 0.25 : 0) - 0.1",
+   "天下": "0.45*values.群体利益 + 0.3*values.秩序 + 0.25*attr.智计/100 - 0.25 + (attr.智计>=88 ? 0.1 : 0)",
+   "安身": "0.5*decision_weights.损失厌恶 + 0.5*(1-risk_preference) - 0.3",
+   "学问": "0.3*attr.智计/100 - 0.2 + (has_learning_habit ? 0.4 : 0)",
+   "报仇": "knot_object_intensity>=60 ? 0.8 : 0"
+  },
+  "pick": "取最高者；次高 ≥ 最高×0.85 时保留为第二心志；两条按分数归一，单条权重 1.0",
+  "learning_habits": [
+   "habit_078"
+  ]
+ },
+ "signals": {
+  "note": "drives.rules / rewrite 里用到、但不产生记忆的信号。全部由引擎发出，不由人物事件总线的 emit 产生记忆。",
+  "idle_xun": {
+   "source": "people_tick",
+   "when": "旬末：本旬无任命、无出征、无军议发言",
+   "phase": "P2"
+  },
+  "no_reward_xun": {
+   "source": "people_tick",
+   "when": "旬末：本旬未受赏",
+   "phase": "P2"
+  },
+  "campaign_xun": {
+   "source": "people_tick",
+   "when": "旬末：本旬在出征军中",
+   "phase": "P2"
+  },
+  "yearly": {
+   "source": "people_tick",
+   "when": "每年正月上旬",
+   "phase": "P2"
+  },
+  "city_taken": {
+   "source": "campaign_outcomes._capture_city",
+   "when": "本势力攻占城池",
+   "phase": "P2"
+  },
+  "city_besieged": {
+   "source": "siege_system",
+   "when": "本势力城池被围的第一日",
+   "phase": "P2"
+  },
+  "main_army_lost": {
+   "source": "campaign_outcomes._check_rout",
+   "when": "溃败军团兵力 ≥ 本势力野战兵力 50%",
+   "phase": "P2"
+  },
+  "sent_to_danger": {
+   "source": "campaign_dispatch / army_corps",
+   "when": "受命前往的战线估计敌我比 ≥ 1.5",
+   "phase": "P2"
+  },
+  "peace_made": {
+   "source": "diplomacy（未实现）",
+   "when": "本势力与某势力议和",
+   "phase": "P7"
+  },
+  "object_died": {
+   "source": "lifecycle / officer_fate",
+   "when": "某人死亡；对以其为心结对象者发出",
+   "phase": "P2"
+  }
  }
 }

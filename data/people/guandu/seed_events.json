@@ -1,10 +1,22 @@
 {
  "scenario": "guandu",
+ "pack": {
+  "snapshot": {
+   "year": 200,
+   "month": 2
+  },
+  "min_start": {
+   "year": 200,
+   "month": 2,
+   "xun": 1
+  },
+  "note": "人物卡与本包都是建安五年（200）官渡快照。只在声明 people_pack=guandu 且开局不早于 min_start 的剧本载入；开局日期由剧本给出，seed 只用早于开局的事件。191 年世界剧本不载入本包。"
+ },
  "start": {
   "year": 200,
   "month": 2,
   "xun": 1,
-  "note": "建安五年二月上旬（剧本未写开局日期，此为假设，可改）"
+  "note": "默认开局：建安五年二月上旬（剧本未给日期时用；预演也用它）"
  },
  "events": [
   {
@@ -463,9 +475,10 @@
    "month": 5,
    "kind": "deed",
    "actor": "cc_004",
-   "target": "juancheng",
+   "target": "dingtao",
    "data": {
-    "tag": "关口"
+    "tag": "关口",
+    "place_note": "鄄城不在地图，以所在济阴郡治定陶代"
    },
    "bio": true,
    "text": "兖州叛迎吕布，与荀彧守鄄城、范、东阿三城"
@@ -574,13 +587,16 @@
    "year": 197,
    "month": 1,
    "kind": "praised",
-   "actor": "cc_008",
-   "target": "cc_001",
+   "actor": "cc_001",
+   "target": "cc_008",
    "data": {
-    "tag": "关口"
+    "tag": "关口",
+    "bio_also": [
+     "cc_008"
+    ]
    },
    "bio": true,
-   "text": "宛城乱中独整军讨青州兵；曹操曰「虽古名将何以加之」"
+   "text": "宛城乱中于禁独整军讨青州兵；曹操曰「虽古名将何以加之」"
   },
   {
    "eid": "seed_041",

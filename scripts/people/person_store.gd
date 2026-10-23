@@ -3,7 +3,7 @@ extends Node
 ## Autoload「People」：全部人物的运行时状态、按 id 分表的记忆/关系/印象/许诺，以及存档（01 §4、00 §7）。
 ##
 ## 人物系统只经这里读写人物，不直接改 campaign_state.state。开局 load_scenario() 读人物卡（经 OfficerRepository）
-## 与 data/people/<剧本>/ 的补丁和前史事件，迁到 schema 7、生成 PersonState、写开局记忆；读档 import_state()
+## 与 data/people/<人物包>/ 的补丁和前史事件，迁到 schema 7、生成 PersonState、写开局记忆；读档 import_state()
 ## 只还原存档，不再读卡。圈子定义与不上场人物是静态数据，按存档里的剧本 id 重新读取，不进存档。
 ## P1：relations / impressions / promises 只建表与存读档，由 P3 起的模块填写；不提供战斗侧桥接 runtime_officer()。
 
@@ -41,12 +41,26 @@ static func read_json(path: String) -> Variant:
 	return parsed
 
 
-## 开新局：读当前剧本人物卡与 data/people/<scenario_id>/ 下的补丁、前史事件，生成全部人物并写开局记忆。
-func load_scenario(scenario_id: String) -> void:
-	var dir := DATA_DIR + scenario_id + "/"
+## 剧本声明了人物包（people_pack）时载入它，开局日期取剧本的 people_start，没有时用包的默认开局。
+## 在 war.setup 之后调用；没有声明时什么都不做并返回 false。
+func load_declared(scenario_spec: Dictionary) -> bool:
+	if not scenario_spec.has("people_pack"): return false
+	return load_scenario(str(scenario_spec["people_pack"]), scenario_spec.get("people_start", {}))
+
+
+## 开新局：读当前剧本人物卡与人物包 data/people/<pack_id>/ 的补丁、前史事件，生成全部人物并写开局记忆。
+## start = {year, month, xun}，为空时用包的 start。开局早于包的 pack.min_start 时拒绝载入、不动当前状态并返回 false。
+func load_scenario(pack_id: String, start: Dictionary = {}) -> bool:
+	var dir := DATA_DIR + pack_id + "/"
 	var seed_events: Dictionary = read_json(dir + "seed_events.json")
-	setup_from_scenario(scenario_id, Repository.cards(), read_json(dir + "persons_s7.json"), seed_events["start"])
+	var opening: Dictionary = seed_events["start"] if start.is_empty() else start
+	var earliest: Dictionary = seed_events["pack"]["min_start"]
+	if _xun_of(opening) < _xun_of(earliest):
+		push_warning("人物包 %s 最早 %d 年 %d 月开局，剧本开局 %d 年 %d 月，不载入" % [pack_id, earliest["year"], earliest["month"], opening["year"], opening["month"]])
+		return false
+	setup_from_scenario(pack_id, Repository.cards(), read_json(dir + "persons_s7.json"), opening)
 	Memory.seed(self, seed_events, read_json(DATA_DIR + "memory_rules.json"))
+	return true
 
 
 ## 由人物卡（schema 6 或 7）与 schema 7 补丁建立全部人物；start = {year, month, xun} 是开局日期。
@@ -55,6 +69,10 @@ func setup_from_scenario(scenario_id: String, cards: Array, patches: Array, star
 	xun = xun_index(int(start["year"]), int(start["month"]), int(start["xun"]))
 	for card in Migrate.migrate_all(cards, patches):
 		persons[str(card["id"])] = Migrate.to_state(card, xun)
+
+
+static func _xun_of(date: Dictionary) -> int:
+	return xun_index(int(date["year"]), int(date["month"]), int(date.get("xun", 1)))
 
 
 func get_person(id: String) -> State:
@@ -80,6 +98,16 @@ func kin_of(id: String) -> Array[String]:
 			if str(link["to"]) == id:
 				out.append(other.id)
 				break
+	return out
+
+
+## 同势力的其他在场人物（不含本人），按人物卡顺序；此人不在场或没有势力时为空。
+func court_of(id: String) -> Array[String]:
+	var out: Array[String] = []
+	var state: State = persons.get(id)
+	if state == null or state.faction.is_empty(): return out
+	for other in by_faction(state.faction):
+		if other.id != id: out.append(other.id)
 	return out
 
 

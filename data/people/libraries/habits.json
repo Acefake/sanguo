@@ -1,0 +1,1394 @@
+[
+  {
+    "id": "habit_001",
+    "family": "习性",
+    "name": "好夜袭",
+    "domain": "作战",
+    "tier": "卓越·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build；候选方案含 tactic.tag=night_raid；ctx.time_window 可安排在夜间（ctx.night_available 等于 true）。",
+    "effect": "夜袭类战术模板评分 +14；同分时优先把接敌时刻排在子夜至黎明前。",
+    "channel": "选择权重",
+    "cost": "敌营 intel.enemy_night_guard 为高时仍倾向夜袭，易撞上有备之敌；夜间行军失序的风险照常结算。",
+    "report": "{人物}按剑言曰：“昼战非吾所长，今夜衔枚击{对象}。”",
+    "exclusive": [
+      "畏夜战"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_002",
+    "family": "习性",
+    "name": "畏夜战",
+    "domain": "作战",
+    "tier": "普通·局限",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build 或 replan；候选方案需夜间行动（tactic.tag=night_raid 或 night_march）。",
+    "effect": "夜间行动类方案评分 -12；夜间遭袭时 AI 优先选择固守营垒，不主动出营反击。",
+    "channel": "选择权重",
+    "cost": "错失敌军疲惫、无备的夜间战机；被敌夜袭时反应保守。",
+    "report": "{人物}以夜色晦暗为辞，不肯夜出击{对象}。",
+    "exclusive": [
+      "好夜袭"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_003",
+    "family": "习性",
+    "name": "喜设伏",
+    "domain": "作战",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build；terrain.cover 至少 0.4（谷道、林地、苇泽等）；intel.enemy_route_known 等于 true。",
+    "effect": "伏击类战术模板评分 +12；撤退或诱敌时优先选择“佯退设伏”路线。",
+    "channel": "选择权重",
+    "cost": "敌军不走预设路线时伏兵空耗时日；对着侦察严密之敌照样设伏，易被识破反遭夹击。",
+    "report": "{人物}遣兵伏于道侧，静候{对象}入彀。",
+    "exclusive": [
+      "好正兵"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_004",
+    "family": "习性",
+    "name": "好正兵",
+    "domain": "作战",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build；ctx.own_strength_ratio 至少 1.0（我众不少于敌）。",
+    "effect": "正面列阵决战模板评分 +10；诈术类模板（伏击、佯动、诈降应对）评分 -6。",
+    "channel": "选择权重",
+    "cost": "兵力占优时打得稳，但不善以少击众；对善用奇兵之敌容易被引入圈套。",
+    "report": "{人物}曰：“堂堂之阵，何须诡道！”遂列阵以待{对象}。",
+    "exclusive": [
+      "喜设伏",
+      "好绕后",
+      "好离间",
+      "好劫粮"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_005",
+    "family": "习性",
+    "name": "穷追",
+    "domain": "追击",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "ctx.enemy_state 等于 routing（敌溃退）；task.kind 等于 replan 或 march_start。",
+    "effect": "追击模板评分 +12；追击终止阈值放宽：直到 unit.fatigue 至少 0.8 或补给比降至 0.5 才收兵。",
+    "channel": "选择权重",
+    "cost": "易追入敌预设伏兵或脱离粮道；追远后己方战线拉长、回援迟缓。",
+    "report": "{人物}大呼“勿使走脱”，引兵穷追{对象}。",
+    "exclusive": [
+      "不追穷寇"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_006",
+    "family": "习性",
+    "name": "不追穷寇",
+    "domain": "追击",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "ctx.enemy_state 等于 routing；intel.terrain_ahead_cover 至少 0.3 或 intel.enemy_reserve_unknown 等于 true。",
+    "effect": "追击模板评分 -10；改为优先“收兵整队、清点俘获”。",
+    "channel": "选择权重",
+    "cost": "少中伏，也少扩大战果，溃敌常得以重整再来。",
+    "report": "{人物}勒马曰：“穷寇莫追。”收兵还营，纵{对象}而去。",
+    "exclusive": [
+      "穷追"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_007",
+    "family": "习性",
+    "name": "坚壁",
+    "domain": "守城",
+    "tier": "普通·优势",
+    "roles": "主将、太守",
+    "trigger": "task.kind 等于 plan_build；ctx.posture 等于 defending（守城或守营）。",
+    "effect": "固守模板评分 +12；出城野战模板评分 -8，除非 ctx.enemy_supply_ratio 低于 0.3。",
+    "channel": "选择权重",
+    "cost": "城池稳固，但城外乡里、粮道任敌蹂躏，可能错失援军内外夹击之机。",
+    "report": "{人物}闭门坚守，任{对象}城下叫阵，终不出战。",
+    "exclusive": [
+      "好出击"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_008",
+    "family": "习性",
+    "name": "好出击",
+    "domain": "守城",
+    "tier": "普通·优势",
+    "roles": "主将、先锋、太守",
+    "trigger": "task.kind 等于 plan_build；ctx.posture 等于 defending；intel.enemy_camp_unsettled 等于 true 或 ctx.enemy_just_arrived 等于 true。",
+    "effect": "出城突击模板评分 +12；守城时每过 ctx.siege_days 10 日无出击即再评估一次出城。",
+    "channel": "选择权重",
+    "cost": "出击失利则城中兵力折损、门户空虚；易中敌诱城之计。",
+    "report": "{人物}趁{对象}立足未稳，开门突出。",
+    "exclusive": [
+      "坚壁",
+      "忍辱"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_009",
+    "family": "习性",
+    "name": "好绕后",
+    "domain": "作战",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build；terrain.alt_route_exists 等于 true；intel.alt_route_verified 等于 true。",
+    "effect": "迂回包抄、绕袭侧后类路线评分 +10；正面强攻评分 -4。",
+    "channel": "选择权重",
+    "cost": "绕行耗时更长，正面友军需独自顶住；路线情报有误时迟到误期。",
+    "report": "{人物}不与{对象}正面相持，引兵取间道绕出其后。",
+    "exclusive": [
+      "直进",
+      "好正兵"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_010",
+    "family": "习性",
+    "name": "直进",
+    "domain": "行军",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 march_start 或 plan_build；存在多条可行路线。",
+    "effect": "路线评分里“路程最短”权重额外 +10；迂回、间道路线评分 -8。",
+    "channel": "选择权重",
+    "cost": "行军快、少失序，但路线可被敌预判，易逢阻截与伏兵。",
+    "report": "{人物}不取小路，径奔{对象}。",
+    "exclusive": [
+      "好绕后"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_011",
+    "family": "习性",
+    "name": "亲冒矢石",
+    "domain": "军心",
+    "tier": "普通·优势",
+    "roles": "主将、先锋",
+    "trigger": "ctx.in_contact 等于 true；unit.morale 低于 0.5 或 ctx.assault_stage 等于 breach（攻城破口、阵线动摇）。",
+    "effect": "AI 选择“主将亲临前线”行为的权重 +12（进入亲战位置）；该行为本身的士气效果按已有规则结算。",
+    "channel": "选择权重",
+    "cost": "主将受伤、被擒、阵亡概率按前线位置结算，明显高于居中坐镇；指挥全局反应因此变慢。",
+    "report": "{人物}披甲当先，亲冒矢石，督众向{对象}。",
+    "exclusive": [
+      "坐镇中军"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_012",
+    "family": "习性",
+    "name": "坐镇中军",
+    "domain": "指挥",
+    "tier": "普通·优势",
+    "roles": "主将",
+    "trigger": "ctx.in_contact 等于 true；unit.subcommanders_assigned 至少 1。",
+    "effect": "“居中指挥”行为权重 +10；除非 unit.morale 低于 0.25，不进入前线位置。",
+    "channel": "选择权重",
+    "cost": "主将安全、全局调度不乱，但前线危急时缺少主将亲临的提振。",
+    "report": "{人物}据中军高处，挥旗调度，迎拒{对象}。",
+    "exclusive": [
+      "亲冒矢石"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_013",
+    "family": "习性",
+    "name": "好速战",
+    "domain": "作战",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build；ctx.supply_days 低于 30 或 intel.enemy_reinforcement_eta 已知。",
+    "effect": "决战类、强攻类模板评分 +10；相持类模板评分 -6；军议中支持“速战”提案的倾向 +8。",
+    "channel": "选择权重",
+    "cost": "敌坚守不出时易强攻高损；不肯等待更好时机。",
+    "report": "{人物}曰：“兵贵神速，宜急击{对象}。”",
+    "exclusive": [
+      "持重"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_014",
+    "family": "习性",
+    "name": "持重",
+    "domain": "作战",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build；ctx.supply_days 至少 30；ctx.enemy_supply_ratio 低于 ctx.own_supply_ratio。",
+    "effect": "相持、待敌自疲类模板评分 +10；决战模板需 ctx.own_strength_ratio 至少 1.3 才进入首选。",
+    "channel": "选择权重",
+    "cost": "耗时长、粮草消耗大；敌援将至时可能贻误战机。",
+    "report": "{人物}深沟高垒，与{对象}相持，以待其弊。",
+    "exclusive": [
+      "好速战",
+      "轻进"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_015",
+    "family": "习性",
+    "name": "轻进",
+    "domain": "行军",
+    "tier": "普通·局限",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 march_start 或 replan；ctx.recent_victory 等于 true 或 ctx.own_strength_ratio 至少 1.5。",
+    "effect": "斥候派出权重 -10；前进途中遇“可疑情报”时继续推进的权重 +10。",
+    "channel": "选择权重",
+    "cost": "易入伏、易被截断后路；连胜之后尤甚。",
+    "report": "{人物}恃胜而进，不复遣斥候，逼近{对象}。",
+    "exclusive": [
+      "持重",
+      "好侦探",
+      "多疑"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_016",
+    "family": "习性",
+    "name": "多疑",
+    "domain": "情报",
+    "tier": "普通·局限",
+    "roles": "主将、副将、先锋、军师",
+    "trigger": "task.kind 等于 intel_interpret 或 replan；intel.ambiguity 至少 0.4 或 intel.contradicting_reports 等于 true。",
+    "effect": "“暂停推进、复查情报”行为权重 +12；对敌空城、示弱类迹象判为诈术的倾向 +10。",
+    "channel": "选择权重",
+    "cost": "常被疑兵、空营拖住，进兵迟缓，坐失战机。",
+    "report": "{人物}见{对象}营中寂然，疑有伏兵，按兵不进。",
+    "exclusive": [
+      "轻进"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_017",
+    "family": "习性",
+    "name": "好搦战",
+    "domain": "个人武艺",
+    "tier": "普通·优势",
+    "roles": "主将、先锋",
+    "trigger": "ctx.in_contact 等于 true；ctx.duel_possible 等于 true；officer.personal_melee_rank 不低于敌将。",
+    "effect": "阵前搦战（邀敌将单挑）选项权重 +12；敌将搦战时应战权重 +10。",
+    "channel": "选择权重",
+    "cost": "对手更强时也难以推辞，受伤、被斩风险照常结算。",
+    "report": "{人物}出阵搦战：“{对象}可敢出与吾决一死战！”",
+    "exclusive": [
+      "不斗将"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_018",
+    "family": "习性",
+    "name": "不斗将",
+    "domain": "个人武艺",
+    "tier": "普通·优势",
+    "roles": "主将、先锋",
+    "trigger": "ctx.duel_offered 等于 true 或 ctx.duel_possible 等于 true。",
+    "effect": "应战与发起单挑的权重 -12；改选弓弩射住阵脚或回阵。",
+    "channel": "选择权重",
+    "cost": "少受伤亡，但拒战可能按已有规则影响本部士气与敌军气势。",
+    "report": "{对象}阵前搦战，{人物}令弓弩射住阵脚，不与交锋。",
+    "exclusive": [
+      "好搦战"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_019",
+    "family": "习性",
+    "name": "喜火攻",
+    "domain": "作战",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋、军师",
+    "trigger": "task.kind 等于 plan_build；ctx.weather 为干燥或 ctx.wind_favorable 等于 true；terrain.flammable 至少 0.4（林木、苇泽、连营、船队）。",
+    "effect": "火攻类战术模板评分 +12；对城邑方案中选择焚毁城外屯聚的倾向 +6。",
+    "channel": "选择权重",
+    "cost": "风向突变时反噬自军；焚及民居、田亩时按已有规则损民心与产出。",
+    "report": "{人物}察风势，令军士多备引火之物，欲焚{对象}。",
+    "exclusive": [
+      "惜民力"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_020",
+    "family": "习性",
+    "name": "好骂阵",
+    "domain": "作战",
+    "tier": "普通·优势",
+    "roles": "主将、先锋",
+    "trigger": "ctx.posture 等于 attacking；ctx.enemy_posture 等于 holding（敌闭营/闭城不出）。",
+    "effect": "每日“遣军阵前辱骂、激敌出战”行为权重 +12。",
+    "channel": "选择权重",
+    "cost": "敌将沉稳时徒劳无功；激出的敌军若怀愤而来，士气按已有规则结算。",
+    "report": "{人物}遣军士于{对象}城下百般辱骂，激其出战。",
+    "exclusive": [
+      "缄默"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_021",
+    "family": "习性",
+    "name": "惜兵",
+    "domain": "用兵",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build 或 replan；方案预计伤亡 plan.expected_loss_ratio 至少 0.15。",
+    "effect": "高伤亡方案评分 -10；战中 unit.loss_ratio 达 0.3 时，主动请求撤退或改为固守的权重 +10。",
+    "channel": "选择权重",
+    "cost": "攻坚时不肯付出代价，易久攻不下；关键一战可能半途而退。",
+    "report": "{人物}见士卒死伤枕藉，叹曰：“不忍以此易{对象}。”遂收兵。",
+    "exclusive": [
+      "不恤死伤"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_022",
+    "family": "习性",
+    "name": "不恤死伤",
+    "domain": "用兵",
+    "tier": "普通·局限",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build 或 replan；plan.objective_value 为高（攻坚、夺关、救急）。",
+    "effect": "评估方案时忽略伤亡项（plan.expected_loss_ratio 权重降至 0）；战中撤退阈值推迟到 unit.loss_ratio 至少 0.6。",
+    "channel": "选择权重",
+    "cost": "常以重大伤亡换取目标；部下与士卒对其的关系边“恩义”在大伤亡后按已有事件规则下降。",
+    "report": "{人物}驱众蚁附而上，前仆后继，必欲拔{对象}。",
+    "exclusive": [
+      "惜兵",
+      "爱兵"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_023",
+    "family": "习性",
+    "name": "重粮道",
+    "domain": "补给",
+    "tier": "普通·优势",
+    "roles": "主将、督粮",
+    "trigger": "task.kind 等于 plan_build 或 convoy_schedule；ctx.supply_line_length 至少 3（格/驿）。",
+    "effect": "分派兵力护粮、设置中转屯粮的权重 +12；粮道受威胁时回援粮道优先于前线推进。",
+    "channel": "选择权重",
+    "cost": "前锋兵力被分薄，推进变慢。",
+    "report": "{人物}分兵屯守要隘，护粮道无虞，方进逼{对象}。",
+    "exclusive": [
+      "轻辎重"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_024",
+    "family": "习性",
+    "name": "轻辎重",
+    "domain": "补给",
+    "tier": "普通·局限",
+    "roles": "主将、先锋",
+    "trigger": "task.kind 等于 march_start；ctx.urgency 至少 0.5。",
+    "effect": "出发时选择“少带辎重、轻装疾进”的权重 +12；护粮兵力分配权重 -8。",
+    "channel": "选择权重",
+    "cost": "前期行军快，久战则断粮，被截粮道时极为被动。",
+    "report": "{人物}弃辎重、裹粮三日，轻兵疾趋{对象}。",
+    "exclusive": [
+      "重粮道"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_025",
+    "family": "习性",
+    "name": "好分兵",
+    "domain": "用兵",
+    "tier": "普通·优势",
+    "roles": "主将",
+    "trigger": "task.kind 等于 plan_build；unit.subcommanders_assigned 至少 2。",
+    "effect": "多路并进、分进合击类方案评分 +10。",
+    "channel": "选择权重",
+    "cost": "各路联络失灵时易被各个击破。",
+    "report": "{人物}分军数道，约期并进，合击{对象}。",
+    "exclusive": [
+      "聚兵"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_026",
+    "family": "习性",
+    "name": "聚兵",
+    "domain": "用兵",
+    "tier": "普通·优势",
+    "roles": "主将",
+    "trigger": "task.kind 等于 plan_build；ctx.own_strength_ratio 低于 1.5。",
+    "effect": "全军集中一路的方案评分 +10；分兵方案评分 -8。",
+    "channel": "选择权重",
+    "cost": "不易被各个击破，但难以同时应付多处之敌，侧翼、后方空虚。",
+    "report": "{人物}曰：“兵合则强，分则弱。”合兵一处，直指{对象}。",
+    "exclusive": [
+      "好分兵"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_027",
+    "family": "习性",
+    "name": "好侦探",
+    "domain": "情报",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 march_start 或 plan_build；intel.enemy_position_age 至少 2 日。",
+    "effect": "多派斥候、先遣探马的权重 +12；情报陈旧时推迟出发直至取得新报的倾向 +6。",
+    "channel": "选择权重",
+    "cost": "出发、决断稍迟；斥候被截时反暴露行踪。",
+    "report": "{人物}遣探马四出，尽得{对象}虚实，然后进兵。",
+    "exclusive": [
+      "轻进"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_028",
+    "family": "习性",
+    "name": "好劫粮",
+    "domain": "作战",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "task.kind 等于 plan_build；intel.enemy_supply_route_known 等于 true。",
+    "effect": "袭扰、截断敌粮道类方案评分 +12；正面接战评分 -4。",
+    "channel": "选择权重",
+    "cost": "分出的劫粮兵孤军深入，易被敌护粮部队围歼。",
+    "report": "{人物}遣轻骑潜出，专截{对象}粮道。",
+    "exclusive": [
+      "好正兵"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_029",
+    "family": "习性",
+    "name": "直谏",
+    "domain": "议事",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "task.kind 等于 discussion 或 opinion_receive；主公或主将提出的方案被本人评估为劣（officer.own_eval 低于 proposal.eval 0.2 以上）。",
+    "effect": "当场提出反对意见的权重 +12，不因对方地位高而收声。",
+    "channel": "选择权重",
+    "cost": "主公“雅量”低或与之“信任”关系边不高时，按已有规则降低信任，甚至被疏远、贬斥。",
+    "report": "{人物}进曰：“此计不可！”力谏{对象}。",
+    "exclusive": [
+      "唯命",
+      "缄默"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_030",
+    "family": "习性",
+    "name": "唯命",
+    "domain": "议事",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "task.kind 等于 discussion 或 order_receive；命令来自上级（主公、主将）。",
+    "effect": "接受上级方案与命令的权重 +12；提出异议权重 -10。",
+    "channel": "选择权重",
+    "cost": "上级失策时不加劝阻，一同陷入危局；军议中提供不了不同视角。",
+    "report": "{人物}唯唯而退，奉{对象}之命而行。",
+    "exclusive": [
+      "直谏",
+      "擅专"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_031",
+    "family": "习性",
+    "name": "擅专",
+    "domain": "指挥",
+    "tier": "普通·优势",
+    "roles": "主将、先锋、太守",
+    "trigger": "ctx.communication 等于 false 或 ctx.order_delay 至少 2 日；或本人评估当前命令已明显过时。",
+    "effect": "不待上级回复即按自己判断改变行动的权重 +12。",
+    "channel": "选择权重",
+    "cost": "成则得机先，败则担擅自行事之责，按已有规则损主公“信任”；主公多疑时更甚。",
+    "report": "{人物}曰：“将在外，君命有所不受。”遂自引兵击{对象}。",
+    "exclusive": [
+      "唯命"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_032",
+    "family": "习性",
+    "name": "请缨",
+    "domain": "人事",
+    "tier": "普通·优势",
+    "roles": "任意武将岗位",
+    "trigger": "ctx.task_open 等于 true（主公或主将征求出征、先锋、守险人选）；本人 officer.status 等于 idle 或 garrison。",
+    "effect": "主动请命的权重 +12；危险任务（ctx.task_risk 高）不降低请命倾向。",
+    "channel": "选择权重",
+    "cost": "常被派往最险之处；能力不足时也请命，易致失利。",
+    "report": "{人物}出班请缨：“末将愿往取{对象}！”",
+    "exclusive": [
+      "避事"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_033",
+    "family": "习性",
+    "name": "避事",
+    "domain": "人事",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "ctx.task_open 等于 true；ctx.task_risk 至少 0.5 或任务为苦差（督粮、守偏城、出使敌国）。",
+    "effect": "主动请命权重 -12；被点名时推托（以病、以才疏为辞）的权重 +10。",
+    "channel": "选择权重",
+    "cost": "难以承担要务；屡次推托后，主公与同僚的“敬重”关系按已有规则下降。",
+    "report": "众议遣将赴{对象}，{人物}托病不出。",
+    "exclusive": [
+      "请缨"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_034",
+    "family": "习性",
+    "name": "邀功",
+    "domain": "人事",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "history.battle_end 等于 true 且本人参战；或 task.kind 等于 report_compose（撰写军报/战报）。",
+    "effect": "战后奏报中把功劳归于自己的权重 +12；与友军争首功、争战利品的倾向 +10。",
+    "channel": "选择权重",
+    "cost": "同僚“怨恨”关系边按已有规则上升；战报失实可能误导主公判断。",
+    "report": "{人物}具表言功，尽掩{对象}之劳。",
+    "exclusive": [
+      "让功",
+      "好名"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_035",
+    "family": "习性",
+    "name": "让功",
+    "domain": "人事",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "history.battle_end 等于 true 且本人参战；或 task.kind 等于 report_compose。",
+    "effect": "奏报中把功劳归于部下、友军的权重 +12。",
+    "channel": "选择权重",
+    "cost": "自身升迁、封赏偏慢；部下与友军的“恩义”“敬重”按已有规则上升。",
+    "report": "{人物}上表，功皆归于{对象}，己无一言。",
+    "exclusive": [
+      "邀功",
+      "好名"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_036",
+    "family": "习性",
+    "name": "好荐贤",
+    "domain": "人事",
+    "tier": "普通·优势",
+    "roles": "军师、太守、任意文官岗位",
+    "trigger": "ctx.vacancy 等于 true（岗位空缺）或 ctx.recruit_candidates 非空；本人知晓某候选（officer.known_people 包含该人）。",
+    "effect": "向主公推荐他人的权重 +12；推荐能力高于自己的人也不回避。",
+    "channel": "选择权重",
+    "cost": "所荐之人失败时，按已有规则连带损失主公对本人的“信任”。",
+    "report": "{人物}荐{对象}于主公：“此人之才，十倍于臣。”",
+    "exclusive": [
+      "妒贤"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_037",
+    "family": "习性",
+    "name": "妒贤",
+    "domain": "人事",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "同势力中出现能力或功勋高于本人的同僚（某人），且双方岗位相近。",
+    "effect": "主公征询对某人的意见时给出负面评价的权重 +12；推荐某人的权重降为 0；与某人协同作战时配合优先度 -8。",
+    "channel": "选择权重",
+    "cost": "人才被压制，同僚之间形成“怨恨”关系边；事情败露时本人被主公疏远。",
+    "report": "{人物}于主公前短{对象}，言其不堪大任。",
+    "exclusive": [
+      "好荐贤",
+      "提携后进"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_038",
+    "family": "习性",
+    "name": "爱兵",
+    "domain": "军心",
+    "tier": "普通·优势",
+    "roles": "主将、副将、先锋",
+    "trigger": "unit.fatigue 至少 0.5 或 unit.wounded_ratio 至少 0.1 或 ctx.supply_ratio 低于 0.6。",
+    "effect": "安排休整、救治伤兵、与士卒同食的行为权重 +12；疲兵强行军的权重 -10。",
+    "channel": "选择权重",
+    "cost": "行动节奏偏慢，急需赶路时不忍催逼。",
+    "report": "{人物}亲为伤卒裹创，与士卒同甘苦，暂缓追{对象}。",
+    "exclusive": [
+      "不恤死伤",
+      "严苛"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_039",
+    "family": "习性",
+    "name": "严苛",
+    "domain": "治军",
+    "tier": "普通·优势",
+    "roles": "主将、副将",
+    "trigger": "unit.discipline_incident 等于 true（违令、扰民、怯战、逃亡）。",
+    "effect": "选择重罚（鞭笞、斩首示众）的权重 +12；宽宥选项权重 -10。",
+    "channel": "选择权重",
+    "cost": "军纪肃然，但士卒与部将的“恩义”关系按已有规则下降，哗变、叛投的倾向上升。",
+    "report": "{人物}斩违令者以徇，三军股栗，{对象}莫敢复犯。",
+    "exclusive": [
+      "爱兵",
+      "施小恩"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_040",
+    "family": "习性",
+    "name": "提携后进",
+    "domain": "人事",
+    "tier": "普通·优势",
+    "roles": "主将、太守、军师",
+    "trigger": "ctx.assign_candidates 中存在年资浅（officer.service_years 低于 3）而能力达标者。",
+    "effect": "人选排序中年轻部将权重 +10；让其担任先锋、副将或主持一面的倾向 +8。",
+    "channel": "选择权重",
+    "cost": "新人历练不足时易误事，老将可能因被越过而不满。",
+    "report": "{人物}拔{对象}于行伍，委以偏师。",
+    "exclusive": [
+      "任人唯亲",
+      "妒贤"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_041",
+    "family": "习性",
+    "name": "任人唯亲",
+    "domain": "人事",
+    "tier": "卓越·局限",
+    "roles": "主将、太守、主公",
+    "trigger": "task.kind 等于 appointment；候选中有与本人亲族、同乡或“派系”关系边相同者。",
+    "effect": "该类候选排序权重 +14，可压过能力更高者。",
+    "channel": "选择权重",
+    "cost": "关键岗位所用非人，政务与战事效率按所任者能力结算而下降；其他部下“怨恨”上升。",
+    "report": "{人物}不问才具，以亲故{对象}领要职。",
+    "exclusive": [
+      "提携后进",
+      "信赏必罚"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_042",
+    "family": "习性",
+    "name": "护短",
+    "domain": "人事",
+    "tier": "普通·局限",
+    "roles": "主将、太守、主公",
+    "trigger": "部下或亲近之人（与本人“信任”或“恩义”高者）发生 discipline_incident 或战败追责。",
+    "effect": "从轻处置、为其开脱的权重 +14。",
+    "channel": "选择权重",
+    "cost": "军纪与法度在其辖下松弛；受害方与旁观部下的“怨恨”关系上升。",
+    "report": "{对象}违令当斩，{人物}力为开脱，竟得免罪。",
+    "exclusive": [
+      "信赏必罚"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_043",
+    "family": "习性",
+    "name": "信赏必罚",
+    "domain": "治军",
+    "tier": "卓越·优势",
+    "roles": "主将、太守、主公",
+    "trigger": "history.battle_end 等于 true 或 unit.discipline_incident 等于 true。",
+    "effect": "赏罚选择严格按功过排序，忽略关系边（信任、恩义、派系）对赏罚的影响；权重偏移最多 15 分以抵消关系加成。",
+    "channel": "选择权重",
+    "cost": "亲近之人犯错也照罚，私谊关系边可能受损。",
+    "report": "{人物}论功行赏，罚不避亲，{对象}亦服。",
+    "exclusive": [
+      "护短",
+      "任人唯亲"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_044",
+    "family": "习性",
+    "name": "施小恩",
+    "domain": "人事",
+    "tier": "普通·优势",
+    "roles": "主将、太守",
+    "trigger": "ctx.private_funds_ratio 至少 0.2 或 history.battle_end 等于 true。",
+    "effect": "以私财赏赐部下、宴请部将的行为权重 +12。",
+    "channel": "选择权重",
+    "cost": "私财消耗；部下的忠诚更多系于本人而非主公（与主公的关系不因此增加）。",
+    "report": "{人物}散私财以赏{对象}，众皆感之。",
+    "exclusive": [
+      "严苛",
+      "好财"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_045",
+    "family": "习性",
+    "name": "优俘",
+    "domain": "对敌",
+    "tier": "普通·优势",
+    "roles": "主将、太守、主公",
+    "trigger": "task.kind 等于 captive_dispose（处置俘虏）。",
+    "effect": "释放、优待俘虏的权重 +12；处斩权重 -12。",
+    "channel": "选择权重",
+    "cost": "放归之敌可能再度为敌；俘将被放归后对本人的“恩义”按已有规则上升。",
+    "report": "{人物}解{对象}之缚，赐以酒食，纵之归。",
+    "exclusive": [
+      "斩降"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_046",
+    "family": "习性",
+    "name": "斩降",
+    "domain": "对敌",
+    "tier": "普通·优势",
+    "roles": "主将、太守、主公",
+    "trigger": "task.kind 等于 captive_dispose 或 surrender_receive；ctx.enemy_resisted_long 等于 true 或 本人对来降者有“怨恨”。",
+    "effect": "处斩俘虏、拒受降卒的权重 +12；招降权重 -10。",
+    "channel": "选择权重",
+    "cost": "此后敌军守城、被围时更倾向死战（敌方 AI 对本人的投降可接受度按已有规则降低）。",
+    "report": "{人物}尽斩降卒，{对象}闻之震怖。",
+    "exclusive": [
+      "优俘",
+      "喜招降"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_047",
+    "family": "习性",
+    "name": "喜招降",
+    "domain": "对敌",
+    "tier": "普通·优势",
+    "roles": "主将、军师、太守",
+    "trigger": "ctx.enemy_morale 低于 0.4 或 ctx.enemy_encircled 等于 true；task.kind 等于 plan_build 或 diplomatic_negotiation。",
+    "effect": "劝降、开城许降类选项权重 +12；强攻权重 -6。",
+    "channel": "选择权重",
+    "cost": "等待回复耽误时日，也可能中诈降之计。",
+    "report": "{人物}遣使入城，晓谕{对象}祸福，劝其早降。",
+    "exclusive": [
+      "斩降"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_048",
+    "family": "习性",
+    "name": "睚眦必报",
+    "domain": "对敌",
+    "tier": "卓越·局限",
+    "roles": "任意岗位",
+    "trigger": "存在本人对某人/某势力的“怨恨”关系边（运行时变量）至少 中等；ctx.target 为该对象。",
+    "effect": "以该对象为目标的进攻、拒和、处斩类选项权重 +14，可压过战略收益更高的选项。",
+    "channel": "选择权重",
+    "cost": "为私怨偏离大局；该对象求和、来降时多被拒，平白多树强敌。",
+    "report": "{人物}切齿曰：“{对象}之辱，不敢一日忘！”",
+    "exclusive": [
+      "不念旧恶"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_049",
+    "family": "习性",
+    "name": "不念旧恶",
+    "domain": "对敌",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "存在本人对某人/某势力的“怨恨”关系边；该对象来降、求和或可被招揽。",
+    "effect": "决策中忽略对该对象的怨恨项（怨恨对选项的加权降至 0）。",
+    "channel": "选择权重",
+    "cost": "曾经的仇敌被接纳后，若本性难改仍可能再叛。",
+    "report": "{人物}曰：“前事不必再言。”待{对象}如故。",
+    "exclusive": [
+      "睚眦必报"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_050",
+    "family": "习性",
+    "name": "忍辱",
+    "domain": "军心",
+    "tier": "普通·优势",
+    "roles": "主将、太守",
+    "trigger": "ctx.enemy_taunt 等于 true（敌骂阵、送巾帼辱物）。",
+    "effect": "受激出战的权重 -12；维持原定方略。",
+    "channel": "选择权重",
+    "cost": "部下中好勇者易生不满，按已有规则小幅影响其对本人的“敬重”。",
+    "report": "{对象}百般辱骂，{人物}笑而不应，坚守如故。",
+    "exclusive": [
+      "易受激",
+      "好出击"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_051",
+    "family": "习性",
+    "name": "易受激",
+    "domain": "军心",
+    "tier": "普通·局限",
+    "roles": "主将、先锋",
+    "trigger": "ctx.enemy_taunt 等于 true 或 本人在军议中被当众质疑胆略。",
+    "effect": "受激出战或改变既定方略的权重 +14。",
+    "channel": "选择权重",
+    "cost": "常被骂阵、诱敌之计调出坚城、险地，落入敌军算计。",
+    "report": "{人物}闻{对象}辱骂，怒不可遏，开门出战。",
+    "exclusive": [
+      "忍辱"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_052",
+    "family": "习性",
+    "name": "好离间",
+    "domain": "谋略",
+    "tier": "普通·优势",
+    "roles": "军师、参军、使者",
+    "trigger": "task.kind 等于 plan_build 或 discussion；intel.enemy_internal_rift 等于 true（敌方有关系不睦者）。",
+    "effect": "在军议中提出离间、反间类方案的权重 +12。",
+    "channel": "选择权重",
+    "cost": "计泄则敌方上下反而同仇；与“重然诺”之主公共事时易被视为诡诈。",
+    "report": "{人物}献计：“{对象}君臣素有隙，可间之。”",
+    "exclusive": [
+      "好正兵",
+      "重然诺"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_053",
+    "family": "习性",
+    "name": "重农",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、主公",
+    "trigger": "task.kind 等于 budget_allocate 或 development_choose（城内开发项目排序）。",
+    "effect": "农田、水利、屯田类项目排序权重 +12；商业类 -6。",
+    "channel": "选择权重",
+    "cost": "钱粮结构偏粮轻钱，金钱吃紧时募兵、赏赐受限。",
+    "report": "{人物}劝课农桑，{对象}境内阡陌相望。",
+    "exclusive": [
+      "重商"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_054",
+    "family": "习性",
+    "name": "重商",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、主公",
+    "trigger": "task.kind 等于 budget_allocate 或 development_choose。",
+    "effect": "市场、商路、关市类项目排序权重 +12；农业类 -6。",
+    "channel": "选择权重",
+    "cost": "灾年粮储偏薄，长期围城时易乏粮。",
+    "report": "{人物}通商贾、立市肆，{对象}货殖日盛。",
+    "exclusive": [
+      "重农"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_055",
+    "family": "习性",
+    "name": "好兴工",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、主公",
+    "trigger": "task.kind 等于 development_choose；ctx.idle_funds 或 ctx.labor_available 有余。",
+    "effect": "城墙、道路、宫室、仓廪等工程类项目排序权重 +12。",
+    "channel": "选择权重",
+    "cost": "徭役重时按已有规则降民心；工程未完遇战事则投入空悬。",
+    "report": "{人物}大兴役作，修筑{对象}城垣道路。",
+    "exclusive": [
+      "惜民力"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_056",
+    "family": "习性",
+    "name": "惜民力",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、主公",
+    "trigger": "task.kind 等于 development_choose 或 conscription；ctx.public_order 低于 0.7 或 ctx.recent_disaster 等于 true。",
+    "effect": "大型工程、加征徭役、强征兵员的权重 -12；休养类选项 +8。",
+    "channel": "选择权重",
+    "cost": "城防、道路建设滞后，紧急扩军时兵源不足。",
+    "report": "{人物}罢不急之役，与{对象}之民休息。",
+    "exclusive": [
+      "好兴工",
+      "喜火攻"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_057",
+    "family": "习性",
+    "name": "宽刑",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、主公",
+    "trigger": "task.kind 等于 case_judge（断狱）或 law_policy_choose。",
+    "effect": "轻判、赦免、减刑类选项权重 +12。",
+    "channel": "选择权重",
+    "cost": "盗匪与豪强在辖下易坐大，治安事件频率按已有规则上升。",
+    "report": "{人物}省刑薄罚，{对象}囹圄为之一空。",
+    "exclusive": [
+      "严法"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_058",
+    "family": "习性",
+    "name": "严法",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、主公",
+    "trigger": "task.kind 等于 case_judge 或 law_policy_choose。",
+    "effect": "从重判决、打击豪强、连坐类选项权重 +12。",
+    "channel": "选择权重",
+    "cost": "治安肃然，但豪族与百姓怨望，民心在灾年更易下滑。",
+    "report": "{人物}执法如山，{对象}豪右敛手。",
+    "exclusive": [
+      "宽刑"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_059",
+    "family": "习性",
+    "name": "好开仓",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、主公",
+    "trigger": "ctx.famine 等于 true 或 ctx.refugees 等于 true 或 ctx.public_order 低于 0.5。",
+    "effect": "开仓赈济选项权重 +12，库存低于安全线（ctx.granary_ratio 低于 0.3）时仍倾向开仓。",
+    "channel": "选择权重",
+    "cost": "军粮储备被挤占，战事骤起时补给吃紧。",
+    "report": "{人物}不待上命，开仓赈济{对象}饥民。",
+    "exclusive": [
+      "吝仓"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_060",
+    "family": "习性",
+    "name": "吝仓",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、督粮",
+    "trigger": "ctx.granary_ratio 低于 0.6；出现赈济、调粮、借粮请求。",
+    "effect": "同意放粮、调粮的权重 -12；优先保有库存。",
+    "channel": "选择权重",
+    "cost": "灾年民心流失、流民他投；友军求粮时延误，影响协同。",
+    "report": "{对象}求粮，{人物}以仓廪不实为辞，迟迟不发。",
+    "exclusive": [
+      "好开仓"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_061",
+    "family": "习性",
+    "name": "好巡乡",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守",
+    "trigger": "ctx.idle_days 至少 5 或 ctx.public_order 低于 0.6。",
+    "effect": "亲自出城巡视乡里、听讼问疾的行为权重 +12。",
+    "channel": "选择权重",
+    "cost": "巡视期间不在城中，突发军情时应对迟缓。",
+    "report": "{人物}轻车简从，巡行{对象}乡里，问民疾苦。",
+    "exclusive": [
+      "委政"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_062",
+    "family": "习性",
+    "name": "委政",
+    "domain": "内政",
+    "tier": "普通·优势",
+    "roles": "太守、主公",
+    "trigger": "辖下存在可用的文官（officer.subordinates_admin 至少 1）。",
+    "effect": "把日常政务交属吏处理的权重 +12；亲自处理权重 -10。",
+    "channel": "选择权重",
+    "cost": "政务成效取决于属吏才能；属吏贪墨时察觉更晚。",
+    "report": "{人物}委{对象}以庶务，己但总其大纲。",
+    "exclusive": [
+      "好巡乡"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_063",
+    "family": "习性",
+    "name": "主和",
+    "domain": "外交",
+    "tier": "普通·优势",
+    "roles": "军师、使者、主公、任意文官岗位",
+    "trigger": "task.kind 等于 discussion 或 diplomatic_negotiation；议题为宣战、续战或议和。",
+    "effect": "支持议和、停战、联盟的权重 +12；在可接受条款范围内更愿让步。",
+    "channel": "选择权重",
+    "cost": "对方乘机休整再战；让步过多损及地盘或声望。",
+    "report": "{人物}力主与{对象}讲和，言兵连祸结非国之福。",
+    "exclusive": [
+      "主战"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_064",
+    "family": "习性",
+    "name": "主战",
+    "domain": "外交",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "task.kind 等于 discussion 或 diplomatic_negotiation；议题为宣战、续战或议和。",
+    "effect": "支持开战、拒和的权重 +12。",
+    "channel": "选择权重",
+    "cost": "国力未济时也主战，易使势力陷入多面受敌。",
+    "report": "{人物}按剑而起：“{对象}可伐，何和之有！”",
+    "exclusive": [
+      "主和"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_065",
+    "family": "习性",
+    "name": "善调和",
+    "domain": "议事",
+    "tier": "普通·优势",
+    "roles": "军师、参军、任意文官岗位",
+    "trigger": "task.kind 等于 discussion；与会者意见分歧（ctx.opinion_split 至少 0.4）。",
+    "effect": "提出折中方案、调停双方的权重 +12；明确站队的权重 -8。",
+    "channel": "选择权重",
+    "cost": "折中方案常两头不讨好，紧急时议而不决。",
+    "report": "{人物}从中调和，众议稍定，{对象}亦无异言。",
+    "exclusive": [
+      "好诘难"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_066",
+    "family": "习性",
+    "name": "好诘难",
+    "domain": "议事",
+    "tier": "普通·优势",
+    "roles": "军师、参军、任意岗位",
+    "trigger": "task.kind 等于 discussion 或 opinion_receive；他人提出方案。",
+    "effect": "质疑、反驳他人方案的权重 +12，哪怕最终结论相同。",
+    "channel": "选择权重",
+    "cost": "方案漏洞更易暴露，但议事更慢；被驳者的“怨恨”关系按已有规则上升。",
+    "report": "{人物}连发数难，{对象}不能对。",
+    "exclusive": [
+      "善调和",
+      "缄默"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_067",
+    "family": "习性",
+    "name": "重然诺",
+    "domain": "外交",
+    "tier": "卓越·优势",
+    "roles": "主公、使者、主将",
+    "trigger": "存在本方已缔结的盟约或已作出的承诺（history.pledge 存在）；出现违约更有利的选项。",
+    "effect": "违约、背盟类选项权重 -14。",
+    "channel": "选择权重",
+    "cost": "错失背盟取利的良机；盟友失信时仍拘守旧约而吃亏。",
+    "report": "{人物}曰：“既许{对象}，岂可食言！”",
+    "exclusive": [
+      "轻诺",
+      "好离间"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_068",
+    "family": "习性",
+    "name": "轻诺",
+    "domain": "外交",
+    "tier": "普通·局限",
+    "roles": "主公、使者",
+    "trigger": "task.kind 等于 diplomatic_negotiation；对方提出要求或请援。",
+    "effect": "当场应允的权重 +12；事后履约的权重 -10。",
+    "channel": "选择权重",
+    "cost": "失信累积，各方对本方的盟约可接受度按已有规则下降，后续谈判更难。",
+    "report": "{人物}满口应允{对象}，事后竟无一兵一粮至。",
+    "exclusive": [
+      "重然诺"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_069",
+    "family": "习性",
+    "name": "缄默",
+    "domain": "议事",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "task.kind 等于 discussion；与会者中有地位高于本人者。",
+    "effect": "主动发言、提出异议的权重 -14；即便自己判断更优也多不陈说。",
+    "channel": "选择权重",
+    "cost": "军议中白白浪费其见识；方案有误时无人点破。",
+    "report": "众议攻{对象}，{人物}默然无语。",
+    "exclusive": [
+      "好诘难",
+      "好骂阵",
+      "直谏"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_070",
+    "family": "习性",
+    "name": "好酒",
+    "domain": "生活",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "ctx.feast 等于 true 或 ctx.idle_days 至少 1；军中有酒（ctx.wine_available 等于 true）。",
+    "effect": "饮酒行为权重 +14；醉后当夜“巡营、查哨”行为权重降至 0，次日晨间决策延后半日。",
+    "channel": "选择权重",
+    "cost": "营中夜间戒备疏松，易被夜袭；醉后误事、鞭挞士卒按已有事件规则结算。",
+    "report": "{人物}痛饮达旦，营中刁斗不鸣，{对象}夜至。",
+    "exclusive": [
+      "滴酒不沾"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_071",
+    "family": "习性",
+    "name": "滴酒不沾",
+    "domain": "生活",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "ctx.feast 等于 true 或 ctx.wine_available 等于 true。",
+    "effect": "饮酒行为权重降至 0；宴席中保持巡营、查哨日程不变。",
+    "channel": "选择权重",
+    "cost": "宴饮场合拒酒，好酒的同僚、盟友“敬重”可能小降。",
+    "report": "宴间{人物}以水代酒，夜仍亲巡{对象}营垒。",
+    "exclusive": [
+      "好酒"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_072",
+    "family": "习性",
+    "name": "好色",
+    "domain": "生活",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "攻克城池（history.city_taken 等于 true）或 ctx.idle_days 至少 3；ctx.beauty_present 等于 true（运行时事件）。",
+    "effect": "选择流连后宅、纳降人家眷的权重 +14；此期间政务与军务决策延后、亲自巡视权重 -10。",
+    "channel": "选择权重",
+    "cost": "降人亲族“怨恨”上升，可能引发叛变或刺杀事件；敌方美人计成功率按已有规则对其更高。",
+    "report": "{人物}得{对象}家眷，日夜宴乐，不理军务。",
+    "exclusive": [
+      "俭朴"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_073",
+    "family": "习性",
+    "name": "好财",
+    "domain": "生活",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "task.kind 等于 bribe_receive（被行贿）、loot_dispose（处置缴获）或 tax_collect。",
+    "effect": "接受贿赂、私吞缴获、额外加征的权重 +14。",
+    "channel": "选择权重",
+    "cost": "敌方收买、离间对其成功率按已有规则更高；辖下民心下降；事发后主公“信任”大降。",
+    "report": "{人物}纳{对象}金帛，遂缓其事。",
+    "exclusive": [
+      "一介不取",
+      "施小恩"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_074",
+    "family": "习性",
+    "name": "一介不取",
+    "domain": "生活",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "task.kind 等于 bribe_receive 或 loot_dispose。",
+    "effect": "受贿与私吞的权重降至 0；缴获优先上缴或分赏士卒。",
+    "channel": "选择权重",
+    "cost": "得罪行贿的豪强，可能被其在主公前构陷。",
+    "report": "{对象}以金帛相赠，{人物}正色拒之，悉封还。",
+    "exclusive": [
+      "好财"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_075",
+    "family": "习性",
+    "name": "好名",
+    "domain": "生活",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "候选选项中有带声名后果的一项（option.fame_gain 高，如单骑救援、宽待降俘、守节不屈）。",
+    "effect": "带声名收益的选项权重 +12，即使实际收益略低。",
+    "channel": "选择权重",
+    "cost": "为名所累：明知不利也难以撤退、投降、示弱；易被以虚名诱之。",
+    "report": "{人物}曰：“大丈夫当留名青史。”遂往{对象}。",
+    "exclusive": [
+      "邀功",
+      "让功"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_076",
+    "family": "习性",
+    "name": "俭朴",
+    "domain": "生活",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "task.kind 等于 personal_spending 或 budget_allocate；或出现宴饮、营造私第的选项。",
+    "effect": "私人宴饮、营造私第、添置奢物的权重 -12；节省之资更倾向投入军资或赈济。",
+    "channel": "选择权重",
+    "cost": "不喜奢华的作风使其与好奢的同僚、豪族往来稀少。",
+    "report": "{人物}布衣蔬食，所得赏赐尽散{对象}。",
+    "exclusive": [
+      "好奢",
+      "好色"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_077",
+    "family": "习性",
+    "name": "好奢",
+    "domain": "生活",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "task.kind 等于 personal_spending 或 budget_allocate；ctx.idle_funds 有余。",
+    "effect": "营造私第、置办宴乐、添置器玩的权重 +14；任太守时该类支出挤占城建预算。",
+    "channel": "选择权重",
+    "cost": "金钱消耗大，辖下民心与清廉同僚的“敬重”下降；更易为钱所动。",
+    "report": "{人物}大起府第，日费万钱，{对象}侧目。",
+    "exclusive": [
+      "俭朴"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_078",
+    "family": "习性",
+    "name": "好学",
+    "domain": "生活",
+    "tier": "普通·优势",
+    "roles": "任意岗位",
+    "trigger": "ctx.idle_days 至少 3；或 task.kind 等于 opinion_receive 且发言者有专长。",
+    "effect": "闲时选择读书、求教名士的行为权重 +12；军议中采纳专长者意见的倾向 +6。",
+    "channel": "选择权重",
+    "cost": "闲暇多耗于书卷，结交豪强、游猎、宴饮等社交选项减少。",
+    "report": "{人物}手不释卷，军中犹从{对象}问学。",
+    "exclusive": [
+      "厌读",
+      "好游猎"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_079",
+    "family": "习性",
+    "name": "厌读",
+    "domain": "生活",
+    "tier": "普通·局限",
+    "roles": "任意岗位",
+    "trigger": "ctx.idle_days 至少 3；或 task.kind 等于 opinion_receive 且建议引经据典、以古证今。",
+    "effect": "闲时读书、求教行为权重降至 0；对引用古例、兵书的建议采纳权重 -12。",
+    "channel": "选择权重",
+    "cost": "成长停滞，不肯听书生谋士之言，屡蹈前人覆辙。",
+    "report": "{对象}引兵法为谏，{人物}笑曰：“书生之见。”不从。",
+    "exclusive": [
+      "好学"
+    ],
+    "decay": ""
+  },
+  {
+    "id": "habit_080",
+    "family": "习性",
+    "name": "好游猎",
+    "domain": "生活",
+    "tier": "普通·优势",
+    "roles": "任意武将岗位、太守",
+    "trigger": "ctx.idle_days 至少 2；驻地周边有山林（terrain.forest_nearby 等于 true）。",
+    "effect": "出城游猎行为权重 +12；游猎期间顺带更新驻地周边地形情报（intel.local_terrain_age 归零）。",
+    "channel": "选择权重",
+    "cost": "离城期间政务停滞、遇刺或遭敌突袭的风险按已有规则结算。",
+    "report": "{人物}引从骑猎于{对象}山中，数日方还。",
+    "exclusive": [
+      "好学"
+    ],
+    "decay": ""
+  }
+]

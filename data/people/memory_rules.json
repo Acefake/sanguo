@@ -1,10 +1,11 @@
 {
- "version": 1,
+ "version": 2,
  "decay_r": {
-  "light": 0.08,
-  "mid": 0.04,
+  "light": 0.05,
+  "mid": 0.015,
   "heavy": 0.01
  },
+ "decay_note": "线性：intensity = base × (1 − r × 距今旬数)。v1.1 起轻档约 20 旬（7 个月）淡出，中档约 67 旬（1 年 10 个月），重档 60 旬后停在 base×0.4。",
  "floor_ratio": {
   "light": 0,
   "mid": 0,
@@ -18,7 +19,10 @@
    "saw_victory",
    "visited",
    "consulted",
-   "praised_other"
+   "praised_other",
+   "passed_over",
+   "saw_injustice",
+   "accepted_surrender"
   ],
   "mid": [
    "appointed",
@@ -40,7 +44,11 @@
    "blamed_by",
    "subordinate_failed",
    "circle_member_defected",
-   "fined"
+   "kin_punished",
+   "city_lost",
+   "asked_to_betray",
+   "advice_credited",
+   "advice_overruled"
   ],
   "heavy": [
    "rescued_by",
@@ -49,6 +57,7 @@
    "ally_killed",
    "kin_killed",
    "kin_jailed",
+   "kin_captured",
    "captured",
    "released",
    "surrendered_to",
@@ -202,6 +211,13 @@
     "about": "lord",
     "valence": -1,
     "base": 12
+   },
+   {
+    "who": "lord",
+    "kind": "advice_credited",
+    "about": "actor",
+    "valence": 1,
+    "base": 12
    }
   ],
   "advice_rejected": [
@@ -219,6 +235,13 @@
     "valence": -1,
     "base": 20,
     "if": "data.adopted_from != ''"
+   },
+   {
+    "who": "lord",
+    "kind": "advice_overruled",
+    "about": "actor",
+    "valence": -1,
+    "base": 10
    }
   ],
   "publicly_humiliated": [
@@ -340,6 +363,13 @@
     "about": "data.captor",
     "valence": -1,
     "base": 50
+   },
+   {
+    "who": "kin_of_actor",
+    "kind": "kin_captured",
+    "about": "data.captor",
+    "valence": -1,
+    "base": 40
    }
   ],
   "released": [
@@ -498,6 +528,99 @@
     "valence": -1,
     "base": 40
    }
+  ],
+  "consulted": [
+   {
+    "who": "actor",
+    "kind": "consulted",
+    "about": "lord",
+    "valence": 1,
+    "base": 10
+   }
+  ],
+  "lord_misdeed": [
+   {
+    "who": "court",
+    "kind": "saw_injustice",
+    "about": "actor",
+    "valence": -1,
+    "base": 12
+   }
+  ],
+  "asked_to_betray": [
+   {
+    "who": "actor",
+    "kind": "asked_to_betray",
+    "about": "target",
+    "valence": 0,
+    "base": 30
+   }
+  ],
+  "deed": []
+ },
+ "event_catalog": {
+  "note": "PeopleEvents.emit 可发出的全部 kind。memory_only 是只作为记忆出现、不能直接 emit 的 kind（由其他事件派生）。",
+  "P1_war_hooks": {
+   "battle_won": "officer_fate.settle / campaign_outcomes",
+   "battle_lost": "officer_fate.settle",
+   "captured": "officer_fate.settle",
+   "released": "officer_fate.release",
+   "ally_killed": "officer_fate.settle（阵亡，对同军者）",
+   "surrendered_to": "officer_fate.settle",
+   "city_lost": "campaign_outcomes._capture_city",
+   "advice_adopted": "campaign_orders（请示被准）",
+   "advice_rejected": "campaign_orders（请示被驳）",
+   "appointed": "army_corps / faction_lifecycle 任命"
+  },
+  "P2_P3": [
+   "dismissed",
+   "promoted",
+   "demoted",
+   "rewarded",
+   "punished",
+   "jailed",
+   "kin_jailed",
+   "kin_killed",
+   "publicly_humiliated",
+   "praised",
+   "rescued_by",
+   "abandoned_by",
+   "defected",
+   "lord_died",
+   "slandered_by",
+   "credit_stolen",
+   "served_together",
+   "gift_given",
+   "visited",
+   "mentor_taught"
+  ],
+  "P5_P7": [
+   "promise_made",
+   "promise_kept",
+   "promise_broken",
+   "consulted",
+   "lord_misdeed",
+   "asked_to_betray"
+  ],
+  "bio_only": [
+   "deed"
+  ],
+  "memory_only": [
+   "betrayed_by",
+   "rescued",
+   "passed_over",
+   "praised_other",
+   "kin_punished",
+   "kin_captured",
+   "saw_defeat",
+   "saw_victory",
+   "saw_injustice",
+   "accepted_surrender",
+   "blamed_by",
+   "subordinate_failed",
+   "circle_member_defected",
+   "advice_credited",
+   "advice_overruled"
   ]
  },
  "personality": {
@@ -523,5 +646,10 @@
  },
  "seed": {
   "note": "开局前史事件按 elapsed_xun 线性衰减后写入；intensity<=3 不写。bio=true 的事件进生平时间线。"
+ },
+ "key_moment": {
+  "tag": "关口",
+  "r_mult": 0.5,
+  "note": "带「关口」标签的事件（人生转折：被谮、受知遇、被当众称许）产生的记忆衰减减半。运行期事件由发出方在 data.tag 标记。"
  }
 }

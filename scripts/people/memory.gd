@@ -5,7 +5,8 @@ extends RefCounted
 ## 开局记忆不手写：前史事件（data/people/<剧本>/seed_events.json）走 data/people/memory_rules.json，
 ## 一条事件按规则给多个人写各自的记忆，再按「开局旬号 − 事件旬号」线性衰减：
 ## intensity = max(base − base × r × 经过旬数, base × floor_ratio)，r 与 floor_ratio 按 weight_class 分轻/中/重三档，
-## 重档保底 base×0.4；强度不超过 drop_below 的不写。bio=true 的事件同时进当事人的生平。
+## 重档保底 base×0.4；data.tag 为 key_moment.tag（「关口」）的事件 r 乘 key_moment.r_mult（减半）；
+## 强度不超过 drop_below 的不写。只用不晚于开局旬的事件（事件只记到月，按当月上旬算）。bio=true 的事件同时进当事人的生平。
 ## P1 不乘性格系数（记仇、自尊等），与 Python 参考预演同序同值。
 ## 读 store.persons / store.circles，写 store.memories / store.biographies。
 
@@ -19,14 +20,17 @@ const DEFAULT_WEIGHT_CLASS := "mid"
 ## 把前史事件写成开局记忆与生平。store 须已 setup_from_scenario，开局旬号取 store.xun。
 static func seed(store: Store, events_doc: Dictionary, rules: Dictionary) -> void:
 	var classes := weight_classes(rules)
+	var key_moment: Dictionary = rules["key_moment"]
 	for event in events_doc["events"]:
-		if bool(event.get("bio", false)): _record_bio(store, event)
 		var event_xun := Store.xun_index(int(event["year"]), int(event["month"]), 1)
+		if event_xun > store.xun: continue
+		if bool(event.get("bio", false)): _record_bio(store, event)
+		var r_mult := float(key_moment["r_mult"]) if str(event["data"].get("tag", "")) == str(key_moment["tag"]) else 1.0
 		for rule in rules["events"].get(str(event["kind"]), []):
 			if not _condition_holds(rule, event): continue
 			var about_id := _about(str(rule["about"]), event)
 			var weight_class: String = classes.get(str(rule["kind"]), DEFAULT_WEIGHT_CLASS)
-			var intensity := decayed(float(rule["base"]), weight_class, store.xun - event_xun, rules)
+			var intensity := decayed(float(rule["base"]), weight_class, store.xun - event_xun, rules, r_mult)
 			if intensity <= float(rules["drop_below"]): continue
 			for owner in _recipients(str(rule["who"]), event, store):
 				if not store.persons.has(owner) or owner == about_id: continue
@@ -39,9 +43,9 @@ static func seed(store: Store, events_doc: Dictionary, rules: Dictionary) -> voi
 				})
 
 
-## 经过 elapsed 旬后的强度：线性衰减，不低于该档保底。
-static func decayed(base: float, weight_class: String, elapsed: int, rules: Dictionary) -> float:
-	var r := float(rules["decay_r"][weight_class])
+## 经过 elapsed 旬后的强度：线性衰减，不低于该档保底。r_mult 是关口事件的衰减倍率。
+static func decayed(base: float, weight_class: String, elapsed: int, rules: Dictionary, r_mult: float = 1.0) -> float:
+	var r := float(rules["decay_r"][weight_class]) * r_mult
 	return maxf(base - base * r * elapsed, base * float(rules["floor_ratio"][weight_class]))
 
 
@@ -95,6 +99,7 @@ static func _recipients(who: String, event: Dictionary, store: Store) -> Array[S
 		"kin_of_actor": found = store.kin_of(actor)
 		"kin_of_target": found = store.kin_of(str(event["target"]))
 		"circle_of_actor": found = store.circle_mates(actor)
+		"court": found = store.court_of(actor)
 		_:
 			if who.begins_with("data."): found = [str(data.get(who.trim_prefix("data."), ""))]
 			else: assert(who in CONTEXT_ONLY_RECIPIENTS, "未知的记忆接收方：" + who)

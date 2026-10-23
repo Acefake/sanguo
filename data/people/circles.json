@@ -24,7 +24,7 @@
  },
  {
   "id": "circle_qiaopei",
-  "kind": "宗族",
+  "kind": "同乡",
   "name": "谯沛乡党",
   "members_rule": {
    "origin.commandery_in": [
@@ -66,7 +66,7 @@
   "id": "circle_hebei_scholars",
   "kind": "派系",
   "name": "河北士人",
-  "faction": "袁绍集团",
+  "faction": "yuan_shao",
   "members": [
    "ys_016",
    "ys_015",
@@ -77,7 +77,7 @@
   "id": "circle_mufu_guests",
   "kind": "派系",
   "name": "南阳颍川幕客",
-  "faction": "袁绍集团",
+  "faction": "yuan_shao",
   "members": [
    "ys_020",
    "ys_017",
@@ -88,7 +88,7 @@
   "id": "circle_cao_advisers",
   "kind": "派系",
   "name": "颍川谋主",
-  "faction": "曹操集团",
+  "faction": "cao_cao",
   "members": [
    "cc_002",
    "cc_003",

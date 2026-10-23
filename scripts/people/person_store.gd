@@ -35,6 +35,12 @@ static func xun_index(year: int, month: int, xun_in_month: int) -> int:
 	return (year * 12 + month - 1) * XUN_PER_MONTH + xun_in_month - 1
 
 
+## Autoload「People」节点。战场脚本经测试的 preload 链在 Autoload 注册之前就会被编译，那时全局名 People
+## 还不存在，所以它们经这里取节点，不写全局名。
+static func autoload() -> PersonStore:
+	return (Engine.get_main_loop() as SceneTree).root.get_node("People")
+
+
 static func read_json(path: String) -> Variant:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	assert(parsed != null, "人物数据读取失败：" + path)

@@ -11,6 +11,7 @@ const Data = preload("res://scripts/war/proving/battlefield_data.gd")
 const Sim = preload("res://scripts/war/proving/battlefield_sim.gd")
 const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Leadership = preload("res://scripts/officers/officer_leadership.gd")
+const PeopleStore = preload("res://scripts/people/person_store.gd")
 const Intent = preload("res://scripts/officers/officer_intent.gd")
 const CitySkin = preload("res://scripts/ui/city_ui_skin.gd")
 
@@ -121,7 +122,7 @@ func _button(text: String, action: Callable) -> Button:
 
 func _load_field() -> void:
 	field = Data.load_field(str(field_choice.get_item_metadata(field_choice.selected)))
-	People.load_declared(field)
+	PeopleStore.autoload().load_declared(field)
 	trial_choice.clear()
 	for trial in field["trials"]:
 		trial_choice.add_item(str(trial["label"]))

@@ -1,0 +1,339 @@
+{
+ "version": 1,
+ "ids": [
+  "功名",
+  "忠义",
+  "财货",
+  "家族",
+  "天下",
+  "安身",
+  "学问",
+  "报仇"
+ ],
+ "allegiance_focus": {
+  "功名": "前程",
+  "忠义": "名分",
+  "财货": "利益",
+  "家族": "家眷",
+  "天下": "大势",
+  "安身": "安危",
+  "学问": "知遇",
+  "报仇": "仇"
+ },
+ "decay_per_xun": 0.9,
+ "rules": [
+  {
+   "drive": "功名",
+   "on": "battle_won",
+   "delta": 12,
+   "role": "actor"
+  },
+  {
+   "drive": "功名",
+   "on": "promoted",
+   "delta": 15,
+   "role": "actor"
+  },
+  {
+   "drive": "功名",
+   "on": "rewarded",
+   "delta": 8,
+   "role": "actor"
+  },
+  {
+   "drive": "功名",
+   "on": "appointed",
+   "delta": 6,
+   "role": "actor",
+   "if": "data.post_rank >= 3"
+  },
+  {
+   "drive": "功名",
+   "on": "idle_xun",
+   "delta": -6,
+   "min_streak": 6,
+   "repeat": true
+  },
+  {
+   "drive": "功名",
+   "on": "credit_stolen",
+   "delta": -18,
+   "role": "actor"
+  },
+  {
+   "drive": "功名",
+   "on": "demoted",
+   "delta": -20,
+   "role": "actor"
+  },
+  {
+   "drive": "功名",
+   "on": "battle_lost",
+   "delta": -8,
+   "role": "actor"
+  },
+  {
+   "drive": "忠义",
+   "on": "promise_kept",
+   "delta": 10,
+   "role": "target"
+  },
+  {
+   "drive": "忠义",
+   "on": "entrusted",
+   "delta": 15,
+   "role": "actor"
+  },
+  {
+   "drive": "忠义",
+   "on": "promise_broken",
+   "delta": -15,
+   "role": "target"
+  },
+  {
+   "drive": "忠义",
+   "on": "lord_misdeed",
+   "delta": -12,
+   "role": "faction_all"
+  },
+  {
+   "drive": "忠义",
+   "on": "asked_to_betray",
+   "delta": -20,
+   "role": "actor"
+  },
+  {
+   "drive": "财货",
+   "on": "rewarded",
+   "delta": 14,
+   "role": "actor"
+  },
+  {
+   "drive": "财货",
+   "on": "gift_given",
+   "delta": 10,
+   "role": "target"
+  },
+  {
+   "drive": "财货",
+   "on": "appointed",
+   "delta": 8,
+   "role": "actor",
+   "if": "data.post_kind == 'treasury'"
+  },
+  {
+   "drive": "财货",
+   "on": "fined",
+   "delta": -15,
+   "role": "actor"
+  },
+  {
+   "drive": "财货",
+   "on": "no_reward_xun",
+   "delta": -4,
+   "min_streak": 12,
+   "repeat": true
+  },
+  {
+   "drive": "家族",
+   "on": "kin_appointed",
+   "delta": 12,
+   "role": "kin_of_actor"
+  },
+  {
+   "drive": "家族",
+   "on": "kin_rewarded",
+   "delta": 8,
+   "role": "kin_of_actor"
+  },
+  {
+   "drive": "家族",
+   "on": "kin_jailed",
+   "delta": -35,
+   "role": "kin_of_actor"
+  },
+  {
+   "drive": "家族",
+   "on": "kin_killed",
+   "delta": -60,
+   "role": "kin_of_actor"
+  },
+  {
+   "drive": "家族",
+   "on": "kin_captured",
+   "delta": -30,
+   "role": "kin_of_actor"
+  },
+  {
+   "drive": "天下",
+   "on": "city_taken",
+   "delta": 6,
+   "role": "faction_all"
+  },
+  {
+   "drive": "天下",
+   "on": "advice_adopted",
+   "delta": 8,
+   "role": "actor",
+   "if": "data.scope == 'grand'"
+  },
+  {
+   "drive": "天下",
+   "on": "lord_misdeed",
+   "delta": -10,
+   "role": "faction_all"
+  },
+  {
+   "drive": "天下",
+   "on": "main_army_lost",
+   "delta": -10,
+   "role": "faction_all"
+  },
+  {
+   "drive": "安身",
+   "on": "appointed",
+   "delta": 8,
+   "role": "actor",
+   "if": "data.post_kind == 'rear'"
+  },
+  {
+   "drive": "安身",
+   "on": "battle_won",
+   "delta": 4,
+   "role": "faction_all"
+  },
+  {
+   "drive": "安身",
+   "on": "sent_to_danger",
+   "delta": -12,
+   "role": "actor"
+  },
+  {
+   "drive": "安身",
+   "on": "city_besieged",
+   "delta": -10,
+   "role": "faction_all"
+  },
+  {
+   "drive": "安身",
+   "on": "battle_lost",
+   "delta": -6,
+   "role": "faction_all"
+  },
+  {
+   "drive": "学问",
+   "on": "appointed",
+   "delta": 8,
+   "role": "actor",
+   "if": "data.post_kind == 'civil'"
+  },
+  {
+   "drive": "学问",
+   "on": "consulted",
+   "delta": 6,
+   "role": "actor"
+  },
+  {
+   "drive": "学问",
+   "on": "visited",
+   "delta": 6,
+   "role": "actor"
+  },
+  {
+   "drive": "学问",
+   "on": "campaign_xun",
+   "delta": -3,
+   "min_streak": 12,
+   "repeat": true
+  },
+  {
+   "drive": "报仇",
+   "on": "battle_won",
+   "delta": 25,
+   "role": "actor",
+   "if": "enemy_commander == knot.报仇.object"
+  },
+  {
+   "drive": "报仇",
+   "on": "enemy_harmed",
+   "delta": 20,
+   "role": "actor",
+   "if": "target == knot.报仇.object"
+  },
+  {
+   "drive": "报仇",
+   "on": "peace_made",
+   "delta": -25,
+   "role": "faction_all",
+   "if": "target_faction has knot.报仇.object"
+  },
+  {
+   "drive": "报仇",
+   "on": "appointed",
+   "delta": -30,
+   "role": "faction_all",
+   "if": "actor == knot.报仇.object"
+  }
+ ],
+ "rewrite": [
+  {
+   "on": "kin_killed",
+   "if": "data.killer != ''",
+   "do": "add_or_replace",
+   "drive": "报仇",
+   "weight": 0.5,
+   "object": "data.killer"
+  },
+  {
+   "on": "object_died",
+   "if": "has_drive('报仇')",
+   "do": "remove",
+   "drive": "报仇"
+  },
+  {
+   "on": "yearly",
+   "if": "age >= 55 and meter('功名') > 60",
+   "do": "replace",
+   "drive": "功名",
+   "with": "second_highest_of(['家族','安身'])"
+  },
+  {
+   "on": "lord_died",
+   "if": "data.regent == self",
+   "do": "add",
+   "drive": "忠义",
+   "weight": 0.5
+  }
+ ],
+ "rewrite_cooldown_xun": 36,
+ "exclusive": [
+  [
+   "安身",
+   "报仇"
+  ],
+  [
+   "财货",
+   "忠义"
+  ]
+ ],
+ "exclusive_habits": {
+  "安身": [
+   "habit_032",
+   "habit_011"
+  ],
+  "忠义": [
+   "habit_073"
+  ]
+ },
+ "infer_from_card": {
+  "功名": "values.功业*0.6 + decision_weights.个人功业*0.4",
+  "忠义": "loyalty.承诺坚持*0.5 + values.承诺*0.5",
+  "财货": "values.个人利益*0.7 + axis.贪欲/100*0.3",
+  "家族": "loyalty.私人依附*0.4 + (kin.size()>0 ? 0.3 : 0)",
+  "天下": "values.群体利益*0.6 + values.秩序*0.2 + axis.野心/100*0.2",
+  "安身": "decision_weights.损失厌恶*0.6 + (1-risk_preference)*0.4",
+  "学问": "attr.智计/100*0.4 + (has_learning_habit ? 0.4 : 0)",
+  "报仇": "knot_object_intensity>=60 ? 0.8 : 0",
+  "keep_second_if_ge": 0.15
+ }
+}

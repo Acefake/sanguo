@@ -1,0 +1,527 @@
+{
+ "version": 1,
+ "decay_r": {
+  "light": 0.08,
+  "mid": 0.04,
+  "heavy": 0.01
+ },
+ "floor_ratio": {
+  "light": 0,
+  "mid": 0,
+  "heavy": 0.4
+ },
+ "floor_note": "重档记忆衰减到 base×0.4 后不再下降（救命之恩、亲族被杀、旧主之死终身不忘）；心结消解规则仍可清除",
+ "weight_class": {
+  "light": [
+   "served_together",
+   "saw_defeat",
+   "saw_victory",
+   "visited",
+   "consulted",
+   "praised_other"
+  ],
+  "mid": [
+   "appointed",
+   "dismissed",
+   "promoted",
+   "demoted",
+   "rewarded",
+   "punished",
+   "advice_adopted",
+   "advice_rejected",
+   "publicly_humiliated",
+   "praised",
+   "battle_won",
+   "battle_lost",
+   "slandered_by",
+   "credit_stolen",
+   "gift_given",
+   "promise_made",
+   "blamed_by",
+   "subordinate_failed",
+   "circle_member_defected",
+   "fined"
+  ],
+  "heavy": [
+   "rescued_by",
+   "rescued",
+   "abandoned_by",
+   "ally_killed",
+   "kin_killed",
+   "kin_jailed",
+   "captured",
+   "released",
+   "surrendered_to",
+   "defected",
+   "betrayed_by",
+   "promise_kept",
+   "promise_broken",
+   "lord_died",
+   "jailed",
+   "mentor_taught"
+  ]
+ },
+ "per_person_cap": 40,
+ "drop_below": 3,
+ "events": {
+  "appointed": [
+   {
+    "who": "actor",
+    "kind": "appointed",
+    "about": "lord",
+    "valence": 1,
+    "base": 25
+   },
+   {
+    "who": "rivals_same_post",
+    "kind": "passed_over",
+    "about": "actor",
+    "valence": -1,
+    "base": 15
+   }
+  ],
+  "dismissed": [
+   {
+    "who": "actor",
+    "kind": "dismissed",
+    "about": "lord",
+    "valence": -1,
+    "base": 35
+   }
+  ],
+  "promoted": [
+   {
+    "who": "actor",
+    "kind": "promoted",
+    "about": "lord",
+    "valence": 1,
+    "base": 35
+   },
+   {
+    "who": "circle_of_actor",
+    "kind": "praised_other",
+    "about": "actor",
+    "valence": 0,
+    "base": 8
+   }
+  ],
+  "demoted": [
+   {
+    "who": "actor",
+    "kind": "demoted",
+    "about": "lord",
+    "valence": -1,
+    "base": 35
+   },
+   {
+    "who": "actor",
+    "kind": "slandered_by",
+    "about": "data.instigator",
+    "valence": -1,
+    "base": 30,
+    "if": "data.instigator != ''"
+   }
+  ],
+  "rewarded": [
+   {
+    "who": "actor",
+    "kind": "rewarded",
+    "about": "lord",
+    "valence": 1,
+    "base": 25
+   }
+  ],
+  "punished": [
+   {
+    "who": "actor",
+    "kind": "punished",
+    "about": "lord",
+    "valence": -1,
+    "base": 40
+   },
+   {
+    "who": "kin_of_actor",
+    "kind": "kin_punished",
+    "about": "lord",
+    "valence": -1,
+    "base": 25
+   }
+  ],
+  "jailed": [
+   {
+    "who": "actor",
+    "kind": "jailed",
+    "about": "lord",
+    "valence": -1,
+    "base": 60
+   },
+   {
+    "who": "kin_of_actor",
+    "kind": "kin_jailed",
+    "about": "lord",
+    "valence": -1,
+    "base": 45
+   },
+   {
+    "who": "circle_of_actor",
+    "kind": "saw_injustice",
+    "about": "lord",
+    "valence": -1,
+    "base": 12
+   }
+  ],
+  "kin_jailed": [
+   {
+    "who": "kin_of_target",
+    "kind": "kin_jailed",
+    "about": "data.by",
+    "valence": -1,
+    "base": 55
+   }
+  ],
+  "kin_killed": [
+   {
+    "who": "kin_of_target",
+    "kind": "kin_killed",
+    "about": "data.killer",
+    "valence": -1,
+    "base": 80
+   }
+  ],
+  "advice_adopted": [
+   {
+    "who": "actor",
+    "kind": "advice_adopted",
+    "about": "lord",
+    "valence": 1,
+    "base": 25
+   },
+   {
+    "who": "rival_advisers",
+    "kind": "advice_rejected",
+    "about": "lord",
+    "valence": -1,
+    "base": 12
+   }
+  ],
+  "advice_rejected": [
+   {
+    "who": "actor",
+    "kind": "advice_rejected",
+    "about": "lord",
+    "valence": -1,
+    "base": 25
+   },
+   {
+    "who": "actor",
+    "kind": "advice_rejected",
+    "about": "data.adopted_from",
+    "valence": -1,
+    "base": 20,
+    "if": "data.adopted_from != ''"
+   }
+  ],
+  "publicly_humiliated": [
+   {
+    "who": "target",
+    "kind": "publicly_humiliated",
+    "about": "actor",
+    "valence": -1,
+    "base": 50,
+    "public": true
+   }
+  ],
+  "praised": [
+   {
+    "who": "target",
+    "kind": "praised",
+    "about": "actor",
+    "valence": 1,
+    "base": 20,
+    "public": true
+   }
+  ],
+  "battle_won": [
+   {
+    "who": "actor",
+    "kind": "battle_won",
+    "about": "enemy_commander",
+    "valence": 0,
+    "base": 20
+   },
+   {
+    "who": "participants",
+    "kind": "battle_won",
+    "about": "actor",
+    "valence": 1,
+    "base": 12
+   },
+   {
+    "who": "enemy_commander",
+    "kind": "battle_lost",
+    "about": "actor",
+    "valence": -1,
+    "base": 30
+   }
+  ],
+  "battle_lost": [
+   {
+    "who": "actor",
+    "kind": "battle_lost",
+    "about": "enemy_commander",
+    "valence": -1,
+    "base": 30
+   },
+   {
+    "who": "actor",
+    "kind": "blamed_by",
+    "about": "data.blamer",
+    "valence": -1,
+    "base": 50,
+    "if": "data.blamer != ''"
+   },
+   {
+    "who": "data.blamer",
+    "kind": "subordinate_failed",
+    "about": "actor",
+    "valence": -1,
+    "base": 25,
+    "if": "data.blamer != ''"
+   },
+   {
+    "who": "witnesses",
+    "kind": "saw_defeat",
+    "about": "actor",
+    "valence": 0,
+    "base": 10
+   }
+  ],
+  "rescued_by": [
+   {
+    "who": "actor",
+    "kind": "rescued_by",
+    "about": "target",
+    "valence": 1,
+    "base": 70
+   },
+   {
+    "who": "target",
+    "kind": "rescued",
+    "about": "actor",
+    "valence": 1,
+    "base": 30
+   }
+  ],
+  "abandoned_by": [
+   {
+    "who": "actor",
+    "kind": "abandoned_by",
+    "about": "target",
+    "valence": -1,
+    "base": 60
+   }
+  ],
+  "ally_killed": [
+   {
+    "who": "actor",
+    "kind": "ally_killed",
+    "about": "target",
+    "valence": 0,
+    "base": 55,
+    "tags": [
+     "亡友"
+    ]
+   }
+  ],
+  "captured": [
+   {
+    "who": "actor",
+    "kind": "captured",
+    "about": "data.captor",
+    "valence": -1,
+    "base": 50
+   }
+  ],
+  "released": [
+   {
+    "who": "actor",
+    "kind": "released",
+    "about": "data.captor",
+    "valence": 1,
+    "base": 50
+   }
+  ],
+  "surrendered_to": [
+   {
+    "who": "actor",
+    "kind": "surrendered_to",
+    "about": "target",
+    "valence": 0,
+    "base": 40
+   },
+   {
+    "who": "target",
+    "kind": "accepted_surrender",
+    "about": "actor",
+    "valence": 0,
+    "base": 15
+   }
+  ],
+  "defected": [
+   {
+    "who": "actor",
+    "kind": "defected",
+    "about": "data.from_lord",
+    "valence": 0,
+    "base": 40
+   },
+   {
+    "who": "data.from_lord",
+    "kind": "betrayed_by",
+    "about": "actor",
+    "valence": -1,
+    "base": 60
+   },
+   {
+    "who": "circle_of_actor",
+    "kind": "circle_member_defected",
+    "about": "actor",
+    "valence": 0,
+    "base": 20
+   }
+  ],
+  "lord_died": [
+   {
+    "who": "former_subordinates",
+    "kind": "lord_died",
+    "about": "actor",
+    "valence": 0,
+    "base": 60,
+    "tags": [
+     "旧主"
+    ]
+   }
+  ],
+  "slandered_by": [
+   {
+    "who": "actor",
+    "kind": "slandered_by",
+    "about": "target",
+    "valence": -1,
+    "base": 40
+   }
+  ],
+  "credit_stolen": [
+   {
+    "who": "actor",
+    "kind": "credit_stolen",
+    "about": "target",
+    "valence": -1,
+    "base": 45
+   }
+  ],
+  "promise_made": [
+   {
+    "who": "target",
+    "kind": "promise_made",
+    "about": "actor",
+    "valence": 1,
+    "base": 20
+   }
+  ],
+  "promise_kept": [
+   {
+    "who": "target",
+    "kind": "promise_kept",
+    "about": "actor",
+    "valence": 1,
+    "base": 40
+   }
+  ],
+  "promise_broken": [
+   {
+    "who": "target",
+    "kind": "promise_broken",
+    "about": "actor",
+    "valence": -1,
+    "base": 55
+   }
+  ],
+  "gift_given": [
+   {
+    "who": "target",
+    "kind": "gift_given",
+    "about": "actor",
+    "valence": 1,
+    "base": 20
+   }
+  ],
+  "visited": [
+   {
+    "who": "target",
+    "kind": "visited",
+    "about": "actor",
+    "valence": 1,
+    "base": 12
+   }
+  ],
+  "served_together": [
+   {
+    "who": "actor",
+    "kind": "served_together",
+    "about": "target",
+    "valence": 1,
+    "base": 4
+   },
+   {
+    "who": "target",
+    "kind": "served_together",
+    "about": "actor",
+    "valence": 1,
+    "base": 4
+   }
+  ],
+  "mentor_taught": [
+   {
+    "who": "target",
+    "kind": "mentor_taught",
+    "about": "actor",
+    "valence": 1,
+    "base": 50
+   }
+  ],
+  "city_lost": [
+   {
+    "who": "actor",
+    "kind": "city_lost",
+    "about": "data.enemy_commander",
+    "valence": -1,
+    "base": 40
+   }
+  ]
+ },
+ "personality": {
+  "grudge": "valence<0 ? 1 + (axis.记仇-50)/100 : 1",
+  "empathy": "valence>0 ? 1 + (axis.同理心-50)/200 : 1",
+  "pride": "public and valence<0 ? 1 + (axis.自尊-50)/100 : 1",
+  "drive_related": 1.3,
+  "forgiving_habits": {
+   "ids": [
+    "habit_049"
+   ],
+   "neg_mult": 0.6
+  }
+ },
+ "attribution": {
+  "kinds": [
+   "blamed_by",
+   "credit_stolen",
+   "battle_lost"
+  ],
+  "rule": "worst_relation_present",
+  "circle_bias": 1.3
+ },
+ "seed": {
+  "note": "开局前史事件按 elapsed_xun 线性衰减后写入；intensity<=3 不写。bio=true 的事件进生平时间线。"
+ }
+}

@@ -1,0 +1,176 @@
+{
+ "ys_016": [
+  {
+   "kind": "slandered_by",
+   "about": "ys_020",
+   "valence": -1,
+   "intensity": 16.0,
+   "eid": "seed_017",
+   "text": "郭图谮沮授「监统内外，威震三军」"
+  },
+  {
+   "kind": "demoted",
+   "about": "ys_001",
+   "valence": -1,
+   "intensity": 14.0,
+   "eid": "seed_018",
+   "text": "监军权分为三都督，与郭图、淳于琼各典一军"
+  },
+  {
+   "kind": "slandered_by",
+   "about": "ys_020",
+   "valence": -1,
+   "intensity": 12.0,
+   "eid": "seed_018",
+   "text": "监军权分为三都督，与郭图、淳于琼各典一军"
+  }
+ ],
+ "ys_006": [
+  {
+   "kind": "appointed",
+   "about": "ys_001",
+   "valence": 1,
+   "intensity": 10.0,
+   "eid": "seed_019",
+   "text": "为三都督之一"
+  }
+ ],
+ "ys_020": [
+  {
+   "kind": "appointed",
+   "about": "ys_001",
+   "valence": 1,
+   "intensity": 10.0,
+   "eid": "seed_020",
+   "text": "为三都督之一"
+  }
+ ],
+ "ys_015": [
+  {
+   "kind": "advice_rejected",
+   "about": "ys_001",
+   "valence": -1,
+   "intensity": 22.0,
+   "eid": "seed_021",
+   "text": "曹操东击刘备，劝袭许；袁绍以子疾辞，田丰举杖击地"
+  }
+ ],
+ "ys_002": [
+  {
+   "kind": "appointed",
+   "about": "ys_001",
+   "valence": 1,
+   "intensity": 25.0,
+   "eid": "seed_023",
+   "text": "为先锋，进围白马"
+  }
+ ],
+ "ys_003": [
+  {
+   "kind": "appointed",
+   "about": "ys_001",
+   "valence": 1,
+   "intensity": 25.0,
+   "eid": "seed_024",
+   "text": "随大军南下黎阳"
+  }
+ ],
+ "cc_001": [
+  {
+   "kind": "rescued_by",
+   "about": "cc_010",
+   "valence": 1,
+   "intensity": 28.0,
+   "eid": "seed_029",
+   "text": "汴水之败，曹洪让马救之：「天下可无洪，不可无君」"
+  },
+  {
+   "kind": "ally_killed",
+   "about": "off_dianwei",
+   "valence": 0,
+   "intensity": 22.0,
+   "eid": "seed_038",
+   "text": "典韦死战护主，殁于宛城"
+  },
+  {
+   "kind": "battle_won",
+   "about": "off_liubei",
+   "valence": 0,
+   "intensity": 17.6,
+   "eid": "seed_048",
+   "text": "东征破刘备，擒关羽"
+  }
+ ],
+ "cc_010": [
+  {
+   "kind": "rescued",
+   "about": "cc_001",
+   "valence": 1,
+   "intensity": 12.0,
+   "eid": "seed_029",
+   "text": "汴水之败，曹洪让马救之：「天下可无洪，不可无君」"
+  }
+ ],
+ "cc_007": [
+  {
+   "kind": "defected",
+   "about": "off_yangfeng",
+   "valence": 0,
+   "intensity": 16.0,
+   "eid": "seed_035",
+   "text": "劝杨奉归曹不从，遂自归曹操"
+  },
+  {
+   "kind": "battle_won",
+   "about": "cc_001",
+   "valence": 1,
+   "intensity": 10.6,
+   "eid": "seed_048",
+   "text": "东征破刘备，擒关羽"
+  },
+  {
+   "kind": "served_together",
+   "about": "off_guanyu",
+   "valence": 1,
+   "intensity": 3.0,
+   "eid": "seed_049",
+   "text": "与关羽同营叙旧"
+  }
+ ],
+ "cc_006": [
+  {
+   "kind": "surrendered_to",
+   "about": "cc_001",
+   "valence": 0,
+   "intensity": 23.2,
+   "eid": "seed_044",
+   "text": "下邳城破，率众降曹"
+  },
+  {
+   "kind": "lord_died",
+   "about": "off_lvbu",
+   "valence": 0,
+   "intensity": 34.8,
+   "eid": "seed_045",
+   "text": "吕布于白门楼被缢杀"
+  },
+  {
+   "kind": "battle_won",
+   "about": "cc_001",
+   "valence": 1,
+   "intensity": 10.6,
+   "eid": "seed_048",
+   "text": "东征破刘备，擒关羽"
+  }
+ ],
+ "cc_003": [
+  {
+   "kind": "advice_adopted",
+   "about": "cc_001",
+   "valence": 1,
+   "intensity": 22.0,
+   "eid": "seed_047",
+   "text": "断袁绍性迟必不来，劝东击刘备"
+  }
+ ]
+}

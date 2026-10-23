@@ -50,6 +50,7 @@ const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
 var store: Node
 var graph = Graph.new()
 var routes = preload("res://scripts/war/campaign/route_memo.gd").new()
+var lords = preload("res://scripts/war/campaign/lord_memo.gd").new()
 var roster = Roster.new()
 var rules: Dictionary = {}
 var state: Dictionary = {}

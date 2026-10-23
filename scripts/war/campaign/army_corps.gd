@@ -10,6 +10,7 @@ const Policy = preload("res://scripts/agents/baseline_policy.gd")
 const Structure = preload("res://scripts/war/campaign/corps_structure.gd")
 const Autonomy = preload("res://scripts/agents/officer_autonomy.gd")
 const StateKeys = preload("res://scripts/war/campaign/war_state_keys.gd")
+const ContextMemo = preload("res://scripts/war/campaign/commander_context_memo.gd")
 const STAFF_ROLE := "参军"
 const TASKS := {"command": "中军统筹", "support": "弓兵支援", "main_attack": "正面进攻", "flank": "侧翼包抄", "reserve": "预备待命", "rear_guard": "掩护撤退", "raid_rear": "绕后奇袭", "cut_supply": "截断粮道", "regroup": "归建"}
 
@@ -892,20 +893,22 @@ static func plan_background(war, adapter: Node) -> void:
 		if not war.ready(root): continue
 		var tick: int = war.state[StateKeys.TICK]
 		var key: String = "corps:" + corps["id"]
+		# 本军团这一段里几次 commander_context 共用一份，下达军令后失效（见 commander_context_memo.gd）。
+		var memo = ContextMemo.new()
 		var signature := decision_signature(war, corps, adapter)
-		var proposal: Dictionary = war.planner.take(key, decision_authority_signature(signature), tick, commander_context(war, corps) if war.planner.ready.has(key) else {})
+		var proposal: Dictionary = war.planner.take(key, decision_authority_signature(signature), tick, _memo_context(war, corps, memo) if war.planner.ready.has(key) else {})
 		if not proposal.is_empty():
 			var result: Dictionary = proposal["result"]
 			var selected: Dictionary = {}
 			for candidate in proposal["context"]["candidates"]:
 				if candidate["id"] == result.get("candidate_id", ""): selected = candidate; break
 			if not selected.is_empty():
-				record_background_order(war, corps, selected["action"], result, int(proposal["tick"]))
+				record_background_order(war, corps, selected["action"], result, int(proposal["tick"]), memo)
 				corps["request_signature"] = decision_signature(war, corps, adapter)
 				corps["last_requested"] = tick
 			else:
 				adapter.metrics["fallbacks"] += 1
-		var context: Dictionary = commander_context(war, corps)
+		var context: Dictionary = _memo_context(war, corps, memo)
 		context["background"] = true
 		var local: Dictionary = fallback(context)
 		# Critical routing and missing frontline are handled immediately by rules.
@@ -915,10 +918,10 @@ static func plan_background(war, adapter: Node) -> void:
 		if int(corps["last_plan"]) < 0 or (local["candidate_id"] != "maintain" and (tick - int(corps["last_plan"]) >= 3 or urgent)):
 			for candidate in context["candidates"]:
 				if candidate["id"] == local["candidate_id"]:
-					record_background_order(war, corps, candidate["action"], local, tick)
+					record_background_order(war, corps, candidate["action"], local, tick, memo)
 					break
 		if corps.get("withdrawing", false): continue
-		context = commander_context(war, corps)
+		context = _memo_context(war, corps, memo)
 		context["background"] = true
 		signature = decision_signature(war, corps, adapter)
 		var age: int = tick - int(corps.get("last_requested", -10))
@@ -933,12 +936,29 @@ static func plan_background(war, adapter: Node) -> void:
 			corps["last_requested"] = war.state[StateKeys.TICK]
 			corps["request_signature"] = decision_signature(war, corps, adapter)
 
-static func record_background_order(war, corps: Dictionary, action: Dictionary, result: Dictionary, observed_tick: int) -> void:
+
+## 取本军团的主帅上下文：memo 里有就复用，没有就构造后记下。
+## 复用时仍调用 Structure.ensure 与 Autonomy.evaluate_corps：它们是 commander_context 里会改状态的两个入口，
+## 照常调用才能保持与原先相同的调用次数和副作用；上下文内容依赖它们对同一状态的结果不变（ensure/evaluate 语义）。
+static func _memo_context(war, corps: Dictionary, memo) -> Dictionary:
+	var cached: Dictionary = memo.lookup(str(corps["id"]))
+	if cached.is_empty():
+		cached = commander_context(war, corps)
+		memo.store(str(corps["id"]), cached)
+	else:
+		Structure.ensure(corps)
+		Autonomy.evaluate_corps(war, corps)
+	return cached
+
+
+## 按今日上下文复查并下达一条后台军令。memo 不为空时用它取复查上下文，下达后令它失效。
+static func record_background_order(war, corps: Dictionary, action: Dictionary, result: Dictionary, observed_tick: int, memo = null) -> void:
 	# Request-local IDs and battlefield conditions may change while the model runs.
 	# Recheck the concrete action against today's authorized candidates.
-	var current := commander_context(war, corps)
+	var current: Dictionary = _memo_context(war, corps, memo) if memo != null else commander_context(war, corps)
 	var legal: bool = current["candidates"].any(func(c): return c["action"] == action)
 	var applied := issue(war, corps, action, str(result.get("reason_summary", "主帅军令"))) if legal else {"ok": false, "message": "战局已变化，旧提案不再适用"}
+	if memo != null: memo.invalidate()
 	corps["withdraw_hysteresis"] = str(action.get("type", "")) == "withdraw_corps"
 	if applied.get("ok", false): war.state[StateKeys.ARMIES][corps["root_id"]]["last_reason"] = str(result.get("reason_summary", "主帅军令"))
 	if applied.get("ok", false): corps["last_plan"] = war.state[StateKeys.TICK]

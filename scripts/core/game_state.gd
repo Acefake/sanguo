@@ -207,6 +207,7 @@ func _load_save() -> void:
 		agent.cancel_pending()
 	war = WarCampaign.new()
 	war.setup(self, parsed.get("war", {}) if parsed.get("war", {}) is Dictionary else {})
+	_import_people(parsed.get("people", {}))
 
 
 func _save() -> void:
@@ -225,13 +226,27 @@ func _save() -> void:
 		"action_points": action_points,
 		"places": scenario.get("places", {}),
 		"chronicles": chronicles,
-		"war": war.export_state()
+		"war": war.export_state(),
+		"people": _export_people()
 	}
 	file.store_string(JSON.stringify(payload, "\t"))
 	file.flush()
 	file.close()
 	if DirAccess.rename_absolute(ProjectSettings.globalize_path(pending_path), ProjectSettings.globalize_path(save_path)) != OK:
 		push_warning("无法替换进度文件，原存档已保留。")
+
+
+## 人物系统存档：People 的状态加上 PeopleEvents 未结算的事件队列，存在 people 键（people_version 见 PersonStore.VERSION）。
+func _export_people() -> Dictionary:
+	var state: Dictionary = People.export_state()
+	state["events"] = PeopleEvents.export_state()
+	return state
+
+
+## 旧档没有 people 键时保持人物系统现状。
+func _import_people(state: Variant) -> void:
+	if not state is Dictionary or state.is_empty(): return
+	if People.import_state(state): PeopleEvents.import_state(state.get("events", {}))
 
 
 func city_state(city_id: String) -> Dictionary:

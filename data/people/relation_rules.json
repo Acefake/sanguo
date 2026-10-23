@@ -1,0 +1,233 @@
+{
+ "version": 2,
+ "dims": [
+  "信任",
+  "敬重",
+  "恩义",
+  "利益",
+  "怨恨"
+ ],
+ "from_memory": {
+  "appointed": {
+   "恩义": 4,
+   "利益": 4
+  },
+  "promoted": {
+   "恩义": 8,
+   "信任": 3
+  },
+  "rewarded": {
+   "恩义": 5,
+   "利益": 6
+  },
+  "dismissed": {
+   "怨恨": 8,
+   "信任": -5
+  },
+  "demoted": {
+   "怨恨": 12,
+   "信任": -6
+  },
+  "punished": {
+   "怨恨": 15,
+   "敬重": -4
+  },
+  "jailed": {
+   "怨恨": 25,
+   "信任": -15
+  },
+  "kin_jailed": {
+   "怨恨": 25,
+   "信任": -10
+  },
+  "kin_killed": {
+   "怨恨": 45
+  },
+  "kin_punished": {
+   "怨恨": 10
+  },
+  "advice_adopted": {
+   "信任": 4,
+   "敬重": 2
+  },
+  "advice_rejected": {
+   "信任": -3
+  },
+  "publicly_humiliated": {
+   "怨恨": 15,
+   "敬重": -5
+  },
+  "praised": {
+   "敬重": 4,
+   "恩义": 3
+  },
+  "rescued_by": {
+   "恩义": 20,
+   "信任": 10
+  },
+  "rescued": {
+   "信任": 4
+  },
+  "abandoned_by": {
+   "怨恨": 20,
+   "信任": -15
+  },
+  "slandered_by": {
+   "怨恨": 12,
+   "信任": -8
+  },
+  "credit_stolen": {
+   "怨恨": 12,
+   "信任": -8
+  },
+  "betrayed_by": {
+   "怨恨": 30,
+   "信任": -30
+  },
+  "promise_kept": {
+   "信任": 10,
+   "恩义": 5
+  },
+  "promise_broken": {
+   "怨恨": 15,
+   "信任": -15
+  },
+  "gift_given": {
+   "恩义": 3,
+   "利益": 4
+  },
+  "visited": {
+   "familiarity": 4,
+   "信任": 1
+  },
+  "served_together": {
+   "familiarity": 3,
+   "信任": 1
+  },
+  "mentor_taught": {
+   "恩义": 15,
+   "敬重": 10
+  },
+  "battle_won": {
+   "敬重": 2
+  },
+  "blamed_by": {
+   "怨恨": 10
+  },
+  "subordinate_failed": {
+   "信任": -4
+  },
+  "released": {
+   "恩义": 15
+  },
+  "captured": {
+   "怨恨": 6
+  },
+  "passed_over": {
+   "怨恨": 4
+  },
+  "saw_injustice": {
+   "敬重": -3
+  },
+  "battle_lost": {
+   "怨恨": 6
+  },
+  "city_lost": {
+   "怨恨": 8
+  },
+  "saw_defeat": {
+   "敬重": -2
+  },
+  "saw_victory": {
+   "敬重": 2
+  },
+  "praised_other": {
+   "敬重": 2
+  },
+  "promise_made": {
+   "信任": 2
+  },
+  "accepted_surrender": {
+   "信任": -5
+  },
+  "kin_captured": {
+   "怨恨": 15
+  },
+  "consulted": {
+   "信任": 2,
+   "敬重": 1
+  },
+  "asked_to_betray": {
+   "信任": -5
+  },
+  "advice_credited": {
+   "信任": 3
+  },
+  "advice_overruled": {
+   "信任": -2
+  },
+  "ally_killed": {},
+  "lord_died": {},
+  "defected": {},
+  "surrendered_to": {},
+  "circle_member_defected": {}
+ },
+ "no_change_note": "空对象是有意的：亡友、旧主之死、改投、投降的记忆只进心结与去留天平（02/03），不直接改对其的关系边；被投降方对降将的初始戒心由 accepted_surrender 体现。",
+ "multiplier": "memory.intensity / memory.base",
+ "cap_per_xun_per_dim": 20,
+ "regress": {
+  "怨恨": -0.5,
+  "怨恨_grudge_high": -0.2,
+  "信任_to_50": 0.01
+ },
+ "default_edge": {
+  "same_faction": {
+   "信任": 45,
+   "敬重": 45,
+   "恩义": 10,
+   "利益": 50,
+   "怨恨": 0
+  },
+  "same_circle_bonus": {
+   "信任": 8,
+   "familiarity": 20
+  },
+  "stranger": {
+   "信任": 30,
+   "敬重": 40,
+   "恩义": 0,
+   "利益": 40,
+   "怨恨": 0
+  }
+ },
+ "labels": [
+  [
+   "宿怨",
+   "怨恨>=40"
+  ],
+  [
+   "猜忌",
+   "怨恨>=20 or 信任<35"
+  ],
+  [
+   "知己",
+   "信任>=80 and 敬重>=75 and familiarity>=60"
+  ],
+  [
+   "同袍",
+   "信任>=70 and 怨恨<10"
+  ],
+  [
+   "恩主",
+   "恩义>=60"
+  ],
+  [
+   "利合",
+   "利益>=65 and 信任<60"
+  ],
+  [
+   "泛泛",
+   "true"
+  ]
+ ]
+}

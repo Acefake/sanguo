@@ -166,7 +166,7 @@ func _agent_page() -> Control:
 	page.add_child(Widgets.label("运行档位", "DimLabel"))
 	var tiers := Widgets.hbox(1)
 	page.add_child(tiers)
-	for tier in TIERS: tiers.add_child(_tier_card(tier))
+	for tier in _tier_list(): tiers.add_child(_tier_card(tier))
 	var status_row := Widgets.hbox(1)
 	page.add_child(status_row)
 	_status_dot = ColorRect.new()
@@ -282,6 +282,16 @@ func _read_runtime() -> void:
 	if not data is Dictionary: return
 	_presets = data.get("presets", {})
 	for name in data.get("api_key_env", []): _key_env.append(str(name))
+
+
+## 档位卡片：四个已知档位按固定顺序，ai_runtime presets 里另有的档位接在后面（标题用其 id）。
+## 合入 feat/ai-model-queue 后四档都有预设、全部可选；文件缺失时只有「纯规则」可选。
+func _tier_list() -> Array:
+	var tiers: Array = TIERS.duplicate()
+	var known := TIERS.map(func(tier: Dictionary) -> String: return tier["id"])
+	for id in _presets:
+		if not known.has(str(id)): tiers.append({"id": str(id), "title": str(id), "note": ""})
+	return tiers
 
 
 ## 预设的「选择」通道：{endpoint, model}；纯规则为空。

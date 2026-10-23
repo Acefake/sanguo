@@ -8,6 +8,7 @@ class SlowAgent extends Node:
 	var enabled := true
 	var metrics := {"calls": 0, "fallbacks": 0}
 	var delay := 0.35
+	var concurrency := 6
 	func supports_background_decisions() -> bool: return true
 	func can_request_model(context: Dictionary) -> bool: return context.get("level","") not in ["unit", "adviser"]
 	func choose_batch(contexts: Array) -> Dictionary:
@@ -61,7 +62,7 @@ func _run() -> void:
 	# 旧实现直接返回 false，调用方不检查，当天所有非军团部队只吃本地策略，且因为
 	# decision_key 已提前写入，最长三日不会重判。
 	var scheduler: RefCounted = preload("res://scripts/agents/decision_scheduler.gd").new()
-	scheduler.concurrency = 1
+	agent.concurrency = 1
 	var context: Dictionary = {"army_id": "army-0001", "observation_revision": 1, "request_id": "army-0001:1", "candidates": [{"id": "hold", "action": {"type": "hold"}}]}
 	var queued_context: Dictionary = context.duplicate(true)
 	queued_context["army_id"] = "army-0002"

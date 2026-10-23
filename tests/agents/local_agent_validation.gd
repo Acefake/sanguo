@@ -36,8 +36,8 @@ func _run() -> void:
 	var valid: bool = adapter.is_ollama() and payload["think"] == false and payload["options"]["num_predict"] == 128
 	valid = valid and payload["format"]["properties"]["candidate_id"]["enum"] == ["hold"] and not payload["messages"][1]["content"].contains("biography") and not payload["messages"][1]["content"].contains("terrain")
 	var body := JSON.stringify({"message": {"content": JSON.stringify({"candidate_id": "hold", "reason_summary": "保持阵线"})}, "prompt_eval_count": 20, "eval_count": 10})
-	var action: Dictionary = adapter._decode_response(HTTPRequest.RESULT_SUCCESS, 200, body.to_utf8_buffer())
-	valid = valid and action.get("candidate_id") == "hold" and adapter.metrics["input_tokens"] == 20
+	var action: Dictionary = adapter.Client.decode(adapter.endpoint, HTTPRequest.RESULT_SUCCESS, 200, body.to_utf8_buffer())
+	valid = valid and action.get("candidate_id") == "hold" and action["usage"]["input"] == 20
 	var server := LocalServer.new()
 	var port := 50000 + int(Time.get_ticks_usec() % 10000)
 	if server.tcp.listen(port, "127.0.0.1") != OK:

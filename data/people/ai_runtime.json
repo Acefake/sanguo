@@ -10,7 +10,7 @@
   "commit_delay_ticks": 1,
   "latency_window": 200,
   "decision_log": "user://people_decisions.jsonl",
-  "api_key_env": ["SANGUO_MODEL_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY"],
+  "api_key_env": ["SANGUO_MODEL_API_KEY"],
   "per_xun_cap": 40,
   "cache": {"enabled": true, "scope": "xun"},
   "degrade": {"p95_ratio": 0.8, "timeout_rate": 0.3, "veto_rate": 0.1, "recover_xun": 3},

@@ -67,7 +67,7 @@ ModelQueue（后台，按帧）
 
 api_key：
 
-1. 按 `api_key_env` 的顺序读环境变量（`SANGUO_MODEL_API_KEY`、`OPENROUTER_API_KEY`、`OPENAI_API_KEY`），第一个非空的生效。
+1. 按 `api_key_env` 的顺序读环境变量，第一个非空的生效。默认只有游戏专用的 `SANGUO_MODEL_API_KEY`：不读 `OPENROUTER_API_KEY`、`OPENAI_API_KEY` 这类通用变量，免得用户给别的工具设的密钥被发到这里配置的任意接口。
 2. 有环境变量时，设置页保存不再把密钥写进 `user://officer_agent.cfg`（写空串）。
 3. 没有环境变量时保持原有方式：密钥存在本机 `user://officer_agent.cfg`。这个文件不在存档里，也不在仓库里，旧配置不用改就能继续用。
 

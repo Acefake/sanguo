@@ -66,6 +66,7 @@ const SUITE := [
 	"war/ui/battle_extension_ui_validation",
 	"war/battle/battle_extension_campaign_validation",
 	"war/presentation/xiaopei_battle_validation",
+	"war/battle/battle_sides_validation",
 ]
 
 # 需要模型服务或长时间运行，默认跳过。

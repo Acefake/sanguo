@@ -40,8 +40,14 @@ func setup(cards: Array, mapping: Dictionary) -> void:
 			sources["personality"][axis] = parsed["source"]
 		parsing_audit.append({"id":card["id"],"sources":sources.duplicate(true)})
 		# Keep parsing provenance separate from the card's original values.
-		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": str(mapping.get(str(card.get("faction", "")), "")), "stats": card.get("stats", []).duplicate(), "skills": skills, "personality": personality, "battle_traits": Battle.traits(card), "portrait": card.get("thumbnail", ""), "positions": str(card.get("sections", {}).get("位置", "")), "profile_note": str(card.get("sections", {}).get("核心定义", "")).left(350)}
+		officers[str(card["id"])] = {"id": str(card["id"]), "name": str(card["name"]), "faction": faction_id(card, mapping), "stats": card.get("stats", []).duplicate(), "skills": skills, "personality": personality, "battle_traits": Battle.traits(card), "portrait": card.get("thumbnail", ""), "positions": str(card.get("sections", {}).get("位置", "")), "profile_note": str(card.get("sections", {}).get("核心定义", "")).left(350)}
 		officers[str(card["id"])]["data_sources"] = sources
+
+
+## 人物卡的势力 id：卡上有 faction_id 时直接用，否则把显示名 faction 经剧本的 faction_mapping 换算；都没有为 ""。
+static func faction_id(card: Dictionary, mapping: Dictionary) -> String:
+	if card.has("faction_id"): return str(card["faction_id"])
+	return str(mapping.get(str(card.get("faction", "")), ""))
 
 
 func militia(faction: String, city: String) -> String:

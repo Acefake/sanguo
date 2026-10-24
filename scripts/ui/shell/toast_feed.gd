@@ -51,7 +51,7 @@ func show_latest(text: String, count: int, urgent := false) -> void:
 	if not visible: return
 	if _line.text != text: _line.text = text
 	_count.text = "军报 %d" % count
-	_dot.color = Tokens.color("accent") if urgent else Tokens.color("label")
+	_dot.color = get_theme_color("accent" if urgent else "label", "Tokens")
 
 
 func _gui_input(event: InputEvent) -> void:

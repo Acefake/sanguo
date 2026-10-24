@@ -11,8 +11,9 @@ const Builder = preload("res://scripts/ui/theme/ui_theme_builder.gd")
 
 ## 给挂在 CanvasLayer 下的界面根节点挂统一主题。CanvasLayer 截断了 Control 的主题继承链，
 ## 它下面的控件拿不到根窗口的主题，所以每个 CanvasLayer 界面在自己的根 Control 上挂一次（同一个 Theme 实例）。
-static func adopt_theme(root: Control) -> void:
-	root.theme = Builder.build()
+## palette 为 "glass" 时是地图 HUD 的浅纸色半透明外观（顶栏、抽屉、战况条、小地图、军报浮条）。
+static func adopt_theme(root: Control, palette := "") -> void:
+	root.theme = Builder.build(palette)
 
 
 ## 文字。variant 为空时是正文；可选 TitleLabel、DisplayLabel、MutedLabel、NoteLabel、CaptionLabel、DimLabel、AccentLabel。

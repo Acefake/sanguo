@@ -23,7 +23,7 @@ var _busy_timer := 0.0
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Widgets.adopt_theme(self)
+	Widgets.adopt_theme(self, "glass")
 	store = get_node("/root/GameState")
 	top_bar = TopBar.new()
 	add_child(top_bar)

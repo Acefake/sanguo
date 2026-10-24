@@ -1,13 +1,14 @@
 extends VBoxContainer
 
 signal close_requested
+## 旧宿主的跳转信号；卡底按钮已删（抽屉分页「军令 / 战报」负责切换），信号保留不发。
 signal orders_requested(id: String)
 signal reports_requested(id: String)
 const UISkin = preload("res://scripts/war/ui/war_ui_skin.gd")
+const Widgets = preload("res://scripts/ui/theme/ui_widgets.gd")
 const CommandRoles = preload("res://scripts/war/campaign/army_command_roles.gd")
 var store: Node
 var army_id := ""
-var portrait: TextureRect
 var officer_name: Label
 var mission: Label
 var troop_count: Label
@@ -24,98 +25,98 @@ var judgment: Label
 var source: Label
 var expanded := false
 var expand_button: Button
-var portrait_paths: Dictionary = {}
-var report_button: Button
 var plaque: Control
 var attribute_labels: Dictionary = {}
 var card_morale: Control
 var card_morale_value := 0.0
 var card_morale_number: Label
 
+## 名牌卡高度：任务签 23 + 名牌 90。主将头像在抽屉抬头（side_drawer.set_avatar），这里不再留头像区。
+const CARD_HEIGHT := 113
+var hero: Control
+var card_layer: Control
+var personnel_button: Button
+var personnel_expanded := false
+
+
 func _ready() -> void:
 	name = "ArmyInspector"
-	add_theme_constant_override("separation", 0)
-	portrait_paths = JSON.parse_string(FileAccess.get_file_as_string("res://data/officer_portraits.json"))
-	var hero := Control.new()
-	hero.custom_minimum_size.y = 250
+	add_theme_constant_override("separation", 8)
+	hero = Control.new()
+	hero.custom_minimum_size.y = CARD_HEIGHT
 	hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(hero)
-	portrait = TextureRect.new()
-	portrait.position = Vector2(13, 0)
-	portrait.size = Vector2(290, 245)
-	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hero.add_child(portrait)
+	# 名牌卡里的坐标都相对卡顶（任务签顶边）。
+	card_layer = Control.new()
+	card_layer.size = Vector2(334, CARD_HEIGHT)
+	card_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hero.add_child(card_layer)
 	# 关闭由所在抽屉的抬头负责（「关闭」文字钮）；名牌上不再叠第二个关闭钮。close_requested 保留给其他宿主。
 	plaque = preload("res://scripts/war/ui/army_card_plaque.gd").new()
-	plaque.position = Vector2(0, 160)
+	plaque.position = Vector2(0, 23)
 	plaque.size = Vector2(334, 90)
 	plaque.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hero.add_child(plaque)
+	card_layer.add_child(plaque)
 	officer_name = UISkin.label("", 17)
 	officer_name.add_theme_font_override("font", UISkin.CitySkin.font())
-	officer_name.position = Vector2(33, 166)
+	officer_name.position = Vector2(33, 29)
 	officer_name.size = Vector2(158, 24)
-	hero.add_child(officer_name)
+	card_layer.add_child(officer_name)
 	mission = UISkin.label("", 12, UISkin.MUTED)
 	var status_panel := PanelContainer.new()
 	status_panel.add_theme_stylebox_override("panel", UISkin.CitySkin.dark_panel(0.9, 4))
-	status_panel.position = Vector2(8, 137)
+	status_panel.position = Vector2(8, 0)
 	status_panel.size = Vector2(102, 23)
-	hero.add_child(status_panel)
+	card_layer.add_child(status_panel)
 	mission.add_theme_color_override("font_color", Color("ede0bb"))
 	status_panel.add_child(mission)
 	troop_count = UISkin.label("", 19)
-	troop_count.position = Vector2(33, 190)
+	troop_count.position = Vector2(33, 53)
 	troop_count.size = Vector2(62, 24)
-	hero.add_child(troop_count)
+	card_layer.add_child(troop_count)
 	unit_type = UISkin.label("", 12, UISkin.MUTED)
-	unit_type.position = Vector2(99, 195)
+	unit_type.position = Vector2(99, 58)
 	unit_type.size = Vector2(95, 20)
-	hero.add_child(unit_type)
-	for spec in [["武艺", Vector2(237, 165), Vector2(58, 18)], ["智计", Vector2(202, 198), Vector2(43, 18)], ["带兵", Vector2(281, 198), Vector2(43, 18)], ["布阵", Vector2(237, 229), Vector2(58, 18)]]:
+	card_layer.add_child(unit_type)
+	# 四项属性围着名牌右侧的菱形；布阵上提，离开名牌底边与底部细线。
+	for spec in [["武艺", Vector2(237, 28), Vector2(58, 18)], ["智计", Vector2(202, 61), Vector2(43, 18)], ["带兵", Vector2(281, 61), Vector2(43, 18)], ["布阵", Vector2(237, 88), Vector2(58, 18)]]:
 		var item := UISkin.label("", 11, UISkin.MUTED)
 		item.autowrap_mode = TextServer.AUTOWRAP_OFF
 		item.position = spec[1]
 		item.size = spec[2]
 		item.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		hero.add_child(item)
+		card_layer.add_child(item)
 		attribute_labels[spec[0]] = item
 	var morale_caption := UISkin.label("士气", 11, UISkin.MUTED)
-	morale_caption.position = Vector2(13, 224)
+	morale_caption.position = Vector2(13, 87)
 	morale_caption.size = Vector2(28, 18)
-	hero.add_child(morale_caption)
+	card_layer.add_child(morale_caption)
 	card_morale = Control.new()
-	card_morale.position = Vector2(45, 232)
+	card_morale.position = Vector2(45, 95)
 	card_morale.size = Vector2(128, 4)
 	card_morale.mouse_filter = MOUSE_FILTER_IGNORE
 	card_morale.draw.connect(func():
 		card_morale.draw_rect(Rect2(Vector2.ZERO, card_morale.size), Color("d4c9ae"))
 		card_morale.draw_rect(Rect2(Vector2.ZERO, Vector2(128 * clampf(card_morale_value / 100.0, 0, 1), 4)), UISkin.GREEN)
 	)
-	hero.add_child(card_morale)
+	card_layer.add_child(card_morale)
 	card_morale_number = UISkin.label("", 11)
-	card_morale_number.position = Vector2(178, 224)
+	card_morale_number.position = Vector2(178, 87)
 	card_morale_number.size = Vector2(24, 18)
-	hero.add_child(card_morale_number)
-	_ink_plaque_labels(hero, mission)
-	var sheet := UISkin.framed_panel(16)
+	card_layer.add_child(card_morale_number)
+	_ink_plaque_labels(card_layer, mission)
+	# 数据卡：随所在抽屉的主题（地图上是浅色 glass 卡片），不再垫深色底板。
+	var sheet := Widgets.card()
 	add_child(sheet)
-	var body := VBoxContainer.new()
-	body.add_theme_constant_override("separation", 10)
+	var body := Widgets.vbox(1)
 	sheet.add_child(body)
 	var info := VBoxContainer.new()
 	body.add_child(info)
-	info.add_theme_constant_override("separation", 6)
-	var resources := HBoxContainer.new()
-	info.add_child(resources)
-	wounded = UISkin.label("")
-	grain = UISkin.label("")
-	grain.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	resources.add_child(wounded)
-	resources.add_child(grain)
-	for spec in [["士气", "morale", UISkin.GREEN], ["组织", "organization", Color("648793")], ["疲劳", "fatigue", UISkin.GOLD]]:
+	info.add_theme_constant_override("separation", 4)
+	wounded = Widgets.label("", "NoteLabel")
+	info.add_child(wounded)
+	# 士气已在名牌上（细条 + 数值），数据卡只列组织与疲劳，不重复。
+	for spec in [["组织", "organization", Color("648793")], ["疲劳", "fatigue", UISkin.GOLD]]:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 		info.add_child(row)
@@ -142,44 +143,78 @@ func _ready() -> void:
 		row.add_child(number)
 		bars[spec[1]] = bar
 		numbers[spec[1]] = number
-	target = UISkin.label("", 12)
+	# 目标与余粮同一行：目标靠左，余粮靠右。
+	var target_row := Widgets.hbox(1)
+	info.add_child(target_row)
+	# 同行的标签不自动换行：HBox 里自动换行的 Label 会按极窄宽度算出很高的最小高度。
+	target = Widgets.label("", "NoteLabel")
+	target.size_flags_horizontal = SIZE_EXPAND_FILL
+	target.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	target_row.add_child(target)
+	grain = Widgets.label("", "MutedLabel")
+	grain.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	target_row.add_child(grain)
 	task = UISkin.label("", 12, UISkin.MUTED)
-	info.add_child(target)
 	info.add_child(task)
-	personnel = UISkin.label("", 12)
+	# 军团编制默认只露一行（标题），右侧「展开编制」；展开后整段换行显示（军令页也有完整编制）。
+	var personnel_row := Widgets.hbox(1)
+	info.add_child(personnel_row)
+	personnel = Widgets.label("", "NoteLabel")
 	personnel.name = "CorpsPersonnel"
-	info.add_child(personnel)
-	command_personnel = UISkin.label("", 11)
+	personnel.size_flags_horizontal = SIZE_EXPAND_FILL
+	personnel.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	personnel.max_lines_visible = 1
+	personnel_row.add_child(personnel)
+	personnel_button = Widgets.text_button("展开编制", func():
+		personnel_expanded = not personnel_expanded
+		personnel.max_lines_visible = -1 if personnel_expanded else 1
+		personnel.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if personnel_expanded else TextServer.AUTOWRAP_OFF
+		personnel_button.text = "收起编制" if personnel_expanded else "展开编制"
+	)
+	personnel_button.size_flags_vertical = SIZE_SHRINK_BEGIN
+	personnel_row.add_child(personnel_button)
+	command_personnel = Widgets.label("", "NoteLabel")
 	command_personnel.name = "CommandRoles"
+	command_personnel.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	command_personnel.mouse_filter = MOUSE_FILTER_PASS
 	info.add_child(command_personnel)
-	UISkin.rule(body)
 	var thought := UISkin.section(body, "临机判断")
-	source = UISkin.label("", 11, UISkin.MUTED)
-	thought.add_child(source)
+	# 来源一行右侧放「展开判断」文字钮，不再单独占一行；军令、战报由抽屉分页切换，卡底不再重复两个按钮。
+	var source_row := Widgets.hbox(1)
+	thought.add_child(source_row)
+	source = Widgets.label("", "MutedLabel")
+	source.size_flags_horizontal = SIZE_EXPAND_FILL
+	source.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	source.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	source_row.add_child(source)
 	judgment = UISkin.label("", 13)
 	judgment.name = "DecisionSummary"
 	judgment.max_lines_visible = 3
 	thought.add_child(judgment)
-	expand_button = UISkin.button("展开判断", func():
+	expand_button = Widgets.text_button("展开判断", func():
 		expanded = not expanded
 		judgment.max_lines_visible = -1 if expanded else 3
 		expand_button.text = "收起判断" if expanded else "展开判断"
 	)
-	expand_button.size_flags_horizontal = SIZE_SHRINK_END
-	thought.add_child(expand_button)
-	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", 7)
-	UISkin.rule(body)
-	body.add_child(actions)
-	var order_button := UISkin.button("军令", func(): orders_requested.emit(army_id))
-	order_button.name = "OpenArmyOrders"
-	order_button.size_flags_horizontal = SIZE_EXPAND_FILL
-	actions.add_child(order_button)
-	report_button = UISkin.button("军报  ›", func(): reports_requested.emit(army_id), true)
-	report_button.name = "OpenArmyReports"
-	report_button.size_flags_horizontal = SIZE_EXPAND_FILL
-	actions.add_child(report_button)
+	expand_button.size_flags_vertical = SIZE_SHRINK_CENTER
+	source_row.add_child(expand_button)
 	update_info()
+
+
+static var _portraits: Dictionary
+
+
+## 主将头像：优先头部裁切缩略图（thumbnail），没有再用半身像；都没有返回 null。
+static func avatar_texture(store_node: Node, army: Dictionary) -> Texture2D:
+	if _portraits.is_empty():
+		_portraits = JSON.parse_string(FileAccess.get_file_as_string("res://data/officer_portraits.json"))
+	var card: Dictionary = store_node.war.roster.officers.get(army.get("officer_id", ""), {})
+	var entry: Dictionary = _portraits.get(card.get("name", ""), {})
+	for key in ["thumbnail", "portrait"]:
+		var path := str(entry.get(key, ""))
+		if not path.is_empty() and ResourceLoader.exists(path): return load(path)
+	return null
+
 
 static func personnel_text(war, corps: Dictionary) -> String:
 	var structure := preload("res://scripts/war/campaign/corps_structure.gd")
@@ -232,14 +267,10 @@ static func decision(war, army: Dictionary) -> Dictionary:
 	return latest
 
 func update_info() -> void:
-	if not is_instance_valid(portrait): return
+	if not is_instance_valid(card_layer): return
 	var army: Dictionary = store.war.state["armies"].get(army_id, {})
 	if army.is_empty(): return
 	var card: Dictionary = store.war.roster.officers.get(army["officer_id"], {})
-	var path := str(portrait_paths.get(card.get("name", ""), {}).get("portrait", ""))
-	if portrait.get_meta("path", "") != path:
-		portrait.texture = load(path) if FileAccess.file_exists(path) else null
-		portrait.set_meta("path", path)
 	officer_name.text = str(army["name"])
 	mission.text = "已结束" if army["status"] == "ended" else "撤往友城" if army["returning"] else str(store.war.Corps.TASKS.get(army.get("corps_task", {}).get("type", ""), "待命"))
 	troop_count.text = str(store.war.Combat.strength(army))
@@ -264,27 +295,32 @@ func update_info() -> void:
 	var faction: Dictionary = store.scenario["factions"].get(army["faction"], {})
 	plaque.badge = str(faction.get("name", "军")).left(1)
 	plaque.queue_redraw()
-	wounded.text = "伤兵 %d\n主将杀敌 %d   部队杀敌 %d" % [int(army["wounded"]), int(store.war.state["officer_personal_kills"].get(army["officer_id"], 0)), int(army.get("enemy_killed", 0)) - int(army.get("personal_soldier_kills", 0))]
+	wounded.text = "伤兵 %d  ·  主将杀敌 %d  ·  部队杀敌 %d" % [int(army["wounded"]), int(store.war.state["officer_personal_kills"].get(army["officer_id"], 0)), int(army.get("enemy_killed", 0)) - int(army.get("personal_soldier_kills", 0))]
 	grain.visible = store.war.supply_enabled()
 	grain.text = "余粮  约%d日" % int(float(army["grain"]) / maxf(store.war.daily_food(army), 0.001))
 	for key in bars:
 		bars[key].value = float(army[key])
 		numbers[key].text = str(int(army[key]))
 		var danger: bool = float(army[key]) > 80 if key == "fatigue" else float(army[key]) < 30
-		numbers[key].add_theme_color_override("font_color", UISkin.RED if danger else UISkin.INK)
+		# 危险值标红（取所在主题的强调色），其余跟随主题正文色。
+		if danger: numbers[key].add_theme_color_override("font_color", get_theme_color("accent", "Tokens"))
+		else: numbers[key].remove_theme_color_override("font_color")
 	target.text = "目标  " + store.war.graph.name_of(str(army["target"]))
 	var corps: Dictionary = store.war.state["corps"].get(army.get("corps_id", ""), {})
 	wounded.tooltip_text = "战斗主将：%s\n军团主帅：%s\n主将杀敌：亲自击杀士兵或单挑斩将。\n部队杀敌：士兵造成的实际阵亡，不含主将击杀、伤兵和俘虏。" % [card.get("name", "无"), store.war.roster.officers.get(corps.get("commander_id", ""), {}).get("name", "无")]
 	wounded.mouse_filter = MOUSE_FILTER_PASS
 	var terrain: String = store.war.Terrain.name_of(store.war.Tactical.terrain_class(army["tactical"]["cell"])) if army.has("tactical") else "行军途中"
-	task.text = "%s  %s" % [terrain, army.get("tactical", {}).get("phase", "待命")]
-	task.text += "\n主将 %s  主帅 %s" % [card.get("name", "无"), store.war.roster.officers.get(corps.get("commander_id", ""), {}).get("name", "无")]
+	# 目标一行带上地形与阶段；任务行只留主将 / 主帅（与独立立场、主将下落）。
+	target.text += "  ·  %s  %s" % [terrain, army.get("tactical", {}).get("phase", "待命")]
+	target.tooltip_text = target.text
+	task.text = "主将 %s  主帅 %s" % [card.get("name", "无"), store.war.roster.officers.get(corps.get("commander_id", ""), {}).get("name", "无")]
 	if army.has("autonomy") and str(army["autonomy"].get("stance", "obey")) != "obey":
 		task.text += "\n独立立场 %s：%s" % [preload("res://scripts/agents/officer_autonomy.gd").label(str(army["autonomy"]["stance"])), str(army["autonomy"].get("reason", ""))]
 	var command_roles := CommandRoles.resolve(store.war, army)
 	command_personnel.visible = command_roles["enabled"]
-	command_personnel.text = CommandRoles.role_text(command_roles["commander"], "主将") + "\n" + CommandRoles.role_text(command_roles["deputy"], "副将")
-	command_personnel.tooltip_text = "主将沿用现有指挥权限；副将随军展示，不新增岗位或指挥增益。"
+	# 主将 / 副将并成一行（超长省略，悬停看全文），概况页不为它多占一行。
+	command_personnel.text = CommandRoles.role_text(command_roles["commander"], "主将") + "  ·  " + CommandRoles.role_text(command_roles["deputy"], "副将")
+	command_personnel.tooltip_text = command_personnel.text + "\n主将沿用现有指挥权限；副将随军展示，不新增岗位或指挥增益。"
 	personnel.visible = not corps.is_empty()
 	personnel.text = "军团编制（自由编组）\n" + personnel_text(store.war, corps) if not corps.is_empty() else ""
 	if not corps.is_empty():
@@ -292,6 +328,7 @@ func update_info() -> void:
 			var stance := str(advice.get("stance", ""))
 			var suffix := "（独立立场：%s）" % preload("res://scripts/agents/officer_autonomy.gd").label(stance) if stance not in ["", "obey"] else ""
 			personnel.text += "\n%s%s：%s" % [advice["name"], suffix, advice["reason"]]
+	personnel_button.visible = personnel.visible and personnel.text.count("\n") >= 1
 	if army.has("commander_fate"):
 		task.text += "\n%s%s" % [army["commander_fate"]["name"], "战死" if army["commander_fate"]["status"] == "dead" else "被俘"]
 	var result := decision(store.war, army)

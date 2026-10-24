@@ -14,9 +14,9 @@ const Tokens = preload("res://scripts/ui/theme/ui_tokens.gd")
 const Widgets = preload("res://scripts/ui/theme/ui_widgets.gd")
 const ACTION_NAMES := {"march": "行军", "continue": "继续行军", "hold": "驻守整顿", "scout": "侦察", "resupply": "补給", "engage": "接战", "besiege": "围城", "pursue": "追击", "withdraw": "撤退", "request_support": "求援", "flank": "侧翼绕行", "support": "协同支援", "reposition":"战术换位", "local_disengage":"准备局部脱离"}
 const ARMY_TABS := [["army", "概况"], ["orders", "军令"], ["reports", "战报"]]
-## 军报浮条与抽屉的纵向留位：顶栏下方到浮条上方。
-const DRAWER_TOP := 72
-const DRAWER_BOTTOM := 72
+## 抽屉的纵向留位：顶栏下方到窗口底边（军报浮条让在抽屉左侧，不再压在抽屉下面）。
+const DRAWER_TOP := 88
+const DRAWER_BOTTOM := 16
 var store: Node
 var drawer: PanelContainer
 var body: VBoxContainer
@@ -47,7 +47,7 @@ func _ready() -> void:
 	var canvas := Control.new()
 	canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Widgets.adopt_theme(canvas)
+	Widgets.adopt_theme(canvas, "glass")
 	add_child(canvas)
 	if not is_instance_valid(store.war_presentation): _build_toolbar(canvas)
 	drawer = SideDrawer.new()
@@ -76,7 +76,7 @@ func _ready() -> void:
 	toast.anchor_left = 0.0
 	toast.anchor_right = 1.0
 	toast.offset_left = Tokens.space(4) + Minimap.SIZE.x
-	toast.offset_right = -Tokens.space(2)
+	toast.offset_right = -SideDrawer.WIDTH - Tokens.space(4)
 	toast.open_requested.connect(show_reports)
 	canvas.add_child(toast)
 	store.campaign_changed.connect(refresh)
@@ -266,6 +266,7 @@ func _present_army(id: String, active: String) -> void:
 	var action: String = "已结束" if army.get("status", "") == "ended" else "撤往友城" if army.get("returning", false) else ACTION_NAMES.get(str(army.get("action", {}).get("type", "")), "行动中")
 	var subtitle := "%s  →  %s" % [action, store.war.graph.name_of(str(army.get("target", "")))]
 	drawer.present(str(army.get("name", "部队")), subtitle, ARMY_TABS, active)
+	drawer.set_avatar(preload("res://scripts/war/ui/army_inspector.gd").avatar_texture(store, army))
 
 
 func _army_tab(id: String) -> void:

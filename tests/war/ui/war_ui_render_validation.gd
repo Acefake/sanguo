@@ -65,7 +65,8 @@ func run() -> void:
 	await process_frame
 	check(ui.drawer.visible and ui.inspector != null, "Army card not opened")
 	check(ui.inspector.judgment.get_theme_font_size("font_size") == 13, "Decision body font too large")
-	check(ui.inspector.portrait.texture != null, "Officer portrait missing")
+	# 主将头像收进抽屉抬头（圆形头像），不再在内容区顶上占一块头像区。
+	check(ui.drawer.avatar.texture != null and ui.drawer.avatar.is_visible_in_tree(), "Officer portrait missing")
 	check(ui.inspector.card_morale.size.y == 4, "Plaque morale meter expanded into a thick block")
 	check(ui.inspector.attribute_labels.size() == 4, "Plaque attribute layout incomplete")
 	await capture("army-inspector.png")
@@ -82,11 +83,13 @@ func run() -> void:
 	await capture("army-inspector-thinking.png")
 	store.war.planner.ready.erase(key)
 	ui.inspector.update_info()
-	await click(ui.inspector.find_child("OpenArmyOrders", true, false))
+	# 军令、战报只经抽屉分页切换；卡底不再有重复的「军令 / 军报」按钮。
+	check(ui.inspector.find_child("OpenArmyOrders", true, false) == null and ui.inspector.find_child("OpenArmyReports", true, false) == null, "Inspector still duplicates the drawer tabs with its own buttons")
+	await click(ui.drawer.tab_button("orders"))
 	check(ui.page == "army_orders" and ui.body.find_child("WithdrawArmy", true, false) != null, "Commands disappeared from their separate page")
 	await capture("army-orders.png")
 	ui.show_army(own["id"])
-	await click(ui.inspector.report_button)
+	await click(ui.drawer.tab_button("reports"))
 	# 军报簿不再是独立窗口：它是右侧唯一抽屉里的一页，与部队概况/军令同一块面板，按「战报」分页切换。
 	check(ui.drawer.visible and ui.reports_view.visible and ui.page == "army_reports", "Army reports not shown as the drawer's 战报 page")
 	check(ui.reports_view.get_parent() == ui.drawer.pages, "Reports opened outside the single side drawer")

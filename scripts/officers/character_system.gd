@@ -16,7 +16,7 @@ func setup(war, saved: Dictionary = {}) -> void:
 	relations = saved.get("relations", {}).duplicate(true)
 	migration_audit = saved.get("migration_audit", []).duplicate(true)
 	var cards: Dictionary = {}
-	for card in war._json("res://data/officers.json"): cards[str(card["id"])] = card
+	for card in OfficerRepository.cards(): cards[str(card["id"])] = card
 	for id in war.roster.officers:
 		var officer: Dictionary = war.roster.officers[id]
 		var def: Dictionary = Model.definition(cards.get(id, {}), officer)

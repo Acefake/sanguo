@@ -48,7 +48,7 @@ func setup(owner: Node, saved: Dictionary = {}) -> void:
 	graph.setup(_json("res://data/world_map.json"))
 	for edge in graph.edges.values():
 		if Fortifications.road_path(store, str(edge["from"]), str(edge["to"])).is_empty(): graph.closed_routes.append(edge["id"])
-	roster.setup(_json("res://data/officers.json"), rules.get("faction_mapping", {}))
+	roster.setup(OfficerRepository.cards(), rules.get("faction_mapping", {}))
 	state = {"version": 2, "tick": 0, "next_id": 1, "player_faction": "liu_bei", "armies": {}, "corps": {}, "sieges": {}, "missions": {}, "reports": [], "report_policy": {"sent": {}}, "decisions": [], "officer_states": {}, "officer_fates": {}, "officer_kills": {}, "officer_personal_kills": {}, "officer_personal_soldiers": {}, "garrison_commanders": {}, "battle_victories": {}, "defense_cooldowns": {}, "rng_state": "0", "dissent_seed": 0, "dissent_state": 0, "duels": {"pairs": {}, "counts": {}, "records": []}, "battle_feedback": {}, "strategy_log": []}
 	if not saved.is_empty():
 		for key in state:
@@ -152,7 +152,7 @@ func setup(owner: Node, saved: Dictionary = {}) -> void:
 func _json(path: String) -> Variant:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
-		return [] if path.ends_with("officers.json") else {}
+		return {}
 	var data: Variant = JSON.parse_string(file.get_as_text())
 	return data
 

@@ -1,0 +1,99 @@
+[
+ {
+  "id": "circle_runan_yuan",
+  "kind": "宗族",
+  "name": "汝南袁氏",
+  "members": [
+   "ys_001",
+   "off_yuantan",
+   "off_yuanshang"
+  ]
+ },
+ {
+  "id": "circle_yingchuan",
+  "kind": "同乡",
+  "name": "颍川士人",
+  "members_rule": {
+   "origin.commandery": "颍川",
+   "origin.class_in": [
+    "名门",
+    "士族"
+   ]
+  },
+  "note": "跨势力：郭图、淳于琼与荀攸、郭嘉同圈，消息互通、易成招揽渠道"
+ },
+ {
+  "id": "circle_qiaopei",
+  "kind": "同乡",
+  "name": "谯沛乡党",
+  "members_rule": {
+   "origin.commandery_in": [
+    "沛国",
+    "谯国"
+   ]
+  }
+ },
+ {
+  "id": "circle_hanfu_old",
+  "kind": "旧部",
+  "name": "韩馥旧部",
+  "members": [
+   "ys_016",
+   "ys_018",
+   "ys_004"
+  ],
+  "former_lord": "off_hanfu"
+ },
+ {
+  "id": "circle_lvbu_old",
+  "kind": "旧部",
+  "name": "吕布旧部",
+  "members": [
+   "cc_006"
+  ],
+  "former_lord": "off_lvbu"
+ },
+ {
+  "id": "circle_cao_yuancong",
+  "kind": "旧部",
+  "name": "曹氏元从",
+  "members": [
+   "cc_009",
+   "cc_010"
+  ]
+ },
+ {
+  "id": "circle_hebei_scholars",
+  "kind": "派系",
+  "name": "河北士人",
+  "faction": "yuan_shao",
+  "members": [
+   "ys_016",
+   "ys_015",
+   "ys_018"
+  ]
+ },
+ {
+  "id": "circle_mufu_guests",
+  "kind": "派系",
+  "name": "南阳颍川幕客",
+  "faction": "yuan_shao",
+  "members": [
+   "ys_020",
+   "ys_017",
+   "off_xinping"
+  ]
+ },
+ {
+  "id": "circle_cao_advisers",
+  "kind": "派系",
+  "name": "颍川谋主",
+  "faction": "cao_cao",
+  "members": [
+   "cc_002",
+   "cc_003",
+   "cc_004",
+   "off_xunyu"
+  ]
+ }
+]

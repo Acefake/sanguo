@@ -1,0 +1,156 @@
+[
+ {
+  "id": "off_yuantan",
+  "name": "袁谭",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "袁绍长子，时为青州刺史"
+ },
+ {
+  "id": "off_yuanshang",
+  "name": "袁尚",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "袁绍少子，得宠"
+ },
+ {
+  "id": "off_jupei",
+  "name": "沮鹄",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "沮授之子"
+ },
+ {
+  "id": "off_xuyou_kin",
+  "name": "许攸家属",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "留邺；集合人物，供家眷事件引用"
+ },
+ {
+  "id": "off_shenrong",
+  "name": "审荣",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "审配兄子"
+ },
+ {
+  "id": "off_fengji",
+  "name": "逢纪",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "谋士，拥袁尚"
+ },
+ {
+  "id": "off_xinping",
+  "name": "辛评",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "颍川人，拥袁谭"
+ },
+ {
+  "id": "off_xunyu",
+  "name": "荀彧",
+  "faction": "cao_cao",
+  "status": "alive",
+  "note": "留守许都"
+ },
+ {
+  "id": "off_dianwei",
+  "name": "典韦",
+  "faction": "cao_cao",
+  "status": "dead",
+  "died": 197,
+  "note": "宛城战死"
+ },
+ {
+  "id": "off_lvbu",
+  "name": "吕布",
+  "faction": "",
+  "status": "dead",
+  "died": 198,
+  "note": "下邳被擒处死"
+ },
+ {
+  "id": "off_guanyu",
+  "name": "关羽",
+  "faction": "cao_cao",
+  "status": "alive",
+  "note": "200 年暂归曹操"
+ },
+ {
+  "id": "off_liubei",
+  "name": "刘备",
+  "faction": "liu_bei",
+  "status": "alive",
+  "note": "200 年正月被曹操击破，奔袁绍"
+ },
+ {
+  "id": "off_gongsunzan",
+  "name": "公孙瓒",
+  "faction": "",
+  "status": "dead",
+  "died": 199,
+  "note": "易京败亡"
+ },
+ {
+  "id": "off_hanfu",
+  "name": "韩馥",
+  "faction": "",
+  "status": "dead",
+  "died": 191,
+  "note": "让冀州后自杀"
+ },
+ {
+  "id": "off_yangfeng",
+  "name": "杨奉",
+  "faction": "",
+  "status": "dead",
+  "died": 197,
+  "note": "徐晃旧主"
+ },
+ {
+  "id": "off_baoxin",
+  "name": "鲍信",
+  "faction": "",
+  "status": "dead",
+  "died": 192,
+  "note": "于禁旧主"
+ },
+ {
+  "id": "off_zhangxiu",
+  "name": "张绣",
+  "faction": "cao_cao",
+  "status": "alive",
+  "note": "199 年冬降曹"
+ },
+ {
+  "id": "off_dongzhuo",
+  "name": "董卓",
+  "faction": "",
+  "status": "dead",
+  "died": 192,
+  "note": ""
+ },
+ {
+  "id": "off_gaolan",
+  "name": "高览",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "袁绍部将，与张郃同列"
+ },
+ {
+  "id": "off_lvweihuang",
+  "name": "吕威璜",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "袁绍部将"
+ },
+ {
+  "id": "off_suiyuanjin",
+  "name": "眭元进",
+  "faction": "yuan_shao",
+  "status": "alive",
+  "note": "袁绍部将，乌巢守将之一"
+ }
+]

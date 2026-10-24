@@ -39,6 +39,11 @@ func invalidate_paths() -> void:
 	_path_cache.clear()
 
 
+## 路径缓存的代数：封锁变化或重新 setup 时加一。依赖路径结果的外部缓存用它判断是否过期。
+func path_generation() -> int:
+	return _path_generation
+
+
 func set_blocked(nodes: Array) -> void:
 	if str(blocked) == str(nodes): return
 	blocked = nodes

@@ -28,6 +28,7 @@ const Autonomy = preload("res://scripts/agents/officer_autonomy.gd")
 const TacticalPlan = preload("res://scripts/agents/tactical_plan.gd")
 const Characters = preload("res://scripts/officers/character_system.gd")
 const Talent = preload("res://scripts/officers/talent_service.gd")
+const ObservationReuse = preload("res://scripts/war/campaign/observation_reuse.gd")
 var characters = Characters.new()
 var store: Node
 var graph = Graph.new()
@@ -37,6 +38,8 @@ var state: Dictionary = {}
 var urgent_event := false
 var generation := 0
 var planner = preload("res://scripts/agents/decision_scheduler.gd").new()
+var routes = preload("res://scripts/war/campaign/route_memo.gd").new()
+var lords = preload("res://scripts/war/campaign/lord_memo.gd").new()
 var rng := RandomNumberGenerator.new()
 
 
@@ -200,22 +203,22 @@ func is_besieged(city: String) -> bool:
 
 func hostile(first: String, second: String) -> bool:
 	if first == second: return false
-	var pair: Array = [first, second]
-	pair.sort()
-	return state.get("relations", {}).get("|".join(pair), "hostile") == "hostile"
+	return state.get("relations", {}).get(_relation_key(first, second), "hostile") == "hostile"
 
 func can_cross(faction: String, node: String) -> bool:
 	var owner := str(store.city_state(node).get("faction", ""))
 	if owner == "" or owner == faction: return true
-	var pair: Array = [faction, owner]
-	pair.sort()
-	return state.get("relations", {}).get("|".join(pair), "hostile") == "allied"
+	return state.get("relations", {}).get(_relation_key(faction, owner), "hostile") == "allied"
 
+
+## 两个不同势力的关系键：按字典序排好后用 | 连接，与 relations 表的键一致。
+## route() 未命中记忆时要对全图地点调用 can_cross，这里不再为每次比较新建并排序数组。
+static func _relation_key(first: String, second: String) -> String:
+	return first + "|" + second if first < second else second + "|" + first
+
+## 势力从起点到终点的通路：不能穿越非友方城池（起终点除外）。按通行状态记忆，见 route_memo.gd。
 func route(faction: String, start: String, finish: String) -> Dictionary:
-	var excluded: Array = []
-	for node in graph.places:
-		if node != start and node != finish and not can_cross(faction, str(node)): excluded.append(node)
-	return graph.path(start, finish, excluded)
+	return routes.route(self, faction, start, finish)
 
 func campaign_finished() -> bool:
 	return not state.get("campaign_result", {}).is_empty()
@@ -817,6 +820,7 @@ func enemy_intel(enemy: Dictionary) -> Dictionary:
 	return result
 
 
+## 刷新每支在役军队的城池与敌军情报。城池情报没变时沿用上一份（见 observation_reuse.gd）。
 func _observe_all() -> void:
 	Tactical.clear_target_cache()
 	var cities := {}
@@ -825,7 +829,7 @@ func _observe_all() -> void:
 	var armies := active_armies()
 	for army in armies:
 		# Keep the intelligence schema for saves and decision snapshots, with no sight limits.
-		army["intel"] = {"cities": cities.duplicate(true), "enemies": {}}
+		army["intel"] = {"cities": ObservationReuse.cities_for(army.get("intel"), cities), "enemies": {}}
 		for enemy in armies:
 			if hostile(str(enemy["faction"]), str(army["faction"])):
 				army["intel"]["enemies"][enemy["id"]] = enemy_intel(enemy)

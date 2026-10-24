@@ -65,7 +65,8 @@ func _ready() -> void:
 	faction = OptionButton.new()
 	faction.position = Vector2(1000, 113)
 	faction.size = Vector2(143, 30)
-	for value in ["全部势力", "袁绍集团", "孙吴集团", "蜀汉集团"]:
+	faction.add_item("全部势力")
+	for value in _factions():
 		faction.add_item(value)
 	OfficerSkin.style_button(faction)
 	faction.add_theme_font_size_override("font_size", 14)
@@ -135,6 +136,13 @@ func _render() -> void:
 		_render_table()
 	else:
 		_render_detail()
+
+## 势力筛选项：按人物卡出现顺序去重（不在代码里写势力名）。
+func _factions() -> Array:
+	var result: Array = []
+	for person in officers:
+		if not result.has(person["faction"]): result.append(person["faction"])
+	return result
 
 func _filtered() -> Array:
 	var indices: Array = []

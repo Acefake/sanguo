@@ -20,6 +20,8 @@ var faction_color := Color("8ac56b")
 var highlighted := false
 var estimated := false
 var commander := ""
+## 主将的人物 id（喊话按 id 查台词）；没有主将时为空。
+var officer_id := ""
 var commander_state := ""
 var squad_number := 1
 var hostile := false

@@ -71,7 +71,7 @@ static func pair_key(war, a: Dictionary, b: Dictionary) -> String:
 #   4. 地形允许进入；战场格距离为 1；不处于“远射”阶段。
 #   5. 本次战斗双方尚未单挑，且每人单挑次数未达上限。
 #   6. 角色资格：只有前锋／猛将／守备类角色可单挑，军师与主帅不亲自单挑（见 officer_role.gd）。
-#      —— 诸葛亮（武力 48、定位“核心位置：主帅、军师／不宜位置：前锋”）在此被排除。
+#      —— 武力低、定位“核心位置：主帅、军师／不宜位置：前锋”的谋士在此被排除。
 static func eligible(war, a: Dictionary, b: Dictionary) -> bool:
 	if stamina(war, a) <= 0 or stamina(war, b) <= 0: return false
 	if Fate.unavailable(war, str(a["officer_id"])) or Fate.unavailable(war, str(b["officer_id"])) or a.get("duel_wounded", false) or b.get("duel_wounded", false): return false

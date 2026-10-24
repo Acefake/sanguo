@@ -3,7 +3,7 @@ extends RefCounted
 # 角色定位（Battlefield Role）——单挑与战场行为的第一层判定。
 #
 # 设计目标：将领在战场上的行为由其档案中的职能定位与能力决定，而不是由阵营、
-# 名字或调用顺序决定。诸葛亮这类“主帅／军师”型人物不会亲自单挑；前锋、
+# 名字或调用顺序决定。“主帅／军师”型人物不会亲自单挑；前锋、
 # 武将型人物才会。判定只用两类客观输入：
 #
 #   1. 档案文本 `positions`（data/officers.json 的 sections.位置），形如
@@ -97,7 +97,7 @@ static func _role_from_positions(positions: String) -> String:
 				if not mapped in core_set: core_set.append(mapped)
 			elif secondary == "": secondary = mapped
 	# 核心位置可能列出多个职位（“主帅、军师”）。决策与谋划型身份优先表达：
-	# 一人若同时是主帅与军师，其角色定位以谋略职能标示（诸葛亮即此例）。
+	# 一人若同时是主帅与军师，其角色定位以谋略职能标示。
 	# 这不影响可单挑性——两者都不在 allowed_roles 内。
 	for priority in ["strategist", "commander", "duelist", "frontline", "civil", "guard"]:
 		if priority in core_set and not _vetoed(positions, priority): return priority

@@ -24,7 +24,7 @@ var faction: OptionButton
 var footer: Label
 
 func _ready() -> void:
-	officers = JSON.parse_string(FileAccess.get_file_as_string("res://data/officers.json"))
+	officers = OfficerRepository.cards()
 	frame = Control.new()
 	frame.size = Layout.DESIGN
 	frame.theme = Theme.new()

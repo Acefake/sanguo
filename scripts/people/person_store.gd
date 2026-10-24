@@ -5,12 +5,18 @@ extends Node
 ## 人物系统只经这里读写人物，不直接改 campaign_state.state。开局 load_scenario() 读人物包的人物卡（pack_cards）
 ## 与 data/people/<人物包>/ 的补丁和前史事件，迁到 schema 7、生成 PersonState、写开局记忆；读档 import_state()
 ## 只还原存档，不再读卡。圈子定义与不上场人物是静态数据，按存档里的剧本 id 重新读取，不进存档。
-## P1：relations / impressions / promises 只建表与存读档，由 P3 起的模块填写；不提供战斗侧桥接 runtime_officer()。
+## 属性、成长与关系值归 characters 系统（CharacterSystem，GameState.war.characters）：人物系统不另存关系表，
+## relation()/relation_event() 经 PeopleCharacterBridge 换维度名后读写 characters；attributes() 读 characters 的当前属性。
+## 宿主经 characters_source 告诉这里当前的 CharacterSystem（GameState 在 _ready 里设置）；没有设置时（单测里 Store.new()）
+## 不收录、关系读写返回空/false。人物包的名册外人物在载入、读档以及宿主重建 characters 后的首次取用时收录进 characters（CharacterSystem.adopt）。
+## P1：impressions / promises 只建表与存读档，由 P3 起的模块填写；不提供战斗侧桥接 runtime_officer()。
 
 const State = preload("res://scripts/people/person_state.gd")
 const Migrate = preload("res://scripts/people/card_migrate.gd")
 const Memory = preload("res://scripts/people/memory.gd")
 const Circles = preload("res://scripts/people/circles.gd")
+const Bridge = preload("res://scripts/people/character_bridge.gd")
+const CharacterModel = preload("res://scripts/officers/character_model.gd")
 
 const VERSION := 1
 const DATA_DIR := "res://data/people/"
@@ -22,7 +28,6 @@ const XUN_PER_MONTH := 3
 var scenario := ""
 var xun := 0
 var persons: Dictionary = {}
-var relations: Dictionary = {}
 var memories: Dictionary = {}
 var impressions: Dictionary = {}
 var promises: Dictionary = {}
@@ -30,6 +35,10 @@ var biographies: Dictionary = {}
 var offstage: Dictionary = {}
 var circles: Dictionary = {}
 var _next_mid := 1
+## 返回当前 CharacterSystem（或 null）的 Callable。
+var characters_source := Callable()
+## 本剧本迁移后的人物卡，用来把名册外的人收录进 characters；宿主换了 war 或重建了 characters 时按它补收录。
+var _adoptable: Array = []
 
 
 ## 全局旬号：(年×12 + 月−1)×3 + 旬−1，旬取 1–3（上中下旬）。
@@ -87,12 +96,52 @@ func load_scenario(pack_id: String, start: Dictionary = {}) -> bool:
 func setup_from_scenario(scenario_id: String, cards: Array, patches: Array, start: Dictionary) -> void:
 	_reset(scenario_id)
 	xun = xun_index(int(start["year"]), int(start["month"]), int(start["xun"]))
-	for card in Migrate.migrate_all(cards, patches):
+	var migrated := Migrate.migrate_all(cards, patches)
+	for card in migrated:
 		persons[str(card["id"])] = Migrate.to_state(card, xun)
+	_adoptable = migrated
+	_ensure_adopted(_characters_raw())
 
 
 static func _xun_of(date: Dictionary) -> int:
 	return xun_index(int(date["year"]), int(date["month"]), int(date.get("xun", 1)))
+
+
+## 当前的 CharacterSystem；宿主没有设置 characters_source 时为 null。
+## 宿主换掉 war（读档、新开局）或重新 setup 了 characters 时，名册外的人物包人物会丢；这里取用前补收录，
+## 保证人物系统里的每个人在 characters 里都有定义与状态。未载入人物包时不碰 characters。
+func characters() -> Object:
+	var system: Object = _characters_raw()
+	_ensure_adopted(system)
+	return system
+
+
+func _characters_raw() -> Object:
+	return characters_source.call() if characters_source.is_valid() else null
+
+
+## from 对 to 的关系（人物系统维度名：信任/敬重/恩义/利益/怨恨）；没有边或没有 characters 时为空字典。
+func relation(from_id: String, to_id: String) -> Dictionary:
+	var system: Object = characters()
+	return {} if system == null else Bridge.from_character_edge(system.relation(from_id, to_id))
+
+
+## 记一次关系变化（人物系统维度名），写进 characters 的关系边，换算与去重规则沿用 CharacterSystem.relation_event。
+## 有 characters 没有的维度（familiarity）时整条拒绝并报错。
+func relation_event(from_id: String, to_id: String, event_id: String, changes: Dictionary, tick: int, confidence: float = 1.0, witnessed: bool = true) -> bool:
+	var system: Object = characters()
+	if system == null: return false
+	var axes := Bridge.to_character_axes(changes)
+	if not axes["ok"]:
+		push_error("人物关系维度 %s 在 characters 没有对应轴" % str(axes["unmapped"]))
+		return false
+	return system.relation_event(from_id, to_id, event_id, axes["changes"], tick, confidence, witnessed)
+
+
+## 此人当前的 25 项属性（含成长、年龄、伤病修正），读 characters；没有 characters 或此人不在其中时为空字典。
+func attributes(id: String) -> Dictionary:
+	var system: Object = characters()
+	return {} if system == null else system.view(id).get("attributes", {})
 
 
 func get_person(id: String) -> State:
@@ -162,7 +211,7 @@ func export_state() -> Dictionary:
 	for id in persons: person_dicts[id] = persons[id].to_dict()
 	return {
 		"people_version": VERSION, "scenario": scenario, "xun": xun, "next_mid": _next_mid,
-		"persons": person_dicts, "relations": relations.duplicate(true), "memories": memories.duplicate(true),
+		"persons": person_dicts, "memories": memories.duplicate(true),
 		"impressions": impressions.duplicate(true), "promises": promises.duplicate(true), "biographies": biographies.duplicate(true),
 	}
 
@@ -176,19 +225,31 @@ func import_state(data: Dictionary) -> bool:
 	xun = int(data.get("xun", 0))
 	_next_mid = int(data.get("next_mid", 1))
 	for id in data.get("persons", {}): persons[id] = State.from_dict(data["persons"][id])
-	relations = data.get("relations", {}).duplicate(true)
 	memories = data.get("memories", {}).duplicate(true)
 	impressions = data.get("impressions", {}).duplicate(true)
 	promises = data.get("promises", {}).duplicate(true)
 	biographies = data.get("biographies", {}).duplicate(true)
+	if not scenario.is_empty():
+		_adoptable = Migrate.migrate_all(pack_cards(scenario), read_json(DATA_DIR + scenario + "/persons_s7.json"))
+		_ensure_adopted(_characters_raw())
 	return true
+
+
+## 把人物包里名册外的人收录进 characters；已在 characters 里的（名册人物、读档还原的）不动。
+func _ensure_adopted(system: Object) -> void:
+	if system == null or _adoptable.is_empty(): return
+	for card in _adoptable:
+		if system.definitions.has(str(card["id"])) and system.states.has(str(card["id"])): continue
+		var officer := Bridge.character_officer(card)
+		system.adopt(CharacterModel.definition(Bridge.character_card(card), officer), officer)
 
 
 func _reset(scenario_id: String) -> void:
 	scenario = scenario_id
 	xun = 0
 	_next_mid = 1
-	for table in [persons, relations, memories, impressions, promises, biographies, offstage, circles]: table.clear()
+	_adoptable = []
+	for table in [persons, memories, impressions, promises, biographies, offstage, circles]: table.clear()
 	if scenario_id.is_empty(): return
 	for entry in read_json(DATA_DIR + "offstage.json"): offstage[str(entry["id"])] = entry
 	for entry in read_json(DATA_DIR + "circles.json"): circles[str(entry["id"])] = entry

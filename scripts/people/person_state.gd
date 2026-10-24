@@ -5,7 +5,8 @@ extends RefCounted
 ## 开局由 CardMigrate.to_state() 从 schema 7 人物卡生成，之后只由 scripts/people/* 修改；读档时从
 ## to_dict() 的结果还原，不再读卡。字段只用 Dictionary/Array/基本类型，保证能原样序列化。
 ## 关系、记忆、印象数据量大，不放在这里，由 PersonStore 按 id 分表保存。
-## 访问器只读；P1 不做伤病、年龄对属性的修正（属于 05 成长与一生）。
+## 属性、潜力、成长、伤病归 characters 系统（PersonStore.attributes() 读它），这里不再存 attrs/potentials；
+## birth_year 留作人物包的身份数据（年龄由 characters 按同一生年结算）。访问器只读。
 
 var id := ""
 var alive := true
@@ -15,8 +16,6 @@ var lord := ""
 var post := ""
 var location := ""
 
-var attrs: Dictionary = {}
-var potentials: Dictionary = {}
 var xp: Dictionary = {}
 var birth_year := 0
 
@@ -42,7 +41,7 @@ var injuries: Array = []
 var mood := 50
 var stress := 0
 
-const _FIELDS := ["id", "alive", "status", "faction", "lord", "post", "location", "attrs", "potentials", "xp", "birth_year",
+const _FIELDS := ["id", "alive", "status", "faction", "lord", "post", "location", "xp", "birth_year",
 	"origin", "kin", "circles", "hidden", "axes", "axes_base", "habits", "drives", "drive_meter", "traits", "career",
 	"knots", "fame", "health", "injuries", "mood", "stress"]
 const _INT_FIELDS := ["birth_year", "health", "mood", "stress"]
@@ -51,11 +50,6 @@ const _INT_FIELDS := ["birth_year", "health", "mood", "stress"]
 ## 年龄：当前年份减生年；生年未知时返回 0。
 func age(current_year: int) -> int:
 	return current_year - birth_year if birth_year > 0 else 0
-
-
-## 属性当前值；没有这项时返回 0。
-func attr(key: String) -> float:
-	return float(attrs.get(key, 0))
 
 
 ## 人格轴当前值；没有这条轴时按中值 50。

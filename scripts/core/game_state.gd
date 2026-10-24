@@ -7,6 +7,7 @@ signal campaign_progress
 
 const WarCampaign = preload("res://scripts/war/campaign/campaign_state.gd")
 const AgentAdapter = preload("res://scripts/agents/agent_adapter.gd")
+const PeopleStore = preload("res://scripts/people/person_store.gd")
 
 const DEMO_PATH := "res://data/scenario_world_demo.json"
 const SAVE_PATH := "user://city_campaign.json"
@@ -144,6 +145,8 @@ func _install_theme() -> void:
 
 
 func _ready() -> void:
+	# 人物系统的属性与关系值读写当前战役的 characters；war 会被换掉，所以给取值函数而不是对象。
+	PeopleStore.autoload().characters_source = func(): return war.characters
 	_install_theme()
 	_load_demo()
 	_load_save()

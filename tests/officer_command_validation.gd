@@ -1,8 +1,8 @@
 extends SceneTree
 
-const Battle = preload("res://scripts/war/officer_battle.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Battle = preload("res://scripts/war/battle/officer_battle.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 var failures: Array = []
 
 

@@ -4,12 +4,12 @@ extends SceneTree
 # 弓兵对骑兵威胁的提前换位与贴脸脱离准备。
 # 日期标记 2026-10-11；方案文档 docs/追击与兵种近战改进方案-2026-10-10.md。
 
-const T = preload("res://scripts/war/tactical_battlefield.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Brain = preload("res://scripts/agents/unit_brain.gd")
 const Eval = preload("res://scripts/agents/tactical_evaluator.gd")
 const Commit = preload("res://scripts/agents/decision_commit.gd")
-const Roles = preload("res://scripts/war/troop_roles.gd")
-const Fort = preload("res://scripts/war/city_fortifications.gd")
+const Roles = preload("res://scripts/war/battle/troop_roles.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 var store
 var failures: Array[String] = []
 

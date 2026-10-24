@@ -1,5 +1,5 @@
 extends SceneTree
-const Roles = preload("res://scripts/war/army_command_roles.gd")
+const Roles = preload("res://scripts/war/campaign/army_command_roles.gd")
 var failures: Array[String] = []
 func check(value: bool, text: String) -> void:
 	if not value: failures.append(text); push_error(text)

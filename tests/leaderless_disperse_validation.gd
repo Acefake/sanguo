@@ -1,6 +1,6 @@
 extends SceneTree
-const Fate = preload("res://scripts/war/officer_fate.gd")
-const War = preload("res://scripts/war/campaign_state.gd")
+const Fate = preload("res://scripts/war/campaign/officer_fate.gd")
+const War = preload("res://scripts/war/campaign/campaign_state.gd")
 var failures: Array = []
 func _initialize(): call_deferred("run")
 func check(ok: bool, message: String):

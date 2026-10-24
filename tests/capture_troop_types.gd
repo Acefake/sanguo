@@ -1,5 +1,5 @@
 extends SceneTree
-const World = preload("res://scripts/war/army_world_3d.gd")
+const World = preload("res://scripts/war/presentation/army_world_3d.gd")
 func _initialize(): call_deferred("run")
 func expected_count(world, army_id: String, kind: String) -> int:
 	var group: Node3D = world.formations[army_id]

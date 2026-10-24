@@ -4,8 +4,8 @@ const Plan = preload("res://scripts/agents/tactical_plan.gd")
 const Eval = preload("res://scripts/agents/tactical_evaluator.gd")
 const Candidates = preload("res://scripts/agents/tactical_candidates.gd")
 const Commit = preload("res://scripts/agents/decision_commit.gd")
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
-const Coordination = preload("res://scripts/war/corps_coordination.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Coordination = preload("res://scripts/war/campaign/corps_coordination.gd")
 var failures: Array[String] = []
 var store: Node
 var pair: Array = []

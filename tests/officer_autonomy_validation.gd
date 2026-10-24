@@ -4,8 +4,8 @@ extends SceneTree
 # 服从/异议/自行行动、拒命同回合与下回合不被主帅覆盖、自行行动执行本地合法动作、
 # 生死继任与兵力台账守恒。
 
-const Corps = preload("res://scripts/war/army_corps.gd")
-const Structure = preload("res://scripts/war/corps_structure.gd")
+const Corps = preload("res://scripts/war/campaign/army_corps.gd")
+const Structure = preload("res://scripts/war/campaign/corps_structure.gd")
 const Autonomy = preload("res://scripts/agents/officer_autonomy.gd")
 var failures: Array[String] = []
 

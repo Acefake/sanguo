@@ -1,6 +1,6 @@
 extends SceneTree
 
-const T = preload("res://scripts/war/tactical_battlefield.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
 var failures: Array[String] = []
 
 class DeploymentAgent extends Node:
@@ -22,7 +22,7 @@ func prepare_siege_fixture(store) -> void:
 	store.prepare_battle_test(false,"plains_clash")
 	# This checks autonomous deployment from two commanders at Xiaopei, not the
 	# startup picker's default field-battle scenario.
-	preload("res://scripts/war/xiaopei_battle.gd").setup(store,false)
+	preload("res://scripts/war/battle/xiaopei_battle.gd").setup(store,false)
 func check(ok: bool, message: String) -> void:
 	if not ok: failures.append(message); push_error(message)
 

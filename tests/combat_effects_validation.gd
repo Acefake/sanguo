@@ -2,7 +2,7 @@ extends SceneTree
 
 var failures: Array[String] = []
 class MapStub extends Node3D:
-	var hex_world: Dictionary = {"grid": preload("res://scripts/rtk14_hex_grid.gd").shared()}
+	var hex_world: Dictionary = {"grid": preload("res://scripts/world/rtk14_hex_grid.gd").shared()}
 	func height_at(_x: float, _z: float) -> float: return 7.0
 
 func _initialize() -> void: call_deferred("run")
@@ -13,7 +13,7 @@ func run() -> void:
 	store.persist_enabled = false
 	store.prepare_battle_test()
 	for day in range(3): await store.war.step(null)
-	var world = preload("res://scripts/war/army_world_3d.gd").new()
+	var world = preload("res://scripts/war/presentation/army_world_3d.gd").new()
 	var map := MapStub.new()
 	world.store = store
 	world.map = map
@@ -63,7 +63,7 @@ func run() -> void:
 		for frame in range(60): world._face_contact_sectors(own_group, [{"target": own_group.position + Vector3.BACK * 10}], 1.0 / 60.0)
 		for i in range(24):
 			check((batch.multimesh.get_instance_transform(i).basis * Vector3.BACK).normalized().dot(Vector3.BACK) > 0.99, "单面接敌后仍残留旧方向")
-	var effects = preload("res://scripts/war/combat_effects_3d.gd").new()
+	var effects = preload("res://scripts/war/presentation/combat_effects_3d.gd").new()
 	root.add_child(effects)
 	effects.height_at = map.height_at
 	var camera := Camera3D.new()
@@ -137,7 +137,7 @@ func run() -> void:
 	fighter["combat_tick"] = store.war.state["tick"]
 	store.war.state["sieges"][fighter["target"]] = {"phase":"强攻","active_tick":store.war.state["tick"],"participants":[fighter["id"]]}
 	check(world._combat_visual(fighter["id"]).is_empty(),"远离城墙仍显示攻城攻击")
-	var Fort = preload("res://scripts/war/city_fortifications.gd")
+	var Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 	var board: Dictionary = store.war.state["battlefield"]
 	var approaches: Array = Fort.approach(store.war,board,fighter["faction"],fighter["target"],fighter["tactical"]["cell"])
 	check(not approaches.is_empty(),"城市没有合法城下攻击格")

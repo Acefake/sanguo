@@ -1,5 +1,5 @@
 extends SceneTree
-const Policy = preload("res://scripts/war/report_policy.gd")
+const Policy = preload("res://scripts/war/campaign/report_policy.gd")
 var failures: Array[String] = []
 func _initialize(): call_deferred("run")
 func check(ok: bool, message: String) -> void:
@@ -63,7 +63,7 @@ func run() -> void:
 	check(not war.request_battle_summary().is_empty(), "主动当前总结不可用")
 	check(not war.request_battle_summary(str(army["id"])).get("army", {}).is_empty(), "交战中主动复盘不可用")
 	check(war.state["reports"].size() == count, "主动请求污染自动报告去重")
-	var view = preload("res://scripts/war/military_reports.gd").new()
+	var view = preload("res://scripts/war/ui/military_reports.gd").new()
 	view.store = store
 	root.add_child(view)
 	view.show_summary()

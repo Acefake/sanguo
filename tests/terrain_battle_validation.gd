@@ -1,7 +1,7 @@
 extends SceneTree
-const Combat = preload("res://scripts/war/combat_system.gd")
-const Terrain = preload("res://scripts/war/battle_terrain.gd")
-const T = preload("res://scripts/war/tactical_battlefield.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const Terrain = preload("res://scripts/war/battle/battle_terrain.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
 var failures: Array[String] = []
 func _initialize(): call_deferred("run")
 func check(ok: bool, message: String):
@@ -68,7 +68,7 @@ func run():
 	var old_cell: int = own["tactical"]["cell"]
 	var old_word: int = T.grid().words[old_cell*4+1]
 	T.grid().words[old_cell*4+1] = (old_word & ~255) | 13
-	var reloaded = load("res://scripts/war/campaign_state.gd").new()
+	var reloaded = load("res://scripts/war/campaign/campaign_state.gd").new()
 	reloaded.setup(store,war.export_state())
 	var migrated: Dictionary = reloaded.state["armies"][own["id"]]
 	check(migrated["tactical"]["cell"] != old_cell and T.grid().walkable(migrated["tactical"]["cell"]),"旧档川格部队没有就近归岸")

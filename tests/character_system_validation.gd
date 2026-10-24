@@ -1,8 +1,8 @@
 extends SceneTree
 
-const Model = preload("res://scripts/characters/character_model.gd")
-const System = preload("res://scripts/characters/character_system.gd")
-const Talent = preload("res://scripts/characters/talent_service.gd")
+const Model = preload("res://scripts/officers/character_model.gd")
+const System = preload("res://scripts/officers/character_system.gd")
+const Talent = preload("res://scripts/officers/talent_service.gd")
 var failures: Array = []
 
 func _initialize() -> void: call_deferred("run")

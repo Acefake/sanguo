@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Inspector = preload("res://scripts/war/army_inspector.gd")
-const UISkin = preload("res://scripts/war/war_ui_skin.gd")
+const Inspector = preload("res://scripts/war/ui/army_inspector.gd")
+const UISkin = preload("res://scripts/war/ui/war_ui_skin.gd")
 var failures: Array[String] = []
 var checks := 0
 var output := "res://docs/validation/war-ui/"
@@ -13,7 +13,7 @@ class LocalAgent extends Node:
 	func choose_batch(contexts: Array) -> Dictionary:
 		var answers := {}
 		for context in contexts:
-			answers[context["request_id"]] = preload("res://scripts/war/army_corps.gd").fallback(context)
+			answers[context["request_id"]] = preload("res://scripts/war/campaign/army_corps.gd").fallback(context)
 		return answers
 
 func _initialize() -> void: call_deferred("run")

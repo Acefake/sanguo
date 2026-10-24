@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Store = preload("res://scripts/game_state.gd")
+const Store = preload("res://scripts/core/game_state.gd")
 var failures: Array[String] = []
 var events: Array = []
 func _initialize() -> void: call_deferred("run")

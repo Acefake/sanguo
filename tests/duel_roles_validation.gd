@@ -9,9 +9,9 @@ extends SceneTree
 #   C2 边界：同为接战、同等兵力下，前锋合格而军师不合格；武力不足者亦不合格。
 #   C5 真实战场推进：相邻接战多回合后，单挑记录只归属于合格角色。
 
-const D = preload("res://scripts/war/duel_system.gd")
-const Role = preload("res://scripts/war/officer_role.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
+const D = preload("res://scripts/war/duel/duel_system.gd")
+const Role = preload("res://scripts/war/duel/officer_role.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
 
 var failures: Array[String] = []
 var checks := 0

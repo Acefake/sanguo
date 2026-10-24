@@ -3,8 +3,8 @@ extends SceneTree
 # 自由编制专用验证：>6人、多级指挥树、非法循环/跨军团拒绝、每节点兵力、
 # 旧存档兼容（不裁人）、存读档往返。禁止固定六人上限。
 
-const Corps = preload("res://scripts/war/army_corps.gd")
-const Structure = preload("res://scripts/war/corps_structure.gd")
+const Corps = preload("res://scripts/war/campaign/army_corps.gd")
+const Structure = preload("res://scripts/war/campaign/corps_structure.gd")
 var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("run")

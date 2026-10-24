@@ -3,7 +3,7 @@ extends SceneTree
 const Brain = preload("res://scripts/agents/unit_brain.gd")
 const Eval = preload("res://scripts/agents/tactical_evaluator.gd")
 const Commit = preload("res://scripts/agents/decision_commit.gd")
-const Roles = preload("res://scripts/war/troop_roles.gd")
+const Roles = preload("res://scripts/war/battle/troop_roles.gd")
 var directory := "res://docs/validation/tactical-ai-2026-10-09/"
 var evidence: Array = []
 

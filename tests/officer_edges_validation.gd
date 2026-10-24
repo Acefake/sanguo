@@ -1,9 +1,9 @@
 extends SceneTree
 
-const Edges = preload("res://scripts/war/officer_edges.gd")
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
-const Officer = preload("res://scripts/war/officer_battle.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
+const Edges = preload("res://scripts/war/campaign/officer_edges.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Officer = preload("res://scripts/war/battle/officer_battle.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
 var failures: Array = []
 
 
@@ -146,7 +146,7 @@ func _run() -> void:
 	root_army["edge"] = Edges.ensure(root_army, war.roster.officers[str(root_army["officer_id"])], true)
 	root_army["edge"]["uses"] = 1
 	var exported: Dictionary = war.export_state()
-	var sandbox := preload("res://scripts/game_state.gd").new()
+	var sandbox := preload("res://scripts/core/game_state.gd").new()
 	sandbox.persist_enabled = false
 	sandbox._load_demo()
 	sandbox.war.setup(sandbox, exported)

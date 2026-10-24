@@ -1,5 +1,5 @@
 extends SceneTree
-const Siege = preload("res://scripts/war/siege_visual.gd")
+const Siege = preload("res://scripts/war/presentation/siege_visual.gd")
 var output := "res://docs/validation/troop-siege-revision-2026-10-07/"
 func _initialize() -> void: call_deferred("run")
 func save(name: String) -> Image:

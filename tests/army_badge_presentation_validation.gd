@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Badge = preload("res://scripts/war/army_badge.gd")
+const Badge = preload("res://scripts/war/presentation/army_badge.gd")
 var output := "res://docs/validation/army-badge-update-2026-10-06/"
 func _initialize() -> void: call_deferred("run")
 

@@ -6,7 +6,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var sandbox = load("res://scripts/game_state.gd").new()
+	var sandbox = load("res://scripts/core/game_state.gd").new()
 	sandbox.persist_enabled = false
 	for action_id in sandbox.ACTIONS:
 		sandbox._load_demo()

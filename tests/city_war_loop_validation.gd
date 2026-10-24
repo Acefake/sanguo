@@ -1,10 +1,10 @@
 extends SceneTree
 
-const Store = preload("res://scripts/game_state.gd")
-const Fort = preload("res://scripts/war/city_fortifications.gd")
-const Fields = preload("res://scripts/war/campaign_battlefields.gd")
-const T = preload("res://scripts/war/tactical_battlefield.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
+const Store = preload("res://scripts/core/game_state.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
+const Fields = preload("res://scripts/war/campaign/campaign_battlefields.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
 var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("run")

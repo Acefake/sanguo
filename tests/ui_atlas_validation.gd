@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Atlas = preload("res://scripts/ui_sprite_atlas.gd")
-const CitySkin = preload("res://scripts/city_ui_skin.gd")
+const Atlas = preload("res://scripts/ui/ui_sprite_atlas.gd")
+const CitySkin = preload("res://scripts/ui/city_ui_skin.gd")
 
 
 func _initialize() -> void:

@@ -3,9 +3,9 @@ extends SceneTree
 # Diagnostic for: archers countering at a siege should be standing inside 城区.
 # Dumps real cell coordinates instead of reasoning about them.
 
-const T = preload("res://scripts/war/tactical_battlefield.gd")
-const Fort = preload("res://scripts/war/city_fortifications.gd")
-const Grid = preload("res://scripts/rtk14_hex_grid.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
+const Grid = preload("res://scripts/world/rtk14_hex_grid.gd")
 
 
 func _initialize() -> void:

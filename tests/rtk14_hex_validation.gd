@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Grid = preload("res://scripts/rtk14_hex_grid.gd")
+const Grid = preload("res://scripts/world/rtk14_hex_grid.gd")
 
 
 func _initialize() -> void:

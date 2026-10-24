@@ -1,10 +1,10 @@
 extends SceneTree
 
-const Hex = preload("res://scripts/war/hex_presentation.gd")
-const Effects = preload("res://scripts/war/combat_effects_3d.gd")
-const Siege = preload("res://scripts/war/siege_visual.gd")
+const Hex = preload("res://scripts/war/presentation/hex_presentation.gd")
+const Effects = preload("res://scripts/war/presentation/combat_effects_3d.gd")
+const Siege = preload("res://scripts/war/presentation/siege_visual.gd")
 var failed := false
-class WorldProbe extends "res://scripts/war/army_world_3d.gd":
+class WorldProbe extends "res://scripts/war/presentation/army_world_3d.gd":
 	func _ready() -> void: pass
 class MapStub extends Node3D:
 	func height_at(_x: float,_z: float) -> float: return 0.0

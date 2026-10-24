@@ -1,7 +1,7 @@
 extends SceneTree
-const D = preload("res://scripts/war/duel_system.gd")
-const N = preload("res://scripts/war/duel_rules_v2.gd")
-const Role = preload("res://scripts/war/officer_role.gd")
+const D = preload("res://scripts/war/duel/duel_system.gd")
+const N = preload("res://scripts/war/duel/duel_rules_v2.gd")
+const Role = preload("res://scripts/war/duel/officer_role.gd")
 var failures: Array[String] = []
 var evidence: Array = []
 var output := "res://docs/validation/duel-v2-2026-10-09"

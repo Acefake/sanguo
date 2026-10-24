@@ -4,7 +4,7 @@ func _initialize() -> void:
 	call_deferred("validate")
 
 func validate() -> void:
-	var sandbox: Node = load("res://scripts/game_state.gd").new()
+	var sandbox: Node = load("res://scripts/core/game_state.gd").new()
 	sandbox.persist_enabled = false
 	sandbox._load_demo()
 	var interior: CanvasLayer = load("res://scenes/city_interior.tscn").instantiate()

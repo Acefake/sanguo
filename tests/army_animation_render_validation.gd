@@ -25,7 +25,7 @@ func _changed(a: Image, b: Image) -> int:
 	return changed
 
 func run():
-	var world = preload("res://scripts/war/army_world_3d.gd").new()
+	var world = preload("res://scripts/war/presentation/army_world_3d.gd").new()
 	world._load_mesh()
 	var stage := Node3D.new()
 	root.add_child(stage)

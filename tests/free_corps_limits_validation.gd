@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Structure = preload("res://scripts/war/corps_structure.gd")
+const Structure = preload("res://scripts/war/campaign/corps_structure.gd")
 var failures: Array[String] = []
 func _initialize() -> void: call_deferred("run")
 func check(ok: bool, message: String) -> void:

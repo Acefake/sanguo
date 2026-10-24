@@ -1,8 +1,8 @@
 ﻿extends SceneTree
 
-const Presentation = preload("res://scripts/war/duel_presentation.gd")
-const ArmyRenderer = preload("res://scripts/war/army_world_3d.gd")
-const Duel = preload("res://scripts/war/duel_system.gd")
+const Presentation = preload("res://scripts/war/presentation/duel_presentation.gd")
+const ArmyRenderer = preload("res://scripts/war/presentation/army_world_3d.gd")
+const Duel = preload("res://scripts/war/duel/duel_system.gd")
 var failures: Array[String] = []
 
 func _initialize() -> void:

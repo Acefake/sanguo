@@ -1,6 +1,6 @@
 extends SceneTree
 
-class TestStore extends "res://scripts/game_state.gd":
+class TestStore extends "res://scripts/core/game_state.gd":
 	var saves := 0
 	var inject_urgent := false
 	func _ready() -> void: _load_demo()

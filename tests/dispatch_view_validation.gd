@@ -6,7 +6,7 @@ func run() -> void:
 	var store: Node = root.get_node("GameState")
 	store.persist_enabled = false
 	store.war.setup(store)
-	var view = preload("res://scripts/war/dispatch_view.gd").new()
+	var view = preload("res://scripts/war/ui/dispatch_view.gd").new()
 	view.store = store
 	view.target = "xiaopei"
 	if not store.war.graph.places.has(view.target):

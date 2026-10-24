@@ -1,8 +1,8 @@
 extends SceneTree
 
-const Store = preload("res://scripts/game_state.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
-const Fort = preload("res://scripts/war/city_fortifications.gd")
+const Store = preload("res://scripts/core/game_state.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 var failures: Array[String] = []
 var results: Array = []
 

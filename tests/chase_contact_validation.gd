@@ -5,13 +5,13 @@ extends SceneTree
 # 覆盖两种移动先后顺序、两点预算不双花、不可见/占格/守点/非追击状态禁追。
 # 日期标记 2026-10-11；方案文档 docs/追击与兵种近战改进方案-2026-10-10.md。
 
-const T = preload("res://scripts/war/tactical_battlefield.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Brain = preload("res://scripts/agents/unit_brain.gd")
 const Eval = preload("res://scripts/agents/tactical_evaluator.gd")
 const Commit = preload("res://scripts/agents/decision_commit.gd")
 const Plan = preload("res://scripts/agents/tactical_plan.gd")
-const Roles = preload("res://scripts/war/troop_roles.gd")
-const Fort = preload("res://scripts/war/city_fortifications.gd")
+const Roles = preload("res://scripts/war/battle/troop_roles.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 var store
 var failures: Array[String] = []
 

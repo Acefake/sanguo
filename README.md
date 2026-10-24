@@ -32,7 +32,7 @@
 
 城内使用现有建筑与政厅系统：点击官府进入议事厅，底部内政、军事、市集、工务、民情可选命令。其他建筑支持购粮售粮、开垦、征募、操练、锻造、修建和访察。选择命令先查看消耗与结果，按“决定”执行，按“返回”取消。每项消耗 1 点行动力，每月 3 点；结束本月结算并恢复行动力。城市档案、施政记录、设置和说明采用整页 UI。
 
-数据：`data/world_map.json` 保存全国州区、城池与通路，`data/scenario_world_demo.json` 保存归属和城务数值。`tools/build_world_map.py` 是可重复生成这些数据的原始布局清单。`scripts/world_territories.gd` 按州区内城市构建并裁剪领地分区，`scripts/map_slice.gd` 绘制地图并处理相机与交互。旧局部 `map_slice.json`、`scenario_demo.json` 和旧地图美术保留供比对。
+数据：`data/world_map.json` 保存全国州区、城池与通路，`data/scenario_world_demo.json` 保存归属和城务数值。`tools/build_world_map.py` 是可重复生成这些数据的原始布局清单。`scripts/world/world_territories.gd` 按州区内城市构建并裁剪领地分区，`scripts/world/map_slice.gd` 绘制地图并处理相机与交互。旧局部 `map_slice.json`、`scenario_demo.json` 和旧地图美术保留供比对。
 
 当前全国州界、城池坐标与道路属于美术布局；势力归属、城务数值与路线权重是**演示剧本**，尚未按具体历史年份校定。所有城池暂共用城景、议事厅与参议形象。
 

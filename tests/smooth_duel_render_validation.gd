@@ -1,5 +1,5 @@
 extends SceneTree
-const Duel = preload("res://scripts/war/duel_system.gd")
+const Duel = preload("res://scripts/war/duel/duel_system.gd")
 var failures: Array[String] = []
 func _initialize(): call_deferred("run")
 func check(ok: bool, message: String):

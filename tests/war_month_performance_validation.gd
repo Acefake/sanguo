@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Store = preload("res://scripts/game_state.gd")
-const CitySkin = preload("res://scripts/city_ui_skin.gd")
+const Store = preload("res://scripts/core/game_state.gd")
+const CitySkin = preload("res://scripts/ui/city_ui_skin.gd")
 var failures: Array[String] = []
 var frames := 0
 var last_frame_usec := 0
@@ -10,7 +10,7 @@ var measuring := false
 var advance_running := false
 var watched_store: Node
 
-class MeasuredStore extends "res://scripts/game_state.gd":
+class MeasuredStore extends "res://scripts/core/game_state.gd":
 	var saves := 0
 	var save_usec := 0
 	var saved_while_busy := true
@@ -23,7 +23,7 @@ class MeasuredStore extends "res://scripts/game_state.gd":
 		super._save()
 		save_usec += Time.get_ticks_usec() - started
 
-class MeasuredReports extends "res://scripts/war/military_reports.gd":
+class MeasuredReports extends "res://scripts/war/ui/military_reports.gd":
 	var rebuilds := 0
 	var rebuild_usec := 0
 	func rebuild() -> void:
@@ -32,7 +32,7 @@ class MeasuredReports extends "res://scripts/war/military_reports.gd":
 		super.rebuild()
 		rebuild_usec += Time.get_ticks_usec() - started
 
-class MeasuredUI extends "res://scripts/war/campaign_ui.gd":
+class MeasuredUI extends "res://scripts/war/ui/campaign_ui.gd":
 	var rebuilds: int:
 		get: return reports_view.rebuilds if is_instance_valid(reports_view) else 0
 		set(value):

@@ -4,11 +4,11 @@ extends SceneTree
 # 多帧同场景截图用于验证显示连续（move_path 逐段走入，不瞬移）。
 # 输出目录 docs/validation/chase-melee-2026-10-10/，日期标记 2026-10-10/11。
 
-const T = preload("res://scripts/war/tactical_battlefield.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Brain = preload("res://scripts/agents/unit_brain.gd")
 const Eval = preload("res://scripts/agents/tactical_evaluator.gd")
 const Commit = preload("res://scripts/agents/decision_commit.gd")
-const Fort = preload("res://scripts/war/city_fortifications.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 var directory := "res://docs/validation/chase-melee-2026-10-10/"
 var evidence: Array = []
 var store

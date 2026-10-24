@@ -1,7 +1,7 @@
 extends SceneTree
 
 const Adapter = preload("res://scripts/agents/agent_adapter.gd")
-const Scenarios = preload("res://scripts/war/battle_scenarios.gd")
+const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
 
 func _initialize() -> void: call_deferred("run")
 

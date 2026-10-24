@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Catalog = preload("res://scripts/city_scene_catalog.gd")
+const Catalog = preload("res://scripts/city/city_scene_catalog.gd")
 
 func _initialize() -> void:
 	call_deferred("capture")
@@ -18,7 +18,7 @@ func capture() -> void:
 	var path := folder + "/preview-perspective.png"
 	if "--ui-only" not in args:
 		root.size = Vector2i(2560, 1440)
-		var scene: Node3D = load("res://scripts/luoyang_scene.gd").new()
+		var scene: Node3D = load("res://scripts/city/luoyang_scene.gd").new()
 		scene.scene_manifest = folder + "/scene.json"
 		root.add_child(scene)
 		await create_timer(3.0).timeout
@@ -28,7 +28,7 @@ func capture() -> void:
 		await process_frame
 	if "--ui" in args or "--ui-only" in args:
 		root.size = Vector2i(1280, 720)
-		var sandbox: Node = load("res://scripts/game_state.gd").new()
+		var sandbox: Node = load("res://scripts/core/game_state.gd").new()
 		sandbox.persist_enabled = false
 		sandbox._load_demo()
 		var interior: CanvasLayer = load("res://scenes/city_interior.tscn").instantiate()

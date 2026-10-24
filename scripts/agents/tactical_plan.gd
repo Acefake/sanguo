@@ -1,6 +1,6 @@
 extends RefCounted
 
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const VERSION := 1
 static var _templates: Dictionary = {}
 

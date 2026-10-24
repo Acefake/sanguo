@@ -1,9 +1,9 @@
 extends SceneTree
 
-const Scenarios = preload("res://scripts/war/battle_scenarios.gd")
-const Corps = preload("res://scripts/war/army_corps.gd")
+const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
+const Corps = preload("res://scripts/war/campaign/army_corps.gd")
 const Policy = preload("res://scripts/agents/baseline_policy.gd")
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Adapter = preload("res://scripts/agents/agent_adapter.gd")
 var failures: Array = []
 var checks := 0

@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 
 func _capture() -> void:
-	sandbox = load("res://scripts/game_state.gd").new()
+	sandbox = load("res://scripts/core/game_state.gd").new()
 	sandbox.persist_enabled = false
 	sandbox._load_demo()
 	interior = load("res://scenes/city_interior.tscn").instantiate()

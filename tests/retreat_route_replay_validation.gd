@@ -5,7 +5,7 @@ func check(ok: bool, message: String) -> void:
 	if not ok: failures.append(message); push_error(message)
 func run() -> void:
 	root.get_node("GameState").persist_enabled = false
-	var store = preload("res://scripts/game_state.gd").new()
+	var store = preload("res://scripts/core/game_state.gd").new()
 	store.persist_enabled = false
 	store._load_demo()
 	for city in store.scenario["places"].values():

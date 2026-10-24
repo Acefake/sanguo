@@ -21,14 +21,14 @@ func _check() -> void:
 	assert(world.vegetation_button.get_parent() == hud.tool_list)
 	assert(not world.army_world.army_choice.visible)
 	assert(not world.army_world.ui.next_button.is_visible_in_tree())
-	var regular = preload("res://scripts/city_ui_skin.gd").primary_button_style()
-	var highlight = preload("res://scripts/city_ui_skin.gd").primary_button_style(true)
+	var regular = preload("res://scripts/ui/city_ui_skin.gd").primary_button_style()
+	var highlight = preload("res://scripts/ui/city_ui_skin.gd").primary_button_style(true)
 	assert(regular.texture.resource_path.ends_with("primary-normal.png"))
 	assert(highlight.texture.resource_path.ends_with("primary-highlight.png"))
 	print("WORLD_HUD_CHECK_OK: portraits, hidden debug panels, reports action, camera, tools, button states")
 	quit()
 func _find_hud(node: Node):
-	if node.get_script() == load("res://scripts/world_map_hud.gd"): return node
+	if node.get_script() == load("res://scripts/world/world_map_hud.gd"): return node
 	for child in node.get_children():
 		var found = _find_hud(child)
 		if found != null: return found

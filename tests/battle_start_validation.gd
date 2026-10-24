@@ -16,7 +16,7 @@ func run() -> void:
 	assert(picker.surface.visible and not picker.startup_mode)
 	assert(picker.return_button.visible)
 	assert(picker.launch.text == "开始 / 重置此场景")
-	for spec in preload("res://scripts/war/battle_scenarios.gd").definitions():
+	for spec in preload("res://scripts/war/battle/battle_scenarios.gd").definitions():
 		var id: String = spec["id"]
 		picker.buttons[id].pressed.emit()
 		assert(picker.selected == id)

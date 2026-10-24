@@ -16,7 +16,7 @@ func run() -> void:
 	for officer in store.war.roster.officers.values():
 		if officer["name"] == "关羽": officer_id = officer["id"]
 	var army: Dictionary = store.war._mobilize(store.war.preview_dispatch("luoyang", "hongnong", officer_id))
-	var ui = load("res://scripts/war/campaign_ui.gd").new()
+	var ui = load("res://scripts/war/ui/campaign_ui.gd").new()
 	ui.store = store
 	root.add_child(ui)
 	ui.show_army(army["id"])

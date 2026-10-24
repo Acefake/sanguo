@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Fort = preload("res://scripts/war/city_fortifications.gd")
-const Siege = preload("res://scripts/war/siege_visual.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
+const Siege = preload("res://scripts/war/presentation/siege_visual.gd")
 var output := "res://docs/validation/hex-combat-readability-2026-10-07/"
 func _initialize() -> void: call_deferred("run")
 func save(name: String) -> void:

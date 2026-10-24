@@ -1,5 +1,5 @@
 extends SceneTree
-const Fate = preload("res://scripts/war/officer_fate.gd")
+const Fate = preload("res://scripts/war/campaign/officer_fate.gd")
 var output := "res://docs/validation/officer-fate/"
 func _initialize(): call_deferred("run")
 func capture(name: String):

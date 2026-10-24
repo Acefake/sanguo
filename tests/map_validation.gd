@@ -12,7 +12,7 @@ func _run() -> void:
 	campaign._load_demo()
 	# This suite validates the supplied legacy atlas polygons and route graph.
 	# The RTK14 scene has its own coordinate registration checks.
-	var map = load("res://scripts/map_slice.gd").new()
+	var map = load("res://scripts/world/map_slice.gd").new()
 	root.add_child(map)
 	map.map_mode = "faction"
 	var ids: Dictionary = map.places

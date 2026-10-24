@@ -1,8 +1,8 @@
 extends RefCounted
 
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 const Plan = preload("res://scripts/agents/tactical_plan.gd")
-const Roles = preload("res://scripts/war/troop_roles.gd")
+const Roles = preload("res://scripts/war/battle/troop_roles.gd")
 
 # One bounded flood per actor. All occupancy is from the frozen knowledge view.
 # Actual unseen obstructions are checked by the executor, not scored here.

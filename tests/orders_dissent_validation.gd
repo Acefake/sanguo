@@ -122,7 +122,7 @@ func _run() -> void:
 	# 存档恢复后 pending_request 保持。
 	army["pending_request"] = {"tick": war.state["tick"], "action": {"type": "hold"}, "reason": "存档测试", "probability": 0.4}
 	var exported: Dictionary = war.export_state()
-	var sandbox := preload("res://scripts/game_state.gd").new()
+	var sandbox := preload("res://scripts/core/game_state.gd").new()
 	sandbox.persist_enabled = false
 	sandbox._load_demo()
 	sandbox.war.setup(sandbox, exported)

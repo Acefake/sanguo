@@ -5,8 +5,8 @@ extends SceneTree
 # 授权全部禁占，且兵账不变。日期标记 2026-10-11。
 # 方案文档 docs/追击与兵种近战改进方案-2026-10-10.md。
 
-const T = preload("res://scripts/war/tactical_battlefield.gd")
-const Fort = preload("res://scripts/war/city_fortifications.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 var store
 var failures: Array[String] = []
 

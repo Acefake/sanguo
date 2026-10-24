@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Terrain = preload("res://scripts/war/battle_terrain.gd")
+const Terrain = preload("res://scripts/war/battle/battle_terrain.gd")
 var failures: Array[String] = []
 var output_dir := "res://docs/validation/battle-ui-2026-10-11/"
 func _initialize(): call_deferred("run")

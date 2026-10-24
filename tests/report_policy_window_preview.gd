@@ -6,7 +6,7 @@ func run() -> void:
 	store.persist_enabled = false
 	store.prepare_battle_test()
 	await store.war.step(null)
-	var view = preload("res://scripts/war/military_reports.gd").new()
+	var view = preload("res://scripts/war/ui/military_reports.gd").new()
 	view.store = store
 	root.add_child(view)
 	view.show_summary()

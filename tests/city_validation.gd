@@ -9,7 +9,7 @@ func _run() -> void:
 	var campaign := root.get_node("GameState")
 	campaign.persist_enabled = false
 	campaign._load_demo()
-	var sandbox = load("res://scripts/game_state.gd").new()
+	var sandbox = load("res://scripts/core/game_state.gd").new()
 	sandbox.persist_enabled = false
 	sandbox._load_demo()
 	sandbox.war.state["player_faction"] = "dong_zhuo"
@@ -116,13 +116,13 @@ func _run() -> void:
 	if bool(result["ok"]) or sandbox.action_points != ap_before:
 		_fail("军备达到上限后仍可锻造")
 		return
-	var saved = load("res://scripts/game_state.gd").new()
+	var saved = load("res://scripts/core/game_state.gd").new()
 	saved.save_path = "user://city_validation_temp.json"
 	saved._load_demo()
 	saved.war.state["player_faction"] = "dong_zhuo"
 	saved.apply_action("luoyang", "govern")
 	saved.apply_action("luoyang", "forge")
-	var restored = load("res://scripts/game_state.gd").new()
+	var restored = load("res://scripts/core/game_state.gd").new()
 	restored.save_path = saved.save_path
 	restored._load_demo()
 	restored._load_save()

@@ -10,12 +10,12 @@ extends SceneTree
 # ⑦ 旧存档缺字段可迁移，破口状态与占领条件跨读档连续；
 # ⑧ 全流程兵员账本守恒。
 
-const Fort = preload("res://scripts/war/city_fortifications.gd")
-const Defense = preload("res://scripts/war/city_defense.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
-const T = preload("res://scripts/war/tactical_battlefield.gd")
-const Roles = preload("res://scripts/war/troop_roles.gd")
-const Fields = preload("res://scripts/war/campaign_battlefields.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
+const Defense = preload("res://scripts/war/battle/city_defense.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Roles = preload("res://scripts/war/battle/troop_roles.gd")
+const Fields = preload("res://scripts/war/campaign/campaign_battlefields.gd")
 var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("run")

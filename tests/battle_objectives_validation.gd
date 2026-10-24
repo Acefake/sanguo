@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Scenarios = preload("res://scripts/war/battle_scenarios.gd")
-const Objectives = preload("res://scripts/war/battle_objectives.gd")
+const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
+const Objectives = preload("res://scripts/war/battle/battle_objectives.gd")
 var failures: Array[String] = []
 func _initialize() -> void: call_deferred("run")
 func check(ok: bool, message: String) -> void:
@@ -33,7 +33,7 @@ func run() -> void:
 					check(not unique.has(id), "军团成员重复")
 					unique[id] = true
 					check(corps["appointments"].has(id), "成员缺少自定义岗位")
-					check(preload("res://scripts/war/corps_structure.gd").depth_of(corps, str(id)) >= 0, "指挥层级形成循环")
+					check(preload("res://scripts/war/campaign/corps_structure.gd").depth_of(corps, str(id)) >= 0, "指挥层级形成循环")
 			for faction in spec["strengths"]:
 				var total := 0
 				for army in war.active_armies(faction): total += war.Combat.strength(army)

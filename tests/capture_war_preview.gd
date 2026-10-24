@@ -23,7 +23,7 @@ func _capture() -> void:
 	target["garrison"] = 1600
 	target["units"] = {"infantry": 1600, "archers": 0, "cavalry": 0}
 	target["defense"] = 20
-	var ui = load("res://scripts/war/campaign_ui.gd").new()
+	var ui = load("res://scripts/war/ui/campaign_ui.gd").new()
 	ui.store = campaign
 	root.add_child(ui)
 	ui.show_dispatch("hongnong")

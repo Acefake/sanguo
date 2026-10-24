@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Fort = preload("res://scripts/war/city_fortifications.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 func _initialize() -> void: call_deferred("run")
 func run() -> void:
 	var store = root.get_node("GameState")

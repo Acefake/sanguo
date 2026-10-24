@@ -17,7 +17,7 @@ func run() -> void:
 	assert(members.size() >= 6)
 	var army: Dictionary = store.war._mobilize(store.war.preview_dispatch("luoyang", "hongnong", members[0]))
 	var corps: Dictionary = store.war.Corps.form(store.war, army, members)
-	var ui = load("res://scripts/war/campaign_ui.gd").new()
+	var ui = load("res://scripts/war/ui/campaign_ui.gd").new()
 	ui.store = store
 	root.add_child(ui)
 	ui.show_army(army["id"])
@@ -38,7 +38,7 @@ func run() -> void:
 	await process_frame
 	assert(ui.companion_checks.values().filter(func(c): return c.button_pressed).size() <= 5)
 	assert_no_dots(ui)
-	var dispatch = preload("res://scripts/war/dispatch_view.gd").new()
+	var dispatch = preload("res://scripts/war/ui/dispatch_view.gd").new()
 	dispatch.store = store
 	dispatch.target = "hongnong"
 	root.add_child(dispatch)

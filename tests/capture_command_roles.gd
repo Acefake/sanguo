@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Roles = preload("res://scripts/war/army_command_roles.gd")
-const Hex = preload("res://scripts/war/hex_presentation.gd")
+const Roles = preload("res://scripts/war/campaign/army_command_roles.gd")
+const Hex = preload("res://scripts/war/presentation/hex_presentation.gd")
 var failures: Array[String] = []
 const OUT := "res://docs/validation/combat-grid-command-2026-10-11/"
 

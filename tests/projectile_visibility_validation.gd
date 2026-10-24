@@ -1,6 +1,6 @@
 extends SceneTree
-const Effects = preload("res://scripts/war/combat_effects_3d.gd")
-const Siege = preload("res://scripts/war/siege_visual.gd")
+const Effects = preload("res://scripts/war/presentation/combat_effects_3d.gd")
+const Siege = preload("res://scripts/war/presentation/siege_visual.gd")
 func _initialize() -> void: call_deferred("run")
 func run() -> void:
 	var effects := Effects.new()

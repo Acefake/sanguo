@@ -4,9 +4,9 @@ extends SceneTree
 # 近景增密、中远景限量与滞回、伤亡抽稀、镜外节流与显示开销采样。
 # 日期标记 2026-10-11；方案文档 docs/追击与兵种近战改进方案-2026-10-10.md。
 
-const T = preload("res://scripts/war/tactical_battlefield.gd")
-const World = preload("res://scripts/war/army_world_3d.gd")
-class WorldProbe extends "res://scripts/war/army_world_3d.gd":
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const World = preload("res://scripts/war/presentation/army_world_3d.gd")
+class WorldProbe extends "res://scripts/war/presentation/army_world_3d.gd":
 	func _ready() -> void: pass
 class MapStub extends Node3D:
 	var camera := Camera3D.new()

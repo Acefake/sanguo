@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Corps = preload("res://scripts/war/army_corps.gd")
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Corps = preload("res://scripts/war/campaign/army_corps.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 var failures: Array[String] = []
 
 class CommanderFixture extends Node:

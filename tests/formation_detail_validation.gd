@@ -1,6 +1,6 @@
 extends SceneTree
 
-const World = preload("res://scripts/war/army_world_3d.gd")
+const World = preload("res://scripts/war/presentation/army_world_3d.gd")
 var output := "res://docs/validation/formation-detail-2026-10-09/"
 
 func _initialize() -> void: call_deferred("run")

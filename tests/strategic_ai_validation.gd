@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Strategic = preload("res://scripts/war/strategic_ai.gd")
+const Strategic = preload("res://scripts/war/campaign/strategic_ai.gd")
 var failures: Array = []
 
 
@@ -18,7 +18,7 @@ func keyed(decisions: Array) -> Array:
 
 
 func _run() -> void:
-	var store := preload("res://scripts/game_state.gd").new()
+	var store := preload("res://scripts/core/game_state.gd").new()
 	store.persist_enabled = false
 	store._load_demo()
 	var war = store.war
@@ -31,7 +31,7 @@ func _run() -> void:
 	for decision in first:
 		first_intel[decision["target"]] = war.city_intel(str(decision["target"]))
 	check(first.size() > 0, "战略层评估至少产生一次出兵或增援")
-	var other := preload("res://scripts/game_state.gd").new()
+	var other := preload("res://scripts/core/game_state.gd").new()
 	other.persist_enabled = false
 	other._load_demo()
 	other.war.setup(other, exported)

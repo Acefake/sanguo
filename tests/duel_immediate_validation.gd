@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Overlay = preload("res://scripts/war/duel_gold_presentation.gd")
+const Overlay = preload("res://scripts/war/presentation/duel_gold_presentation.gd")
 var failures: Array[String] = []
 
 class VisibleNotice extends Node:

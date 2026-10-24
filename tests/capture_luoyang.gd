@@ -6,7 +6,7 @@ func _initialize() -> void:
 func capture() -> void:
 	root.size = Vector2i(2560, 1440)
 	var scene := Node3D.new()
-	scene.set_script(load("res://scripts/luoyang_scene.gd"))
+	scene.set_script(load("res://scripts/city/luoyang_scene.gd"))
 	root.add_child(scene)
 	await create_timer(3.0).timeout
 	await RenderingServer.frame_post_draw
@@ -24,7 +24,7 @@ func capture() -> void:
 	scene.queue_free()
 	await process_frame
 	root.size = Vector2i(1280, 720)
-	var sandbox: Node = load("res://scripts/game_state.gd").new()
+	var sandbox: Node = load("res://scripts/core/game_state.gd").new()
 	sandbox.persist_enabled = false
 	sandbox._load_demo()
 	var interior: CanvasLayer = load("res://scenes/city_interior.tscn").instantiate()

@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("_run")

@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Store = preload("res://scripts/game_state.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
+const Store = preload("res://scripts/core/game_state.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Adapter = preload("res://scripts/agents/agent_adapter.gd")
 const Policy = preload("res://scripts/agents/baseline_policy.gd")
 var failures: Array = []

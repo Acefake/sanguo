@@ -1,11 +1,11 @@
 extends SceneTree
 
-const World = preload("res://scripts/war/army_world_3d.gd")
-class WorldProbe extends "res://scripts/war/army_world_3d.gd":
+const World = preload("res://scripts/war/presentation/army_world_3d.gd")
+class WorldProbe extends "res://scripts/war/presentation/army_world_3d.gd":
 	func _ready() -> void: pass
 class MapStub extends Node3D:
 	var camera := Camera3D.new()
-	var hex_world := {"grid":preload("res://scripts/rtk14_hex_grid.gd").shared()}
+	var hex_world := {"grid":preload("res://scripts/world/rtk14_hex_grid.gd").shared()}
 	func height_at(_x: float, _z: float) -> float: return 0.0
 var failures: Array[String] = []
 func _initialize() -> void: call_deferred("run")
@@ -80,7 +80,7 @@ func run() -> void:
 	enemy["returning"] = false
 	if DisplayServer.get_name() != "headless":
 		world._load_mesh()
-		world.combat_effects = preload("res://scripts/war/combat_effects_3d.gd").new()
+		world.combat_effects = preload("res://scripts/war/presentation/combat_effects_3d.gd").new()
 		world.add_child(world.combat_effects)
 		world.combat_effects.height_at = world.map.height_at
 		world.combat_effects.camera = world.map.camera
@@ -94,7 +94,7 @@ func run() -> void:
 			world._update_special_troops(group,0,0)
 			group.get_node("Soldiers").set_meta("pose_start",1)
 			group.get_node("Soldiers").set_meta("transition_at",world.animation_time)
-			world.badges[id] = preload("res://scripts/war/army_badge.gd").new()
+			world.badges[id] = preload("res://scripts/war/presentation/army_badge.gd").new()
 			world.add_child(world.badges[id])
 		world.map.camera.position = world.destinations[own["id"]]+Vector3(0,25,25)
 		world.map.camera.look_at(world.destinations[own["id"]])

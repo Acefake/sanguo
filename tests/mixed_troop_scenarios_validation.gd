@@ -1,8 +1,8 @@
 extends SceneTree
-const Scenarios = preload("res://scripts/war/battle_scenarios.gd")
-const Roles = preload("res://scripts/war/troop_roles.gd")
+const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
+const Roles = preload("res://scripts/war/battle/troop_roles.gd")
 const Policy = preload("res://scripts/agents/baseline_policy.gd")
-const Corps = preload("res://scripts/war/army_corps.gd")
+const Corps = preload("res://scripts/war/campaign/army_corps.gd")
 var failures: Array = []
 var checks := 0
 func _initialize() -> void: call_deferred("run")

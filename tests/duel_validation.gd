@@ -1,8 +1,8 @@
 extends SceneTree
-const D = preload("res://scripts/war/duel_system.gd")
-const C = preload("res://scripts/war/combat_system.gd")
-const War = preload("res://scripts/war/campaign_state.gd")
-const Role = preload("res://scripts/war/officer_role.gd")
+const D = preload("res://scripts/war/duel/duel_system.gd")
+const C = preload("res://scripts/war/battle/combat_system.gd")
+const War = preload("res://scripts/war/campaign/campaign_state.gd")
+const Role = preload("res://scripts/war/duel/officer_role.gd")
 var failures: Array[String] = []
 func _initialize(): call_deferred("run")
 func check(ok: bool, message: String):

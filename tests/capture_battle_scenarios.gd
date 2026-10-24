@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Scenarios = preload("res://scripts/war/battle_scenarios.gd")
+const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
 var failures: Array = []
 var output := "res://docs/validation/battle-scenarios/"
 

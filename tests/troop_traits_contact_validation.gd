@@ -1,10 +1,10 @@
 extends SceneTree
-const T = preload("res://scripts/war/tactical_battlefield.gd")
-const Roles = preload("res://scripts/war/troop_roles.gd")
-const Fort = preload("res://scripts/war/city_fortifications.gd")
+const T = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Roles = preload("res://scripts/war/battle/troop_roles.gd")
+const Fort = preload("res://scripts/war/battle/city_fortifications.gd")
 var store
 var failures: Array[String] = []
-class WorldProbe extends "res://scripts/war/army_world_3d.gd":
+class WorldProbe extends "res://scripts/war/presentation/army_world_3d.gd":
 	func _ready() -> void: pass
 func _initialize() -> void: call_deferred("run")
 func check(ok: bool, message: String) -> void:

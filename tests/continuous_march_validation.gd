@@ -1,5 +1,5 @@
 extends SceneTree
-class WorldProbe extends "res://scripts/war/army_world_3d.gd":
+class WorldProbe extends "res://scripts/war/presentation/army_world_3d.gd":
 	func _ready() -> void: pass
 	func refresh() -> void: pass
 	func _battle_point(cell: int) -> Vector3:

@@ -1,8 +1,8 @@
 extends SceneTree
 
-const Battle = preload("res://scripts/war/officer_battle.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
-const Store = preload("res://scripts/game_state.gd")
+const Battle = preload("res://scripts/war/battle/officer_battle.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const Store = preload("res://scripts/core/game_state.gd")
 var failures: Array = []
 
 func check(value: bool, message: String) -> void:

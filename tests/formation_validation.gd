@@ -1,5 +1,5 @@
 extends SceneTree
-const Migration = preload("res://scripts/war/legacy_formation_migration.gd")
+const Migration = preload("res://scripts/war/campaign/legacy_formation_migration.gd")
 var failures: Array[String] = []
 func _initialize() -> void: call_deferred("run")
 func check(ok: bool, message: String) -> void:

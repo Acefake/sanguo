@@ -1,8 +1,8 @@
 extends SceneTree
 
 const Forecast = preload("res://scripts/agents/forecast.gd")
-const Combat = preload("res://scripts/war/combat_system.gd")
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("_run")
@@ -59,7 +59,7 @@ func _run() -> void:
 	var board: Dictionary = Tactical.board_for(war,own)
 	for step in Tactical.neighbors(source):
 		for candidate in Tactical.neighbors(step):
-			if Tactical.cell_distance(source,candidate) == 2 and Tactical.can_enter(war,own,candidate) and preload("res://scripts/war/city_fortifications.gd").line_of_sight(board,source,candidate): far = candidate; break
+			if Tactical.cell_distance(source,candidate) == 2 and Tactical.can_enter(war,own,candidate) and preload("res://scripts/war/battle/city_fortifications.gd").line_of_sight(board,source,candidate): far = candidate; break
 		if far >= 0: break
 	check(far >= 0,"没有合法两格射击预估位置")
 	if far >= 0:

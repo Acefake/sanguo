@@ -8,7 +8,7 @@ func run() -> void:
 	store.agent.enabled = false
 	store._load_demo()
 	store.city_state("luoyang").merge({"faction": "liu_bei", "garrison": 30000, "units": {"infantry": 30000, "archers": 0, "cavalry": 0}}, true)
-	var view = preload("res://scripts/war/dispatch_view.gd").new()
+	var view = preload("res://scripts/war/ui/dispatch_view.gd").new()
 	view.store = store
 	view.target = "hongnong"
 	view.home_hint = "luoyang"
@@ -38,6 +38,6 @@ func run() -> void:
 	var corps: Dictionary = store.war.state["corps"].values()[-1]
 	assert(corps["members"].size() == chosen.size() + 1)
 	assert(corps["appointments"][chosen[0]] == "帐下都督")
-	assert(preload("res://scripts/war/corps_structure.gd").depth_of(corps, chosen[2]) == 3)
+	assert(preload("res://scripts/war/campaign/corps_structure.gd").depth_of(corps, chosen[2]) == 3)
 	print("FREE_CORPS_UI_OK: free roles, nested superiors and per-node troops deployed through actual dispatch UI")
 	quit()

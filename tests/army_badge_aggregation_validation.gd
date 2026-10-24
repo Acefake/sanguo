@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Scenarios = preload("res://scripts/war/battle_scenarios.gd")
-const Badge = preload("res://scripts/war/army_badge.gd")
+const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
+const Badge = preload("res://scripts/war/presentation/army_badge.gd")
 
 var failures: Array[String] = []
 var checks: int = 0

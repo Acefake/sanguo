@@ -1,7 +1,7 @@
 extends SceneTree
 
-const Hex = preload("res://scripts/war/hex_presentation.gd")
-class WorldProbe extends "res://scripts/war/army_world_3d.gd":
+const Hex = preload("res://scripts/war/presentation/hex_presentation.gd")
+class WorldProbe extends "res://scripts/war/presentation/army_world_3d.gd":
 	func _ready() -> void: pass
 class MapStub extends Node3D:
 	var camera := Camera3D.new()
@@ -99,7 +99,7 @@ func run() -> void:
 		var id: String = label.get_meta("army")
 		var delay := 0.70 if world._loss_contact_mode(id) == "ranged" else 0.20
 		var hit_at: float = world.loss_contact_since[id]+delay
-		var badge := preload("res://scripts/war/army_badge.gd").new()
+		var badge := preload("res://scripts/war/presentation/army_badge.gd").new()
 		world.add_child(badge)
 		world.badges[id] = badge
 		world.presentation_stats[id] = {"strength":3123,"morale":100.0}

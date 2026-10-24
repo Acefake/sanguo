@@ -1,5 +1,5 @@
 extends SceneTree
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 var output := "res://docs/validation/textures-and-pressure-2026-10-06/"
 var scene
 var world

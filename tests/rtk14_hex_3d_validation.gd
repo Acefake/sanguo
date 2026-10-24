@@ -30,7 +30,7 @@ func _run() -> void:
 	material.shader = load("res://shaders/rtk14_terrain.gdshader")
 	chunk.material_override = material
 	fixture.terrain_root.add_child(chunk)
-	var overlay = load("res://scripts/rtk14_hex_world_3d.gd").new()
+	var overlay = load("res://scripts/world/rtk14_hex_world_3d.gd").new()
 	overlay.map = fixture
 	fixture.add_child(overlay)
 	assert(overlay.materials.size() == 1)

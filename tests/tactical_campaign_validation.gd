@@ -1,6 +1,6 @@
 extends SceneTree
 
-const Scenarios = preload("res://scripts/war/battle_scenarios.gd")
+const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
 const Brain = preload("res://scripts/agents/unit_brain.gd")
 const Eval = preload("res://scripts/agents/tactical_evaluator.gd")
 const Forecast = preload("res://scripts/agents/forecast.gd")

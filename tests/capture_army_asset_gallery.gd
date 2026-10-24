@@ -1,6 +1,6 @@
 extends SceneTree
 
-const CitySkin = preload("res://scripts/city_ui_skin.gd")
+const CitySkin = preload("res://scripts/ui/city_ui_skin.gd")
 const ASSET_PATH := "res://assets/armies/rtk14/"
 var failures: Array[String] = []
 var views: Dictionary = {}

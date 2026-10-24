@@ -1,6 +1,6 @@
 extends SceneTree
 func _initialize() -> void:
-    var world = load("res://scripts/rtk14_world_3d.gd").new()
+    var world = load("res://scripts/world/rtk14_world_3d.gd").new()
     var city := Node3D.new()
     world.add_child(city)
     world.city_nodes["luoyang"] = city

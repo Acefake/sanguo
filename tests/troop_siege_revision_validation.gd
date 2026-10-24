@@ -1,5 +1,5 @@
 extends SceneTree
-const Siege = preload("res://scripts/war/siege_visual.gd")
+const Siege = preload("res://scripts/war/presentation/siege_visual.gd")
 func _initialize() -> void: call_deferred("run")
 func run() -> void:
 	for kind in ["catapult","ram"]:
@@ -25,7 +25,7 @@ func run() -> void:
 		assert(engine.get_node("Mechanism").mesh == frames[0],"Idle weapon keeps attacking")
 		equipment.free()
 		print("SIEGE_NATIVE_ACTION_OK ",kind," displacement=",changed)
-	var world := preload("res://scripts/war/army_world_3d.gd").new()
+	var world := preload("res://scripts/war/presentation/army_world_3d.gd").new()
 	world._load_mesh()
 	assert(world.archer_mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR].size() > 0,"Archer reference uniform missing")
 	assert(world.archer_material.get_shader_parameter("reference_archer"))

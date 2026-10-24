@@ -1,11 +1,15 @@
 extends Control
+## 军报簿：放在右侧抽屉里的单列页面。上为「送达军报 / 当前总结」与筛选，中为军报列表，下为所选军报正文。
 
 signal army_requested(id: String)
 signal closed
 const UISkin = preload("res://scripts/war/ui/war_ui_skin.gd")
 const Feedback = preload("res://scripts/war/battle/battle_feedback.gd")
+## 列表区固定高度，下面是所选军报的正文。
+const LIST_HEIGHT := 196
+const Widgets = preload("res://scripts/ui/theme/ui_widgets.gd")
+const Tokens = preload("res://scripts/ui/theme/ui_tokens.gd")
 var store: Node
-var window: PanelContainer
 var report_list: VBoxContainer
 var detail: VBoxContainer
 var list_scroll: ScrollContainer
@@ -26,110 +30,62 @@ var entries: Array = []
 func _ready() -> void:
 	name = "MilitaryReports"
 	set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	mouse_filter = MOUSE_FILTER_STOP
+	mouse_filter = MOUSE_FILTER_PASS
 	portraits = JSON.parse_string(FileAccess.get_file_as_string("res://data/officer_portraits.json"))
-	var shade := ColorRect.new()
-	shade.color = Color(0.07, 0.06, 0.045, 0.55)
-	shade.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	shade.mouse_filter = MOUSE_FILTER_STOP
-	add_child(shade)
-	window = UISkin.framed_panel(22)
-	window.set_anchors_and_offsets_preset(PRESET_CENTER)
-	add_child(window)
-	_resize()
-	resized.connect(_resize)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 14)
-	window.add_child(column)
-	var header := HBoxContainer.new()
-	var header_panel := PanelContainer.new()
-	header_panel.add_theme_stylebox_override("panel", UISkin.ribbon(10))
-	column.add_child(header_panel)
-	header_panel.add_child(header)
-	var title_box := VBoxContainer.new()
-	title_box.size_flags_horizontal = SIZE_EXPAND_FILL
-	header.add_child(title_box)
-	var title := UISkin.label("军报簿", 23, Color("f2e5c6"))
-	title.add_theme_font_override("font", UISkin.CitySkin.font())
-	title_box.add_child(title)
-	subtitle = UISkin.label("", 12, Color("cebd9c"))
-	title_box.add_child(subtitle)
-	var close := UISkin.button("关闭", close_view, true)
-	close.name = "CloseReports"
-	close.size_flags_vertical = SIZE_SHRINK_CENTER
-	header.add_child(close)
-	var nav := HBoxContainer.new()
-	nav.add_theme_constant_override("separation", 6)
+	var column := Widgets.vbox(1)
+	column.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	add_child(column)
+	var nav := Widgets.hbox(1)
 	column.add_child(nav)
-	report_tab = UISkin.button("送达军报", func(): mode = "reports"; rebuild())
+	var tabs := ButtonGroup.new()
+	report_tab = Widgets.pill("送达军报", tabs, func(): mode = "reports"; rebuild())
 	report_tab.name = "ReportsTab"
-	summary_tab = UISkin.button("当前总结", show_summary)
+	summary_tab = Widgets.pill("当前总结", tabs, show_summary)
 	summary_tab.name = "SummaryTab"
 	nav.add_child(report_tab)
 	nav.add_child(summary_tab)
-	count_label = UISkin.label("", 12, UISkin.MUTED)
+	count_label = Widgets.label("", "DimLabel")
+	count_label.size_flags_horizontal = SIZE_EXPAND_FILL
 	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	count_label.size_flags_vertical = SIZE_SHRINK_CENTER
 	nav.add_child(count_label)
-	var separator := HSeparator.new()
-	column.add_child(separator)
-	var content := HBoxContainer.new()
-	content.size_flags_vertical = SIZE_EXPAND_FILL
-	content.add_theme_constant_override("separation", 24)
-	column.add_child(content)
-	var left := VBoxContainer.new()
-	left.custom_minimum_size.x = 224
-	left.add_theme_constant_override("separation", 8)
-	content.add_child(left)
+	var filters := Widgets.hbox(1)
+	column.add_child(filters)
 	army_filter = OptionButton.new()
 	army_filter.name = "ReportArmyFilter"
-	UISkin.field(army_filter)
+	army_filter.size_flags_horizontal = SIZE_EXPAND_FILL
+	army_filter.clip_text = true
 	army_filter.item_selected.connect(func(index):
 		filter_army = str(army_filter.get_item_metadata(index))
 		selected_report = ""
 		rebuild()
 	)
-	left.add_child(army_filter)
+	filters.add_child(army_filter)
 	kind_filter = OptionButton.new()
 	kind_filter.name = "ReportKindFilter"
-	UISkin.field(kind_filter)
+	kind_filter.size_flags_horizontal = SIZE_EXPAND_FILL
+	kind_filter.clip_text = true
 	for title_text in ["全部军报", "交战与攻城", "军令与调动", "补给与求援"]: kind_filter.add_item(title_text)
 	kind_filter.item_selected.connect(func(_index): selected_report = ""; rebuild())
-	left.add_child(kind_filter)
+	filters.add_child(kind_filter)
 	list_scroll = ScrollContainer.new()
-	list_scroll.size_flags_vertical = SIZE_EXPAND_FILL
-	UISkin.scroll(list_scroll)
-	left.add_child(list_scroll)
-	report_list = VBoxContainer.new()
+	list_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	list_scroll.custom_minimum_size.y = LIST_HEIGHT
+	column.add_child(list_scroll)
+	report_list = Widgets.vbox(0)
 	report_list.size_flags_horizontal = SIZE_EXPAND_FILL
-	report_list.add_theme_constant_override("separation", 4)
 	list_scroll.add_child(report_list)
-	var divider := VSeparator.new()
-	content.add_child(divider)
+	column.add_child(Widgets.rule())
 	detail_scroll = ScrollContainer.new()
-	detail_scroll.size_flags_horizontal = SIZE_EXPAND_FILL
+	detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	detail_scroll.size_flags_vertical = SIZE_EXPAND_FILL
-	UISkin.scroll(detail_scroll)
-	var reading := UISkin.framed_panel(20)
-	reading.size_flags_horizontal = SIZE_EXPAND_FILL
-	reading.size_flags_vertical = SIZE_EXPAND_FILL
-	content.add_child(reading)
-	reading.add_child(detail_scroll)
-	detail = VBoxContainer.new()
+	column.add_child(detail_scroll)
+	detail = Widgets.vbox(2)
 	detail.size_flags_horizontal = SIZE_EXPAND_FILL
-	detail.add_theme_constant_override("separation", 14)
 	detail_scroll.add_child(detail)
-	var footer := UISkin.label("军报按送达时间归档；数值保留发报时的快照。", 11, UISkin.MUTED)
-	column.add_child(footer)
+	subtitle = Widgets.label("", "DimLabel")
+	column.add_child(subtitle)
 	hide()
-	get_viewport().size_changed.connect(_resize)
-
-func _resize() -> void:
-	if not is_instance_valid(window): return
-	var extent := Vector2(minf(980, size.x - 48), minf(600, size.y - 48))
-	window.offset_left = -extent.x / 2
-	window.offset_right = extent.x / 2
-	window.offset_top = -extent.y / 2
-	window.offset_bottom = extent.y / 2
 
 func close_view() -> void:
 	hide()
@@ -191,8 +147,8 @@ func _matches(report: Dictionary) -> bool:
 func rebuild() -> void:
 	signature = JSON.stringify([store.war.state["tick"], store.war.state["reports"].size(), store.war.visible_reports().size(), store.war.state["armies"].size()])
 	subtitle.text = "%s  %s  第%d日" % [store.scenario["factions"].get(store.war.state["player_faction"], {}).get("name", "本军"), store.date_text(), store.war.state["tick"]]
-	UISkin.style_button(report_tab, mode == "reports")
-	UISkin.style_button(summary_tab, mode == "summary")
+	report_tab.set_pressed_no_signal(mode == "reports")
+	summary_tab.set_pressed_no_signal(mode == "summary")
 	army_filter.visible = mode == "reports"
 	kind_filter.visible = mode == "reports"
 	UISkin.clear(report_list)
@@ -214,14 +170,16 @@ func rebuild() -> void:
 		var army: Dictionary = store.war.state["armies"].get(report["army_id"], {})
 		var button := UISkin.button("", func(): select_report(id))
 		var row_style := StyleBoxFlat.new()
-		row_style.bg_color = Color("e1d4b8") if selected_report == id else Color(0.9, 0.87, 0.78, 0.15)
+		row_style.bg_color = Tokens.color("raised") if selected_report == id else Color.TRANSPARENT
 		row_style.border_width_left = 3
-		row_style.border_color = UISkin.GOLD if selected_report == id else Color.TRANSPARENT
+		row_style.border_color = Tokens.color("accent") if selected_report == id else Color.TRANSPARENT
 		row_style.content_margin_left = 10
 		row_style.content_margin_right = 10
 		button.add_theme_stylebox_override("normal", row_style)
 		button.name = "Report_" + id
-		button.custom_minimum_size.y = 64
+		button.add_theme_stylebox_override("hover", row_style)
+		button.add_theme_stylebox_override("pressed", row_style)
+		button.custom_minimum_size.y = 56
 		button.tooltip_text = preload("res://scripts/ui/ui_text.gd").clean(str(report["message"]))
 		var box := VBoxContainer.new()
 		box.mouse_filter = MOUSE_FILTER_IGNORE
@@ -371,8 +329,8 @@ func _build_summary() -> void:
 
 func show_review(id: String) -> void:
 	mode = "review"
-	UISkin.style_button(report_tab, false)
-	UISkin.style_button(summary_tab, false)
+	report_tab.set_pressed_no_signal(false)
+	summary_tab.set_pressed_no_signal(false)
 	army_filter.hide()
 	kind_filter.hide()
 	show()

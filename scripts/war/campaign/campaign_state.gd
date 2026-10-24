@@ -28,6 +28,7 @@ const Autonomy = preload("res://scripts/agents/officer_autonomy.gd")
 const TacticalPlan = preload("res://scripts/agents/tactical_plan.gd")
 const Characters = preload("res://scripts/officers/character_system.gd")
 const Talent = preload("res://scripts/officers/talent_service.gd")
+const ObservationReuse = preload("res://scripts/war/campaign/observation_reuse.gd")
 var characters = Characters.new()
 var store: Node
 var graph = Graph.new()
@@ -816,6 +817,7 @@ func enemy_intel(enemy: Dictionary) -> Dictionary:
 	return result
 
 
+## 刷新每支在役军队的城池与敌军情报。城池情报没变时沿用上一份（见 observation_reuse.gd）。
 func _observe_all() -> void:
 	Tactical.clear_target_cache()
 	var cities := {}
@@ -824,7 +826,7 @@ func _observe_all() -> void:
 	var armies := active_armies()
 	for army in armies:
 		# Keep the intelligence schema for saves and decision snapshots, with no sight limits.
-		army["intel"] = {"cities": cities.duplicate(true), "enemies": {}}
+		army["intel"] = {"cities": ObservationReuse.cities_for(army.get("intel"), cities), "enemies": {}}
 		for enemy in armies:
 			if hostile(str(enemy["faction"]), str(army["faction"])):
 				army["intel"]["enemies"][enemy["id"]] = enemy_intel(enemy)

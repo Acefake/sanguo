@@ -203,16 +203,18 @@ func is_besieged(city: String) -> bool:
 
 func hostile(first: String, second: String) -> bool:
 	if first == second: return false
-	var pair: Array = [first, second]
-	pair.sort()
-	return state.get("relations", {}).get("|".join(pair), "hostile") == "hostile"
+	return state.get("relations", {}).get(_relation_key(first, second), "hostile") == "hostile"
 
 func can_cross(faction: String, node: String) -> bool:
 	var owner := str(store.city_state(node).get("faction", ""))
 	if owner == "" or owner == faction: return true
-	var pair: Array = [faction, owner]
-	pair.sort()
-	return state.get("relations", {}).get("|".join(pair), "hostile") == "allied"
+	return state.get("relations", {}).get(_relation_key(faction, owner), "hostile") == "allied"
+
+
+## 两个不同势力的关系键：按字典序排好后用 | 连接，与 relations 表的键一致。
+## route() 未命中记忆时要对全图地点调用 can_cross，这里不再为每次比较新建并排序数组。
+static func _relation_key(first: String, second: String) -> String:
+	return first + "|" + second if first < second else second + "|" + first
 
 ## 势力从起点到终点的通路：不能穿越非友方城池（起终点除外）。按通行状态记忆，见 route_memo.gd。
 func route(faction: String, start: String, finish: String) -> Dictionary:

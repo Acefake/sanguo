@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "color": {
+    "ink": "#181613",
+    "panel": "#1C1A17",
+    "raised": "#26231F",
+    "line": "#FFFFFF17",
+    "rim": "#FFFFFF17",
+    "text": "#ECE4D2",
+    "muted": "#A0968A",
+    "dim": "#6E665A",
+    "accent": "#B5432F",
+    "accent_hover": "#C8523C",
+    "accent_pressed": "#9A3826",
+    "label": "#C9A45C",
+    "green": "#609668",
+    "blue": "#5880B2",
+    "shade": "#0A090899",
+    "backdrop": "#181613",
+    "on_accent": "#FFF6EA"
+  },
+  "alpha": {
+    "panel": 0.9,
+    "hover": 0.06,
+    "pressed": 0.1,
+    "disabled_text": 0.45,
+    "shadow": 0.35
+  },
+  "palettes": {
+    "glass": {
+      "_note": "地图 HUD 用的浅纸色半透明面板（顶栏、战况条、右侧抽屉、小地图、军报浮条）、设置页、选择战场。只覆盖与默认不同的令牌；文字色按面板 0.94 透明度压在近黑地形上仍 ≥4.5:1 选定；0.84 时地图上的城名牌会透进抽屉、顶栏，和面板文字打架，所以收到 0.94。backdrop 是开局直接进入选择战场时的浅纸色底，shade 是叠在地图上的半透明遮罩。",
+      "color": {
+        "ink": "#3A3226",
+        "panel": "#F5F0E6",
+        "raised": "#FFFFFF99",
+        "line": "#2B241A1F",
+        "rim": "#FFFFFFB3",
+        "text": "#231F1A",
+        "muted": "#4A4339",
+        "dim": "#51493E",
+        "accent": "#9E3523",
+        "accent_hover": "#B5432F",
+        "accent_pressed": "#862C1D",
+        "label": "#6E4B10",
+        "green": "#4F8A58",
+        "shade": "#0A090866",
+        "backdrop": "#E3DBCB"
+      },
+      "alpha": {
+        "panel": 0.94,
+        "shadow": 0.16
+      }
+    }
+  },
+  "radius": {
+    "panel": 14,
+    "card": 10,
+    "control": 8,
+    "pill": 18
+  },
+  "font": {
+    "title": ["KaiTi", "楷体", "STKaiti", "AR PL UKai CN", "Noto Serif CJK SC"],
+    "body": ["Noto Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC"]
+  },
+  "font_size": {
+    "display": 32,
+    "title": 24,
+    "body": 16,
+    "body_small": 15,
+    "note": 13,
+    "caption": 12
+  },
+  "space": {
+    "unit": 8
+  },
+  "control": {
+    "height": 36,
+    "height_small": 28,
+    "border": 1,
+    "focus": 2,
+    "toggle_width": 44,
+    "toggle_height": 24
+  },
+  "motion": {
+    "drawer_seconds": 0.14,
+    "fade_seconds": 0.12
+  }
+}

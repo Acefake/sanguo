@@ -1,7 +1,7 @@
 extends Control
 
 signal dispatched(id: String)
-const CitySkin = preload("res://scripts/ui/city_ui_skin.gd")
+const Widgets = preload("res://scripts/ui/theme/ui_widgets.gd")
 const Corps = preload("res://scripts/war/campaign/army_corps.gd")
 const Structure = preload("res://scripts/war/campaign/corps_structure.gd")
 var store: Node
@@ -27,74 +27,44 @@ var composition: Dictionary = {}
 var editors: VBoxContainer
 var assignment: Label
 
-func label(text: String, font_size: int = 18) -> Label:
-	var item := CitySkin.label(text, font_size)
-	item.add_theme_font_override("font", CitySkin.font())
+## 字号 ≤13 用注释样式，≤15 用正文小号，其余正文；全部自动换行，适配抽屉宽度。
+func label(text: String, font_size: int = 16) -> Label:
+	var item := Widgets.label(text, "NoteLabel" if font_size <= 13 else "", true)
 	item.size_flags_horizontal = SIZE_EXPAND_FILL
-	item.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return item
 
+## 分节标题：强调色小标题，前面留一步空白。
 func section(parent: Control, text: String) -> void:
-	var panel := PanelContainer.new()
-	var style := StyleBoxTexture.new()
-	style.texture = load("res://assets/war/dispatch/section.png")
-	panel.add_theme_stylebox_override("panel", style)
-	var caption := label(text)
-	caption.add_theme_color_override("font_color", Color("f5e2ae"))
-	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	panel.add_child(caption)
-	parent.add_child(panel)
+	parent.add_child(Widgets.gap(1))
+	var caption := Widgets.label(text, "AccentLabel", true)
+	parent.add_child(caption)
 
 func choice(parent: Control, title: String) -> OptionButton:
-	parent.add_child(label(title, 16))
+	var row := Widgets.hbox(1)
+	parent.add_child(row)
+	var caption := Widgets.muted(title)
+	caption.custom_minimum_size.x = 96
+	row.add_child(caption)
 	var item := OptionButton.new()
-	item.add_theme_font_override("font", CitySkin.font())
-	item.custom_minimum_size.y = 34
-	CitySkin.style_button(item)
-	parent.add_child(item)
+	item.size_flags_horizontal = SIZE_EXPAND_FILL
+	item.clip_text = true
+	row.add_child(item)
 	return item
 
+## 右侧抽屉的「派将」页：上方可滚动的单列表单，底部固定操作行。由 campaign_ui 放进抽屉，
+## 返回 / Esc / 派出后释放自身（抽屉随之关闭）。
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	var shade := ColorRect.new()
-	shade.color = Color(0, 0, 0, 0.62)
-	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(shade)
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(minf(1100, get_viewport_rect().size.x - 40), minf(690, get_viewport_rect().size.y - 30))
-	var paper := StyleBoxTexture.new()
-	paper.texture = load("res://assets/war/dispatch/paper.png")
-	paper.texture_margin_left = 12
-	paper.texture_margin_right = 12
-	paper.texture_margin_top = 12
-	paper.texture_margin_bottom = 12
-	paper.content_margin_left = 22
-	paper.content_margin_right = 22
-	paper.content_margin_top = 16
-	paper.content_margin_bottom = 16
-	panel.add_theme_stylebox_override("panel", paper)
-	center.add_child(panel)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 10)
-	panel.add_child(column)
-	column.add_child(label("出阵  自由编组：人数不设上限，岗位/上级/兵力自定", 28))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 26)
-	row.size_flags_vertical = SIZE_EXPAND_FILL
-	column.add_child(row)
-	var left := VBoxContainer.new()
-	left.custom_minimum_size.x = 420
-	row.add_child(left)
-	var right := VBoxContainer.new()
-	right.size_flags_horizontal = SIZE_EXPAND_FILL
-	row.add_child(right)
-	sources = choice(left, "出发城")
-	targets = choice(left, "出征目标")
-	chiefs = choice(left, "部队长 / 主帅")
+	var column := Widgets.vbox(1)
+	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(column)
+	var form := Widgets.vbox(1)
+	column.add_child(Widgets.scroll(form))
+	form.add_child(Widgets.muted("自由编组：人数不设上限，岗位、上级、兵力自定", true))
+	sources = choice(form, "出发城")
+	targets = choice(form, "出征目标")
+	chiefs = choice(form, "部队长 / 主帅")
 	officers = store.war.available_officers(str(store.war.state["player_faction"]))
 	officers.sort_custom(func(a, b): return Corps.suitability(a, "主帅") > Corps.suitability(b, "主帅"))
 	portrait_paths = JSON.parse_string(FileAccess.get_file_as_string("res://data/officer_portraits.json"))
@@ -116,88 +86,52 @@ func _ready() -> void:
 			sources.select(sources.item_count - 1)
 	for i in range(sources.item_count):
 		if str(sources.get_item_metadata(i)) == home_hint: sources.select(i)
-	cards = VBoxContainer.new()
-	var card_scroll := ScrollContainer.new()
-	card_scroll.custom_minimum_size.y = 150
-	card_scroll.size_flags_vertical = SIZE_EXPAND_FILL
-	card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	left.add_child(card_scroll)
-	cards.size_flags_horizontal = SIZE_EXPAND_FILL
-	card_scroll.add_child(cards)
-	section(left, "兵士  按城池库存综合编组")
+	section(form, "兵士  按城池库存综合编组")
 	troops = HSlider.new()
 	troops.min_value = int(store.war.rules["minimum_army"])
 	troops.step = 1
-	left.add_child(troops)
-	resources = label("", 16)
-	left.add_child(resources)
-	section(right, "能力  主帅军事能力（满刻度120）")
+	form.add_child(troops)
+	resources = label("", 15)
+	form.add_child(resources)
+	section(form, "主帅能力  满刻度 120")
 	radar = preload("res://scripts/war/ui/military_radar.gd").new()
-	radar.custom_minimum_size = Vector2(300, 200)
-	right.add_child(radar)
-	details = label("", 16)
-	right.add_child(details)
-	section(right, "随军名单  勾选任意人数")
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size.y = 96
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	right.add_child(scroll)
-	var roster := VBoxContainer.new()
+	radar.custom_minimum_size = Vector2(0, 180)
+	form.add_child(radar)
+	details = label("", 13)
+	form.add_child(details)
+	section(form, "出阵将领")
+	cards = Widgets.vbox(1)
+	cards.size_flags_horizontal = SIZE_EXPAND_FILL
+	form.add_child(cards)
+	section(form, "随军名单  勾选任意人数")
+	var roster := Widgets.vbox(0)
 	roster.size_flags_horizontal = SIZE_EXPAND_FILL
-	scroll.add_child(roster)
+	form.add_child(roster)
 	for officer in officers:
 		var check := CheckBox.new()
 		check.text = str(officer["name"]) + "  " + str(officer.get("positions", "")).split("\n")[0]
-		check.add_theme_font_override("font", CitySkin.font())
-		check.add_theme_color_override("font_color", CitySkin.INK)
-		check.add_theme_color_override("font_hover_color", CitySkin.INK)
-		check.add_theme_color_override("font_pressed_color", CitySkin.INK)
-		check.add_theme_color_override("font_disabled_color", Color("978b78"))
+		check.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		check.clip_text = true
 		check.button_pressed = Corps.select_members(store.war, selection(chiefs), officers.map(func(o): return o["id"]), selection(sources)).has(officer["id"])
 		check.toggled.connect(func(_value): refresh(true))
 		checks[officer["id"]] = check
 		roster.add_child(check)
-	section(right, "编组  岗位可自定义，上级需在随军名单内")
-	var editor_scroll := ScrollContainer.new()
-	editor_scroll.custom_minimum_size.y = 132
-	editor_scroll.size_flags_vertical = SIZE_EXPAND_FILL
-	editor_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	right.add_child(editor_scroll)
-	editors = VBoxContainer.new()
-	editors.add_theme_constant_override("separation", 4)
+	section(form, "编组  岗位可自定义，上级需在随军名单内")
+	editors = Widgets.vbox(1)
 	editors.size_flags_horizontal = SIZE_EXPAND_FILL
-	editor_scroll.add_child(editors)
-	var buttons := HBoxContainer.new()
-	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
-	column.add_child(buttons)
-	var auto_button := Button.new()
-	auto_button.text = "自动编制预设"
-	auto_button.custom_minimum_size = Vector2(130, 44)
-	CitySkin.style_button(auto_button)
-	buttons.add_child(auto_button)
-	auto_button.pressed.connect(auto_compose)
-	var all_button := Button.new()
-	all_button.text = "全选"
-	all_button.custom_minimum_size = Vector2(80, 44)
-	CitySkin.style_button(all_button)
-	buttons.add_child(all_button)
-	all_button.pressed.connect(select_all)
-	confirm = Button.new()
-	confirm.text = "决定  出阵"
-	confirm.custom_minimum_size = Vector2(130, 44)
-	CitySkin.style_button(confirm)
-	confirm.modulate = Color(1, 0.70, 0.65)
-	buttons.add_child(confirm)
-	var back := Button.new()
-	back.text = "返回"
-	back.custom_minimum_size = Vector2(90, 44)
-	CitySkin.style_button(back)
-	back.modulate = Color(1, 0.70, 0.65)
-	buttons.add_child(back)
-	back.pressed.connect(queue_free)
-	confirm.pressed.connect(deploy)
-	notice = label("", 14)
+	form.add_child(editors)
+	notice = label("", 13)
 	column.add_child(notice)
+	var buttons := Widgets.hbox(1)
+	column.add_child(buttons)
+	var auto_button := Widgets.secondary("自动编制", auto_compose)
+	auto_button.tooltip_text = "套用自动编制预设"
+	buttons.add_child(auto_button)
+	buttons.add_child(Widgets.secondary("全选", select_all))
+	buttons.add_child(Widgets.spring())
+	buttons.add_child(Widgets.text_button("返回", queue_free))
+	confirm = Widgets.primary("决定出阵", deploy)
+	buttons.add_child(confirm)
 	sources.item_selected.connect(func(_index): refresh(true))
 	targets.item_selected.connect(func(_index): refresh())
 	chiefs.item_selected.connect(func(_index): refresh(true))
@@ -249,33 +183,32 @@ func rebuild_editors(_layout: Dictionary = {}) -> void:
 	for child in editors.get_children(): editors.remove_child(child); child.queue_free()
 	var chief := selection(chiefs)
 	var budget := maxi(0, int(troops.value) - Structure.MIN_TROOP)
-	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 6)
+	var header := Widgets.vbox(0)
 	editors.add_child(header)
 	header.add_child(label("随军 %d 人（不限）" % members().size(), 13))
 	assignment = label("", 13)
-	assignment.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	header.add_child(assignment)
 	for id in members():
 		var entry: Dictionary = composition.get(id, {})
-		var line := HBoxContainer.new()
-		line.add_theme_constant_override("separation", 4)
+		var line := Widgets.hbox(1)
 		editors.add_child(line)
-		var name := label(str(store.war.roster.officers[id]["name"]), 14)
-		name.custom_minimum_size.x = 62
+		var name := label(str(store.war.roster.officers[id]["name"]), 15)
 		line.add_child(name)
 		var role := LineEdit.new()
 		role.text = str(entry.get("role", "随军"))
-		role.custom_minimum_size.x = 80
-		role.add_theme_font_override("font", CitySkin.font())
+		role.custom_minimum_size.x = 120
 		role.text_changed.connect(func(text):
 			var clean: String = text.strip_edges()
 			composition[id]["role"] = clean if not clean.is_empty() else "随军"
 			update_editor_labels()
 		)
 		line.add_child(role)
+		var command_line := Widgets.hbox(1)
+		editors.add_child(command_line)
+		command_line.add_child(Widgets.label("上级", "DimLabel"))
 		var parent_choice := OptionButton.new()
-		parent_choice.add_theme_font_override("font", CitySkin.font())
+		parent_choice.size_flags_horizontal = SIZE_EXPAND_FILL
+		parent_choice.clip_text = true
 		var options: Array = [chief]
 		for other in members():
 			if other != id and not options.has(other): options.append(other)
@@ -287,19 +220,18 @@ func rebuild_editors(_layout: Dictionary = {}) -> void:
 			composition[id]["parent"] = str(parent_choice.get_item_metadata(index))
 			update_editor_labels()
 		)
-		line.add_child(parent_choice)
+		command_line.add_child(parent_choice)
 		var strength := SpinBox.new()
 		strength.min_value = 0
 		strength.max_value = budget
 		strength.step = 100
 		strength.value = int(entry.get("strength", 0))
-		strength.custom_minimum_size.x = 92
-		strength.add_theme_font_override("font", CitySkin.font())
+		strength.custom_minimum_size.x = 120
 		strength.value_changed.connect(func(value):
 			composition[id]["strength"] = int(value)
 			update_editor_labels()
 		)
-		line.add_child(strength)
+		command_line.add_child(strength)
 	update_editor_labels()
 
 func update_editor_labels() -> void:
@@ -351,10 +283,10 @@ func refresh(reset_count: bool = false) -> void:
 		if id != chief: order.append(id)
 	for id in order:
 		var officer: Dictionary = store.war.roster.officers[id]
-		var card := HBoxContainer.new()
+		var card := Widgets.hbox(1)
 		cards.add_child(card)
 		var portrait := TextureRect.new()
-		portrait.custom_minimum_size = Vector2(60, 65)
+		portrait.custom_minimum_size = Vector2(48, 52)
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		var path := str(portrait_paths.get(officer["name"], {}).get("portrait", ""))
@@ -363,7 +295,7 @@ func refresh(reset_count: bool = false) -> void:
 		var role := str(composition.get(id, {}).get("role", "随军"))
 		var count := int(composition.get(id, {}).get("strength", 0))
 		var suffix := "　%d人" % count if count > 0 else ""
-		card.add_child(label("%s　%s%s\n带兵 %d　布阵 %d　治军 %d" % [role, officer["name"], suffix, officer["skills"].get("带兵", 50), officer["skills"].get("布阵", 50), officer["skills"].get("治军", 50)], 17))
+		card.add_child(label("%s　%s%s\n带兵 %d　布阵 %d　治军 %d" % [role, officer["name"], suffix, officer["skills"].get("带兵", 50), officer["skills"].get("布阵", 50), officer["skills"].get("治军", 50)], 15))
 	var chief_data: Dictionary = store.war.roster.officers[chief]
 	radar.values.clear()
 	for name in radar.NAMES: radar.values.append(chief_data["skills"].get(name, 50))

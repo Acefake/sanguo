@@ -1,9 +1,22 @@
 extends CanvasLayer
+## 军务界面：右侧唯一抽屉（部队概况 / 军令 / 战报、派将、军情、城务、敌军信息）与底部军报浮条。
+##
+## 3D 大地图上推进、速度、日期由 world_map_hud 的顶栏负责；2D 地图（map_slice）没有顶栏，
+## 这里自建一条简化工具行。抽屉每次只显示一页：部队详情等文字页共用 body，
+## 军报簿与出阵编组是常驻页面，切换时复用，不重建。
 
 signal army_dispatched(id: String)
 
-const CitySkin = preload("res://scripts/ui/city_ui_skin.gd")
+const SideDrawer = preload("res://scripts/ui/shell/side_drawer.gd")
+const ToastFeed = preload("res://scripts/ui/shell/toast_feed.gd")
+const Minimap = preload("res://scripts/ui/shell/minimap.gd")
+const Tokens = preload("res://scripts/ui/theme/ui_tokens.gd")
+const Widgets = preload("res://scripts/ui/theme/ui_widgets.gd")
 const ACTION_NAMES := {"march": "行军", "continue": "继续行军", "hold": "驻守整顿", "scout": "侦察", "resupply": "补給", "engage": "接战", "besiege": "围城", "pursue": "追击", "withdraw": "撤退", "request_support": "求援", "flank": "侧翼绕行", "support": "协同支援", "reposition":"战术换位", "local_disengage":"准备局部脱离"}
+const ARMY_TABS := [["army", "概况"], ["orders", "军令"], ["reports", "战报"]]
+## 抽屉的纵向留位：顶栏下方到窗口底边（军报浮条让在抽屉左侧，不再压在抽屉下面）。
+const DRAWER_TOP := 88
+const DRAWER_BOTTOM := 16
 var store: Node
 var drawer: PanelContainer
 var body: VBoxContainer
@@ -11,29 +24,22 @@ var heading: Label
 var date_label: Label
 var status_label: Label
 var next_button: Button
-var target_id := ""
 var page := "reports"
-var source_choice: OptionButton
-var companion_checks: Dictionary = {}
-var officer_choice: OptionButton
-var faction_choice: OptionButton
-var preview_label: Label
-var confirm_button: Button
 var notice_label: Label
 var selected_army := ""
 var scenario_picker: Button
 var toolbar_offset := Vector2(14, 14)
 var dispatch_home := ""
-var flow_button: Button
-var speed_choice: OptionButton
 var dispatch_view: Control
 var inspector: Control
 var reports_view: Control
-var drawer_chrome: Array[Control] = []
+var toast: PanelContainer
 var drawer_scroll: ScrollContainer
 var panel_timer := 0.0
 var battle_label: Label
 var result_dialog: AcceptDialog
+var _body_page: Control
+var _toast_signature := ""
 
 
 func _ready() -> void:
@@ -41,31 +47,61 @@ func _ready() -> void:
 	var canvas := Control.new()
 	canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Widgets.adopt_theme(canvas, "glass")
 	add_child(canvas)
-	var toolbar := HBoxContainer.new()
-	toolbar.position = toolbar_offset
-	toolbar.add_theme_constant_override("separation", 8)
-	canvas.add_child(toolbar)
+	if not is_instance_valid(store.war_presentation): _build_toolbar(canvas)
+	drawer = SideDrawer.new()
+	drawer.offset_top = DRAWER_TOP
+	drawer.offset_bottom = -DRAWER_BOTTOM
+	canvas.add_child(drawer)
+	heading = drawer.title_label
+	drawer.tab_selected.connect(_army_tab)
+	_body_page = Widgets.vbox(1)
+	status_label = Widgets.muted("", true)
+	_body_page.add_child(status_label)
+	drawer_scroll = ScrollContainer.new()
+	drawer_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	drawer_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_body_page.add_child(drawer_scroll)
+	body = Widgets.vbox(1)
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	drawer_scroll.add_child(body)
+	reports_view = _create_reports_view()
+	reports_view.store = store
+	drawer.host(reports_view)
+	drawer.host(_body_page)
+	reports_view.army_requested.connect(show_army)
+	reports_view.closed.connect(drawer.hide)
+	toast = ToastFeed.new()
+	toast.anchor_left = 0.0
+	toast.anchor_right = 1.0
+	toast.offset_left = Tokens.space(4) + Minimap.SIZE.x
+	toast.offset_right = -SideDrawer.WIDTH - Tokens.space(4)
+	toast.open_requested.connect(show_reports)
+	canvas.add_child(toast)
+	store.campaign_changed.connect(refresh)
+	store.campaign_progress.connect(_refresh_status)
+	refresh()
+
+
+## 2D 地图用的简化工具行：军情、城务、推进、设置与日期。
+func _build_toolbar(canvas: Control) -> void:
+	var bar := PanelContainer.new()
+	bar.theme_type_variation = "BarPanel"
+	bar.position = toolbar_offset
+	canvas.add_child(bar)
+	var toolbar := Widgets.hbox(1)
+	bar.add_child(toolbar)
 	if store.battle_test:
-		var scenario_button := _button("战场：" + str(store.war.state.get("battlefield", {}).get("scenario_name", "官渡列阵决战")) + "  ▾", store.open_battle_scenarios)
-		scenario_picker = scenario_button
-		scenario_button.name = "BattleScenarioPicker"
-		scenario_button.position = Vector2(470, 112)
-		scenario_button.add_theme_font_size_override("font_size", 13)
-		canvas.add_child(scenario_button)
-		battle_label = _label("", 15)
-		battle_label.position = Vector2(16, 158)
-		battle_label.size = Vector2(760, 48)
-		battle_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-		battle_label.add_theme_color_override("font_color", Color.WHITE)
-		battle_label.add_theme_color_override("font_shadow_color", Color.BLACK)
-		battle_label.add_theme_constant_override("shadow_offset_x", 1)
-		battle_label.add_theme_constant_override("shadow_offset_y", 1)
+		scenario_picker = Widgets.secondary("", store.open_battle_scenarios)
+		scenario_picker.name = "BattleScenarioPicker"
+		toolbar.add_child(scenario_picker)
+		battle_label = Widgets.muted("")
+		battle_label.position = Vector2(toolbar_offset.x, toolbar_offset.y + 56)
 		canvas.add_child(battle_label)
-		if is_instance_valid(store.war_presentation): battle_label.hide()
-	toolbar.add_child(_button("军情", show_reports))
-	if not store.battle_test: toolbar.add_child(_button("城务与人事", show_city_policy))
-	if not store.battle_test: toolbar.add_child(_button("人才", show_talents))
+	toolbar.add_child(Widgets.secondary("军情", show_reports))
+	if not store.battle_test: toolbar.add_child(Widgets.secondary("城务与人事", show_city_policy))
+	if not store.battle_test: toolbar.add_child(Widgets.secondary("人才", show_talents))
 	var targets := OptionButton.new()
 	targets.add_item("选择出征目标")
 	for id in store.war.graph.places:
@@ -74,78 +110,14 @@ func _ready() -> void:
 	targets.item_selected.connect(func(index):
 		if index > 0: show_dispatch(str(targets.get_item_metadata(index)))
 	)
-	_style_field(targets)
 	toolbar.add_child(targets)
-	# 3D 下点城即出征，这个下拉框没有意义；但整条 toolbar 不能隐藏——全项目唯一的
-	# 1×/2×/4× 速度选择器就建在这条 toolbar 里，隐藏后 3D 模式速度完全不可调。
-	if is_instance_valid(store.war_presentation): targets.hide()
-	next_button = _button("进行", _next_turn)
+	next_button = Widgets.primary("进行", _next_turn)
 	next_button.tooltip_text = "推进十天"
 	toolbar.add_child(next_button)
-	if not is_instance_valid(store.war_presentation): toolbar.add_child(_button("设置", store.open_settings))
-	if is_instance_valid(store.war_presentation):
-		flow_button = next_button
-		var speed := OptionButton.new()
-		speed_choice = speed
-		for value in ["1×", "2×", "4×"]: speed.add_item(value)
-		speed.select(clampi(int(round(log(store.time_scale) / log(2.0))), 0, 2))
-		speed.item_selected.connect(func(index): store.time_scale = pow(2.0, index))
-		_style_field(speed)
-		toolbar.add_child(speed)
-	date_label = _label("", 16)
-	date_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	date_label.add_theme_color_override("font_color", Color("fff2d0"))
+	toolbar.add_child(Widgets.secondary("设置", store.open_settings))
+	date_label = Widgets.label("")
 	date_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	toolbar.add_child(date_label)
-	drawer = PanelContainer.new()
-	drawer.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
-	drawer.offset_left = -350
-	drawer.offset_right = -16
-	drawer.offset_top = 60
-	drawer.offset_bottom = -12
-	drawer.add_theme_stylebox_override("panel", CitySkin.paper(0.98, 16))
-	canvas.add_child(drawer)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 10)
-	drawer.add_child(column)
-	var top := HBoxContainer.new()
-	column.add_child(top)
-	drawer_chrome.append(top)
-	heading = _label("军情", 18)
-	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top.add_child(heading)
-	top.add_child(_button("关闭", func(): drawer.hide()))
-	var tabs := HBoxContainer.new()
-	column.add_child(tabs)
-	drawer_chrome.append(tabs)
-	tabs.add_child(_button("军报", show_reports))
-	status_label = _label("", 13)
-	column.add_child(status_label)
-	drawer_chrome.append(status_label)
-	var divider := HSeparator.new()
-	column.add_child(divider)
-	drawer_chrome.append(divider)
-	var scroll := ScrollContainer.new()
-	drawer_scroll = scroll
-	preload("res://scripts/war/ui/war_ui_skin.gd").scroll(scroll)
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	column.add_child(scroll)
-	body = VBoxContainer.new()
-	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_theme_constant_override("separation", 10)
-	scroll.add_child(body)
-	drawer.hide()
-	reports_view = _create_reports_view()
-	reports_view.store = store
-	canvas.add_child(reports_view)
-	reports_view.army_requested.connect(show_army)
-	store.campaign_changed.connect(refresh)
-	store.campaign_progress.connect(_refresh_status)
-	store.city_changed.connect(func(_id):
-		if not store.busy and drawer.visible and page == "dispatch": _update_preview()
-	)
-	refresh()
 
 
 func _create_reports_view() -> Control:
@@ -153,40 +125,37 @@ func _create_reports_view() -> Control:
 
 
 func _label(value: String, size: int = 13) -> Label:
-	var label := preload("res://scripts/war/ui/war_ui_skin.gd").label(value, size)
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	return label
+	return Widgets.label(value, "NoteLabel" if size <= 13 else "", true)
 
 
 func _button(value: String, action: Callable) -> Button:
-	var button := Button.new()
-	button.text = value
-	button.custom_minimum_size.y = 29
-	button.add_theme_font_override("font", preload("res://scripts/war/ui/war_ui_skin.gd").font())
-	button.add_theme_font_size_override("font_size", 13)
-	CitySkin.style_button(button)
-	button.pressed.connect(action)
-	return button
+	return Widgets.secondary(value, action)
 
 
 func _clear() -> void:
-	for child in body.get_children():
-		body.remove_child(child)
-		child.queue_free()
-	preview_label = null
-	confirm_button = null
+	Widgets.clear(body)
 	notice_label = null
+
+
+## 打开抽屉的文字页（部队详情、军令、城务、敌军信息共用），清空 body 供调用方填写。
+func open_body(title: String, subtitle := "", tabs: Array = [], active := "") -> void:
+	drawer.present(title, subtitle, tabs, active)
+	drawer.host(_body_page)
+	if is_instance_valid(dispatch_view):
+		dispatch_view.queue_free()
+		dispatch_view = null
+	status_label.hide()
+	drawer_scroll.scroll_vertical = 0
+	_clear()
 
 
 func refresh() -> void:
 	_refresh_status()
+	_refresh_toast()
 	if is_instance_valid(reports_view): reports_view.refresh()
 	if not drawer.visible:
 		return
-	if page == "dispatch":
-		if not store.busy: _update_preview()
-	elif page == "army":
+	if page == "army":
 		if is_instance_valid(inspector): inspector.update_info()
 	elif page == "army_orders":
 		if not store.busy: show_army_orders(selected_army)
@@ -196,12 +165,9 @@ func _refresh_status() -> void:
 	if is_instance_valid(scenario_picker): scenario_picker.text = "战场：" + str(store.war.state.get("battlefield",{}).get("scenario_name","平原会战")) + "  ▾"
 	if not store.war.state.get("campaign_result", {}).is_empty():
 		status_label.text = str(store.war.state["campaign_result"]["message"])
-		next_button.disabled = true
-		if is_instance_valid(flow_button): flow_button.disabled = true
+		if is_instance_valid(next_button): next_button.disabled = true
 		if not is_instance_valid(result_dialog):
 			result_dialog = AcceptDialog.new()
-			CitySkin.theme_window(result_dialog)
-			result_dialog.theme.set_color("title_color", "Window", Color("f4ebd5"))
 			result_dialog.title = "战役胜利" if store.war.state["campaign_result"]["status"] == "victory" else "战役结束"
 			result_dialog.dialog_text = str(store.war.state["campaign_result"]["message"])
 			result_dialog.ok_button_text = "检视战役"
@@ -212,16 +178,31 @@ func _refresh_status() -> void:
 			add_child(result_dialog)
 			result_dialog.popup_centered(Vector2i(520, 180))
 		return
-	_refresh_time_label()
-	if is_instance_valid(flow_button):
-		flow_button.text = ("继续" if store.time_paused else "暂停") if store.busy else "进行"
-	next_button.disabled = store.busy and not is_instance_valid(flow_button)
+	if is_instance_valid(date_label): date_label.text = "%s  %s" % [store.date_text(), time_phase_text()]
+	if is_instance_valid(next_button): next_button.disabled = store.busy
 	if store.agent != null:
 		status_label.text = "主帅后台推演  军队沿用当前军令" if store.war.planner.running else str(store.agent.last_status)
-	if store.busy and is_instance_valid(confirm_button):
-		confirm_button.disabled = true
 
 
+## 底部浮条：本方最新送达的一份军报。只在军报数变化时改字。
+func _refresh_toast() -> void:
+	var player := str(store.war.state["player_faction"])
+	var mine: Array = store.war.visible_reports().filter(func(report: Dictionary) -> bool:
+		var army: Dictionary = store.war.state["armies"].get(report.get("army_id", ""), {})
+		return report.get("faction", army.get("faction", "")) == player)
+	var signature := "%d:%s" % [mine.size(), str(mine.back()["id"]) if not mine.is_empty() else ""]
+	if signature == _toast_signature: return
+	_toast_signature = signature
+	if mine.is_empty():
+		toast.show_latest("", 0)
+		return
+	var latest: Dictionary = mine.back()
+	var army: Dictionary = store.war.state["armies"].get(latest.get("army_id", ""), {})
+	var text := "%s  %s：%s" % [army.get("name", "部队"), latest["kind"], preload("res://scripts/ui/ui_text.gd").clean(str(latest["message"])).replace("\n", " ")]
+	toast.show_latest(text, mine.size(), bool(latest.get("urgent", false)))
+
+
+## 抽屉的「派将」页（出阵编组）：派出或返回后释放，抽屉随之关闭。
 func show_dispatch(target: String) -> void:
 	if store.busy: return
 	if is_instance_valid(dispatch_view): dispatch_view.queue_free()
@@ -231,132 +212,11 @@ func show_dispatch(target: String) -> void:
 	view.target = target
 	view.home_hint = dispatch_home
 	view.dispatched.connect(func(id): dispatch_home = ""; army_dispatched.emit(id); show_reports())
-	add_child(view)
-	drawer.hide()
-
-
-func _show_dispatch_legacy(target: String) -> void:
-	if store.busy:
-		return
-	target_id = target
+	view.tree_exiting.connect(func() -> void:
+		if dispatch_view == view and page == "dispatch": drawer.hide())
 	page = "dispatch"
-	heading.text = "派将  " + store.war.graph.name_of(target)
-	drawer.show()
-	_clear()
-	body.add_child(_label("军团人数、岗位、兵力和指挥层级由玩家自由设置；各角色按自身性格与立场决定服从、异议或自行行动。", 15))
-	body.add_child(_label("出征目标", 14))
-	var target_choice := OptionButton.new()
-	_style_field(target_choice)
-	for id in store.war.graph.places:
-		target_choice.add_item(store.war.graph.name_of(str(id)))
-		target_choice.set_item_metadata(target_choice.item_count - 1, id)
-		if str(id) == target: target_choice.select(target_choice.item_count - 1)
-	target_choice.item_selected.connect(func(index): show_dispatch(str(target_choice.get_item_metadata(index))))
-	body.add_child(target_choice)
-	body.add_child(_label("当前势力", 14))
-	faction_choice = OptionButton.new()
-	_style_field(faction_choice)
-	var factions: Array = store.scenario["factions"].keys()
-	factions.sort()
-	for faction in factions:
-		faction_choice.add_item(str(store.scenario["factions"][faction]["name"]))
-		faction_choice.set_item_metadata(faction_choice.item_count - 1, faction)
-		if faction == store.war.state["player_faction"]:
-			faction_choice.select(faction_choice.item_count - 1)
-	faction_choice.disabled = store.war.state.get("campaign_started", false) or not store.war.active_armies(str(store.war.state["player_faction"])).is_empty()
-	faction_choice.item_selected.connect(func(index):
-		if store.war.set_player_faction(str(faction_choice.get_item_metadata(index))):
-			store._save()
-			show_dispatch(target_id)
-	)
-	body.add_child(faction_choice)
-	body.add_child(_label("出发城", 14))
-	source_choice = OptionButton.new()
-	_style_field(source_choice)
-	var best_cost: float = INF
-	var best_index: int = -1
-	for id in store.war.graph.places:
-		var city: Dictionary = store.city_state(str(id))
-		if not city.has("population") or str(city.get("faction", "")) != str(store.war.state["player_faction"]):
-			continue
-		source_choice.add_item("%s  驻军%d" % [store.war.graph.name_of(str(id)), int(city.get("garrison", 0))])
-		source_choice.set_item_metadata(source_choice.item_count - 1, id)
-		var path: Dictionary = store.war.graph.path(str(id), target)
-		if str(id) != target and bool(path["found"]) and float(path["cost"]) < best_cost:
-			best_cost = float(path["cost"])
-			best_index = source_choice.item_count - 1
-	if best_index >= 0: source_choice.select(best_index)
-	for index in range(source_choice.item_count):
-		if str(source_choice.get_item_metadata(index)) == dispatch_home: source_choice.select(index)
-	source_choice.item_selected.connect(func(_index): _update_preview())
-	body.add_child(source_choice)
-	body.add_child(_label("主将", 14))
-	officer_choice = OptionButton.new()
-	_style_field(officer_choice)
-	for officer in store.war.available_officers(str(store.war.state["player_faction"])):
-		officer_choice.add_item("%s  带兵%d" % [officer["name"], int(officer["skills"].get("带兵", 50))])
-		officer_choice.set_item_metadata(officer_choice.item_count - 1, officer["id"])
-	officer_choice.item_selected.connect(func(_index): _update_preview())
-	body.add_child(officer_choice)
-	body.add_child(_label("随军人员  最多选五人，按职位能力任命", 16))
-	companion_checks.clear()
-	for officer in store.war.available_officers(str(store.war.state["player_faction"])):
-		var check := CheckButton.new()
-		check.text = officer["name"] + "  " + str(officer.get("positions", "")).split("\n")[0]
-		check.button_pressed = store.war.Corps.select_members(store.war, str(officer_choice.get_item_metadata(officer_choice.selected)), store.war.available_officers(str(store.war.state["player_faction"])).map(func(o): return o["id"])).has(officer["id"])
-		check.tooltip_text = officer.get("positions", "")
-		check.add_theme_font_override("font", CitySkin.font())
-		check.add_theme_color_override("font_color", CitySkin.INK)
-		check.toggled.connect(func(_pressed): _update_preview())
-		companion_checks[officer["id"]] = check
-		body.add_child(check)
-	preview_label = _label("", 16)
-	body.add_child(preview_label)
-	confirm_button = _button("派遣", _dispatch)
-	body.add_child(confirm_button)
-	notice_label = _label("", 15)
-	body.add_child(notice_label)
-	body.add_child(_label("演示人物与势力配置，尚未按历史年份校定。", 12))
-	_update_preview()
-
-
-func _update_preview() -> void:
-	if preview_label == null or not is_instance_valid(preview_label): return
-	if source_choice.item_count == 0 or officer_choice.item_count == 0:
-		preview_label.text = "暂无可派遣的城池或主将。执行任务中的将领需归营后再次任命。"
-		confirm_button.disabled = true
-		return
-	var home: String = str(source_choice.get_item_metadata(source_choice.selected))
-	var id: String = str(officer_choice.get_item_metadata(officer_choice.selected))
-	if companion_checks.has(id): companion_checks[id].set_pressed_no_signal(false)
-	var selected_count := 0
-	for officer in companion_checks:
-		if companion_checks[officer].button_pressed: selected_count += 1
-	for officer in companion_checks:
-		companion_checks[officer].disabled = officer == id or (selected_count >= 5 and not companion_checks[officer].button_pressed)
-	var preview: Dictionary = store.war.preview_dispatch(home, target_id, id)
-	confirm_button.disabled = store.busy or not bool(preview["ok"])
-	if not bool(preview["ok"]):
-		preview_label.text = str(preview["message"])
-		return
-	var officer: Dictionary = store.war.roster.officers[id]
-	var personality: Dictionary = officer["personality"]
-	preview_label.text = "%s%s\n\n自动动员 %d 人\n留守 %d 人\n最短通路约 %d 日，实际路线由主将决定\n\n风险承受 %d  耐心 %d  决断 %d\n%s" % ["守援" if preview["mission_type"] == "defend" else "攻取", store.war.graph.name_of(target_id), int(preview["strength"]), int(preview["reserve"]), int(preview["travel_days"]), int(personality["风险承受"]), int(personality["耐心"]), int(personality["决断"]), str(officer["profile_note"])]
-
-
-func _dispatch() -> void:
-	if confirm_button.disabled: return
-	var commander: String = str(officer_choice.get_item_metadata(officer_choice.selected))
-	var companions: Array = []
-	for officer in companion_checks:
-		if officer != commander and companion_checks[officer].button_pressed: companions.append(officer)
-	var result: Dictionary = store.war.dispatch(str(source_choice.get_item_metadata(source_choice.selected)), target_id, commander, companions, true)
-	if bool(result["ok"]):
-		dispatch_home = ""
-		show_reports()
-		army_dispatched.emit(str(result["army_id"]))
-	else:
-		notice_label.text = str(result["message"])
+	drawer.present("派将", "出征目标  " + store.war.graph.name_of(target))
+	drawer.host(view)
 
 
 func show_dispatch_from(home: String) -> void:
@@ -375,63 +235,79 @@ func show_dispatch_from(home: String) -> void:
 
 
 func show_reports() -> void:
-	drawer.hide()
+	page = "reports"
+	drawer.present("军情", _faction_date())
+	drawer.host(reports_view)
 	reports_view.open()
 
 
 func show_army_reports(id: String) -> void:
-	drawer.hide()
+	_present_army(id, "reports")
+	page = "army_reports"
+	drawer.host(reports_view)
 	reports_view.open(id)
 
 
 func show_review(id: String) -> void:
-	drawer.hide()
+	_present_army(id, "reports")
+	page = "army_reports"
+	drawer.host(reports_view)
 	reports_view.show_review(id)
 
 
-func _prepare_drawer(kind: String) -> void:
-	for item in drawer_chrome: item.visible = kind != "army"
+func _faction_date() -> String:
+	return "%s  ·  %s" % [store.scenario["factions"].get(store.war.state["player_faction"], {}).get("name", "本军"), store.date_text()]
+
+
+## 部队抽屉的抬头：名称、任务一行与「概况 / 军令 / 战报」分页。
+func _present_army(id: String, active: String) -> void:
+	var army: Dictionary = store.war.state["armies"].get(id, {})
+	selected_army = id
+	var action: String = "已结束" if army.get("status", "") == "ended" else "撤往友城" if army.get("returning", false) else ACTION_NAMES.get(str(army.get("action", {}).get("type", "")), "行动中")
+	var subtitle := "%s  →  %s" % [action, store.war.graph.name_of(str(army.get("target", "")))]
+	drawer.present(str(army.get("name", "部队")), subtitle, ARMY_TABS, active)
+	drawer.set_avatar(preload("res://scripts/war/ui/army_inspector.gd").avatar_texture(store, army))
+
+
+func _army_tab(id: String) -> void:
+	match id:
+		"army": show_army(selected_army)
+		"orders": show_army_orders(selected_army)
+		"reports": show_army_reports(selected_army)
+
+
+## 旧调用方（敌军信息）用的入口；现在等同 open_body 的文字页。
+func _prepare_drawer(_kind: String) -> void:
+	drawer.host(_body_page)
 	status_label.hide()
-	drawer.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if kind == "army" else preload("res://scripts/war/ui/war_ui_skin.gd").paper(12))
 	drawer_scroll.scroll_vertical = 0
 
 
 func show_army(id: String) -> void:
 	var army: Dictionary = store.war.state["armies"].get(id, {})
 	if army.is_empty(): return
-	if is_instance_valid(dispatch_view):
-		dispatch_view.queue_free()
-		dispatch_view = null
-	if is_instance_valid(reports_view): reports_view.hide()
-	var same: bool = page == "army" and selected_army == id and is_instance_valid(inspector)
-	selected_army = id
-	page = "army"
-	heading.text = str(army["name"])
-	drawer.show()
+	var same: bool = page == "army" and selected_army == id and is_instance_valid(inspector) and drawer.visible
 	if same:
 		inspector.update_info()
 		return
-	_clear()
-	_prepare_drawer("army")
+	open_body("", "", [], "")
+	_present_army(id, "army")
+	page = "army"
 	inspector = preload("res://scripts/war/ui/army_inspector.gd").new()
 	inspector.store = store
 	inspector.army_id = id
 	inspector.orders_requested.connect(show_army_orders)
 	inspector.reports_requested.connect(show_army_reports)
-	inspector.close_requested.connect(func(): drawer.hide())
+	inspector.close_requested.connect(drawer.close)
 	body.add_child(inspector)
 
 
 func show_army_orders(id: String) -> void:
 	var army: Dictionary = store.war.state["armies"].get(id, {})
 	if army.is_empty(): return
-	selected_army = id
+	open_body("")
+	_present_army(id, "orders")
 	page = "army_orders"
-	drawer.show()
-	_clear()
-	_prepare_drawer("army_orders")
-	heading.text = "军令  " + str(army["name"])
-	body.add_child(_button("返回部队信息", func(): show_army(id)))
 	var ended: bool = army["status"] == "ended"
 	var corps: Dictionary = store.war.state["corps"].get(army.get("corps_id", ""), {})
 	if not corps.is_empty():
@@ -479,7 +355,6 @@ func show_army_orders(id: String) -> void:
 		body.add_child(row)
 		row.add_child(_label(spec[0], 13))
 		var choice := OptionButton.new()
-		_style_field(choice)
 		choice.add_item(spec[2])
 		choice.add_item(spec[3])
 		var key: String = spec[1]
@@ -497,7 +372,6 @@ func show_army_orders(id: String) -> void:
 		body.add_child(order_row)
 		order_row.add_child(_label(spec[0], 13))
 		var order_choice := OptionButton.new()
-		_style_field(order_choice)
 		for value in spec[2]:
 			order_choice.add_item(str(value))
 			order_choice.set_item_metadata(order_choice.item_count - 1, str(value))
@@ -510,7 +384,6 @@ func show_army_orders(id: String) -> void:
 		body.add_child(line_row)
 		line_row.add_child(_label(spec[0], 13))
 		var line_choice := OptionButton.new()
-		_style_field(line_choice)
 		var current := float(orders["retreat_line"].get(spec[1], 0.0))
 		for preset in spec[2]:
 			line_choice.add_item(str(preset[0]))
@@ -532,12 +405,10 @@ func show_army_orders(id: String) -> void:
 func show_settings() -> void:
 	store.open_settings()
 
+## 人才页：寻访在野人才、接洽任用、查看本方人物履历（功能同主线人才页，改用统一主题控件）。
 func show_talents(selected: String = "") -> void:
-	_prepare_drawer("talents")
+	open_body("人才与履历", _faction_date())
 	page = "talents"
-	heading.text = "人才与履历"
-	drawer.show()
-	_clear()
 	var war = store.war
 	war.characters.sync(war)
 	var faction_id := str(war.state["player_faction"])
@@ -545,7 +416,6 @@ func show_talents(selected: String = "") -> void:
 	if owned.is_empty(): body.add_child(_label("本方暂无城池", 16)); return
 	if not owned.has(selected): selected = str(owned[0])
 	var cities := OptionButton.new()
-	_style_field(cities)
 	for id in owned:
 		cities.add_item(war.graph.name_of(id))
 		cities.set_item_metadata(cities.item_count - 1, id)
@@ -553,22 +423,25 @@ func show_talents(selected: String = "") -> void:
 	cities.item_selected.connect(func(index): show_talents(str(cities.get_item_metadata(index))))
 	body.add_child(cities)
 	body.add_child(_label("安排寻访 · 1行动力，调查3日，另计往返时间", 13))
+	var search_row := Widgets.hbox(1)
+	body.add_child(search_row)
 	var actors := OptionButton.new()
-	_style_field(actors)
+	actors.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for officer in war.available_officers(faction_id):
 		actors.add_item(str(officer["name"]))
 		actors.set_item_metadata(actors.item_count - 1, officer["id"])
-	body.add_child(actors)
+	search_row.add_child(actors)
 	var search_button := _button("派员寻访", func():
 		var result: Dictionary = war.Talent.investigate(war, str(actors.get_item_metadata(actors.selected)), selected)
 		show_talents(selected)
 		notice_label.text = str(result["message"])
 	)
 	search_button.disabled = actors.item_count == 0 or store.busy
-	body.add_child(search_button)
+	search_row.add_child(search_button)
 	for task in war.Talent.state(war)["tasks"].values():
 		if task["faction"] == faction_id and task["phase"] != "complete":
 			body.add_child(_label("%s · %s · 剩余%d日" % [war.roster.officers[task["actor"]]["name"], "寻访" if task["phase"] == "searching" else "归程", maxi(0, int(task["arrival_tick"]) - int(war.state["tick"]))], 13))
+	body.add_child(Widgets.rule())
 	body.add_child(_label("已发现的在野人才", 16))
 	var count := 0
 	for id in war.characters.states:
@@ -576,6 +449,10 @@ func show_talents(selected: String = "") -> void:
 		if person["service_status"] != "wild" or not war.Talent.known(war, faction_id, str(id)): continue
 		count += 1
 		body.add_child(_label("%s · %s" % [war.characters.definitions[id]["name"], war.graph.name_of(str(person["availability"].get("city", "")))], 14))
+		var offers := HFlowContainer.new()
+		offers.add_theme_constant_override("h_separation", Tokens.space(1))
+		offers.add_theme_constant_override("v_separation", Tokens.space(1))
+		body.add_child(offers)
 		for spec in [["接洽待任", ""], ["接洽太守", "governor"], ["接洽守将", "guard"]]:
 			var target := str(id)
 			var job := str(spec[1])
@@ -590,35 +467,47 @@ func show_talents(selected: String = "") -> void:
 				notice_label.text = str(result["message"])
 			)
 			button.disabled = store.busy
-			body.add_child(button)
+			offers.add_child(button)
 	if count == 0: body.add_child(_label("尚无已发现的在野人才，可先派员寻访。", 13))
+	body.add_child(Widgets.rule())
 	body.add_child(_label("本方人物履历", 16))
 	for id in war.characters.states:
 		var person: Dictionary = war.characters.states[id]
 		if person["faction_id"] != faction_id: continue
 		var target := str(id)
-		body.add_child(_button(str(war.characters.definitions[id]["name"]) + " · " + str(person["events"].size()) + "条记录", func(): show_character_history(target, selected)))
+		var entry := Widgets.text_button(str(war.characters.definitions[id]["name"]) + " · " + str(person["events"].size()) + "条记录", func(): show_character_history(target, selected))
+		entry.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		body.add_child(entry)
 	notice_label = _label("人才接洽需要本城可用人员，岗位已有任职者时不能许诺该岗位。", 13)
 	body.add_child(notice_label)
 
+
+## 人物履历：五维、各岗位适岗度与最近 25 条经历事件。
 func show_character_history(id: String, city: String) -> void:
-	_prepare_drawer("talents")
-	page = "talents"
-	heading.text = "人物履历"
-	_clear()
 	var system = store.war.characters
 	var person: Dictionary = system.states[id]
 	var view: Dictionary = system.view(id)
+	open_body("人物履历", str(view["name"]))
+	page = "talents"
 	body.add_child(_button("返回人才", func(): show_talents(city)))
 	body.add_child(_label(str(view["name"]), 20))
 	var names := ["军事", "谋略", "勇武", "政务", "影响"]
+	var dims := GridContainer.new()
+	dims.columns = 2
+	dims.add_theme_constant_override("h_separation", Tokens.space(3))
+	body.add_child(dims)
 	for index in names.size():
 		var dimension: Variant = view["dimensions"][index]
-		body.add_child(_label(str(names[index]) + "  " + (str(roundi(float(dimension))) if dimension != null else "待标定"), 14))
+		dims.add_child(_label(str(names[index]) + "  " + (str(roundi(float(dimension))) if dimension != null else "待标定"), 14))
+	var job_names := {"commander":"主将", "strategist":"军师", "vanguard":"先锋", "deputy":"副将", "governor":"太守", "diplomat":"外交使者"}
+	var fits := GridContainer.new()
+	fits.columns = 2
+	fits.add_theme_constant_override("h_separation", Tokens.space(3))
+	body.add_child(fits)
 	for job in system.JOBS:
 		var fit: Dictionary = system.job_fit(id, str(job))
-		var job_names := {"commander":"主将", "strategist":"军师", "vanguard":"先锋", "deputy":"副将", "governor":"太守", "diplomat":"外交使者"}
-		body.add_child(_label(str(job_names[job]) + "适岗  " + ("%.0f%%" % (float(fit["score"]) * 100.0) if fit["known"] else "资料待补全"), 13))
+		fits.add_child(_label(str(job_names[job]) + "适岗  " + ("%.0f%%" % (float(fit["score"]) * 100.0) if fit["known"] else "资料待补全"), 13))
+	body.add_child(Widgets.rule())
 	body.add_child(_label("经历与关系事件", 16))
 	var kinds := {"appointment":"任命", "duty":"履职", "learning":"有效学习", "attribute_growth":"能力成长", "relation":"关系变化", "service_transition":"身份变化", "legacy_experience":"旧档经历", "talent_search":"寻访安排", "talent_discovered":"发现人才", "recruitment_offer":"招募接洽"}
 	for event in person["events"].slice(maxi(0, person["events"].size() - 25)):
@@ -628,12 +517,10 @@ func show_character_history(id: String, city: String) -> void:
 		body.add_child(_label("第%d日 · %s" % [int(event["tick"]), description], 13))
 	if person["events"].is_empty(): body.add_child(_label("尚无履职记录", 13))
 
+
 func show_city_policy(selected: String = "") -> void:
-	_prepare_drawer("city_policy")
+	open_body("城务与人事", _faction_date())
 	page = "city_policy"
-	heading.text = "城务与人事"
-	drawer.show()
-	_clear()
 	var owned: Array = store.war.Operations.cities(store.war, str(store.war.state["player_faction"]))
 	if owned.is_empty(): body.add_child(_label("本方暂无城池", 16)); return
 	if not owned.has(selected): selected = str(owned[0])
@@ -642,7 +529,6 @@ func show_city_policy(selected: String = "") -> void:
 		cities.add_item(store.war.graph.name_of(id))
 		cities.set_item_metadata(cities.item_count - 1, id)
 		if id == selected: cities.select(cities.item_count - 1)
-	_style_field(cities)
 	body.add_child(cities)
 	cities.item_selected.connect(func(index): show_city_policy(str(cities.get_item_metadata(index))))
 	var policy: Dictionary = store.war.Operations.policy(store.war, selected)
@@ -654,14 +540,10 @@ func show_city_policy(selected: String = "") -> void:
 			choice.add_item(item[1])
 			choice.set_item_metadata(choice.item_count - 1, item[0])
 			if policy[spec[1]] == item[0]: choice.select(choice.item_count - 1)
-		_style_field(choice)
 		body.add_child(choice)
 	var delegated := CheckButton.new()
 	delegated.text = "委任太守经营"
 	delegated.tooltip_text = "经营消耗本方行动力与城市资源"
-	delegated.add_theme_font_override("font", preload("res://scripts/war/ui/war_ui_skin.gd").font())
-	delegated.add_theme_font_size_override("font_size", 13)
-	delegated.add_theme_color_override("font_color", CitySkin.INK)
 	delegated.button_pressed = policy["delegated"]
 	body.add_child(delegated)
 	body.add_child(_button("更新城池方针", func():
@@ -676,7 +558,6 @@ func show_city_policy(selected: String = "") -> void:
 		var home: String = str(store.war.state["officer_states"].get(officer["id"], {}).get("city", ""))
 		officers.add_item("%s · %s" % [officer["name"], store.war.graph.name_of(home)])
 		officers.set_item_metadata(officers.item_count - 1, officer["id"])
-	_style_field(officers)
 	body.add_child(officers)
 	for spec in [["任命太守", "governor"], ["任命守将", "guard"], ["调任本城", ""]]:
 		var role: String = spec[1]
@@ -694,28 +575,9 @@ func show_city_policy(selected: String = "") -> void:
 	body.add_child(notice_label)
 
 
-func _style_field(control: Control) -> void:
-	control.add_theme_font_override("font", preload("res://scripts/war/ui/war_ui_skin.gd").font())
-	control.add_theme_font_size_override("font_size", 13)
-	var field := StyleBoxFlat.new()
-	field.bg_color = Color("f5eedb")
-	field.border_color = Color("bca878")
-	field.border_width_bottom = 1
-	field.set_content_margin_all(7)
-	for type in ["normal", "hover", "pressed", "focus"]:
-		control.add_theme_stylebox_override(type, field)
-	for type in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
-		control.add_theme_color_override(type, CitySkin.INK)
-	control.add_theme_color_override("font_placeholder_color", Color("8e8168"))
-	if control is OptionButton:
-		var popup: PopupMenu = control.get_popup()
-		popup.add_theme_stylebox_override("panel", CitySkin.paper(0.99, 6))
-		popup.add_theme_color_override("font_color", CitySkin.INK)
-
-
 func _next_turn() -> void:
 	if store.busy:
-		if is_instance_valid(flow_button): store.toggle_time_pause()
+		if _continuous(): store.toggle_time_pause()
 		return
 	await store.advance_turn()
 	show_reports()
@@ -728,16 +590,20 @@ func _toggle_time() -> void:
 	await store.advance_turn()
 	show_reports()
 
-func _refresh_time_label() -> void:
+## 时间阶段与推进进度，如「下令」「进行 40%」；顶栏与 2D 工具行共用。
+func time_phase_text() -> String:
 	var phase: String = "下令" if store.time_phase == "strategy" else "旬报" if store.time_phase == "report" else "暂停" if store.time_paused else "进行"
-	var progress := ""
-	if store.busy and store.turn_days_total > 0:
-		var fraction := 0.0
-		if is_instance_valid(store.war_presentation) and store.war_presentation.presenting:
-			fraction = clampf(store.war_presentation.presentation_elapsed / store.war_presentation.DAY_SECONDS, 0, 1)
-		progress = " %d%%" % int(100 * (store.turn_days_done + fraction) / store.turn_days_total)
-	var period: String = ["上旬", "中旬", "下旬"][clampi((store.day - 1) / 10, 0, 2)]
-	date_label.text = "%s %s  %s%s" % [store.date_text(), period, phase, progress]
+	if not store.busy or store.turn_days_total <= 0: return phase
+	var fraction := 0.0
+	if is_instance_valid(store.war_presentation) and store.war_presentation.presenting:
+		fraction = clampf(store.war_presentation.presentation_elapsed / store.war_presentation.DAY_SECONDS, 0, 1)
+	return "%s %d%%" % [phase, int(100 * (store.turn_days_done + fraction) / store.turn_days_total)]
+
+
+## 3D 大地图上时间连续流动（空格暂停 / 继续）；2D 地图按十日一推。
+func _continuous() -> bool:
+	return is_instance_valid(store.war_presentation)
+
 
 func _process(_delta: float) -> void:
 	panel_timer += _delta
@@ -745,19 +611,21 @@ func _process(_delta: float) -> void:
 		panel_timer = 0.0
 		if drawer.visible and page == "army" and is_instance_valid(inspector): inspector.update_info()
 		if is_instance_valid(reports_view): reports_view.refresh()
-	if is_instance_valid(date_label) and store.busy: _refresh_time_label()
+	if is_instance_valid(date_label) and store.busy: date_label.text = "%s  %s" % [store.date_text(), time_phase_text()]
 	if store.busy and store.agent != null and is_instance_valid(status_label): status_label.text = str(store.agent.last_status)
 	if is_instance_valid(battle_label) and store.agent != null and store.war.state.has("battlefield"):
 		var metrics: Dictionary = store.agent.metrics
 		battle_label.text = "%s  种子%d\n%s  累计请求%d / 失败%d / 回退%d" % [store.war.state["battlefield"].get("scenario_name", "小沛攻防"), store.war.state["battlefield"].get("seed", 1910901), "当前模型：" + str(store.agent.model) if store.agent.enabled else "本地策略（请在设置中启用模型）", metrics.get("calls", 0), metrics.get("failures", 0), metrics.get("fallbacks", 0)]
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if not is_instance_valid(flow_button): return
+	if not _continuous(): return
 	if get_viewport().gui_get_focus_owner() is LineEdit or get_viewport().gui_get_focus_owner() is TextEdit: return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE:
 		_toggle_time()
 		get_viewport().set_input_as_handled()
 
 func show_battle_summary() -> void:
-	drawer.hide()
+	page = "reports"
+	drawer.present("会战总结", _faction_date())
+	drawer.host(reports_view)
 	reports_view.show_summary()

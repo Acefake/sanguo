@@ -1,0 +1,24 @@
+{
+  "ask_threshold": 0.35,
+  "margin": 12,
+  "stakes_weights": {"strength_share": 0.4, "key_person": 0.25, "player_visible": 0.2, "irreversible": 0.4},
+  "lod_factor": {"L0": 1.0, "L1": 0.6, "L2": 0.0},
+  "deadline_ms": {"plan": 4000, "replan": 3000, "lord": 6000, "council_speak": 6000, "audience_turn": 12000,
+                  "commander": 8000, "army": 8000, "unit": 6000, "adviser": 6000},
+  "value": {"commander": 3.0, "army": 2.0, "unit": 1.0, "adviser": 1.0},
+  "concurrency": {"local": 1, "cloud": 5},
+  "commit_delay_ticks": 1,
+  "latency_window": 200,
+  "decision_log": "user://people_decisions.jsonl",
+  "api_key_env": ["SANGUO_MODEL_API_KEY"],
+  "per_xun_cap": 40,
+  "cache": {"enabled": true, "scope": "xun"},
+  "degrade": {"p95_ratio": 0.8, "timeout_rate": 0.3, "veto_rate": 0.1, "recover_xun": 3},
+  "presets": {
+    "rules_only": {},
+    "local_light": {"select": {"endpoint": "http://127.0.0.1:11434/api/chat", "model": "qwen3:1.7b"}},
+    "local_standard": {"select": {"endpoint": "http://127.0.0.1:11434/api/chat", "model": "qwen3:4b"},
+                       "speak":  {"endpoint": "http://127.0.0.1:11434/api/chat", "model": "qwen3:8b"}},
+    "cloud": {"select": {"endpoint": "", "model": ""}, "speak": {"endpoint": "", "model": ""}}
+  }
+}

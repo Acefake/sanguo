@@ -7,6 +7,8 @@ signal campaign_progress
 
 const WarCampaign = preload("res://scripts/war/campaign/campaign_state.gd")
 const AgentAdapter = preload("res://scripts/agents/agent_adapter.gd")
+const PeopleStore = preload("res://scripts/people/person_store.gd")
+const EventBus = preload("res://scripts/people/people_events.gd")
 
 const DEMO_PATH := "res://data/scenario_world_demo.json"
 const SAVE_PATH := "user://city_campaign.json"
@@ -144,6 +146,8 @@ func _install_theme() -> void:
 
 
 func _ready() -> void:
+	# 人物系统的属性与关系值读写当前战役的 characters；war 会被换掉，所以给取值函数而不是对象。
+	PeopleStore.autoload().characters_source = func(): return war.characters
 	_install_theme()
 	_load_demo()
 	_load_save()
@@ -206,6 +210,7 @@ func _load_save() -> void:
 		agent.cancel_pending()
 	war = WarCampaign.new()
 	war.setup(self, parsed.get("war", {}) if parsed.get("war", {}) is Dictionary else {})
+	_import_people(parsed.get("people", {}))
 
 
 func _save() -> void:
@@ -226,11 +231,29 @@ func _save() -> void:
 		"chronicles": chronicles,
 		"war": war.export_state()
 	}
+	var people := _export_people()
+	if not people.is_empty(): payload["people"] = people
 	file.store_string(JSON.stringify(payload, "\t", true, true))
 	file.flush()
 	file.close()
 	if DirAccess.rename_absolute(ProjectSettings.globalize_path(pending_path), ProjectSettings.globalize_path(save_path)) != OK:
 		push_warning("无法替换进度文件，原存档已保留。")
+
+
+## 人物系统存档：载入了人物包时，People 的状态加上 PeopleEvents 未结算的事件队列，存在 people 键
+## （people_version 见 PersonStore.VERSION）；没有载入人物包时为空，存档里不写 people 键。
+func _export_people() -> Dictionary:
+	var people := PeopleStore.autoload()
+	if people.scenario.is_empty(): return {}
+	var state: Dictionary = people.export_state()
+	state["events"] = EventBus.autoload().export_state()
+	return state
+
+
+## 没有 people 键的存档不动人物系统。
+func _import_people(state: Variant) -> void:
+	if not state is Dictionary or state.is_empty(): return
+	if PeopleStore.autoload().import_state(state): EventBus.autoload().import_state(state.get("events", {}))
 
 
 func city_state(city_id: String) -> Dictionary:

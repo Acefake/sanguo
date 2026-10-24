@@ -27,6 +27,9 @@ func setup(war, saved: Dictionary = {}) -> void:
 		if not states.has(id):
 			states[id] = Model.initial_state(def, officer)
 			migration_audit.append({"character_id":id, "version":Model.VERSION, "requires_review":def["calibration_required"].duplicate(), "missing_configuration":Model.validate(def)})
+	# People adopted from outside the roster (adopt) keep their frozen definition too.
+	for id in saved.get("definitions", {}):
+		if not definitions.has(id) and states.has(id): definitions[id] = saved["definitions"][id].duplicate(true)
 	sync(war)
 	# Keep tactical memories on their original army, and archive them by person
 	# exactly once. Migration is not a source of experience points.
@@ -40,6 +43,15 @@ func ensure(officer: Dictionary) -> void:
 	if definitions.has(id): return
 	definitions[id] = Model.definition({}, officer)
 	states[id] = Model.initial_state(definitions[id], officer)
+
+# Adopts a person who is not on the war roster (a people-pack character). An id
+# already known keeps its definition and state; returns whether it was added.
+func adopt(def: Dictionary, officer: Dictionary) -> bool:
+	var id := str(def.get("character_id", ""))
+	if id.is_empty() or definitions.has(id): return false
+	definitions[id] = def.duplicate(true)
+	if not states.has(id): states[id] = Model.initial_state(definitions[id], officer)
+	return true
 
 func sync(war) -> void:
 	for id in war.roster.officers:

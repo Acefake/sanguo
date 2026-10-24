@@ -106,8 +106,6 @@ static func to_state(card: Dictionary, xun: int) -> State:
 	var state := State.new()
 	state.id = str(card["id"])
 	state.faction = str(card.get("faction_id", ""))
-	state.attrs = card.get("attributes", {}).duplicate(true)
-	state.potentials = card.get("potentials", {}).duplicate(true)
 	state.birth_year = int(card.get("birth_year", 0))
 	state.origin = card.get("origin", {}).duplicate(true)
 	state.kin = card.get("kin", []).duplicate(true)

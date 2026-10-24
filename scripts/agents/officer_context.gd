@@ -4,7 +4,7 @@ const AXES := ["野心", "风险承受", "耐心", "决断", "自制", "猜疑",
 const SKILLS := [["带兵", "布阵", "水练", "奇袭", "治军"], ["智计", "沉着", "料敌", "应变", "辩才"], ["膂力", "体魄", "武艺", "骑术", "箭术"], ["农桑", "商贾", "吏治", "律法", "辞令"], ["威仪", "仁德", "忠义", "名望", "雅量"]]
 var officers: Dictionary = {}
 var parsing_audit: Array = []
-const Battle = preload("res://scripts/war/officer_battle.gd")
+const Battle = preload("res://scripts/war/battle/officer_battle.gd")
 
 static func numeric(value: Variant, maximum: int) -> Dictionary:
 	if typeof(value) not in [TYPE_INT,TYPE_FLOAT] and not (value is String and value.is_valid_float()): return {"value":50,"source":"invalid_default"}

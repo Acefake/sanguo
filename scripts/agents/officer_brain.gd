@@ -1,7 +1,7 @@
 extends RefCounted
 
 const Plan = preload("res://scripts/agents/tactical_plan.gd")
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 
 # One persistent identity per officer. Commander, physical leader and adviser are
 # authority facets of that identity; advisers never submit movement or casualties.

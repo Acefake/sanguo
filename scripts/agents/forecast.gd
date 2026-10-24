@@ -4,8 +4,8 @@ extends RefCounted
 # never consumes random numbers (random factor uses the 1.0 expectation), and only
 # ever reads the limited intel an army actually holds.
 
-const Combat = preload("res://scripts/war/combat_system.gd")
-const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
 
 const MELEE := ["engage", "flank", "pursue", "besiege"]
 const ESTIMATE := {"training": 50, "equipment": 50, "morale": 70.0, "organization": 70.0, "fatigue": 0.0, "skills": {}, "ranged_attack": false}
@@ -120,7 +120,7 @@ static func _nearest_observed(war, army: Dictionary, enemies: Dictionary) -> Dic
 			if target < 0: continue
 			distance = Tactical.cell_distance(int(army["tactical"]["cell"]),target)
 			if distance < 1 or distance > Tactical.attack_range(enemy): continue
-			if distance > 1 and not preload("res://scripts/war/city_fortifications.gd").line_of_sight(Tactical.board_for(war,army),int(army["tactical"]["cell"]),target): continue
+			if distance > 1 and not preload("res://scripts/war/battle/city_fortifications.gd").line_of_sight(Tactical.board_for(war,army),int(army["tactical"]["cell"]),target): continue
 			enemy["ranged_attack"] = distance > 1
 		else:
 			var location: Dictionary = sight.get("location",{})

@@ -4,7 +4,7 @@ extends RefCounted
 # point; internals read data/agents/policy_weights.json and score every authorized
 # candidate so the best option is explainable and personality-driven.
 
-const Combat = preload("res://scripts/war/combat_system.gd")
+const Combat = preload("res://scripts/war/battle/combat_system.gd")
 const Roster = preload("res://scripts/agents/officer_context.gd")
 const WEIGHTS_PATH := "res://data/agents/policy_weights.json"
 const MELEE := ["engage", "flank", "pursue", "besiege"]
@@ -619,7 +619,7 @@ static func commander_explicit(context: Dictionary, candidate: Dictionary, kind:
 	if kind == "assign_task":
 		for unit in units:
 			if str(unit.get("id","")) == str(candidate.get("action",{}).get("unit","")):
-				var fit := preload("res://scripts/war/troop_roles.gd").role_fit(unit,task)
+				var fit := preload("res://scripts/war/battle/troop_roles.gd").role_fit(unit,task)
 				if not is_zero_approx(fit): out["兵种职责适配"] = fit
 
 	return out

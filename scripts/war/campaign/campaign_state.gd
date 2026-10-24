@@ -39,6 +39,7 @@ var urgent_event := false
 var generation := 0
 var planner = preload("res://scripts/agents/decision_scheduler.gd").new()
 var routes = preload("res://scripts/war/campaign/route_memo.gd").new()
+var lords = preload("res://scripts/war/campaign/lord_memo.gd").new()
 var rng := RandomNumberGenerator.new()
 
 

@@ -106,6 +106,8 @@ func _supersede_checks() -> void:
 	for i in range(20): queue.submit(_request("dup-%d" % i, "same-actor", 0.05))
 	check(queue.queued_count() + queue.inflight_count() == 1, "同人同类顶替后队列长度增长：%d" % (queue.queued_count() + queue.inflight_count()))
 	check(int(queue.stats()["superseded"]) - before == 19, "顶替计数错误")
+	# dup-0 已发出：作废后 HTTP 请求仍在路上，通道（并发 1）要等它返回才让最新请求发出。
+	check(queue.inflight_count() == 0 and queue.queued_count() == 1, "顶替在飞请求后，新请求在旧请求返回前就占用了通道")
 	while queue.is_pending("dup-19"): await process_frame
 	check(queue.has_answer("dup-19") and not queue.has_answer("dup-0"), "顶替后保留的不是最新请求")
 	queue.take("dup-19")

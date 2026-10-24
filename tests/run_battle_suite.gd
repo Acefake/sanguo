@@ -47,6 +47,8 @@ const SUITE := [
 	"agents/model_gate_validation",
 	"agents/orders_dissent_validation",
 	"agents/decision_scheduler_validation",
+	"agents/model_queue_validation",
+	"agents/step_latency_validation",
 	"agents/unit_brain_validation",
 	"agents/unit_model_validation",
 	"agents/tactical_behavior_validation",

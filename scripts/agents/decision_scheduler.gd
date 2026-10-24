@@ -1,4 +1,3 @@
-class_name DecisionScheduler
 extends RefCounted
 ## 战场决策的提交点：每个 CampaignState 一个，把将领决策交给 ModelQueue，到提交点再决定用模型答案还是默认答案。
 ##
@@ -143,7 +142,7 @@ func _on_settled(request_id: String) -> void:
 	var adapter: Node = waiting["adapter"]
 	if requested.get(key) != request: return
 	if not _models().has_answer(request_id):
-		if is_instance_valid(adapter) and adapter.has_method("record_failure"): adapter.record_failure("模型没有在时限内给出可用答案")
+		if is_instance_valid(adapter) and adapter.has_method("record_failure"): adapter.record_failure(_models().failure_reason(request_id))
 		return
 	var answer: Dictionary = _models().take(request_id)
 	if is_instance_valid(adapter) and adapter.has_method("resolve"): answer = adapter.resolve(waiting["context"], answer)

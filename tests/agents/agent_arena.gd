@@ -58,7 +58,8 @@ func _round(store: Node, adapter, label: String) -> Dictionary:
 		days += 1
 		if adapter != null and drain:
 			var guard := 0
-			while (war.planner._inflight > 0 or not war.planner.queue.is_empty()) and guard < 1200:
+			var models: Node = root.get_node("ModelQueue")
+			while (models.inflight_count() > 0 or models.queued_count() > 0) and guard < 1200:
 				await process_frame
 				guard += 1
 		if war.state.get("battlefield", {}).has("winner"): break
@@ -82,6 +83,6 @@ func _round(store: Node, adapter, label: String) -> Dictionary:
 		"local_decisions": 0 if adapter == null else int(adapter.metrics.get("local_decisions", 0)),
 		"mode": "local" if adapter == null else adapter.model_mode,
 		"failure_reasons": {} if adapter == null else adapter.failure_reasons.duplicate(),
-		"planner": {"inflight": war.planner._inflight, "queued": war.planner.queue.size(), "ready": war.planner.ready.size(), "requested": war.planner.requested.size(), "discarded": war.planner.discarded, "submitted": war.planner._submitted, "round": war.planner._round},
+		"planner": {"inflight": root.get_node("ModelQueue").inflight_count(), "queued": root.get_node("ModelQueue").queued_count(), "ready": war.planner.ready.size(), "requested": war.planner.requested.size(), "discarded": war.planner.discarded, "submitted": int(root.get_node("ModelQueue").stats()["submitted"]), "round": war.planner._round},
 		"ms": Time.get_ticks_msec() - started
 	}

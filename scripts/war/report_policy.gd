@@ -25,10 +25,13 @@ static func allow(state: Dictionary, army: Dictionary, kind: String, event_key: 
 	sent[key] = int(state.get("tick", 0))
 	return true
 
+## Records the last position, strength and status each player army was seen with, so the next report can be
+## compared against it. Armies without a "location" yet (fixtures built by hand, or an army created mid-setup)
+## record an empty location instead of aborting the whole pass; armies that have one are recorded unchanged.
 static func observe(war) -> void:
 	for army in war.state["armies"].values():
 		if army.get("faction", "") != war.state["player_faction"]: continue
-		army["last_observation"] = {"location": army["location"].duplicate(true), "strength": war.Combat.strength(army), "ended": army.get("status", "active") == "ended", "tick": war.state["tick"], "date": war.store.date_text()}
+		army["last_observation"] = {"location": army.get("location", {}).duplicate(true), "strength": war.Combat.strength(army), "ended": army.get("status", "active") == "ended", "tick": war.state["tick"], "date": war.store.date_text()}
 
 static func migrate(state: Dictionary) -> void:
 	# Legacy daily options must not resurrect frequent notifications after loading.

@@ -14,6 +14,10 @@ const Widgets = preload("res://scripts/ui/theme/ui_widgets.gd")
 const WIDTH := 384
 const SLIDE := 24.0
 
+## 抬头左侧的圆形头像（部队页显示主将头像；其他页隐藏）。
+const AVATAR := 52
+var avatar: TextureRect
+var _avatar_frame: PanelContainer
 var title_label: Label
 var subtitle_label: Label
 var pages: Control
@@ -29,10 +33,26 @@ func _init() -> void:
 	offset_left = -WIDTH - Tokens.space(2)
 	offset_right = -Tokens.space(2)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	var column := Widgets.vbox(2)
+	# 上下内边距收紧到 16（左右仍 24），抬头与分页间距 8：把纵向空间让给内容区，概况页默认不用长滚动。
+	var column := Widgets.vbox(1)
 	add_child(column)
 	var head := Widgets.hbox(1)
 	column.add_child(head)
+	# 头像放进抬头，与标题同一行：不再在内容区顶上占一大块头像区。
+	_avatar_frame = PanelContainer.new()
+	_avatar_frame.custom_minimum_size = Vector2(AVATAR, AVATAR)
+	_avatar_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_avatar_frame.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	var ring := preload("res://scripts/ui/theme/ui_theme_builder.gd").box(Tokens.color("raised", -1, "glass"), "pill")
+	ring.set_corner_radius_all(AVATAR / 2)
+	_avatar_frame.add_theme_stylebox_override("panel", ring)
+	_avatar_frame.visible = false
+	head.add_child(_avatar_frame)
+	avatar = TextureRect.new()
+	avatar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	avatar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_avatar_frame.add_child(avatar)
 	var titles := Widgets.vbox(0)
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(titles)
@@ -54,9 +74,36 @@ func _init() -> void:
 	visible = false
 
 
+## 面板样式取自所在子树主题（地图上是 glass），只把上下内边距收紧到 16。
+## 只在第一次进树时做一次（覆盖样式本身会触发主题变更通知，不能挂在 theme_changed 上）。
+func _apply_padding() -> void:
+	if has_theme_stylebox_override("panel"): return
+	var style := get_theme_stylebox("panel", "PanelContainer").duplicate() as StyleBox
+	style.content_margin_top = Tokens.space(2)
+	style.content_margin_bottom = Tokens.space(2)
+	add_theme_stylebox_override("panel", style)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_ENTER_TREE: _apply_padding()
+
+
+## 抬头头像；null 隐藏。每次 present() 都会先清空，需要头像的页面在 present 之后设置。
+func set_avatar(texture: Texture2D) -> void:
+	avatar.texture = texture
+	_avatar_frame.visible = texture != null
+
+
+## 分页胶囊按钮（测试与快捷键用）；没有该页时返回 null。
+func tab_button(id: String) -> Button:
+	var index := _tab_ids.find(id)
+	return _tabs[index] if index >= 0 else null
+
+
 ## 设置抬头与分页并打开抽屉。tabs 为 [[id, 文字], ...]，空数组隐藏分页行。
 func present(title: String, subtitle := "", tabs: Array = [], active := "") -> void:
 	title_label.text = title
+	set_avatar(null)
 	subtitle_label.text = subtitle
 	subtitle_label.visible = not subtitle.is_empty()
 	_set_tabs(tabs, active)

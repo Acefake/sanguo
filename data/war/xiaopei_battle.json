@@ -1,0 +1,7 @@
+{
+  "player_faction": "liu_bei",
+  "sides": [
+    {"faction": "liu_bei", "role": "defender", "leader": ""},
+    {"faction": "yuan_shao", "role": "attacker", "leader": ""}
+  ]
+}

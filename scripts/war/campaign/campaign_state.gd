@@ -81,6 +81,8 @@ func setup(owner: Node, saved: Dictionary = {}) -> void:
 	# 违令掷点走独立随机流：种子来自剧本/存档，而不是当日战斗随机流的快照，
 	# 否则任何一处战斗消耗的差异都会改写全部违令结果，"同种子可复现"不再成立。
 	state["dissent_seed"] = int(state.get("dissent_seed", 0))
+	# dissent_state 是 64 位随机数状态，存档里是十进制字符串（见 export_state）。
+	state["dissent_state"] = _saved_int64(saved.get("dissent_state", 0))
 	for army in state["armies"].values():
 		# 旧档缺将领档案时先补登记，再回写 officer_id；只补不写会留下悬空引用。
 		var previous_id := str(army.get("officer_id", ""))
@@ -149,6 +151,13 @@ func setup(owner: Node, saved: Dictionary = {}) -> void:
 	ReportPolicy.observe(self)
 
 
+## 从存档读回 64 位整数状态。新档存十进制字符串（无损）；旧档存的是 JSON 数字，
+## 读回来已是截断过的浮点数，只能按原样取整（旧档的违令随机流读档后仍与原局不同）。
+static func _saved_int64(value: Variant) -> int:
+	if value is String: return (value as String).to_int()
+	return int(value) if typeof(value) in [TYPE_INT, TYPE_FLOAT] else 0
+
+
 func _json(path: String) -> Variant:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
@@ -162,6 +171,9 @@ func export_state() -> Dictionary:
 	state["characters"] = characters.export_state()
 	state["rng_state"] = str(rng.state)
 	var snapshot := state.duplicate(true)
+	# 与 rng_state 一样按字符串存：JSON 数字是双精度浮点，只有 53 位有效位，64 位的违令随机流
+	# 状态按数字存会在读档时被截断，读档后的违令掷点就和不读档时不同（参军回复存档重放因此改变战斗）。
+	snapshot["dissent_state"] = str(int(state.get("dissent_state", 0)))
 	snapshot.erase("battle_ai_metrics")
 	snapshot.erase("battle_ai_shadow")
 	for corps in snapshot["corps"].values():

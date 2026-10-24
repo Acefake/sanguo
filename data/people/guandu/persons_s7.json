@@ -1,0 +1,1381 @@
+[
+ {
+  "id": "ys_001",
+  "schema_version": 7,
+  "birth_year": 154,
+  "origin": {
+   "commandery": "汝南",
+   "class": "名门"
+  },
+  "kin": [
+   {
+    "to": "off_yuantan",
+    "type": "子"
+   },
+   {
+    "to": "off_yuanshang",
+    "type": "子"
+   }
+  ],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 0.55
+   },
+   {
+    "id": "家族",
+    "weight": 0.45
+   }
+  ],
+  "habits": [
+   "habit_004",
+   "habit_075"
+  ],
+  "career": [
+   "career_028",
+   "career_026",
+   "career_030"
+  ],
+  "knots": [
+   {
+    "id": "knot_035",
+    "object": {
+     "kind": "person",
+     "id": "cc_001"
+    },
+    "intensity": 45
+   }
+  ],
+  "fame": {
+   "id": "fame_015",
+   "level": 2
+  },
+  "circles": [
+   "circle_runan_yuan"
+  ],
+  "hidden": [
+   "habits.habit_075"
+  ],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "off_yuantan",
+    "信任": 73,
+    "敬重": 62,
+    "恩义": 27,
+    "利益": 58,
+    "怨恨": 0
+   },
+   {
+    "to": "off_yuanshang",
+    "信任": 77,
+    "敬重": 74,
+    "恩义": 30,
+    "利益": 58,
+    "怨恨": 0
+   },
+   {
+    "to": "ys_015",
+    "信任": 52,
+    "敬重": 75,
+    "恩义": 25,
+    "利益": 58,
+    "怨恨": 10
+   },
+   {
+    "to": "ys_016",
+    "信任": 61,
+    "敬重": 84,
+    "恩义": 29,
+    "利益": 58,
+    "怨恨": 3
+   },
+   {
+    "to": "ys_018",
+    "信任": 78,
+    "敬重": 70,
+    "恩义": 30,
+    "利益": 58,
+    "怨恨": 0
+   },
+   {
+    "to": "ys_020",
+    "信任": 66,
+    "敬重": 62,
+    "恩义": 26,
+    "利益": 58,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "ys_016",
+  "schema_version": 7,
+  "birth_year": 160,
+  "origin": {
+   "commandery": "广平",
+   "class": "士族"
+  },
+  "kin": [
+   {
+    "to": "off_jupei",
+    "type": "子"
+   }
+  ],
+  "drives": [
+   {
+    "id": "天下",
+    "weight": 0.6
+   },
+   {
+    "id": "忠义",
+    "weight": 0.4
+   }
+  ],
+  "habits": [
+   "habit_023",
+   "habit_014"
+  ],
+  "career": [
+   "career_043",
+   "career_024"
+  ],
+  "knots": [
+   {
+    "id": "knot_031",
+    "object": {
+     "kind": "person",
+     "id": "ys_001"
+    },
+    "intensity": 40
+   },
+   {
+    "id": "knot_038",
+    "object": {
+     "kind": "person",
+     "id": "ys_020"
+    },
+    "intensity": 50
+   }
+  ],
+  "fame": {
+   "id": "fame_007",
+   "level": 1
+  },
+  "circles": [
+   "circle_hanfu_old",
+   "circle_hebei_scholars"
+  ],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "ys_001",
+    "信任": 58,
+    "敬重": 63,
+    "恩义": 17,
+    "利益": 38,
+    "怨恨": 7,
+    "derived": "notion_formula"
+   },
+   {
+    "to": "ys_015",
+    "信任": 82,
+    "敬重": 87,
+    "恩义": 25,
+    "利益": 38,
+    "怨恨": 0,
+    "derived": "notion_formula"
+   },
+   {
+    "to": "ys_020",
+    "信任": 20,
+    "敬重": 25,
+    "恩义": 6,
+    "利益": 38,
+    "怨恨": 45,
+    "derived": "notion_formula"
+   }
+  ]
+ },
+ {
+  "id": "ys_015",
+  "schema_version": 7,
+  "birth_year": 155,
+  "origin": {
+   "commandery": "巨鹿",
+   "class": "士族"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "忠义",
+    "weight": 0.6
+   },
+   {
+    "id": "天下",
+    "weight": 0.4
+   }
+  ],
+  "habits": [
+   "habit_029",
+   "habit_028"
+  ],
+  "career": [
+   "career_043"
+  ],
+  "knots": [
+   {
+    "id": "knot_020",
+    "object": {
+     "kind": "person",
+     "id": "ys_001"
+    },
+    "intensity": 35
+   }
+  ],
+  "fame": {
+   "id": "fame_015",
+   "level": 1
+  },
+  "circles": [
+   "circle_hebei_scholars"
+  ],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "ys_001",
+    "信任": 39,
+    "敬重": 44,
+    "恩义": 12,
+    "利益": 32,
+    "怨恨": 26,
+    "derived": "notion_formula"
+   },
+   {
+    "to": "ys_016",
+    "信任": 76,
+    "敬重": 81,
+    "恩义": 23,
+    "利益": 32,
+    "怨恨": 0,
+    "derived": "notion_formula"
+   },
+   {
+    "to": "ys_020",
+    "信任": 18,
+    "敬重": 23,
+    "恩义": 5,
+    "利益": 32,
+    "怨恨": 47,
+    "derived": "notion_formula"
+   }
+  ]
+ },
+ {
+  "id": "ys_017",
+  "schema_version": 7,
+  "birth_year": 155,
+  "origin": {
+   "commandery": "南阳",
+   "class": "士族"
+  },
+  "kin": [
+   {
+    "to": "off_xuyou_kin",
+    "type": "家眷"
+   }
+  ],
+  "drives": [
+   {
+    "id": "财货",
+    "weight": 0.6
+   },
+   {
+    "id": "功名",
+    "weight": 0.4
+   }
+  ],
+  "habits": [
+   "habit_001",
+   "habit_073"
+  ],
+  "career": [
+   "career_043"
+  ],
+  "knots": [
+   {
+    "id": "knot_035",
+    "object": {
+     "kind": "person",
+     "id": "cc_001"
+    },
+    "intensity": 55
+   }
+  ],
+  "fame": {
+   "id": "fame_020",
+   "level": 1
+  },
+  "circles": [
+   "circle_mufu_guests"
+  ],
+  "hidden": [
+   "drives",
+   "knots.knot_035"
+  ],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "ys_001",
+    "信任": 60,
+    "敬重": 65,
+    "恩义": 18,
+    "利益": 44,
+    "怨恨": 5,
+    "derived": "notion_formula"
+   },
+   {
+    "group": "direct_peers",
+    "信任": 65,
+    "敬重": 70,
+    "恩义": 20,
+    "利益": 44,
+    "怨恨": 0,
+    "derived": "notion_formula"
+   }
+  ]
+ },
+ {
+  "id": "ys_018",
+  "schema_version": 7,
+  "birth_year": 160,
+  "origin": {
+   "commandery": "魏郡",
+   "class": "豪强"
+  },
+  "kin": [
+   {
+    "to": "off_shenrong",
+    "type": "侄"
+   }
+  ],
+  "drives": [
+   {
+    "id": "忠义",
+    "weight": 0.7
+   },
+   {
+    "id": "家族",
+    "weight": 0.3
+   }
+  ],
+  "habits": [
+   "habit_058",
+   "habit_007"
+  ],
+  "career": [
+   "career_031",
+   "career_024"
+  ],
+  "knots": [],
+  "fame": {
+   "id": "fame_005",
+   "level": 1
+  },
+  "circles": [
+   "circle_hanfu_old",
+   "circle_hebei_scholars"
+  ],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "off_yuanshang",
+    "信任": 88,
+    "敬重": 93,
+    "恩义": 26,
+    "利益": 50,
+    "怨恨": 0,
+    "derived": "notion_formula"
+   },
+   {
+    "to": "off_yuantan",
+    "信任": 17,
+    "敬重": 22,
+    "恩义": 5,
+    "利益": 50,
+    "怨恨": 48,
+    "derived": "notion_formula"
+   },
+   {
+    "to": "ys_001",
+    "信任": 83,
+    "敬重": 88,
+    "恩义": 25,
+    "利益": 50,
+    "怨恨": 0,
+    "derived": "notion_formula"
+   }
+  ]
+ },
+ {
+  "id": "ys_020",
+  "schema_version": 7,
+  "birth_year": 160,
+  "origin": {
+   "commandery": "颍川",
+   "class": "士族"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 0.7
+   },
+   {
+    "id": "财货",
+    "weight": 0.3
+   }
+  ],
+  "habits": [
+   "habit_013",
+   "habit_034"
+  ],
+  "career": [
+   "career_043"
+  ],
+  "knots": [],
+  "fame": {},
+  "circles": [
+   "circle_yingchuan",
+   "circle_mufu_guests"
+  ],
+  "hidden": [
+   "habits.habit_034"
+  ],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "ys_001",
+    "信任": 70,
+    "敬重": 74,
+    "恩义": 21,
+    "利益": 47,
+    "怨恨": 0
+   },
+   {
+    "to": "ys_004",
+    "信任": 18,
+    "敬重": 22,
+    "恩义": 5,
+    "利益": 47,
+    "怨恨": 47
+   },
+   {
+    "to": "ys_016",
+    "信任": 22,
+    "敬重": 26,
+    "恩义": 7,
+    "利益": 47,
+    "怨恨": 43
+   }
+  ]
+ },
+ {
+  "id": "ys_002",
+  "schema_version": 7,
+  "birth_year": 160,
+  "origin": {
+   "commandery": "不详",
+   "class": "寒门"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 1.0
+   }
+  ],
+  "habits": [
+   "habit_010",
+   "habit_051"
+  ],
+  "career": [
+   "career_001"
+  ],
+  "knots": [],
+  "fame": {
+   "id": "fame_001",
+   "level": 1
+  },
+  "circles": [],
+  "hidden": [],
+  "inferred": [
+   "birth_year",
+   "origin"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "ys_001",
+    "信任": 80,
+    "敬重": 75,
+    "恩义": 31,
+    "利益": 35,
+    "怨恨": 0
+   },
+   {
+    "to": "ys_003",
+    "信任": 59,
+    "敬重": 64,
+    "恩义": 25,
+    "利益": 35,
+    "怨恨": 5
+   },
+   {
+    "to": "ys_004",
+    "信任": 48,
+    "敬重": 61,
+    "恩义": 22,
+    "利益": 35,
+    "怨恨": 14
+   }
+  ]
+ },
+ {
+  "id": "ys_003",
+  "schema_version": 7,
+  "birth_year": 162,
+  "origin": {
+   "commandery": "不详",
+   "class": "寒门"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 0.7
+   },
+   {
+    "id": "忠义",
+    "weight": 0.3
+   }
+  ],
+  "habits": [
+   "habit_005",
+   "habit_015"
+  ],
+  "career": [],
+  "knots": [],
+  "fame": {
+   "id": "fame_001",
+   "level": 1
+  },
+  "circles": [],
+  "hidden": [],
+  "inferred": [
+   "birth_year",
+   "origin",
+   "drives"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "ys_001",
+    "信任": 76,
+    "敬重": 74,
+    "恩义": 30,
+    "利益": 31,
+    "怨恨": 0
+   },
+   {
+    "to": "ys_002",
+    "信任": 67,
+    "敬重": 71,
+    "恩义": 28,
+    "利益": 31,
+    "怨恨": 0
+   },
+   {
+    "to": "ys_004",
+    "信任": 45,
+    "敬重": 62,
+    "恩义": 21,
+    "利益": 31,
+    "怨恨": 16
+   }
+  ]
+ },
+ {
+  "id": "ys_004",
+  "schema_version": 7,
+  "birth_year": 167,
+  "origin": {
+   "commandery": "河间",
+   "class": "寒门"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 0.6
+   },
+   {
+    "id": "安身",
+    "weight": 0.4
+   }
+  ],
+  "habits": [
+   "habit_021",
+   "habit_006"
+  ],
+  "career": [
+   "career_024",
+   "career_029"
+  ],
+  "knots": [],
+  "fame": {},
+  "circles": [
+   "circle_hanfu_old"
+  ],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "ys_001",
+    "信任": 53,
+    "敬重": 75,
+    "恩义": 26,
+    "利益": 77,
+    "怨恨": 10
+   },
+   {
+    "to": "off_gaolan",
+    "信任": 72,
+    "敬重": 78,
+    "恩义": 30,
+    "利益": 77,
+    "怨恨": 0
+   },
+   {
+    "to": "ys_020",
+    "信任": 24,
+    "敬重": 35,
+    "恩义": 15,
+    "利益": 77,
+    "怨恨": 33
+   },
+   {
+    "to": "ys_016",
+    "信任": 69,
+    "敬重": 76,
+    "恩义": 29,
+    "利益": 77,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "ys_006",
+  "schema_version": 7,
+  "birth_year": 150,
+  "origin": {
+   "commandery": "颍川",
+   "class": "士族"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "安身",
+    "weight": 0.6
+   },
+   {
+    "id": "财货",
+    "weight": 0.4
+   }
+  ],
+  "habits": [
+   "habit_070"
+  ],
+  "career": [
+   "career_023",
+   "career_050"
+  ],
+  "knots": [],
+  "fame": {},
+  "circles": [
+   "circle_yingchuan"
+  ],
+  "hidden": [],
+  "inferred": [
+   "birth_year",
+   "origin.commandery"
+  ],
+  "faction_id": "yuan_shao",
+  "relations": [
+   {
+    "to": "ys_001",
+    "信任": 79,
+    "敬重": 69,
+    "恩义": 30,
+    "利益": 45,
+    "怨恨": 0
+   },
+   {
+    "to": "off_lvweihuang",
+    "信任": 67,
+    "敬重": 54,
+    "恩义": 24,
+    "利益": 45,
+    "怨恨": 0
+   },
+   {
+    "to": "off_suiyuanjin",
+    "信任": 64,
+    "敬重": 56,
+    "恩义": 24,
+    "利益": 45,
+    "怨恨": 1
+   }
+  ]
+ },
+ {
+  "id": "cc_001",
+  "schema_version": 7,
+  "birth_year": 155,
+  "origin": {
+   "commandery": "沛国",
+   "class": "士族"
+  },
+  "kin": [
+   {
+    "to": "cc_010",
+    "type": "族弟"
+   }
+  ],
+  "drives": [
+   {
+    "id": "天下",
+    "weight": 0.7
+   },
+   {
+    "id": "功名",
+    "weight": 0.3
+   }
+  ],
+  "habits": [
+   "habit_028",
+   "habit_049"
+  ],
+  "career": [
+   "career_002",
+   "career_003",
+   "career_018"
+  ],
+  "knots": [
+   {
+    "id": "knot_008",
+    "object": {
+     "kind": "person",
+     "id": "cc_010"
+    },
+    "intensity": 60
+   },
+   {
+    "id": "knot_013",
+    "object": {
+     "kind": "person",
+     "id": "off_dianwei"
+    },
+    "intensity": 50
+   }
+  ],
+  "fame": {
+   "id": "fame_008",
+   "level": 2
+  },
+  "circles": [
+   "circle_qiaopei"
+  ],
+  "hidden": [],
+  "inferred": [],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_002",
+    "信任": 88,
+    "敬重": 90,
+    "恩义": 20,
+    "利益": 70,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_003",
+    "信任": 92,
+    "敬重": 90,
+    "恩义": 18,
+    "利益": 70,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_005",
+    "信任": 90,
+    "敬重": 70,
+    "恩义": 25,
+    "利益": 60,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_010",
+    "信任": 80,
+    "敬重": 60,
+    "恩义": 70,
+    "利益": 60,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_006",
+    "信任": 65,
+    "敬重": 75,
+    "恩义": 10,
+    "利益": 60,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_008",
+    "信任": 82,
+    "敬重": 80,
+    "恩义": 15,
+    "利益": 60,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_002",
+  "schema_version": 7,
+  "birth_year": 157,
+  "origin": {
+   "commandery": "颍川",
+   "class": "名门"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "天下",
+    "weight": 0.6
+   },
+   {
+    "id": "安身",
+    "weight": 0.4
+   }
+  ],
+  "habits": [
+   "habit_069",
+   "habit_035"
+  ],
+  "career": [
+   "career_028"
+  ],
+  "knots": [],
+  "fame": {
+   "id": "fame_007",
+   "level": 1
+  },
+  "circles": [
+   "circle_yingchuan",
+   "circle_cao_advisers"
+  ],
+  "hidden": [],
+  "inferred": [],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 90,
+    "敬重": 92,
+    "恩义": 40,
+    "利益": 60,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_003",
+    "信任": 80,
+    "敬重": 85,
+    "恩义": 10,
+    "利益": 50,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_003",
+  "schema_version": 7,
+  "birth_year": 170,
+  "origin": {
+   "commandery": "颍川",
+   "class": "士族"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "天下",
+    "weight": 0.5
+   },
+   {
+    "id": "功名",
+    "weight": 0.5
+   }
+  ],
+  "habits": [
+   "habit_013",
+   "habit_070"
+  ],
+  "career": [
+   "career_057"
+  ],
+  "knots": [
+   {
+    "id": "knot_011",
+    "object": {
+     "kind": "person",
+     "id": "cc_001"
+    },
+    "intensity": 70
+   }
+  ],
+  "fame": {},
+  "circles": [
+   "circle_yingchuan",
+   "circle_cao_advisers"
+  ],
+  "hidden": [],
+  "inferred": [],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 95,
+    "敬重": 95,
+    "恩义": 45,
+    "利益": 70,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_002",
+    "信任": 80,
+    "敬重": 85,
+    "恩义": 10,
+    "利益": 45,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_004",
+  "schema_version": 7,
+  "birth_year": 141,
+  "origin": {
+   "commandery": "东郡",
+   "class": "豪强"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 0.6
+   },
+   {
+    "id": "天下",
+    "weight": 0.4
+   }
+  ],
+  "habits": [
+   "habit_007",
+   "habit_039"
+  ],
+  "career": [
+   "career_053",
+   "career_030"
+  ],
+  "knots": [
+   {
+    "id": "knot_034",
+    "object": {
+     "kind": "city",
+     "id": "dingtao"
+    },
+    "intensity": 60
+   }
+  ],
+  "fame": {
+   "id": "fame_014",
+   "level": 1
+  },
+  "circles": [
+   "circle_cao_advisers"
+  ],
+  "hidden": [],
+  "inferred": [],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 88,
+    "敬重": 88,
+    "恩义": 35,
+    "利益": 60,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_005",
+  "schema_version": 7,
+  "birth_year": 168,
+  "origin": {
+   "commandery": "谯国",
+   "class": "豪强"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "忠义",
+    "weight": 1.0
+   }
+  ],
+  "habits": [
+   "habit_030"
+  ],
+  "career": [
+   "career_017"
+  ],
+  "knots": [
+   {
+    "id": "knot_011",
+    "object": {
+     "kind": "person",
+     "id": "cc_001"
+    },
+    "intensity": 75
+   }
+  ],
+  "fame": {
+   "id": "fame_001",
+   "level": 1
+  },
+  "circles": [
+   "circle_qiaopei"
+  ],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 98,
+    "敬重": 95,
+    "恩义": 50,
+    "利益": 40,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_006",
+  "schema_version": 7,
+  "birth_year": 169,
+  "origin": {
+   "commandery": "雁门",
+   "class": "边地"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 0.7
+   },
+   {
+    "id": "忠义",
+    "weight": 0.3
+   }
+  ],
+  "habits": [
+   "habit_032",
+   "habit_017"
+  ],
+  "career": [
+   "career_019",
+   "career_033"
+  ],
+  "knots": [
+   {
+    "id": "knot_024",
+    "object": {
+     "kind": "person",
+     "id": "off_lvbu"
+    },
+    "intensity": 35
+   }
+  ],
+  "fame": {},
+  "circles": [
+   "circle_lvbu_old"
+  ],
+  "hidden": [],
+  "inferred": [],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 70,
+    "敬重": 85,
+    "恩义": 40,
+    "利益": 60,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_007",
+  "schema_version": 7,
+  "birth_year": 169,
+  "origin": {
+   "commandery": "河东",
+   "class": "寒门"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 0.6
+   },
+   {
+    "id": "忠义",
+    "weight": 0.4
+   }
+  ],
+  "habits": [
+   "habit_027",
+   "habit_005"
+  ],
+  "career": [
+   "career_024",
+   "career_001"
+  ],
+  "knots": [
+   {
+    "id": "knot_035",
+    "object": {
+     "kind": "person",
+     "id": "off_guanyu"
+    },
+    "intensity": 40
+   }
+  ],
+  "fame": {},
+  "circles": [],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 80,
+    "敬重": 85,
+    "恩义": 30,
+    "利益": 55,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_008",
+  "schema_version": 7,
+  "birth_year": 160,
+  "origin": {
+   "commandery": "泰山",
+   "class": "寒门"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 0.7
+   },
+   {
+    "id": "安身",
+    "weight": 0.3
+   }
+  ],
+  "habits": [
+   "habit_043",
+   "habit_014"
+  ],
+  "career": [
+   "career_029",
+   "career_001"
+  ],
+  "knots": [],
+  "fame": {},
+  "circles": [],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 82,
+    "敬重": 85,
+    "恩义": 30,
+    "利益": 55,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_009",
+    "信任": 65,
+    "敬重": 70,
+    "恩义": 10,
+    "利益": 40,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_009",
+  "schema_version": 7,
+  "birth_year": 165,
+  "origin": {
+   "commandery": "阳平",
+   "class": "寒门"
+  },
+  "kin": [],
+  "drives": [
+   {
+    "id": "功名",
+    "weight": 1.0
+   }
+  ],
+  "habits": [
+   "habit_011",
+   "habit_013"
+  ],
+  "career": [
+   "career_011",
+   "career_023"
+  ],
+  "knots": [],
+  "fame": {
+   "id": "fame_001",
+   "level": 1
+  },
+  "circles": [
+   "circle_cao_yuancong"
+  ],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 78,
+    "敬重": 80,
+    "恩义": 30,
+    "利益": 55,
+    "怨恨": 0
+   },
+   {
+    "to": "cc_008",
+    "信任": 65,
+    "敬重": 70,
+    "恩义": 10,
+    "利益": 40,
+    "怨恨": 0
+   }
+  ]
+ },
+ {
+  "id": "cc_010",
+  "schema_version": 7,
+  "birth_year": 165,
+  "origin": {
+   "commandery": "沛国",
+   "class": "豪强"
+  },
+  "kin": [
+   {
+    "to": "cc_001",
+    "type": "族兄"
+   }
+  ],
+  "drives": [
+   {
+    "id": "财货",
+    "weight": 0.5
+   },
+   {
+    "id": "家族",
+    "weight": 0.5
+   }
+  ],
+  "habits": [
+   "habit_073",
+   "habit_016"
+  ],
+  "career": [
+   "career_023"
+  ],
+  "knots": [],
+  "fame": {},
+  "circles": [
+   "circle_qiaopei",
+   "circle_cao_yuancong"
+  ],
+  "hidden": [],
+  "inferred": [
+   "birth_year"
+  ],
+  "faction_id": "cao_cao",
+  "relations": [
+   {
+    "to": "cc_001",
+    "信任": 96,
+    "敬重": 85,
+    "恩义": 20,
+    "利益": 80,
+    "怨恨": 0
+   }
+  ]
+ }
+]

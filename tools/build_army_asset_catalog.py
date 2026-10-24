@@ -39,7 +39,7 @@ markdown = '# 军队 3D 素材与接入说明\n\n' + description + '\n## 已核�
 markdown += '原始来源：《三国志14》`0002/CharacterEditor` 模型包及其原生材质引用。保留资源哈希；分类经过实际渲染，未猜测武将身份。共 12 个原模型、49 张匹配贴图，以及 1 个项目动作派生 GLB。主帅使用项目已有的 18 套经核对头像，覆盖当前全部 18 名武将。\n\n'
 markdown += '| 模型 | 原始哈希 | 三角面 | 状态 |\n| --- | --- | ---: | --- |\n' + '\n'.join(rows)
 markdown += '\n\n[浏览全部素材和头像](军队3D素材浏览.html) · [3D 地图实机画面](validation/army-assets/army-world-3d.png) · [项目持械站姿](validation/army-assets/infantry-poses-textured.png)\n\n'
-markdown += '## 验证\n\n`tests/capture_army_world_3d.gd`：实际地图渲染、头像点击、出发城映射、敌军情报隔离、军令约束、忙碌保护、主动撤退折返与持续归营、兵力守恒、归营后移除模型。\n\n`tests/war_orders_validation.gd`：军令权限/类型/存档恢复、溃败保命、攻取后待命及改令归营。原有战争与月度性能测试也用于回归检查。所有验证使用临时剧本或临时存档，未覆盖玩家存档。\n\n'
+markdown += '## 验证\n\n`tools/capture/capture_army_world_3d.gd`：实际地图渲染、头像点击、出发城映射、敌军情报隔离、军令约束、忙碌保护、主动撤退折返与持续归营、兵力守恒、归营后移除模型。\n\n`tests/war/campaign/war_orders_validation.gd`：军令权限/类型/存档恢复、溃败保命、攻取后待命及改令归营。原有战争与月度性能测试也用于回归检查。所有验证使用临时剧本或临时存档，未覆盖玩家存档。\n\n'
 markdown += '## 可复用文件\n\n- `assets/armies/rtk14/manifest.json`：原始模型、材质引用及未绑定资源。\n- `assets/armies/rtk14/models/infantry-poses.glb`：保留原始骨骼权重制作的项目站姿与行军帧。\n- `tools/import_rtk14_army_assets.py`：按原生材质关系重新提取贴图与转换 GLB。\n- `tools/pose_army_infantry.py`：从 Noesis 导出的 SMD 烘焙项目动作。\n- `tools/build_war_3d_positions.py`：生成原城池匹配及明确标注的估算坐标。\n'
 (root / 'docs/军队3D素材清单.md').write_text(markdown,encoding='utf8')
 page = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>军队 3D 素材</title><style>

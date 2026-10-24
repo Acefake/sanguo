@@ -47,7 +47,7 @@ def main():
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     try:
-        command = [args.godot, "--headless", "--path", str(workspace), "--script", "tests/war_agent_http_validation.gd", "--", str(server.server_port)]
+        command = [args.godot, "--headless", "--path", str(workspace), "--script", "tests/agents/war_agent_http_validation.gd", "--", str(server.server_port)]
         completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", timeout=45)
         print(completed.stdout, end="")
         print(completed.stderr, end="")

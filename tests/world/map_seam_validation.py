@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 data = json.loads((ROOT / "data/world_map.json").read_text(encoding="utf-8"))
 labels = np.load(ROOT / "assets/map/supplied/block-labels.npy")
 expected = np.zeros((1080, 1920), np.uint8)

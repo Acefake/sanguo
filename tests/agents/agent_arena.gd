@@ -5,8 +5,8 @@ extends SceneTree
 # Xiaopei battle end with the local policy and, when an endpoint/model is passed
 # on the command line, with the model as well, then reports comparable metrics.
 #
-# Usage: godot --headless --path <repo> --script res://tests/agent_arena.gd
-#        godot --headless --path <repo> --script res://tests/agent_arena.gd -- --endpoint http://host/v1/chat/completions --model name
+# Usage: godot --headless --path <repo> --script res://tests/agents/agent_arena.gd
+#        godot --headless --path <repo> --script res://tests/agents/agent_arena.gd -- --endpoint http://host/v1/chat/completions --model name
 
 const Adapter = preload("res://scripts/agents/agent_adapter.gd")
 const Brain = preload("res://scripts/agents/unit_brain.gd")

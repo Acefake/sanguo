@@ -1,4 +1,4 @@
-extends "res://tests/duel_v2_validation.gd"
+extends "res://tests/war/duel/duel_v2_validation.gd"
 
 # Focused state/event regression; use duel_v2_validation.gd for the seed corpus.
 func run() -> void:

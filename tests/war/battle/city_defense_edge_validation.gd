@@ -1,4 +1,4 @@
-extends "res://tests/city_defense_separation_validation.gd"
+extends "res://tests/war/battle/city_defense_separation_validation.gd"
 
 # Boundary regressions supplement the main siege suite using its real scenario helpers.
 func lone_attacker(war) -> Dictionary:

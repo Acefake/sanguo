@@ -2,7 +2,7 @@ extends SceneTree
 
 # 角色定位驱动战场行为 —— 单挑资格与触发条件验证。
 #
-#   godot --headless --path . --script tests/duel_roles_validation.gd
+#   godot --headless --path . --script tests/war/duel/duel_roles_validation.gd
 #
 # 覆盖：
 #   C1 诸葛亮型（武力低、定位“主帅、军师／不宜前锋”）绝不可发起或被选为单挑。

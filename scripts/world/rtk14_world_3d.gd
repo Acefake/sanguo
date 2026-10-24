@@ -344,7 +344,7 @@ func _build_water() -> void:
 func _build_rivers(material: Material) -> void:
 	var path := ASSET_DIR + "water/river_mesh.bin"
 	if not FileAccess.file_exists(path):
-		push_error("Source-sampled river mesh missing; run tools/build_rtk14_water_mesh.py")
+		push_error("Source-sampled river mesh missing; run tools/assets/build_rtk14_water_mesh.py")
 		return
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file.get_buffer(8).get_string_from_ascii() != "RTKWTR01":
@@ -1309,6 +1309,6 @@ func _capture_preview() -> void:
 		push_error("Screenshot failed: " + str(error))
 	else:
 		# This snapshot follows loading and shader compilation; steady frame rates
-		# are measured separately by tools/rtk14_performance_check.gd.
+		# are measured separately by tools/validate/rtk14_performance_check.gd.
 		print("WORLD3D_CAPTURE_OK ", screenshot_path)
 	get_tree().quit()

@@ -31,6 +31,7 @@ var alive: Callable
 var _round := -1
 ## request_id -> {"key", "request", "context", "adapter"}：等答案的请求，答案到达时按 id 找回。
 var _waiting: Dictionary = {}
+var _queue_node: Node
 
 
 func clear() -> void:
@@ -202,7 +203,8 @@ func _refresh() -> void:
 
 
 func _models() -> Node:
-	return Engine.get_main_loop().root.get_node("ModelQueue")
+	if not is_instance_valid(_queue_node): _queue_node = Engine.get_main_loop().root.get_node("ModelQueue")
+	return _queue_node
 
 
 static func key_for(context: Dictionary) -> String:

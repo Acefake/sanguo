@@ -37,13 +37,15 @@ var _counts := {"submitted": 0, "calls": 0, "answers": 0, "failures": 0, "timeou
 ## request_id -> 最近一次失败原因（模型报错原文或超时），供提交方按原因统计；只留最近 64 条。
 var _failure_reasons: Dictionary = {}
 var _log: FileAccess
+## 待写的决策日志条目：log_decision 只入列，下一帧 _process 再序列化写盘，提交点结算不碰文件。
+var _pending_log: Array = []
 var _log_path := ""
 
 
 func _process(_delta: float) -> void:
 	_expire_inflight()
 	_pump()
-	if _log != null: _log.flush()
+	flush_log()
 
 
 ## 推进队列的“当前游戏时刻”，影响优先级。
@@ -123,11 +125,21 @@ func note_commit(adopted: bool, vetoed: bool) -> void:
 
 ## 写一行决策日志（最终采用值）。路径来自 ai_runtime.json，可用 set_log_path 改到测试目录。
 func log_decision(entry: Dictionary) -> void:
+	_pending_log.append(entry)
+
+
+## 把待写的决策日志写进文件（每帧自动调用；读日志前也可手动调用）。
+func flush_log() -> void:
+	if _pending_log.is_empty(): return
 	if _log == null: _open_log(str(Runtime.config()["decision_log"]))
-	if _log != null: _log.store_line(JSON.stringify(entry))
+	if _log != null:
+		for entry in _pending_log: _log.store_line(JSON.stringify(entry))
+		_log.flush()
+	_pending_log.clear()
 
 
 func set_log_path(path: String) -> void:
+	flush_log()
 	_log = null
 	_open_log(path)
 
@@ -194,6 +206,9 @@ func _pick() -> int:
 	var busy := {}
 	for id in _inflight: busy[_open[id].lane] = int(busy.get(_open[id].lane, 0)) + 1
 	for id in _draining: busy[_draining[id]] = int(busy.get(_draining[id], 0)) + 1
+	# 每条通道都已到运行参数的上限时，没有请求能出队（单个请求的上限只会更低），不必扫描队列。
+	# 模型慢时队列会积到上百条，每次 submit 都整表扫一遍会让一批提交变成平方级。
+	if _queued.is_empty() or (int(busy.get("local", 0)) >= Runtime.concurrency("local") and int(busy.get("cloud", 0)) >= Runtime.concurrency("cloud")): return -1
 	var best := -1
 	for index in range(_queued.size()):
 		var request: Request = _queued[index]

@@ -196,4 +196,5 @@ func _commit_checks() -> void:
 
 
 func _log_lines() -> Array:
+	queue.flush_log()
 	return Array(FileAccess.get_file_as_string(queue.log_path()).split("\n", false))

@@ -63,9 +63,11 @@ static func decode(endpoint: String, result: int, code: int, body: PackedByteArr
 	if result != HTTPRequest.RESULT_SUCCESS or code < 200 or code >= 300:
 		# 带上响应体开头，便于看出是鉴权、限流还是模型名错误。
 		return {"error": "模型连接失败（HTTP %d，网络 %d）%s" % [code, result, body.get_string_from_utf8().left(160)]}
-	var parsed: Variant = JSON.parse_string(body.get_string_from_utf8())
-	if parsed == null:
+	# 用 JSON 实例解析：模型输出不合法是常见情况，JSON.parse_string 会把它当引擎错误打印。
+	var parser := JSON.new()
+	if parser.parse(body.get_string_from_utf8()) != OK:
 		return {"error": "模型响应不是合法JSON"}
+	var parsed: Variant = parser.data
 	if is_ollama(endpoint) and parsed is Dictionary and parsed.get("message") is Dictionary:
 		parsed = {"choices": [{"message": parsed["message"]}], "usage": {"prompt_tokens": parsed.get("prompt_eval_count", 0), "completion_tokens": parsed.get("eval_count", 0)}}
 	if not parsed is Dictionary or not parsed.get("choices", []) is Array or parsed.get("choices", []).is_empty():
@@ -73,9 +75,9 @@ static func decode(endpoint: String, result: int, code: int, body: PackedByteArr
 	var first: Variant = parsed["choices"][0]
 	if not first is Dictionary or not first.get("message", {}) is Dictionary:
 		return {"error": "模型响应格式无效"}
-	var action: Variant = JSON.parse_string(_strip_fence(str(first["message"].get("content", "")).strip_edges()))
-	if action == null:
+	if parser.parse(_strip_fence(str(first["message"].get("content", "")).strip_edges())) != OK:
 		return {"error": "模型行动不是合法JSON"}
+	var action: Variant = parser.data
 	if not action is Dictionary or not action.get("candidate_id", null) is String:
 		return {"error": "模型没有返回合法行动选择"}
 	var usage: Variant = parsed.get("usage", {})

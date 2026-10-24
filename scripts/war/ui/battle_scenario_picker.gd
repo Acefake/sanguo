@@ -5,6 +5,9 @@ extends CanvasLayer
 ## 缩略图由 battle_scenarios.json 的 thumb 字段指向 assets/ui/battle_thumbs/，离线用
 ## tools/capture/capture_battle_thumbs.gd 生成；缺图时卡片显示占位。
 ## 界面只建一次，切换场景只改详情里的文字，不重建节点。
+##
+## 与地图 HUD、设置页同一套浅纸色半透明 glass 调色板：浏览区和详情各是一块 glass 面板；
+## 从战役里打开时面板下是半透明遮罩（透出地图），开局直接进入时是浅纸色底（backdrop），不用深色实底。
 
 const Scenarios = preload("res://scripts/war/battle/battle_scenarios.gd")
 const Terrain = preload("res://scripts/war/battle/battle_terrain.gd")
@@ -15,6 +18,7 @@ const KIND_NAMES := {"field": "野战", "siege": "攻城", "combined": "城野�
 const DETAIL_WIDTH := 360
 const GRID_COLUMNS := 4
 const DEFAULT_SEED := 1910901
+const PALETTE := "glass"
 
 var store: Node
 var surface: Control
@@ -53,7 +57,7 @@ func _ready() -> void:
 	if sides is Dictionary: _player_faction = str(sides.get("player_faction", _player_faction))
 	surface = Control.new()
 	surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	Widgets.adopt_theme(surface)
+	Widgets.adopt_theme(surface, PALETTE)
 	add_child(surface)
 	_shade = Widgets.shade()
 	surface.add_child(_shade)
@@ -65,7 +69,10 @@ func _ready() -> void:
 	surface.add_child(frame)
 	var row := Widgets.hbox(4)
 	frame.add_child(row)
-	row.add_child(_build_browser())
+	var browser := Widgets.panel()
+	browser.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	browser.add_child(_build_browser())
+	row.add_child(browser)
 	row.add_child(_build_detail())
 	close_button = Widgets.text_button("关闭", _close)
 	close_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
@@ -123,7 +130,7 @@ func _card(spec: Dictionary) -> Button:
 	mask.clip_children = CanvasItem.CLIP_CHILDREN_ONLY
 	mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var shape := StyleBoxFlat.new()
-	shape.bg_color = Tokens.color("ink")
+	shape.bg_color = Tokens.color("ink", -1, PALETTE)
 	shape.set_corner_radius_all(Tokens.radius("card") - inset)
 	shape.corner_radius_bottom_left = 0
 	shape.corner_radius_bottom_right = 0
@@ -145,7 +152,7 @@ func _card(spec: Dictionary) -> Button:
 		mask.add_child(thumb)
 	else:
 		var placeholder := Widgets.label(str(spec["name"]).left(1), "DisplayLabel")
-		placeholder.add_theme_color_override("font_color", Tokens.color("dim"))
+		placeholder.add_theme_color_override("font_color", Tokens.color("panel", -1, PALETTE))
 		placeholder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		placeholder.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		placeholder.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -265,7 +272,7 @@ func choose(id: String) -> void:
 		var row: Dictionary = _side_rows[i]
 		var faction_id: String = str(ids[i]) if i < ids.size() else ""
 		var faction: Dictionary = factions.get(faction_id, {})
-		(row["style"] as StyleBoxFlat).bg_color = Color.html(str(faction["color"])) if faction.has("color") else Tokens.color("dim")
+		(row["style"] as StyleBoxFlat).bg_color = Color.html(str(faction["color"])) if faction.has("color") else Tokens.color("dim", -1, PALETTE)
 		row["short"].text = str(faction.get("short", faction_id.left(1)))
 		row["name"].text = str(faction.get("name", faction_id))
 		row["mine"].visible = faction_id == player
@@ -280,7 +287,7 @@ func choose(id: String) -> void:
 
 func open(from_startup: bool = false) -> void:
 	startup_mode = from_startup
-	_shade.color = Tokens.color("ink") if startup_mode else Tokens.color("shade")
+	_shade.color = Tokens.color("backdrop", -1, PALETTE) if startup_mode else Tokens.color("shade", -1, PALETTE)
 	subtitle.text = "八个经典战场，地形、兵种与胜利条件各不相同。" if startup_mode else "独立战场，结束后可返回原战役。"
 	close_button.text = "退出" if startup_mode else "关闭"
 	return_button.visible = not startup_mode

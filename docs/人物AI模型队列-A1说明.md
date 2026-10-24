@@ -172,7 +172,7 @@ api_key：
 
 | 核对 | 结果 |
 |---|---|
-| 套件 64 项 + 新 main 额外 10 项，逐项状态与日志（去掉耗时读数） | 全部相同；唯一差异是 `war_month_performance_validation` 的回溯行号 `campaign_state.gd:532→533`（该测试改动前就失败，原因是夹具的 preview 缺 `home`） |
+| 原有 64 项（套件 54 项 + 新 main 额外 10 项，含 2 项 SKIP：GPU 截图、真模型服务），逐项状态与日志（去掉耗时读数） | 全部相同；唯一差异是 `war_month_performance_validation` 的回溯行号 `campaign_state.gd:532→533`（该测试改动前就失败，原因是夹具的 preview 缺 `home`） |
 | 战役逐日哈希 harness（3 个剧本 183 日） | 逐行相同，完整输出相同 |
 | 新增 `model_queue_validation`、`step_latency_validation` | PASS |
 | `local_agent_validation`（不在套件） | 改动前后都 FAIL（单候选上下文被分差门判为不必问模型），与本次无关 |

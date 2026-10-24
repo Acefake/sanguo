@@ -59,16 +59,21 @@ func _ready() -> void:
 	window = Control.new()
 	window.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	window.visible = false
-	Widgets.adopt_theme(window)
+	# 与地图 HUD 同一套浅纸色半透明 glass 调色板：设置页是叠在地图上的浮层，不再用深色实底。
+	Widgets.adopt_theme(window, "glass")
 	add_child(window)
-	window.add_child(Widgets.shade())
+	var shade := Widgets.shade()
+	shade.color = Tokens.color("shade", -1, "glass")
+	window.add_child(shade)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	window.add_child(center)
 	var panel := Widgets.panel()
 	panel.custom_minimum_size = PANEL_SIZE
-	var flush := preload("res://scripts/ui/theme/ui_theme_builder.gd").panel_box(0)
-	flush.bg_color.a = 1.0
+	var flush := preload("res://scripts/ui/theme/ui_theme_builder.gd").panel_box(0, "glass")
+	# 设置页文字密：底下界面的文字在 0.94 时仍隐约透出、和本页文字打架（1280×720 截图可见），
+	# 所以几乎不透明；浅纸色与 glass 描边保持与 HUD 一致。
+	flush.bg_color.a = 0.98
 	panel.add_theme_stylebox_override("panel", flush)
 	center.add_child(panel)
 	var column := Widgets.vbox(0)
@@ -364,7 +369,7 @@ func _fill() -> void:
 
 func _set_status(text: String, ok: bool) -> void:
 	_status.text = text
-	_status_dot.color = Tokens.color("green") if ok else Tokens.color("dim")
+	_status_dot.color = Tokens.color("green", -1, "glass") if ok else Tokens.color("dim", -1, "glass")
 
 
 func open() -> void:

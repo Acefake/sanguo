@@ -1,15 +1,13 @@
 extends RefCounted
 
-# Single source of truth for interface styling.
-#
-# Previously five separate button/panel looks were in play: assets/theme_kaiti.tres,
-# the SAN8R sprite atlas slices, war_ui_skin.gd's flat StyleBoxes, the rounded dark
-# panels in rtk14_world_3d.gd, and officer_page.gd's private slicing. Native controls
-# (CheckButton, CheckBox, HSlider, AcceptDialog, ...) were never styled at all and
-# rendered with Godot defaults. Everything now resolves here.
-#
-# city_ui_skin.gd is a thin facade over this module, so the ~26 scripts that already
-# call CitySkin.* keep working while sharing one definition.
+## 旧的羊皮纸主题，迁移期保留给仍画在羊皮纸贴图上的界面（城内、议事、人物页、单挑演出）。
+##
+## 全局主题已改由 scripts/ui/theme/ui_theme_builder.gd 从 data/ui/theme.json 生成，挂在根节点；
+## 本文件只剩两件事：羊皮纸色板常量（这些界面在浅底上写深字）与 build_parchment_theme()，
+## 由 city_ui_skin.apply_theme 合并进它们各自的局部主题。字体转调 UiTokens。
+## 那几个界面迁到新主题后即可删除本文件。
+
+const Tokens = preload("res://scripts/ui/theme/ui_tokens.gd")
 
 # --- Palette -----------------------------------------------------------------
 # Matches the paper-and-bronze SAN8R art the rest of the interface uses.
@@ -24,39 +22,18 @@ const GREEN := Color("647d53")
 const DISABLED_INK := Color("a7a397")
 
 # --- Type scale --------------------------------------------------------------
-# KaiTi carries the historical tone but its strokes collapse below ~15px, so small
-# and dense text uses the sans face. Flip DISPLAY_FONT_NAMES[0] to move the whole
-# interface between the two in one place.
-const DISPLAY_FONT_NAMES: Array[String] = ["KaiTi", "楷体", "STKaiti"]
-const BODY_FONT_NAMES: Array[String] = ["Noto Sans SC", "Microsoft YaHei"]
-
 const SIZE_CAPTION := 11
 const SIZE_SMALL := 13
 const SIZE_BODY := 15
-const SIZE_LABEL := 17
-const SIZE_TITLE := 21
-const SIZE_HEADING := 28
 
 const UI_DIR := "res://assets/ui/"
 
-static var _display: SystemFont
-static var _body: SystemFont
-
-
-# Heading, title and button face. Matches the project's established look.
 static func font() -> SystemFont:
-	if _display == null:
-		_display = SystemFont.new()
-		_display.font_names = PackedStringArray(DISPLAY_FONT_NAMES)
-	return _display
+	return Tokens.title_font()
 
 
-# Small and data-dense text, where KaiTi is not legible.
 static func text_font() -> SystemFont:
-	if _body == null:
-		_body = SystemFont.new()
-		_body.font_names = PackedStringArray(BODY_FONT_NAMES)
-	return _body
+	return Tokens.body_font()
 
 
 # --- Geometry ----------------------------------------------------------------
@@ -77,10 +54,8 @@ static func _flat(bg: Color, border := Color(0, 0, 0, 0), width := 0) -> StyleBo
 
 # --- Theme construction ------------------------------------------------------
 
-# Builds a Theme covering every native control the project instantiates.
-# `button_styles` supplies the SAN8R-backed button styleboxes, which cannot be
-# expressed in a .tres because they are sliced at runtime.
-static func build_theme(button_styles: Dictionary = {}) -> Theme:
+## 羊皮纸局部主题。`button_styles` 传 SAN8R 贴图切片的按钮样式。
+static func build_parchment_theme(button_styles: Dictionary = {}) -> Theme:
 	var theme := Theme.new()
 	theme.default_font = font()
 	theme.default_font_size = SIZE_BODY

@@ -1,11 +1,14 @@
 extends RefCounted
 
-# Facade over scripts/ui/ui_theme.gd. Palette, fonts and the full native-control
-# theme now live there; these constants and helpers stay so the ~26 scripts that
-# already call CitySkin.* keep working against one shared definition.
+## 城内美术皮肤：SAN8R 贴图切片（羊皮纸、铜按钮、八角确认钮、图标）与羊皮纸色板。
+##
+## 主题相关的入口已转调 scripts/ui/theme/：build_theme()、theme_window() 返回由 data/ui/theme.json
+## 生成的统一主题；font()/text_font() 取 UiTokens 的字体。仍画在羊皮纸上的城内界面继续用
+## 这里的贴图样式和 apply_theme()（羊皮纸局部主题），迁移后逐项删除。
 
 # `Theme` is a built-in Godot class, so a member with that name is a parse error.
 const Palette = preload("res://scripts/ui/ui_theme.gd")
+const Builder = preload("res://scripts/ui/theme/ui_theme_builder.gd")
 const INK := Palette.INK
 const BRONZE := Palette.BRONZE
 const PAPER := Palette.PAPER
@@ -36,11 +39,9 @@ static func label(value: String, size: int, color: Color = INK) -> Label:
 	return result
 
 
-# A Window is its own theme scope: it does not inherit the root Window's theme,
-# so anything hosted in one (the settings dialog) has to be given it explicitly
-# or its LineEdit / SpinBox / OptionButton fall back to Godot defaults.
+## Window 是独立的主题作用域，不继承根窗口主题，需显式给它统一主题。
 static func theme_window(window: Window) -> void:
-	window.theme = build_theme()
+	window.theme = Builder.build()
 
 
 static func paper(alpha: float = 0.92, margin: int = 10) -> StyleBoxTexture:
@@ -219,11 +220,14 @@ static func style_button(button: Button, primary: bool = false) -> void:
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 
-# Full interface theme, including the SAN8R-backed button slices. Installed on
-# the scene tree root at startup so every Control inherits it, including the
-# native ones that previously showed Godot defaults.
+## 全局统一主题（GameState 启动时挂到根窗口）。转调 UiThemeBuilder。
 static func build_theme() -> Theme:
-	return Palette.build_theme({
+	return Builder.build()
+
+
+## 羊皮纸局部主题，含 SAN8R 按钮切片；只给 apply_theme 用。
+static func _parchment_theme() -> Theme:
+	return Palette.build_parchment_theme({
 		"normal": primary_button_style(),
 		"hover": primary_button_style(true),
 		"pressed": primary_button_style(true),
@@ -236,7 +240,7 @@ static func build_theme() -> Theme:
 # previously rendered with Godot defaults. The paper tooltip and the textured
 # scrollbar thumbs are restored on top because they are part of the current look.
 static func apply_theme(theme: Theme) -> void:
-	_merge_theme(theme, build_theme())
+	_merge_theme(theme, _parchment_theme())
 	theme.default_font = Palette.font()
 	theme.default_font_size = Palette.SIZE_BODY
 	theme.set_stylebox("panel", "TooltipPanel", paper(0.98, 9))

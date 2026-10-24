@@ -5,7 +5,8 @@ extends RefCounted
 ## 1. submit：习惯层答案已经由调用方当天执行；问模型的请求带上 commit_tick = 当前回合 + commit_delay_ticks
 ##    （默认下一日 step）交给 ModelQueue，立即返回。
 ## 2. 模型答案一到就进 ready（界面与测试可见），但只在 commit_tick 那一回合可取。
-## 3. begin_round 到达 commit_tick：答案没到的请求作废，记“默认”；答案到了但当回合没被取走的，下一回合丢弃。
+## 3. begin_round 到达 commit_tick：答案没到的请求作废，记“默认”；答案到了但当回合没被取走的，下一回合丢弃：
+##    情境已失效（alive 返回 false，例如军团在提交日之前整体撤退、调用方因此没来取）记 stale，否则记 expired。
 ## 4. take：调用方给出今日上下文时，先复查合法性（同一行动仍在今日候选里），再请适配器按今日上下文
 ##    否决（AgentAdapter.veto 即 POLICY.veto），过关才采用，否则返回 {} 让调用方沿用默认。
 ## 每个结算过的请求都向 ModelQueue 写一行决策日志，记录最终采用值。
@@ -53,7 +54,10 @@ func begin_round(round_now: int) -> void:
 	_models().advance(round_now)
 	for key in ready.keys():
 		if int(ready[key]["commit_tick"]) >= round_now: continue
-		_record(ready[key]["entry"], {}, "expired")
+		# 调用方对已失效的情境（军团撤退、部队覆没）不会再来 take，答案只能在这里结算。
+		# 这类不算“过期”：记 stale 并带上模型答案，与 take 里的 stale 一致，免得把军团撤退误读成提交点错过。
+		if alive.is_valid() and not alive.call(key): _record(ready[key]["entry"], ready[key]["result"], "stale")
+		else: _record(ready[key]["entry"], {}, "expired")
 		ready.erase(key)
 		discarded += 1
 	for key in requested.keys():
@@ -190,7 +194,8 @@ static func _entry(request: Request) -> Dictionary:
 
 
 ## 一个请求在提交点的结论：写一行决策日志（最终采用值），并计入队列统计。
-## outcome：adopted / late（提交点前没有可用答案：未到、失败或超时）/ expired / stale / illegal / vetoed / context_changed。
+## outcome：adopted / late（提交点前没有可用答案：未到、失败或超时）/ expired（答案到了、情境仍有效，但提交点那回合没被取走）/
+## stale（情境已失效：提交点取时失效，或调用方因情境失效没来取）/ illegal / vetoed / context_changed。
 func _record(entry: Dictionary, model_answer: Dictionary, outcome: String) -> void:
 	var adopted := outcome == "adopted"
 	var final: Dictionary = model_answer if adopted else entry["default"]

@@ -1,0 +1,40 @@
+{
+  "versus.png": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_UI素材\\布局还原\\05_底板背景分隔线与遮罩\\07_base_vs__9b65993c_00.png",
+  "victory.png": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_UI素材\\布局还原\\05_底板背景分隔线与遮罩\\07_base_win_01__fb4bf7c7_00.png",
+  "defeat.png": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_UI素材\\布局还原\\05_底板背景分隔线与遮罩\\07_base_lose_01__50beacf3_00.png",
+  "flare.png": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_UI素材\\布局还原\\09_装饰特效与其他界面子图\\07_ani_eff_frea__9b65993c_00.png",
+  "paper-banner.png": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_005.png",
+    "rect": [
+      0,
+      518,
+      888,
+      623
+    ],
+    "processing": "crop only; preserve original alpha",
+    "source_sha256": "7ac9073ea463861b085ec5baf362195565802af0f2e26f439fca229daa016bac"
+  },
+  "name-blue.png": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_005.png",
+    "rect": [
+      1028,
+      391,
+      1752,
+      504
+    ],
+    "processing": "crop only; preserve original alpha",
+    "source_sha256": "7ac9073ea463861b085ec5baf362195565802af0f2e26f439fca229daa016bac"
+  },
+  "name-rust.png": {
+    "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\UI_按钮边框面板\\0x35c27e14_8e889a5f_8eb0_005.png",
+    "rect": [
+      1028,
+      514,
+      1752,
+      624
+    ],
+    "processing": "crop only; preserve original alpha",
+    "source_sha256": "7ac9073ea463861b085ec5baf362195565802af0f2e26f439fca229daa016bac"
+  },
+  "quote-brush.png": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_UI素材\\布局还原\\05_底板背景分隔线与遮罩\\07_base_info__c70598d7_00.png"
+}

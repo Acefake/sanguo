@@ -1,0 +1,29 @@
+{
+  "tower": {
+    "model": "e5dc4fba",
+    "idle": "d1492973",
+    "action": null,
+    "bones": 6,
+    "attack_displacement": 0.0,
+    "binding_evidence": "compatible track indices and rest translations; visually validate mechanism",
+    "march": "native wheel tracks, chassis held at rest"
+  },
+  "catapult": {
+    "model": "682039a2",
+    "idle": "ce531a4d",
+    "action": "fa7ff620",
+    "bones": 7,
+    "attack_displacement": 9.008556504441698,
+    "binding_evidence": "compatible track indices and rest translations; visually validate mechanism",
+    "march": "native wheel tracks, chassis held at rest"
+  },
+  "ram": {
+    "model": "c0d5fa9c",
+    "idle": "e94a7726",
+    "action": "157752f9",
+    "bones": 7,
+    "attack_displacement": 0.6301932176496328,
+    "binding_evidence": "compatible track indices and rest translations; visually validate mechanism",
+    "march": "native wheel tracks, chassis held at rest"
+  }
+}

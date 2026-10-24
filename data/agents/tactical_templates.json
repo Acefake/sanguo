@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "templates": {
+    "hold_line": {"label": "保持职责", "stages": ["execute"], "next": "保持位置与有效威胁"},
+    "advance": {"label": "协同接敌", "stages": ["approach", "execute"], "next": "接近合法攻击位置"},
+    "flank_then_engage": {"label": "侧翼配合", "stages": ["approach", "wait_support", "execute"], "next": "确认正面牵制后投入"},
+    "fire_with_cover": {"label": "保持射程", "stages": ["approach", "execute"], "next": "维持射界，近敌逼近时换位"},
+    "cover_ally": {"label": "接应友军", "stages": ["approach", "execute", "rejoin"], "next": "到达接应位置并保持掩护"},
+    "rally": {"label": "局部整顿", "stages": ["disengage", "reposition", "recover", "rejoin"], "next": "脱离接触后恢复组织再投入"},
+    "reserve_reinforce": {"label": "预备补位", "stages": ["approach", "execute"], "next": "补足已确认的战线缺口"},
+    "approach_objective": {"label": "争夺目标", "stages": ["approach", "execute"], "next": "到达职责目标并保持控制"},
+    "scout": {"label": "核实敌情", "stages": ["execute"], "next": "核实侧路与过期敌情"}
+  }
+}

@@ -1,9 +1,9 @@
 extends RefCounted
 
-const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
 const Plan = preload("res://scripts/agents/tactical_plan.gd")
 const Preview = preload("res://scripts/agents/tactical_projection.gd")
-const Roles = preload("res://scripts/war/battle/troop_roles.gd")
+const Roles = preload("res://scripts/war/troop_roles.gd")
 
 # Shared positional consequences are calculated once per frozen cell. Different
 # plans can use that cell without recomputing every enemy/ally combination.

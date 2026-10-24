@@ -1,6 +1,6 @@
 extends RefCounted
 
-const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
 
 # A two-round estimate on a private knowledge copy. No war object, RNG, execution
 # or loss application is available here. Enemy reactions are estimates, not facts.

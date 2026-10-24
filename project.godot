@@ -10,16 +10,13 @@ config_version=5
 
 [application]
 
-config/name="三国山河·秋日地图"
+config/name="sanguo"
 run/main_scene="res://scenes/battle_start.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
 [autoload]
 
-People="*res://scripts/people/person_store.gd"
-PeopleEvents="*res://scripts/people/people_events.gd"
-ModelQueue="*res://scripts/agents/model_queue.gd"
-GameState="*res://scripts/core/game_state.gd"
+GameState="*res://scripts/game_state.gd"
 
 [display]
 
@@ -27,7 +24,6 @@ window/size/viewport_width=1260
 window/size/viewport_height=710
 window/size/window_width_override=1600
 window/size/window_height_override=900
-window/size/resizable=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 

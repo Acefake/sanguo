@@ -1,0 +1,69 @@
+{
+  "infantry": {
+    "model": "d3c18f06",
+    "clips": [
+      "0439a8ca",
+      "be09ed4e",
+      "13af95d7"
+    ],
+    "triangles_per_model": 525,
+    "fixed_models": 64,
+    "palette": "authored khaki cloth and red belt; source material uses 32x32 texture"
+  },
+  "cavalry": {
+    "horse": "cdf4bc12",
+    "clips": [
+      "80b8fc61",
+      "d94c175d",
+      "13af95d7"
+    ],
+    "rider": "d3c18f06",
+    "seating": "project authored",
+    "triangles_per_mounted_model": 9713,
+    "fixed_models": 36,
+    "atlas_sources": [
+      "90e56d46",
+      "e67ffb54",
+      "24b4dfb4"
+    ],
+    "mounted_attack": "native forward gait and infantry strike with authored seating; excluded horse-only rear/kick",
+    "rider_fit": {
+      "scale": 1.05,
+      "vertical_offset_m": 0.85,
+      "method": "pelvis above saddle; visible torso and helmet verified at battle camera"
+    }
+  },
+  "frame_banks": {
+    "rest": [
+      0,
+      1
+    ],
+    "march": [
+      1,
+      8
+    ],
+    "attack": [
+      9,
+      12
+    ],
+    "idle": [
+      21,
+      8
+    ]
+  },
+  "library": "C:\\Users\\10228\\.codex\\visualizations\\2026\\10\\04\\01a104a0-d367-7881-a636-f066ae161007\\三国志14_动画与战斗资源",
+  "format": "G2A by file magic, despite .g1a suffix",
+  "decoder_reference": "https://github.com/Joschuka/Project-G1M",
+  "archers": {
+    "body": "d3c18f06",
+    "reference": "user supplied SAN8R blue archer formation screenshot",
+    "bow": "project authored six-sided recurved wooden bow and string",
+    "animation": "project authored draw release recovery with native infantry skin weights",
+    "uniform": "project authored blue cloth and leather vertex palette; native face texture retained",
+    "atlas_sources": [
+      "24b4dfb4",
+      "74da3a1d"
+    ],
+    "original_archer_model": "not confirmed"
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "player_faction": "liu_bei",
-  "people_pack": "guandu",
-  "sides": [
-    {"faction": "liu_bei", "role": "defender", "leader": ""},
-    {"faction": "yuan_shao", "role": "attacker", "leader": "ys_001"}
-  ]
-}

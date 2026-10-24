@@ -1,0 +1,80 @@
+{
+  "source": "\\\\S-dxp4800plus\\资料\\游戏\\pc游戏\\【PC】三国志8 REMAKEV1.0.8\\SAN8R_解包资源\\PNG\\03_界面\\按钮边框面板等混合图集\\0x01e1e380_233e72fe_15b7dc0_014.png",
+  "source_sha256": "6898f43222d2fb7e1bd1aac6f8b1e9c4f9005d18c58a4dd7d5d4b499ea40c576",
+  "reference": "user supplied third atlas image, visually verified against original library",
+  "sprites": {
+    "cavalry": [
+      1203,
+      356,
+      1230,
+      384
+    ],
+    "infantry": [
+      2012,
+      352,
+      2040,
+      376
+    ],
+    "archers": [
+      1804,
+      360,
+      1830,
+      389
+    ],
+    "speech-ally": [
+      1026,
+      554,
+      1138,
+      616
+    ],
+    "speech-enemy": [
+      1140,
+      554,
+      1254,
+      616
+    ],
+    "morale-track": [
+      1258,
+      581,
+      1718,
+      597
+    ],
+    "morale-yellow": [
+      1026,
+      636,
+      1122,
+      644
+    ],
+    "morale-red": [
+      1123,
+      636,
+      1221,
+      644
+    ]
+  },
+  "flag_symbols": {
+    "unknown": "敌",
+    "dong_zhuo": "董",
+    "cao_cao": "曹",
+    "yuan_shao": "袁",
+    "liu_bei": "刘",
+    "lu_bu": "吕",
+    "yuan_shu": "袁",
+    "ma_teng": "马",
+    "han_sui": "韩",
+    "zhang_yang": "张",
+    "liu_yu": "刘",
+    "gongsun_zan": "公孙",
+    "gongsun_du": "公孙",
+    "zhang_yan": "张",
+    "kong_rong": "孔",
+    "tao_qian": "陶",
+    "liu_yan": "刘",
+    "zhang_lu": "张",
+    "liu_biao": "刘",
+    "sun_jian": "孙",
+    "liu_yao": "刘",
+    "shi_xie": "士"
+  },
+  "flag_processing": "locally rendered Kai glyph masks; shader projects local cloth coordinates consistently onto both native mesh faces"
+}

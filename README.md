@@ -1,6 +1,8 @@
+# sanguo (三国志)
+
 当前默认进入二维全国战略地图，右上角可切换完整三维地图。自主战争首版已接入二维地图：选择目标城 → 派遣武将 → 自动配兵携粮 → 主将自主行军与作战 → 军报与复盘。模型服务在“军情 → 模型设置”中配置，未配置时使用本地人格策略。[使用、接口与验证说明](docs/自主战争首版使用与验证.md)。三维地图说明见 [current implementation](docs/full-world.md)。
 
-# 三国山河 · 秋日地图
+## 三维参考场景 · 秋日地图
 
 三维参考场景按参考截图布置秋日城郊：完整灰墙方城、秋色树林、道路、河岸、村落、港口和农田均已接入，可自由操作镜头。
 
@@ -14,6 +16,8 @@
 
 ---
 
+## 全国战略地图
+
 已扩展为 1920×1080 的全国战略地图，包含 13 个州区、70 座城池、2 处关隘、96 条双向通路和 21 个演示势力。用 Godot 4.7.2 打开 `project.godot`，运行主场景即可体验。
 
 地图使用用户提供的浮雕底图与对应的 51 块灰白地形素材。每块绑定一座控制城，其他城市归入对应分块；默认显示势力版图，颜色随控制城归属更新。分块在原尺寸画布上拼合，共用一条边界，消除各自描边造成的双线和留白。道路、城池旗标与名称由游戏绘制。
@@ -26,40 +30,14 @@
 
 城池详情包含势力、人口、经济、驻军、城防、粮草和通路。可设置行军起点并封锁或开放东侧关隘。全国地图存在绕行通路，封锁关隘阻止进入该关，不保证所有远方城池都不可达。
 
-城内使用现有建筑与政厅系统：点击官府进入议事厅，底部内政、军事、市集、工务、民情可选择命令。其他建筑支持购粮售粮、开垦、征募、操练、锻造、修筑和访察。选择命令先查看消耗与结果，按“决定”执行，按“返回”取消。每项消耗 1 点行动力，每月 3 点；结束本月结算并恢复行动力。城市档案、施政记录、设置和说明采用整页 UI。
+城内使用现有建筑与政厅系统：点击官府进入议事厅，底部内政、军事、市集、工务、民情可选命令。其他建筑支持购粮售粮、开垦、征募、操练、锻造、修建和访察。选择命令先查看消耗与结果，按“决定”执行，按“返回”取消。每项消耗 1 点行动力，每月 3 点；结束本月结算并恢复行动力。城市档案、施政记录、设置和说明采用整页 UI。
 
-数据：`data/world_map.json` 保存全国州区、城池与通路，`data/scenario_world_demo.json` 保存归属和城务数值。`tools/assets/build_world_map.py` 是可重复生成这些数据的原始布局清单。`scripts/world/world_territories.gd` 按州区内城市构建并裁切领地分区，`scripts/world/map_slice.gd` 绘制地图并处理相机与交互。旧局部 `map_slice.json`、`scenario_demo.json` 和旧地图美术保留供比对。
+数据：`data/world_map.json` 保存全国州区、城池与通路，`data/scenario_world_demo.json` 保存归属和城务数值。`tools/build_world_map.py` 是可重复生成这些数据的原始布局清单。`scripts/world_territories.gd` 按州区内城市构建并裁剪领地分区，`scripts/map_slice.gd` 绘制地图并处理相机与交互。旧局部 `map_slice.json`、`scenario_demo.json` 和旧地图美术保留供比对。
 
 当前全国州界、城池坐标与道路属于美术布局；势力归属、城务数值与路线权重是**演示剧本**，尚未按具体历史年份校定。所有城池暂共用城景、议事厅与参议形象。
 
-进度与最近四十条施政记录保存在 `user://city_campaign.json`。全国版保留原进度读取：原有城池沿用存档，新增城池使用剧本初值，缺少的军备字段补为 50。
+进度与最近四十条施政记录保存在 `user://city_campaign.json`。全国版保留原进度读取：原有城池沿用存档，新增城池使用剧本初值，缺少的一军备字段补为 50。
 
 [全国地图数据与素材说明](docs/全国大地图说明.md) · [城内 UI 元素说明](docs/城内UI元素说明.md) · [大地图实现方案](docs/大地图实现方案.md)
 
 效果图：[全图](assets/map/world-preview.png)、[无主灰白方案](assets/map/neutral-white-preview.png)、[据点情报](assets/map/world-detail-preview.png)、[盾形标记放大](assets/map/world-zoom-preview.png)、[城内](assets/city/han/game-preview.png)、[政厅](assets/city/han/council-overview.png)、[行动预览](assets/city/han/action-preview.png)。
-
-## 目录
-
-按模块放：一个模块的脚本在同一个目录，测试在 `tests/` 下的同名目录。
-
-| 目录 | 内容 |
-|---|---|
-| `scripts/core/` | 全局状态 `game_state.gd`（自动加载 `GameState`）与设置窗口 |
-| `scripts/world/` | 全国地图：二维 `map_slice`、三维 `rtk14_*`、领地与地图 HUD |
-| `scripts/city/` | 城内场景、政厅、城内命令 |
-| `scripts/officers/` | 人物卡、特性、人物流程；`officers/ui/` 是武将页面与其控件 |
-| `scripts/agents/` | 武将智能体：决策、调度、预测、经验 |
-| `scripts/war/campaign/` | 战役状态与推进、军团、战略 AI、人物命运 |
-| `scripts/war/battle/` | 战斗结算、战场、攻城、城防、剧本 |
-| `scripts/war/duel/` | 单挑规则与预览入口 |
-| `scripts/war/presentation/` | 三维军队、战斗特效、单挑演出 |
-| `scripts/war/ui/` | 战争界面：开战页、派遣、军报、部队面板 |
-| `scripts/ui/` | 共用主题、版式、文字工具、各图集与皮肤 |
-| `tests/` | 与 `scripts/` 同构；`tests/run_battle_suite.gd` 是战斗回归入口 |
-| `tools/capture/` | 截图脚本 |
-| `tools/validate/` | 可重复运行的校验（CI 可调用） |
-| `tools/assets/` | 一次性素材导入、恢复与数据生成脚本 |
-
-只在 Windows 本地、尚未推到仓库的 15 个脚本按新目录引用，放置位置见 [缺失脚本新位置对照表](docs/缺失脚本新位置对照表.md)。
-
-# sanguo

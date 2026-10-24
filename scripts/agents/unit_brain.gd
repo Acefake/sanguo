@@ -3,11 +3,11 @@ extends RefCounted
 const Plan = preload("res://scripts/agents/tactical_plan.gd")
 const Candidates = preload("res://scripts/agents/tactical_candidates.gd")
 const Evaluator = preload("res://scripts/agents/tactical_evaluator.gd")
-const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
-const Combat = preload("res://scripts/war/battle/combat_system.gd")
+const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
+const Combat = preload("res://scripts/war/combat_system.gd")
 const Forecast = preload("res://scripts/agents/forecast.gd")
-const Roles = preload("res://scripts/war/battle/troop_roles.gd")
-const Coordination = preload("res://scripts/war/campaign/corps_coordination.gd")
+const Roles = preload("res://scripts/war/troop_roles.gd")
+const Coordination = preload("res://scripts/war/corps_coordination.gd")
 const Commit = preload("res://scripts/agents/decision_commit.gd")
 
 static var ask_stats: Dictionary = {}

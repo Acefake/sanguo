@@ -1,7 +1,7 @@
 {
-  "version": 6,
+  "version": 5,
   "tactical": {"version": 2, "max_candidates": 16, "max_positions": 16, "enemy_candidates": 3, "prediction_candidates": 3, "prediction_depth": 2, "switch_gain": 10, "stay_bonus": 8, "record_limit": 40, "cavalry_archer_bonus": 16, "cavalry_escort_radius": 1, "cavalry_escort_penalty": 0.5, "archer_cavalry_retreat_bonus": 10, "archer_cavalry_cover_bonus": 6, "archer_cavalry_hold_penalty": 8},
-  "note": "效用评分的全部可调参数。base_score 为行动基线，factors 为通用因素权重，personality_modifiers 为 14 轴对各因素权重的偏移系数，形式：权重 = base + (轴值 - 50) × 系数。v6：七个人格因素基础权重改为非 0、主轴系数 0.25，人格 90 对 30 约差 15 分；engage.wait_support、pursue.overreach、support.relation 接入局限与关系。",
+  "note": "效用评分的全部可调参数。base_score 为行动基线，factors 为通用因素权重，personality_modifiers 为 14 轴对各因素权重的偏移系数，形式：权重 = base + (轴值 - 50) × 系数。",
   "base_score": {
     "continue": 35,
     "march": 30,
@@ -36,8 +36,7 @@
     "risk": 14,
     "danger": 40,
     "decisive": 6,
-    "suggested": 8,
-    "wait_support": 20
+    "suggested": 8
   },
   "flank": {
     "role": 58,
@@ -52,13 +51,11 @@
   },
   "pursue": {
     "risk": 28,
-    "decisive": 6,
-    "overreach": 30
+    "decisive": 6
   },
   "support": {
     "role": 60,
-    "other": 20,
-    "relation": {"同袍": 6, "猜忌": -6, "宿怨": -12}
+    "other": 20
   },
   "request_support": {
     "danger": 15,
@@ -105,10 +102,10 @@
       "weight": 10
     },
     "patience": {
-      "weight": 4
+      "weight": 0
     },
     "ambition": {
-      "weight": 4
+      "weight": 0
     },
     "empathy": {
       "weight": 14
@@ -117,27 +114,27 @@
       "weight": 10
     },
     "greed": {
-      "weight": 2
+      "weight": 0
     },
     "suspicion": {
-      "weight": 3
+      "weight": 0
     },
     "discipline": {
-      "weight": 4
+      "weight": 0
     },
     "pride": {
-      "weight": -4
+      "weight": 0
     },
     "tolerance": {
       "weight": 8
     },
     "order": {
-      "weight": 3
+      "weight": 0
     }
   },
   "personality_modifiers": {
     "野心": {
-      "ambition": 0.25,
+      "ambition": 0.15,
       "greed": 0.15
     },
     "风险承受": {
@@ -147,7 +144,7 @@
       "pride": -0.1
     },
     "耐心": {
-      "patience": 0.25,
+      "patience": 0.12,
       "ambition": -0.1,
       "discipline": 0.1
     },
@@ -157,14 +154,14 @@
       "danger": 0.1
     },
     "自制": {
-      "discipline": 0.25,
+      "discipline": 0.2,
       "greed": -0.1
     },
     "猜疑": {
-      "suspicion": 0.25
+      "suspicion": 0.1
     },
     "自尊": {
-      "pride": -0.25,
+      "pride": -0.2,
       "danger": -0.1
     },
     "同理心": {
@@ -172,7 +169,7 @@
       "loyalty": 0.15
     },
     "秩序偏好": {
-      "order": 0.25,
+      "order": 0.2,
       "inertia": 0.2,
       "role_fit": 0.15
     },
@@ -188,7 +185,7 @@
       "ambition": -0.1
     },
     "贪欲": {
-      "greed": 0.25,
+      "greed": 0.2,
       "target_value": 0.1
     },
     "忠义": {

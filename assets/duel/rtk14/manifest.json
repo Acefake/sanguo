@@ -1,0 +1,141 @@
+{
+  "407a9723": {
+    "label": "披风铠甲武将候选",
+    "role": "officer_caped",
+    "path": "res://assets/duel/rtk14/models/407a9723.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "407a9723",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "1c62dbb8",
+    "materials": [
+      {
+        "texture": "e09f47ae",
+        "normal": "1e9d46bc"
+      },
+      {
+        "texture": "7558d313",
+        "normal": "b356d221"
+      },
+      {
+        "texture": "3db44a2e",
+        "normal": "7bb2493c"
+      },
+      {
+        "texture": "94df0cbc",
+        "normal": "968ad4ca"
+      },
+      {
+        "texture": "b05f8730",
+        "normal": "b20b4f3e"
+      },
+      {
+        "texture": "aec22d81",
+        "normal": "ecc02c8f"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references",
+    "identity_status": "appearance candidate; officer name not verified"
+  },
+  "8edce9d9": {
+    "label": "重甲武将候选",
+    "role": "officer_armored",
+    "path": "res://assets/duel/rtk14/models/8edce9d9.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "8edce9d9",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "9a4adfc2",
+    "materials": [
+      {
+        "texture": "fe98c8be",
+        "normal": "b5133c4c"
+      },
+      {
+        "texture": "4b1d0ee3",
+        "normal": "01978271"
+      },
+      {
+        "texture": "6a772b3e",
+        "normal": "20f19ecc"
+      },
+      {
+        "texture": "df472fc0",
+        "normal": "25212c4e"
+      },
+      {
+        "texture": "a1fb824c",
+        "normal": "e7d57eda"
+      },
+      {
+        "texture": "cf9985d1",
+        "normal": "8613f95f"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references",
+    "identity_status": "appearance candidate; officer name not verified"
+  },
+  "179118ca": {
+    "label": "长兵器候选",
+    "role": "weapon_long",
+    "path": "res://assets/duel/rtk14/models/179118ca.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "179118ca",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "281c8ef1",
+    "materials": [
+      {
+        "texture": "df48500e",
+        "normal": "95c2c39c"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references",
+    "identity_status": "appearance candidate; officer name not verified"
+  },
+  "26f8ff97": {
+    "label": "长刀候选",
+    "role": "weapon_long_blade",
+    "path": "res://assets/duel/rtk14/models/26f8ff97.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "26f8ff97",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "05b181c4",
+    "materials": [
+      {
+        "texture": "62547770",
+        "normal": "99a1887e"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references",
+    "identity_status": "appearance candidate; officer name not verified"
+  },
+  "cdf4bc12": {
+    "label": "战马",
+    "role": "horse",
+    "path": "res://assets/duel/rtk14/models/cdf4bc12.glb",
+    "source_package": "CharacterEditor",
+    "source_model": "cdf4bc12",
+    "native_database": "KIDSSystemResource_b290631c.kidsobjdb",
+    "texture_binding": "3e2d54a9",
+    "materials": [
+      {
+        "texture": "90e56d46",
+        "normal": "92913554"
+      },
+      {
+        "texture": "e67ffb54",
+        "normal": "1dcd0c62"
+      }
+    ],
+    "animation_status": "unbound",
+    "unresolved_textures": [],
+    "verification": "original geometry preview and native material references",
+    "identity_status": "appearance candidate; officer name not verified"
+  }
+}

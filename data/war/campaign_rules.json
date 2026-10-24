@@ -42,6 +42,11 @@
       1.1
     ],
     "attributes": {
+      "command_base": 0.8,
+      "command_divisor": 250,
+      "command_min": 0.8,
+      "command_max": 1.28,
+      "command_weight": 0.002,
       "morale_divisor": 100,
       "morale_min": 0.25,
       "training_base": 0.6,
@@ -101,6 +106,10 @@
     "attack_range": 3
   },
   "officer": {
+    "attack_min": 0.8,
+    "attack_max": 1.2,
+    "defense_min": 0.9,
+    "defense_max": 1.1,
     "total_min": 0.6,
     "total_max": 1.6,
     "aura_skill_weight": 0.003,
@@ -148,7 +157,8 @@
   },
   "faction_mapping": {
     "袁绍集团": "yuan_shao",
-    "曹操集团": "cao_cao"
+    "孙吴集团": "sun_jian",
+    "蜀汉集团": "liu_bei"
   },
   "terrain_regions": {
     "yizhou": "mountains",

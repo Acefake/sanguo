@@ -6,8 +6,8 @@ extends RefCounted
 # 不会私自带兵移动。全部掷点走 war.state["dissent_state"] 独立随机流，随存档可复现。
 
 const Dissent = preload("res://scripts/agents/officer_dissent.gd")
-const Structure = preload("res://scripts/war/campaign/corps_structure.gd")
-const Tactical = preload("res://scripts/war/battle/tactical_battlefield.gd")
+const Structure = preload("res://scripts/war/corps_structure.gd")
+const Tactical = preload("res://scripts/war/tactical_battlefield.gd")
 
 const OBEY := "obey"
 const OBJECT := "object"

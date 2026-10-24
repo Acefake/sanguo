@@ -1,6 +1,6 @@
 # 人物 AI 模型队列（A1）说明
 
-分支 `feat/ai-model-queue`（基于 `feat/combat-officer-identity` b3e6858），2026-10-23。对应设计 08b《智能与流畅》第 3、7、9、10 节的 A1：模型传输从适配器里抽出来，新增 ModelQueue 与提交点，战役主循环不再等待模型。不改战斗数值与规则，代码里没有人名、势力名判断。
+分支 `feat/ai-model-queue`（基于 `feat/combat-officer-identity` b3e6858），2026-10-23；2026-10-24 移植到新 main（分支 `feat/ai-model-queue-port`，见 §9）。对应设计 08b《智能与流畅》第 3、7、9、10 节的 A1：模型传输从适配器里抽出来，新增 ModelQueue 与提交点，战役主循环不再等待模型。不改战斗数值与规则，代码里没有人名、势力名判断。
 
 ## 1. 结论
 
@@ -84,13 +84,28 @@ api_key：
 
 | 测试 | 内容 | 本沙箱结果 |
 |---|---|---|
-| `tests/agents/model_queue_validation.gd` | 传输层解码与协议字段；优先级；同人同类顶替且队列不增长；出队时情境失效丢弃；超时；提交点早到用模型、晚到用默认；非法答案不采用；溃散后答案丢弃不报错；clear 后旧答案不落地；决策日志最终采用值 | 通过 |
-| `tests/agents/step_latency_validation.gd` | 30 秒替身连跑 30 日战役，测 step 与调度耗时，检查 step 没有挂起 | 无挂起、调度 p99 达标；step 总耗时不达标（见 §6.1） |
-| `tests/agents/decision_scheduler_validation.gd` | 原有测试，并发设置从调度器改到夹具上 | 依赖缺失脚本，见 §7 |
+| `tests/agents/model_queue_validation.gd` | 传输层解码与协议字段；优先级；同人同类顶替且队列不增长；顶替在飞请求后通道要等旧请求返回才放行；出队时情境失效丢弃；超时；提交点早到用模型、晚到用默认；非法答案不采用；溃散后答案丢弃不报错；clear 后旧答案不落地；决策日志最终采用值 | 新 main 套件 PASS |
+| `tests/agents/step_latency_validation.gd` | 30 秒替身连跑 30 日战役，测 step 与调度耗时，检查 step 没有挂起、调度 p99 < 16 ms；step 总耗时只打印 `STEP_BUDGET`，不作断言（见 §6.1） | 新 main 套件 PASS |
+| `tests/agents/decision_scheduler_validation.gd` | 原有测试，并发设置从调度器改到夹具上 | 新 main 套件 PASS |
+| `tests/agents/unit_model_validation.gd` | 用户的原有测试：每轮预算 6 条、队列上限 64 两条断言改为“同人同类顶替不让队列增长、并发不超过夹具上限”；答案只在提交点（下一回合）可取 | 新 main 套件 PASS |
 
 两项新测试已加入 `tests/run_battle_suite.gd`。
 
 ### 6.1 step 耗时
+
+新 main（真实 unit_brain / tactical_* 链，2026-10-24，Godot 4.7.2 headless、2 核，单 Godot 进程，`step_latency_validation` 连跑 3 次）：
+
+| | p50 | p95 | p99 |
+|---|---|---|---|
+| 纯规则 step | 45–58 | 860–1035 | 875–1067 |
+| 30 秒替身 step | 31–36 | 870–1003 | 890–1023 |
+| 其中决策调度（begin_round + submit + take） | 0.01 | 9.5–9.9 | 9.5–10.1 |
+
+- 30 次 step 都在同一帧内返回，没有挂起。提交 288 个请求、在飞 5 个（云端通道上限），192 个在提交点按默认结算（替身 30 秒不回）。
+- 调度耗时每 10 日一次尖峰：参军（adviser）96 个请求一起提交、次日一起作废。移植时测到这两步原来分别约 10–13 ms 与 10–21 ms：队列积到上百条后每次 submit 都整表扫描（平方级），决策日志在提交点同步写盘。现在出队前先看“有人排队的通道是否还有空位”，日志延到下一帧写，96 条一批的 submit 降到约 2–3 ms，调度 p99 约 10 ms。
+- step 总耗时远超 16 ms，慢在引擎（纯规则一组就是底数，每 10 日一次战略评估约 0.9–1 s），不在模型等待；替身模式 p50 反而低于纯规则，是同机读数波动。
+
+以下是 2026-10-23 在旧分支（富空壳）上的数，留作对照。
 
 沙箱环境：Godot 4.7.2 headless、2 核且同时有其他验证在跑，缺失脚本用富空壳代替，演示剧本 30 日，单位毫秒，不含渲染。
 
@@ -121,7 +136,45 @@ api_key：
 
 ## 8. 已知问题
 
-1. `scripts/core/game_settings.gd:128` 设置页把 `store.agent.api_key` 填进密钥框（掩码显示）。有环境变量时显示的是环境变量里的密钥，保存时不会写盘。预设下拉框、状态行留给 A2。
-2. DecisionScheduler 去掉了旧的内部字段 `concurrency`、`round_budget`、`queue_limit`、`last_batch_ms`。仓库里没有调用方；只在本地的 `unit_brain.gd`、`officer_brain.gd` 如果直接读写这些字段，需要改为调整 `ai_runtime.json`。
-3. `campaign_state.gd:315`（改动前就有）：submit 返回 false（包括当天没有请求）时都会给 `dropped_batches` 加一，这个计数偏大。
+1. `scripts/core/game_settings.gd:130` 设置页把 `store.agent.api_key` 填进密钥框（掩码显示）。有环境变量时显示的是环境变量里的密钥，保存时不会写盘。预设下拉框、状态行留给 A2。
+2. DecisionScheduler 去掉了旧的内部字段 `concurrency`、`round_budget`、`queue_limit`、`last_batch_ms`、`queue`、`_inflight`、`_submitted`。新 main 的 `unit_brain.gd`、`officer_brain.gd` 不读写这些字段（只用 take/submit/has_pending/invalidate）；`tests/agents/agent_arena.gd` 已改读 `ModelQueue` 的计数。
+3. `campaign_state.gd` step 里（改动前就有）：submit 返回 false（包括当天没有请求）时都会给 `dropped_batches` 加一，这个计数偏大。
 4. 启用本地慢模型时，下一日提交点对很多决策太紧，会大量回落到默认。按场景设 commit_tick（接敌预警时发、接敌日提交）是 A2/A3 的工作。
+
+## 9. 移植到新 main（2026-10-24）
+
+来源 `feat/ai-model-queue` 85e95b8^..4d8f328（5 个提交），目标 main 7564b84。新 main 的 `scripts/agents` 是用户的真实 AI 链（unit_brain、officer_brain、tactical_*、decision_commit 等），旧分支当时只有空壳。
+
+### 9.1 保留的用户改动
+
+| 用户在 agent_adapter 的改动 | 移植后所在 |
+|---|---|
+| 并发默认 6→3、决策预算 8→20 s（含读配置的默认值） | `agent_adapter.gd` 不变 |
+| `failure_reasons` 按原因计数 | `record_failure(reason)` 计数；队列路径的原因由 `ModelQueue.failure_reason(id)` 给出（模型报错原文或“超过现实时限”），不再一律记成“没有在时限内回复” |
+| Ollama `num_ctx` 4096→8192 | `model_client.gd` 的 `chat_payload` |
+| HTTP 错误带响应体前 160 字 | `model_client.gd` 的 `decode` |
+| `_compact_context` 只给模型 name + personality（去掉 officer_explain） | 保持用户写法 |
+| `decision_scheduler.gd` 去掉 `class_name` | 保持（新调度器也不注册全局类名） |
+
+### 9.2 接线
+
+- `campaign_state.gd`（新 main 未拆分）：`decision_alive(key)` 放在 CampaignState 本身，`setup` 时 `planner.alive = decision_alive`；有到期答案的部队当天重判；`take` 传今日上下文、`submit` 传当天执行的默认答案。
+- `army_corps.gd`：主帅提案在提交点按今日 `commander_context` 复查。
+- `unit_brain.gd` / `officer_brain.gd` 不改：它们调用 `take` 不传今日上下文，按签名一致判断，再走各自的 `model_verdict` / 候选比对；答案只在提交点（下一回合）可取。
+
+### 9.3 移植时新增的修正
+
+- **作废的在飞请求继续占通道**：HTTP 请求不会因顶替、取消、超时而中断，模型服务仍在算它。原实现作废后立即释放槽位，本地通道（并发 1）会同时收到多个请求。现在作废的在飞请求要等 `fetch` 真正返回才释放槽位；`request_id` 被新请求重用时只认本次发出的请求对象。
+- 出队判断按通道记排队数，有人排队的通道都满时不扫描队列；决策日志延到下一帧写（见 §6.1）。
+- `model_client.decode` 用 JSON 实例解析：模型输出不合法是常见情况，`JSON.parse_string` 会打印引擎 `ERROR`，套件把它判为失败。
+
+### 9.4 回归核对（基线 = main 7564b84 的套件全量输出）
+
+| 核对 | 结果 |
+|---|---|
+| 原有 64 项（套件 54 项 + 新 main 额外 10 项，含 2 项 SKIP：GPU 截图、真模型服务），逐项状态与日志（去掉耗时读数） | 全部相同；唯一差异是 `war_month_performance_validation` 的回溯行号 `campaign_state.gd:532→533`（该测试改动前就失败，原因是夹具的 preview 缺 `home`） |
+| 战役逐日哈希 harness（3 个剧本 183 日） | 逐行相同，完整输出相同 |
+| 新增 `model_queue_validation`、`step_latency_validation` | PASS |
+| `local_agent_validation`（不在套件） | 改动前后都 FAIL（单候选上下文被分差门判为不必问模型），与本次无关 |
+
+无模型服务（纯规则、或适配器未启用）时不经过队列：`request_for` 返回 null，`submit` 没有请求，`ready` 始终为空，所以与改动前逐字节一致。

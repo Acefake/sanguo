@@ -41,6 +41,9 @@ func run() -> void:
 	scheduler.submit([stub("unit:slow"),stub("unit:fast")],fixture,{"unit:slow":"s","unit:fast":"f"})
 	await create_timer(0.06).timeout
 	check(scheduler.ready.has("unit:fast") and not scheduler.ready.has("unit:slow"),"快回复被整批慢回复阻塞")
+	# 答案只在提交点（下一回合）可取。
+	check(scheduler.take("unit:fast","f",1).is_empty(),"提交点之前就采用了模型答案")
+	scheduler.begin_round(2)
 	check(not scheduler.take("unit:fast","f",2).is_empty(),"当前合法回复未独立消费")
 	scheduler.clear()
 	await create_timer(0.32).timeout
@@ -54,10 +57,13 @@ func run() -> void:
 		var key := ("corps:" if level == "commander" else "officer:" if level == "adviser" else "unit:")+str(i)
 		contexts.append(stub(key,level))
 		signatures[key] = "s"
+	var models: Node = root.get_node("ModelQueue")
 	scheduler.submit(contexts,fixture,signatures)
-	check(scheduler.queue.size() <= 64 and fixture.peak <= 6,"队列或并发越界")
+	# 同一人同一类决策只留最新请求：重复提交不让队列增长；并发不超过夹具的上限。
+	scheduler.submit(contexts,fixture,signatures)
+	check(models.queued_count() + models.inflight_count() <= contexts.size() and fixture.peak <= fixture.concurrency,"队列或并发越界")
 	await create_timer(0.09).timeout
-	check(fixture.calls.size() == 6,"每轮请求预算没有控制为六条")
+	check(fixture.peak <= fixture.concurrency and not fixture.calls.is_empty(),"并发越界或请求没有发出")
 	for tick in range(2,24):
 		scheduler.begin_round(tick)
 		var fresh: Array = []
@@ -94,9 +100,9 @@ func run() -> void:
 	var sent: Dictionary = JSON.parse_string(payload["messages"][1]["content"])
 	for field in ["self","knowledge","current_plan","officer","task","authority"]: check(sent.has(field),"部将模型压缩丢失 "+field)
 	check(not JSON.stringify(sent).contains("grain_days"),"补给关闭仍发送粮食风险")
-	var failures_response := adapter._decode_response(HTTPRequest.RESULT_SUCCESS,200,"{bad".to_utf8_buffer())
+	var failures_response := adapter.Client.decode(adapter.endpoint,HTTPRequest.RESULT_SUCCESS,200,"{bad".to_utf8_buffer())
 	check(failures_response.has("error"),"畸形JSON未触发回退")
-	check(adapter._decode_response(HTTPRequest.RESULT_CANT_CONNECT,503,PackedByteArray()).has("error"),"网络错误未触发回退")
+	check(adapter.Client.decode(adapter.endpoint,HTTPRequest.RESULT_CANT_CONNECT,503,PackedByteArray()).has("error"),"网络错误未触发回退")
 	var result := await adapter.choose_batch([ctx])
 	check(result[ctx["request_id"]].get("source","") != "model","断网没有本地接管")
 	store.restore_battle_test()

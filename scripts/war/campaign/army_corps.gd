@@ -890,7 +890,7 @@ static func plan_background(war, adapter: Node) -> void:
 		var tick: int = war.state["tick"]
 		var key: String = "corps:" + corps["id"]
 		var signature := decision_signature(war, corps, adapter)
-		var proposal: Dictionary = war.planner.take(key, decision_authority_signature(signature), tick)
+		var proposal: Dictionary = war.planner.take(key, decision_authority_signature(signature), tick, commander_context(war, corps) if war.planner.ready.has(key) else {})
 		if not proposal.is_empty():
 			var result: Dictionary = proposal["result"]
 			var selected: Dictionary = {}

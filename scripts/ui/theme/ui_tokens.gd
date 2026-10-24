@@ -28,18 +28,36 @@ static func _value(group: String, name: String) -> Variant:
 
 
 ## 颜色令牌，如 "text"、"accent"。可选 alpha 覆盖令牌自带的透明度。
-static func color(name: String, alpha := -1.0) -> Color:
-	if not _colors.has(name):
-		_colors[name] = Color.html(str(_value("color", name)))
-	var result: Color = _colors[name]
+## palette 为 theme.json「palettes」里的调色板名（如 "glass"），只覆盖它列出的令牌，其余沿用默认。
+## 界面里运行时取色优先用 control.get_theme_color(名, "Tokens")：它跟随该控件所在子树挂的调色板。
+static func color(name: String, alpha := -1.0, palette := "") -> Color:
+	var key := palette + ":" + name
+	if not _colors.has(key):
+		var overrides: Dictionary = _palette(palette).get("color", {})
+		_colors[key] = Color.html(str(overrides[name] if overrides.has(name) else _value("color", name)))
+	var result: Color = _colors[key]
 	if alpha >= 0.0:
 		result.a = alpha
 	return result
 
 
-## 透明度令牌（0–1），如 "panel"、"hover"。
-static func alpha(name: String) -> float:
-	return float(_value("alpha", name))
+## 全部颜色令牌名（默认表的键；调色板只能覆盖其中的名字）。
+static func color_names() -> Array:
+	return _table("color").keys()
+
+
+## 透明度令牌（0–1），如 "panel"、"hover"。palette 同 color()。
+static func alpha(name: String, palette := "") -> float:
+	var overrides: Dictionary = _palette(palette).get("alpha", {})
+	return float(overrides[name] if overrides.has(name) else _value("alpha", name))
+
+
+static func _palette(palette: String) -> Dictionary:
+	if palette.is_empty():
+		return {}
+	var table := _table("palettes")
+	assert(table.has(palette), "theme.json 缺少调色板：" + palette)
+	return table[palette]
 
 
 ## 字号令牌（px），三档：title/display 标题、body 正文、note/caption 注释。

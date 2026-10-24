@@ -5,6 +5,7 @@
     "panel": "#1C1A17",
     "raised": "#26231F",
     "line": "#FFFFFF17",
+    "rim": "#FFFFFF17",
     "text": "#ECE4D2",
     "muted": "#A0968A",
     "dim": "#6E665A",
@@ -21,7 +22,32 @@
     "panel": 0.9,
     "hover": 0.06,
     "pressed": 0.1,
-    "disabled_text": 0.45
+    "disabled_text": 0.45,
+    "shadow": 0.35
+  },
+  "palettes": {
+    "glass": {
+      "_note": "地图 HUD 用的浅纸色半透明面板（顶栏、战况条、右侧抽屉、小地图、军报浮条）。只覆盖与默认不同的令牌；文字色按面板 0.84 透明度压在近黑地形上仍 ≥4.5:1 选定。",
+      "color": {
+        "ink": "#3A3226",
+        "panel": "#F5F0E6",
+        "raised": "#FFFFFF99",
+        "line": "#2B241A1F",
+        "rim": "#FFFFFFB3",
+        "text": "#231F1A",
+        "muted": "#4A4339",
+        "dim": "#51493E",
+        "accent": "#9E3523",
+        "accent_hover": "#B5432F",
+        "accent_pressed": "#862C1D",
+        "label": "#6E4B10",
+        "green": "#4F8A58"
+      },
+      "alpha": {
+        "panel": 0.84,
+        "shadow": 0.16
+      }
+    }
   },
   "radius": {
     "panel": 14,

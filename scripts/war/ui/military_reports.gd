@@ -145,6 +145,11 @@ func _matches(report: Dictionary) -> bool:
 	if kind_filter.selected == 3: return kind.contains("粮") or kind.contains("援") or kind.contains("补给") or kind.contains("通路")
 	return true
 
+## 颜色令牌：在场景树里时取所在子树主题的 "Tokens" 色（跟随调色板），否则取默认令牌。
+func _token(name: String) -> Color:
+	return get_theme_color(name, "Tokens") if is_inside_tree() else Tokens.color(name)
+
+
 func rebuild() -> void:
 	signature = JSON.stringify([store.war.state[StateKeys.TICK], store.war.state[StateKeys.REPORTS].size(), store.war.visible_reports().size(), store.war.state[StateKeys.ARMIES].size()])
 	subtitle.text = "%s  %s  第%d日" % [store.scenario["factions"].get(store.war.state[StateKeys.PLAYER_FACTION], {}).get("name", "本军"), store.date_text(), store.war.state[StateKeys.TICK]]
@@ -171,9 +176,10 @@ func rebuild() -> void:
 		var army: Dictionary = store.war.state[StateKeys.ARMIES].get(report["army_id"], {})
 		var button := UISkin.button("", func(): select_report(id))
 		var row_style := StyleBoxFlat.new()
-		row_style.bg_color = Tokens.color("raised") if selected_report == id else Color.TRANSPARENT
+		# 取色跟随所在子树的调色板（地图抽屉是浅色 glass），不写死默认深色。
+		row_style.bg_color = _token("raised") if selected_report == id else Color.TRANSPARENT
 		row_style.border_width_left = 3
-		row_style.border_color = Tokens.color("accent") if selected_report == id else Color.TRANSPARENT
+		row_style.border_color = _token("accent") if selected_report == id else Color.TRANSPARENT
 		row_style.content_margin_left = 10
 		row_style.content_margin_right = 10
 		button.add_theme_stylebox_override("normal", row_style)

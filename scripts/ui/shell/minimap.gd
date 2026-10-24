@@ -35,8 +35,9 @@ func _init() -> void:
 	offset_top = -Tokens.space(2) - SIZE.y
 	offset_bottom = -Tokens.space(2)
 	grow_vertical = Control.GROW_DIRECTION_BEGIN
-	var style := preload("res://scripts/ui/theme/ui_theme_builder.gd").panel_box(0)
-	style.set_content_margin_all(Tokens.space(1) - 2)
+	# 细边浅框：只留 3px 纸色边与圆角，地图本身就是内容，不再垫深色厚框。
+	var style := preload("res://scripts/ui/theme/ui_theme_builder.gd").panel_box(0, "glass")
+	style.set_content_margin_all(3)
 	add_theme_stylebox_override("panel", style)
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	_map = TextureRect.new()
@@ -67,7 +68,9 @@ func _draw_frame() -> void:
 	var area := _frame.size
 	var rect := Rect2(_view.position * area, _view.size * area).intersection(Rect2(Vector2.ZERO, area))
 	if rect.size.x <= 0.0 or rect.size.y <= 0.0: return
-	_frame.draw_rect(rect, Tokens.color("text"), false, 1.5)
+	# 取景框：深色底线 + 浅色细线，亮暗地形上都看得清。
+	_frame.draw_rect(rect.grow(0.5), Tokens.color("ink", 0.7), false, 3.0)
+	_frame.draw_rect(rect, Tokens.color("on_accent"), false, 1.5)
 
 
 func _gui_input(event: InputEvent) -> void:

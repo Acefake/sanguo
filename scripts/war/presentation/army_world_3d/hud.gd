@@ -117,39 +117,44 @@ func _refresh_enemy_panel() -> void:
 	show_enemy(selected_enemy)
 
 ## 战况细条：顶栏下方居中一条「我军 ▬▬ 敌军」，独立战场时下面一行目标进度。
+## 不垫底板：细条与带光晕描边的文字直接压在地图上（Halo 变体），只占一条线的视觉重量。
 func _build_battle_feedback() -> void:
 	var Widgets := preload("res://scripts/ui/theme/ui_widgets.gd")
 	var Tokens := preload("res://scripts/ui/theme/ui_tokens.gd")
 	advantage_panel = PanelContainer.new()
 	advantage_panel.name = "BattleAdvantage"
-	Widgets.adopt_theme(advantage_panel)
-	advantage_panel.theme_type_variation = "BarPanel"
+	Widgets.adopt_theme(advantage_panel, "glass")
+	advantage_panel.theme_type_variation = "FlatPanel"
 	advantage_panel.anchor_left = 0.5
 	advantage_panel.anchor_right = 0.5
-	advantage_panel.offset_left = -220
-	advantage_panel.offset_right = 220
-	advantage_panel.offset_top = 72
+	advantage_panel.offset_left = -200
+	advantage_panel.offset_right = 200
+	advantage_panel.offset_top = 88
 	advantage_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var box := Widgets.vbox(0)
 	advantage_panel.add_child(box)
 	var row := Widgets.hbox(1)
 	box.add_child(row)
-	row.add_child(Widgets.label("我军", "NoteLabel"))
+	row.add_child(Widgets.label("我军", "HaloLabel"))
 	advantage_bar = ProgressBar.new()
-	advantage_bar.custom_minimum_size = Vector2(0, 6)
+	advantage_bar.custom_minimum_size = Vector2(0, 4)
 	advantage_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	advantage_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	advantage_bar.show_percentage = false
 	var enemy_side := StyleBoxFlat.new()
-	enemy_side.bg_color = Tokens.color("accent")
+	enemy_side.bg_color = Tokens.color("accent", -1, "glass")
 	enemy_side.set_corner_radius_all(Tokens.radius("pill"))
+	# 细条两侧一圈纸色描边，压在亮/暗地形上都有边界。
+	enemy_side.border_color = Tokens.color("panel", 0.9, "glass")
+	enemy_side.set_border_width_all(1)
+	enemy_side.set_expand_margin_all(1)
 	advantage_bar.add_theme_stylebox_override("background", enemy_side)
 	row.add_child(advantage_bar)
-	row.add_child(Widgets.label("敌军", "NoteLabel"))
-	advantage_label = Widgets.muted("")
+	row.add_child(Widgets.label("敌军", "HaloLabel"))
+	advantage_label = Widgets.label("", "HaloMutedLabel")
 	advantage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(advantage_label)
-	var objective_label := Widgets.muted("", true)
+	var objective_label := Widgets.label("", "HaloMutedLabel", true)
 	objective_label.name = "BattleObjectiveLabel"
 	objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(objective_label)
@@ -164,7 +169,7 @@ func _refresh_battle_feedback() -> void:
 	advantage_label.text = "战况  %.0f%% : %.0f%%" % [balance["percent"], 100 - balance["percent"]]
 	var objective_label: Label = advantage_panel.find_child("BattleObjectiveLabel", true, false)
 	objective_label.text = preload("res://scripts/war/battle/battle_objectives.gd").status_text(store.war)
-	objective_label.visible = store.battle_test
+	objective_label.visible = store.battle_test and not objective_label.text.strip_edges().is_empty()
 	_refresh_control_marker()
 
 func _refresh_control_marker() -> void:

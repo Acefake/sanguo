@@ -48,7 +48,7 @@ func _ready() -> void:
 	var canvas := Control.new()
 	canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Widgets.adopt_theme(canvas)
+	Widgets.adopt_theme(canvas, "glass")
 	add_child(canvas)
 	if not is_instance_valid(store.war_presentation): _build_toolbar(canvas)
 	drawer = SideDrawer.new()

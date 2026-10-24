@@ -80,6 +80,8 @@ func _faction_block() -> Control:
 	block.add_child(badge)
 	_badge = Widgets.title("")
 	_badge.add_theme_font_size_override("font_size", Tokens.font_size("body") + 2)
+	# 徽记底是势力色（深），字固定用浅色，不随浅色面板的墨色正文。
+	_badge.add_theme_color_override("font_color", Tokens.color("on_accent"))
 	_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	badge.add_child(_badge)

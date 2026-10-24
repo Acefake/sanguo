@@ -37,6 +37,7 @@ var state: Dictionary = {}
 var urgent_event := false
 var generation := 0
 var planner = preload("res://scripts/agents/decision_scheduler.gd").new()
+var routes = preload("res://scripts/war/campaign/route_memo.gd").new()
 var rng := RandomNumberGenerator.new()
 
 
@@ -211,11 +212,9 @@ func can_cross(faction: String, node: String) -> bool:
 	pair.sort()
 	return state.get("relations", {}).get("|".join(pair), "hostile") == "allied"
 
+## 势力从起点到终点的通路：不能穿越非友方城池（起终点除外）。按通行状态记忆，见 route_memo.gd。
 func route(faction: String, start: String, finish: String) -> Dictionary:
-	var excluded: Array = []
-	for node in graph.places:
-		if node != start and node != finish and not can_cross(faction, str(node)): excluded.append(node)
-	return graph.path(start, finish, excluded)
+	return routes.route(self, faction, start, finish)
 
 func campaign_finished() -> bool:
 	return not state.get("campaign_result", {}).is_empty()

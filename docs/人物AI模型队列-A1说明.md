@@ -55,7 +55,7 @@ ModelQueue（后台，按帧）
 
 ### 3.1 决策日志
 
-`user://people_decisions.jsonl`（路径在 `ai_runtime.json` 的 `decision_log`），每个结算过的请求写一行：`request_id`、`kind`、`context_hash`、`commit_tick`、`round`、`default`、`model`、`arrived_before_commit`、`outcome`、`final`、`source`。`final` 是最终采用值。`outcome` 取值：`adopted`、`late`（提交点前没有可用答案：未到、失败或超时）、`expired`、`stale`、`illegal`、`vetoed`、`context_changed`。只记经过队列的决策；纯规则决策本来就可复现，不写日志。回放（A4）读这份日志。
+`user://people_decisions.jsonl`（路径在 `ai_runtime.json` 的 `decision_log`），每个结算过的请求写一行：`request_id`、`kind`、`context_hash`、`commit_tick`、`round`、`default`、`model`、`arrived_before_commit`、`outcome`、`final`、`source`。`final` 是最终采用值。`outcome` 取值：`adopted`、`late`（提交点前没有可用答案：未到、失败或超时）、`expired`（答案到了、情境仍有效，但提交点那回合没被取走）、`stale`（情境已失效：提交点复查时失效，或军团/部队在提交点前已撤退、覆没，调用方没来取）、`illegal`、`vetoed`、`context_changed`。只记经过队列的决策；纯规则决策本来就可复现，不写日志。回放（A4）读这份日志。
 
 ### 3.2 统计
 

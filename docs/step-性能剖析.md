@@ -209,7 +209,7 @@ step 之外（`GameState._finish_advance` 里的 `_save()`，测试和 A1 的 st
 - 每个（剧本，模式）单独一个进程跑 30 日：模型队列是 autoload，同进程连跑时上一模式没回来的请求会占住通道，后面的模式一次都问不到。
 - 纯规则不问模型，主帅上下文复用为 0 是预期（只在替身模式下同一军团一天内重复构造上下文）。
 - 接敌 · 即时替身：同一棵树连跑两次，`export_state` 原始哈希也会不同——差别只在 `battle_ai_model_log[].proposal.context.timing`（候选生成、快照、交换的微秒耗时），游戏状态本身一致。哈希前去掉 `timing` 与 `adapter`（节点名带实例 id）后，改前改后各跑两次，四次哈希相同。这是主线上本来就有的遥测字段，不是本次改动引入。
-- 两种替身模式下几乎所有主帅（commander）答案都是 `expired`（演示即时 38 条全 expired），与本次优化无关（改前改后相同），另行调查。
+- 两种替身模式下几乎所有主帅（commander）答案都是 `expired`（演示即时 38 条全 expired），与本次优化无关（改前改后相同）。后续排查：这 38 条都是第 10/20 日新建、当日整军团撤退的军团，提交点那天 `plan_background` 不再来取，答案被记成 expired；已改为记 `stale`（见 `decision_scheduler.gd` begin_round）。接敌剧本里仍在场的军团，主帅答案照常采纳。
 
 ### 端到端 A/B（p50 / p99）
 

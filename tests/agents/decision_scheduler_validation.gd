@@ -9,11 +9,13 @@ class SlowAgent extends Node:
 	var metrics := {"calls": 0, "fallbacks": 0}
 	var delay := 0.35
 	var concurrency := 6
+	## instant：答案在提交当下同步返回（不等计时器），即“模型答案总能赶上提交点”。
+	var instant := false
 	func supports_background_decisions() -> bool: return true
 	func can_request_model(context: Dictionary) -> bool: return context.get("level","") not in ["unit", "adviser"]
 	func choose_batch(contexts: Array) -> Dictionary:
 		metrics["calls"] += contexts.size()
-		await get_tree().create_timer(delay).timeout
+		if not instant: await get_tree().create_timer(delay).timeout
 		var outputs := {}
 		for context in contexts:
 			var selected: Dictionary = context["candidates"][0]
@@ -72,6 +74,42 @@ func _run() -> void:
 	check(scheduler.queued_requests == 1 and scheduler.has_pending("army:army-0002"), "排队批次没有登记为待决")
 	await create_timer(agent.delay * 2.6).timeout
 	check(not scheduler.running and scheduler.ready.size() == 2, "排队批次没有在槽位空闲后发出")
+	# 3) 即时答案的主帅决策在提交点被采纳；提交日之前军团已撤退的，记 stale 而不是 expired。
+	# 回归：演示剧本里主帅答案几乎全记 expired，排查后是军团在提交日前整体撤退、plan_background 不再来取，
+	# begin_round 把它们当成“提交点错过”记 expired，看起来像模型答案全部作废。
+	agent.concurrency = 6
+	agent.instant = true
+	var outcomes := await _commander_outcomes(store, agent, false)
+	check(int(outcomes.get("adopted", 0)) >= 2 and not outcomes.has("expired"), "即时答案的主帅决策没有在提交点被采纳：%s" % JSON.stringify(outcomes))
+	outcomes = await _commander_outcomes(store, agent, true)
+	check(int(outcomes.get("stale", 0)) == 2 and not outcomes.has("expired") and not outcomes.has("adopted"), "提交日前撤退的军团，主帅答案没有记为 stale：%s" % JSON.stringify(outcomes))
+	store.restore_battle_test()
 	agent.queue_free()
-	print("DECISION_SCHEDULER_OK: non-blocking day_ms=%d, only commanders, boundary application, cooldown, reset cancellation, queued batch" % elapsed if failures.is_empty() else "DECISION_SCHEDULER_FAILED")
+	print("DECISION_SCHEDULER_OK: non-blocking day_ms=%d, only commanders, boundary application, cooldown, reset cancellation, queued batch, instant commander adopted, withdrawn corps stale" % elapsed if failures.is_empty() else "DECISION_SCHEDULER_FAILED")
 	quit(0 if failures.is_empty() else 1)
+
+
+## 新开一场预编成战场，走三日，返回主帅（commander）请求在决策日志里的结论计数。
+## withdraw_first：第一日提交后立刻让全部军团撤退（decision_alive 变 false），模拟提交日前军团整体撤退。
+func _commander_outcomes(store: Node, agent: Node, withdraw_first: bool) -> Dictionary:
+	var queue: Node = root.get_node("ModelQueue")
+	var path := "user://decision_scheduler_validation_%s.jsonl" % ("withdraw" if withdraw_first else "instant")
+	if FileAccess.file_exists(path): DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	var previous: String = queue.log_path()
+	queue.set_log_path(path)
+	store.prepare_battle_test(true)
+	for army in store.war.active_armies(): army["corps_task"]["issued_at"] = 0
+	await store.war.step(agent)
+	await process_frame
+	check(store.war.planner.ready.size() == 2, "即时答案没有在提交当日到达")
+	if withdraw_first:
+		for corps in store.war.state["corps"].values(): corps["withdrawing"] = true
+	for day in 2: await store.war.step(agent)
+	queue.flush_log()
+	queue.set_log_path(previous)
+	var outcomes := {}
+	for line in FileAccess.get_file_as_string(path).split("\n", false):
+		var entry: Variant = JSON.parse_string(line)
+		if entry is Dictionary and entry.get("kind", "") == "commander":
+			outcomes[entry["outcome"]] = int(outcomes.get(entry["outcome"], 0)) + 1
+	return outcomes

@@ -970,6 +970,34 @@ func _observed_contact(army: Dictionary) -> Dictionary:
 	return {"adjacent_enemies": adjacent, "engaged_by": engaged, "flanked": flanked, "attackers": attackers, "covered_by": cover, "required_preparation": preparation}
 
 
+## 本军的威胁范围：所在城（在通路上时取通路两端）及其相邻一跳，加上从这里去往目标（撤退时是归途）的路线。
+## 只用于危险度：情报（intel.enemies、context.enemies）仍是全图敌军，模型、界面和其它系统照旧可见；
+## 远在范围外的敌军不会让刚出发的军团因为「全图敌军加起来比我多」而撤退。
+func threat_scope(army: Dictionary) -> Dictionary:
+	var location: Dictionary = army["location"]
+	var anchors: Array = [str(location["node"])]
+	if str(location.get("edge", "")) != "": anchors = [str(location.get("from", location["node"])), str(location.get("to", location["node"]))]
+	var scope := {}
+	for anchor in anchors:
+		for node in graph.visible_nodes(str(anchor), 1): scope[node] = true
+	var target: String = str(army["home"] if bool(army["returning"]) else army["target"])
+	for node in route(str(army["faction"]), str(anchors[-1]), target).get("nodes", []): scope[node] = true
+	return scope
+
+
+## 敌军情报所在地点（在通路上时取通路任一端）落在威胁范围内，返回 id 列表（排序，存档重放一致）。
+## 到站后 location 里还留着上一段的 from/to，所以只有 edge 非空时才看两端。
+static func threat_ids(scope: Dictionary, sights: Array) -> Array:
+	var ids: Array = []
+	for sight in sights:
+		var seen: Dictionary = sight["location"]
+		var ends: Array = [str(seen.get("node", ""))]
+		if str(seen.get("edge", "")) != "": ends.append_array([str(seen.get("from", "")), str(seen.get("to", ""))])
+		if ends.any(func(node): return scope.has(node)): ids.append(str(sight["id"]))
+	ids.sort()
+	return ids
+
+
 func context_for(army: Dictionary) -> Dictionary:
 	var target: String = str(army["home"] if bool(army["returning"]) else army["target"])
 	var location: Dictionary = army["location"]
@@ -1053,7 +1081,7 @@ func context_for(army: Dictionary) -> Dictionary:
 	# Decision snapshots need geometry, not the growing authoritative battle ledger.
 	local_map.erase("log")
 	local_map.erase("pending_events")
-	return {"request_id": "%s:%d" % [army["id"], int(state["tick"])], "army_id": army["id"], "observation_revision": state["tick"], "date": store.date_text(), "officer": roster.officers.get(str(army["officer_id"]), {"id": str(army["officer_id"]), "name": str(army.get("name", "")), "skills": army.get("skills", {}), "personality": {}, "battle_traits": army.get("battle_traits", [])}).duplicate(true), "army": own, "mission_type": army["mission_type"], "objective": graph.name_of(target), "at_objective": str(location["node"]) == target and str(location.get("edge", "")) == "", "supply_enabled": supply_enabled(), "returning": army["returning"], "target_known": army["intel"]["cities"].has(target), "cities": known_cities, "enemies": known_enemies, "allies": support["allies"], "battlefield": support["battlefield"], "operation": operation.duplicate(true), "orders": orders.duplicate(true), "local_map": local_map.duplicate(true), "current_action": army["action"].duplicate(true), "memory": army["memory"].duplicate(true), "experience": Experience.summary(army), "candidates": candidates}
+	return {"request_id": "%s:%d" % [army["id"], int(state["tick"])], "army_id": army["id"], "observation_revision": state["tick"], "date": store.date_text(), "officer": roster.officers.get(str(army["officer_id"]), {"id": str(army["officer_id"]), "name": str(army.get("name", "")), "skills": army.get("skills", {}), "personality": {}, "battle_traits": army.get("battle_traits", [])}).duplicate(true), "army": own, "mission_type": army["mission_type"], "objective": graph.name_of(target), "at_objective": str(location["node"]) == target and str(location.get("edge", "")) == "", "supply_enabled": supply_enabled(), "returning": army["returning"], "target_known": army["intel"]["cities"].has(target), "cities": known_cities, "enemies": known_enemies, "threat_enemy_ids": threat_ids(threat_scope(army), known_enemies), "allies": support["allies"], "battlefield": support["battlefield"], "operation": operation.duplicate(true), "orders": orders.duplicate(true), "local_map": local_map.duplicate(true), "current_action": army["action"].duplicate(true), "memory": army["memory"].duplicate(true), "experience": Experience.summary(army), "candidates": candidates}
 
 
 func _add_candidate(list: Array, id: String, action: Dictionary, description: String, extra: Dictionary = {}) -> void:

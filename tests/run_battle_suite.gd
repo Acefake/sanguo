@@ -59,6 +59,7 @@ const SUITE := [
 	"war/campaign/war_validation",
 	"war/campaign/retreat_route_replay_validation",
 	"war/campaign/war_month_performance_validation",
+	"war/campaign/corps_departure_validation",
 	"agents/agent_settings_validation",
 	# 场景与界面
 	"war/battle/battle_scenarios_validation",

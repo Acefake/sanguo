@@ -346,10 +346,13 @@ static func commander_context(war, corps: Dictionary) -> Dictionary:
 	var enemy_list: Array = known_enemies.values()
 	enemy_list.sort_custom(func(a, b): return str(a["id"]) < str(b["id"]))
 	context["enemies"] = enemy_list
+	# 全军的敌情是各部情报的并集；危险度与「兵力劣势」只计主帅威胁范围内的敌军（见 campaign_state.threat_scope）。
+	context["threat_enemy_ids"] = war.threat_ids(war.threat_scope(root), enemy_list)
 	context["army"]["strength"] = context["corps"]["strength"]
 	context["allies"] = []
 	var enemy_strength := 0
 	for enemy in context["enemies"]:
+		if not context["threat_enemy_ids"].has(str(enemy["id"])): continue
 		if not enemy.get("routing", false) and int(war.state["tick"]) - int(enemy["observed_at"]) <= 3: enemy_strength += int(enemy["strength_estimate"])
 	var ready := 0
 	for unit in context["corps"]["units"]:
@@ -600,6 +603,9 @@ static func issue(war, corps: Dictionary, action: Dictionary, reason: String) ->
 			for field in ["flank_goal", "flank_target", "flank_ready", "pursuit_origin", "target_until", "previous_cell", "previous_goal"]: assigned["tactical"].erase(field)
 	if kind == "withdraw_corps":
 		if not war.orders_for(war.state["armies"][corps["root_id"]])["retreat"]: return {"ok": false, "message": "军令禁止自主撤退"}
+		if not_departed(war, corps):
+			cancel_departure(war, corps)
+			return {"ok": true}
 		var guards: Array = corps["units"].filter(func(id):
 			var unit: Dictionary = war.state["armies"][id]
 			return id != corps["root_id"] and unit["status"] != "ended" and not unit["returning"] and unit.has("tactical") and unit["organization"] >= 35 and unit["morale"] >= 35
@@ -722,6 +728,9 @@ static func update(war) -> void:
 						for candidate in context["candidates"]:
 							if candidate["action"]["type"] == "besiege": candidate["defender_ratio"] = float(root["intel"]["cities"].get(root["target"], {}).get("strength_estimate", 0)) / maxf(context["army"]["strength"], 1)
 						var legal: Dictionary = war.validate_decision(context, war.Policy.choose(context))
+						if legal.get("ok", false) and str(legal["action"].get("type", "")) == "withdraw" and not_departed(war, corps):
+							cancel_departure(war, corps)
+							break
 						if legal.get("ok", false): war._execute(root, legal["action"])
 					elif unit["location"]["edge"] != "": unit["action"] = {"type": "continue"}
 					elif root["location"]["edge"] != "" and unit["location"]["node"] == root["location"]["from"]:
@@ -800,6 +809,34 @@ static func merge(war, corps: Dictionary, child: Dictionary, root: Dictionary) -
 	war.state["officer_states"][child["officer_id"]] = {"status": "deployed", "army_id": root["id"], "corps_id": corps["id"], "duel_wounded": child.get("duel_wounded", false)}
 	corps["units"].erase(child["id"])
 	preload("res://scripts/war/campaign/officer_fate.gd").restore(war)
+
+
+## 军团还没启程：出发城仍是本方，所有在役部队都在出发城里（不在通路上、未入战场）。
+static func not_departed(war, corps: Dictionary) -> bool:
+	var root: Dictionary = war.state["armies"][corps["root_id"]]
+	var home := str(root["home"])
+	if str(war.store.city_state(home).get("faction", "")) != str(corps["faction"]): return false
+	for id in corps["units"]:
+		var unit: Dictionary = war.state["armies"][id]
+		if unit["status"] == "ended": continue
+		if unit.has("tactical") or str(unit["location"].get("edge", "")) != "" or str(unit["location"]["node"]) != home: return false
+	return true
+
+
+## 尚未启程的军团撤退（中军按敌情撤退，或主帅/主公下达全军撤退）= 取消出征：全军就地回城，军团结束。
+## 不能当作中军单独撤退：那样中军在本城立即结束，succeed() 让下一分队接任，同一日又按同样敌情撤退，
+## 一个接一个直到全军结束（见 docs/validation/演示军团当日撤退-诊断.md）。
+## 先结束各分队、最后结束中军：中军仍在役时 on_finish 不会改任主帅；中军结束时军团收尾、武将解除出征。
+static func cancel_departure(war, corps: Dictionary) -> void:
+	var root: Dictionary = war.state["armies"][corps["root_id"]]
+	var strength := 0
+	for id in corps["units"]:
+		if war.state["armies"][id]["status"] != "ended": strength += Combat.strength(war.state["armies"][id])
+	root["last_reason"] = "敌势过强，尚未启程即取消出征。"
+	war._report(root, "取消出征", "%s判断敌势过强，尚未启程即取消出征，全军%d人回%s。" % [corps["name"], strength, war.graph.name_of(str(root["home"]))], true)
+	for id in corps["units"].duplicate():
+		if id != root["id"] and war.state["armies"][id]["status"] != "ended": war._finish(war.state["armies"][id], "取消出征")
+	war._finish(root, "取消出征")
 
 
 static func succeed(war, corps: Dictionary) -> void:

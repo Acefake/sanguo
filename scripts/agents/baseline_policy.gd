@@ -179,17 +179,24 @@ static func risk_of(context: Dictionary, personality: Dictionary) -> float:
 	return value
 
 
+## 危险度：威胁范围内敌军相对本军的兵力比（取最大单支与合计中较大者），在战场上再与战场敌我比取大。
+## 只计 context.threat_enemy_ids 列出的敌军（同城、相邻一跳、去目标的路线上，见 campaign_state.threat_scope）；
+## 没有这个键的上下文（手工构造的测试上下文、旧决策快照）按全部已知敌军计算。
 static func danger_of(context: Dictionary) -> float:
 	var strength := maxf(float(context.get("army", {}).get("strength", 0)), 1.0)
 	var worst := 0.0
 	var total := 0.0
+	var scoped: bool = context.has("threat_enemy_ids")
+	var threats: Array = context.get("threat_enemy_ids", [])
 	for enemy in context.get("enemies", []):
+		if scoped and not threats.has(str(enemy.get("id", ""))): continue
 		var estimate := float(enemy.get("strength_estimate", 0))
 		worst = maxf(worst, estimate / strength)
 		total += estimate
-	# Take the worse of "biggest single enemy" and "everything we know about". Reading
+	# Take the worse of "biggest single enemy" and "every threatening enemy". Reading
 	# only the battlefield ratio let danger fall to 0 whenever no enemy was within the
-	# scouting radius, which disabled the withdraw threshold entirely.
+	# scouting radius, which disabled the withdraw threshold entirely; counting the whole
+	# map instead made every new corps withdraw on its dispatch day.
 	var danger := maxf(worst, total / strength)
 	if context.has("battlefield"): danger = maxf(danger, float(context["battlefield"].get("enemy_to_friendly_ratio", 0.0)))
 	return danger
